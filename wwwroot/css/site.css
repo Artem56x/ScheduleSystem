@@ -1,0 +1,347 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: #1d1d1f;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(120, 170, 255, 0.22),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(190, 150, 255, 0.18),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #f5f7fb 0%,
+            #eef1f7 50%,
+            #f8f9fc 100%
+        );
+
+    background-attachment: fixed;
+}
+
+
+/* =========================
+   BACKGROUND
+   ========================= */
+
+.background-orb {
+    position: fixed;
+    border-radius: 50%;
+
+    filter: blur(80px);
+
+    pointer-events: none;
+    z-index: -1;
+}
+
+.orb-1 {
+    width: 300px;
+    height: 300px;
+
+    top: 100px;
+    left: -100px;
+
+    background: rgba(100, 160, 255, 0.12);
+}
+
+.orb-2 {
+    width: 350px;
+    height: 350px;
+
+    top: 400px;
+    right: -120px;
+
+    background: rgba(180, 120, 255, 0.10);
+}
+
+
+/* =========================
+   NAVBAR
+   ========================= */
+
+.glass-navbar {
+    position: sticky;
+    top: 15px;
+
+    z-index: 1000;
+
+    margin: 15px auto 30px;
+
+    width: calc(100% - 30px);
+
+    border: 1px solid rgba(255, 255, 255, 0.65);
+
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.58);
+
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.glass-navbar .navbar {
+    min-height: 70px;
+}
+
+
+/* =========================
+   BRAND
+   ========================= */
+
+.navbar-brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: #111 !important;
+
+    letter-spacing: -0.3px;
+}
+
+.brand-icon {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 11px;
+
+    color: white;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    background: linear-gradient(
+        135deg,
+        #007aff,
+        #5856d6
+    );
+
+    box-shadow:
+        0 5px 15px rgba(0, 122, 255, 0.25);
+}
+
+
+/* =========================
+   NAV LINKS
+   ========================= */
+
+.nav-link {
+    position: relative;
+
+    padding: 10px 14px !important;
+
+    border-radius: 12px;
+
+    color: #555 !important;
+
+    font-size: 0.95rem;
+    font-weight: 500;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #111 !important;
+
+    background: rgba(255, 255, 255, 0.65);
+
+    transform: translateY(-1px);
+}
+
+.nav-link.active {
+    color: #007aff !important;
+
+    background: rgba(0, 122, 255, 0.09);
+}
+
+
+/* =========================
+   MOBILE MENU
+   ========================= */
+
+.glass-button {
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+
+    border-radius: 12px !important;
+
+    background: rgba(255, 255, 255, 0.5);
+
+    backdrop-filter: blur(15px);
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+
+/* =========================
+   MAIN
+   ========================= */
+
+.main-content {
+    width: 100%;
+
+    min-height: calc(100vh - 160px);
+
+    padding: 10px 20px 50px;
+}
+
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.glass-footer {
+    margin: 20px auto;
+
+    width: calc(100% - 30px);
+
+    padding: 20px;
+
+    border: 1px solid rgba(255, 255, 255, 0.55);
+
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.4);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    color: #777;
+
+    font-size: 0.85rem;
+}
+
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+.btn {
+    border-radius: 12px;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   FORMS
+   ========================= */
+
+.form-control,
+.form-select {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, 0.7);
+
+    backdrop-filter: blur(10px);
+
+    padding: 10px 13px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: rgba(0, 122, 255, 0.45);
+
+    box-shadow:
+        0 0 0 4px rgba(0, 122, 255, 0.08);
+}
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 991px) {
+
+    .glass-navbar {
+        top: 8px;
+
+        margin-top: 8px;
+    }
+
+    .navbar-collapse {
+        margin-top: 10px;
+
+        padding: 10px;
+
+        border-radius: 16px;
+
+        background: rgba(255, 255, 255, 0.45);
+
+        backdrop-filter: blur(20px);
+    }
+
+    .nav-link {
+        margin-bottom: 3px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .glass-navbar {
+        width: calc(100% - 16px);
+
+        border-radius: 18px;
+    }
+
+    .main-content {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .glass-footer {
+        width: calc(100% - 16px);
+    }
+}

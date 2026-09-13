@@ -1,0 +1,1785 @@
+@model IEnumerable<ScheduleSystem.Models.Schedule>
+
+@{
+    ViewData["Title"] = "Расписание";
+
+    var schedules = Model
+        .OrderBy(s => s.DayOfWeek == DayOfWeek.Sunday ? 7 : (int?)s.DayOfWeek)
+        .ThenBy(s => s.StartTime)
+        .ToList();
+
+    var dayNames = new Dictionary<DayOfWeek, string>
+    {
+        { DayOfWeek.Monday, "Понедельник" },
+        { DayOfWeek.Tuesday, "Вторник" },
+        { DayOfWeek.Wednesday, "Среда" },
+        { DayOfWeek.Thursday, "Четверг" },
+        { DayOfWeek.Friday, "Пятница" },
+        { DayOfWeek.Saturday, "Суббота" },
+        { DayOfWeek.Sunday, "Воскресенье" }
+    };
+
+    var filterGroups = schedules
+        .Where(s => s.Group != null)
+        .GroupBy(s => s.GroupId)
+        .Select(g => g.First())
+        .OrderBy(s => s.Group!.Name)
+        .ToList();
+
+    var filterTeachers = schedules
+        .Where(s => s.Teacher != null)
+        .GroupBy(s => s.TeacherId)
+        .Select(g => g.First())
+        .OrderBy(s => s.Teacher!.FullName)
+        .ToList();
+
+    var filterSubjects = schedules
+        .Where(s => s.Subject != null)
+        .GroupBy(s => s.SubjectId)
+        .Select(g => g.First())
+        .OrderBy(s => s.Subject!.Name)
+        .ToList();
+
+    var filterClassrooms = schedules
+        .Where(s => s.Classroom != null)
+        .GroupBy(s => s.ClassroomId)
+        .Select(g => g.First())
+        .OrderBy(s => s.Classroom!.Name)
+        .ToList();
+
+    string GetDayName(DayOfWeek? day)
+    {
+        if (!day.HasValue)
+            return "День не указан";
+
+        return dayNames.TryGetValue(day.Value, out var name)
+            ? name
+            : "День не указан";
+    }
+
+    string GetStartTime(ScheduleSystem.Models.Schedule schedule)
+    {
+        return schedule.StartTime?.ToString(@"hh\:mm") ?? "--:--";
+    }
+
+    string GetEndTime(ScheduleSystem.Models.Schedule schedule)
+    {
+        return schedule.EndTime?.ToString(@"hh\:mm") ?? "--:--";
+    }
+
+    string GetLessonWord(int count)
+    {
+        if (count % 10 == 1 && count % 100 != 11)
+            return "занятие";
+
+        if (count % 10 >= 2 &&
+            count % 10 <= 4 &&
+            (count % 100 < 10 || count % 100 >= 20))
+            return "занятия";
+
+        return "занятий";
+    }
+}
+
+<div class="schedule-page">
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <div class="schedule-header">
+        <div>
+            <div class="schedule-kicker">СИСТЕМА РАСПИСАНИЯ</div>
+
+            <h1>Расписание</h1>
+
+            <p>
+                Просмотр и управление расписанием занятий
+            </p>
+        </div>
+
+        <a asp-action="Create" class="add-lesson-button">
+            <span class="button-icon">+</span>
+            <span>Добавить занятие</span>
+        </a>
+    </div>
+
+
+    <!-- =========================================================
+         STATS
+         ========================================================= -->
+
+    <div class="schedule-stats">
+
+        <a asp-controller="Teachers" asp-action="Index" class="stat-card">
+
+            <div class="stat-icon">👨‍🏫</div>
+
+            <div>
+                <span class="stat-label">Преподаватели</span>
+                <strong>@ViewBag.TeachersCount</strong>
+            </div>
+
+        </a>
+
+
+        <a asp-controller="Groups" asp-action="Index" class="stat-card">
+
+            <div class="stat-icon">👥</div>
+
+            <div>
+                <span class="stat-label">Группы</span>
+                <strong>@ViewBag.GroupsCount</strong>
+            </div>
+
+        </a>
+
+
+        <a asp-controller="Subjects" asp-action="Index" class="stat-card">
+
+            <div class="stat-icon">📚</div>
+
+            <div>
+                <span class="stat-label">Предметы</span>
+                <strong>@ViewBag.SubjectsCount</strong>
+            </div>
+
+        </a>
+
+
+        <a asp-controller="Classrooms" asp-action="Index" class="stat-card">
+
+            <div class="stat-icon">🏫</div>
+
+            <div>
+                <span class="stat-label">Аудитории</span>
+                <strong>@ViewBag.ClassroomsCount</strong>
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- =========================================================
+         SCHEDULE
+         ========================================================= -->
+
+    <section class="schedule-section">
+
+        <div class="schedule-section-header">
+
+            <div>
+                <div class="section-label">РАСПИСАНИЕ</div>
+
+                <h2>Занятия</h2>
+            </div>
+
+            <div class="total-lessons">
+                <span id="totalLessons">@schedules.Count</span>
+                <span id="totalLessonsWord">@GetLessonWord(schedules.Count)</span>
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             COMPACT FILTERS
+             ===================================================== -->
+
+        <div class="schedule-filters">
+
+            <div class="filters-main-row">
+
+                <div class="filter-search">
+
+                    <span class="filter-search-icon">⌕</span>
+
+                    <input type="text" id="scheduleSearch" placeholder="Поиск по расписанию..." autocomplete="off" />
+
+                </div>
+
+
+                <select id="filterGroup" class="schedule-filter-select">
+
+                    <option value="">Группа</option>
+
+                    @foreach (var item in filterGroups)
+                    {
+                        <option value="@item.GroupId">
+                            @item.Group!.Name
+                        </option>
+                    }
+
+                </select>
+
+
+                <select id="filterTeacher" class="schedule-filter-select">
+
+                    <option value="">Преподаватель</option>
+
+                    @foreach (var item in filterTeachers)
+                    {
+                        <option value="@item.TeacherId">
+                            @item.Teacher!.FullName
+                        </option>
+                    }
+
+                </select>
+
+
+                <select id="filterSubject" class="schedule-filter-select">
+
+                    <option value="">Предмет</option>
+
+                    @foreach (var item in filterSubjects)
+                    {
+                        <option value="@item.SubjectId">
+                            @item.Subject!.Name
+                        </option>
+                    }
+
+                </select>
+
+
+                <select id="filterClassroom" class="schedule-filter-select">
+
+                    <option value="">Аудитория</option>
+
+                    @foreach (var item in filterClassrooms)
+                    {
+                        <option value="@item.ClassroomId">
+                            @item.Classroom!.Name
+                        </option>
+                    }
+
+                </select>
+
+
+                <select id="filterDay" class="schedule-filter-select">
+
+                    <option value="">День</option>
+
+                    @foreach (var day in dayNames)
+                    {
+                        <option value="@((int)day.Key)">
+                            @day.Value
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <div class="filters-secondary-row">
+
+                <div class="time-filter">
+
+                    <span>Время</span>
+
+                    <input type="time" id="filterTimeFrom" aria-label="Время от" />
+
+                    <span class="time-dash">—</span>
+
+                    <input type="time" id="filterTimeTo" aria-label="Время до" />
+
+                </div>
+
+
+                <div class="filter-result">
+
+                    Найдено
+                    <strong id="filteredLessonsCount">
+                        @schedules.Count
+                    </strong>
+                    из
+                    <strong>@schedules.Count</strong>
+
+                </div>
+
+
+                <button type="button" id="resetFilters" class="reset-filters">
+
+                    Сбросить
+
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 COMPACT ANALYTICS
+                 ================================================= -->
+
+            <div id="filterAnalytics" class="filter-analytics">
+
+                <span class="analytics-muted">
+                    Общая нагрузка:
+                </span>
+
+                <strong id="analyticsTotal">
+                    @schedules.Count
+                </strong>
+
+                <span class="analytics-muted">
+                    @GetLessonWord(schedules.Count) в неделю
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             EMPTY STATE
+             ===================================================== -->
+
+        @if (!schedules.Any())
+        {
+            <div class="empty-schedule">
+
+                <div class="empty-icon">📅</div>
+
+                <h3>Расписание пока пустое</h3>
+
+                <p>
+                    Добавьте первое занятие, чтобы оно появилось здесь.
+                </p>
+
+                <a asp-action="Create" class="empty-button">
+                    Добавить занятие
+                </a>
+
+            </div>
+        }
+        else
+        {
+            <div id="scheduleDays">
+
+                @foreach (var dayGroup in schedules.GroupBy(s => s.DayOfWeek))
+                {
+                    var daySchedules = dayGroup
+                        .OrderBy(s => s.StartTime)
+                        .ToList();
+
+                    <div class="day-card" data-day-card="@((int?)dayGroup.Key ?? -1)">
+
+                        <div class="day-header">
+
+                            <div class="day-title">
+
+                                <span class="day-dot"></span>
+
+                                <h3>
+                                    @GetDayName(dayGroup.Key)
+                                </h3>
+
+                            </div>
+
+                            <div class="day-count">
+
+                                <span class="js-day-count">
+                                    @daySchedules.Count
+                                </span>
+
+                                <span class="js-day-word">
+                                    @GetLessonWord(daySchedules.Count)
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="lessons-list">
+
+                            @foreach (var item in daySchedules)
+                            {
+                                <article class="lesson-card" data-schedule="true" data-group-id="@item.GroupId"
+                                         data-teacher-id="@item.TeacherId" data-subject-id="@item.SubjectId"
+                                         data-classroom-id="@item.ClassroomId" data-day="@((int?)item.DayOfWeek ?? -1)"
+                                         data-start="@GetStartTime(item)" data-end="@GetEndTime(item)" data-search="
+                                    @(item.Subject?.Name)
+                                    @(item.Teacher?.FullName)
+                                    @(item.Group?.Name)
+                                    @(item.Classroom?.Name)">
+
+                                    <div class="lesson-time">
+
+                                        <strong>
+                                            @GetStartTime(item)
+                                        </strong>
+
+                                        <span>
+                                            @GetEndTime(item)
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="lesson-info">
+
+                                        <div class="lesson-subject">
+                                            @(item.Subject?.Name ?? "Предмет не указан")
+                                        </div>
+
+                                        <div class="lesson-meta">
+
+                                            <span>
+                                                👨‍🏫
+                                                @(item.Teacher?.FullName ?? "Не указан")
+                                            </span>
+
+                                            <span>
+                                                👥
+                                                @(item.Group?.Name ?? "Не указана")
+                                            </span>
+
+                                            <span>
+                                                🏫
+                                                @(item.Classroom?.Name ?? "Не указана")
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="lesson-actions">
+
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="lesson-action details">
+                                            Подробнее
+                                        </a>
+
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="lesson-action edit">
+                                            Изменить
+                                        </a>
+
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="lesson-action delete">
+                                            Удалить
+                                        </a>
+
+                                    </div>
+
+                                </article>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- =================================================
+                 NO FILTER RESULTS
+                 ================================================= -->
+
+            <div id="filterNoResults" class="filter-no-results" style="display:none;">
+
+                <div class="filter-no-results-icon">⌕</div>
+
+                <strong>Занятия не найдены</strong>
+
+                <span>
+                    Попробуйте изменить параметры поиска.
+                </span>
+
+                <button type="button" id="resetFiltersEmpty">
+                    Сбросить фильтры
+                </button>
+
+            </div>
+
+        }
+
+    </section>
+
+</div>
+
+
+<style>
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .schedule-page {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 32px 28px 60px;
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .schedule-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 28px;
+    }
+
+    .schedule-kicker,
+    .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: #6b7280;
+        margin-bottom: 6px;
+    }
+
+    .schedule-header h1 {
+        margin: 0;
+        font-size: 34px;
+        line-height: 1.15;
+        font-weight: 750;
+        letter-spacing: -0.8px;
+        color: #111827;
+    }
+
+    .schedule-header p {
+        margin: 7px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .add-lesson-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 11px 17px;
+        border-radius: 13px;
+        background: rgba(37, 99, 235, 0.95);
+        color: white;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 650;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
+        transition: 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .add-lesson-button:hover {
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
+    }
+
+    .button-icon {
+        font-size: 19px;
+        line-height: 1;
+        font-weight: 400;
+    }
+
+
+    /* =========================================================
+       STATS
+       ========================================================= */
+
+    .schedule-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 13px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 15px 17px;
+        border: 1px solid rgba(255, 255, 255, 0.75);
+        border-radius: 17px;
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 5px 22px rgba(31, 41, 55, 0.055);
+        text-decoration: none;
+        color: inherit;
+        transition: 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 9px 28px rgba(31, 41, 55, 0.08);
+    }
+
+    .stat-icon {
+        width: 39px;
+        height: 39px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: rgba(37, 99, 235, 0.08);
+        font-size: 18px;
+    }
+
+    .stat-label {
+        display: block;
+        font-size: 11px;
+        color: #6b7280;
+        margin-bottom: 2px;
+    }
+
+    .stat-card strong {
+        font-size: 19px;
+        color: #111827;
+    }
+
+
+    /* =========================================================
+       SECTION
+       ========================================================= */
+
+    .schedule-section {
+        position: relative;
+    }
+
+    .schedule-section-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 13px;
+    }
+
+    .schedule-section-header h2 {
+        margin: 0;
+        font-size: 23px;
+        font-weight: 720;
+        letter-spacing: -0.3px;
+        color: #111827;
+    }
+
+    .total-lessons {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .total-lessons span:first-child {
+        color: #111827;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       COMPACT FILTERS
+       ========================================================= */
+
+    .schedule-filters {
+        padding: 13px;
+        margin-bottom: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.68);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 5px 24px rgba(31, 41, 55, 0.045);
+    }
+
+    .filters-main-row {
+        display: grid;
+        grid-template-columns: 1.35fr repeat(5, 1fr);
+        gap: 8px;
+    }
+
+    .filter-search {
+        position: relative;
+        min-width: 0;
+    }
+
+    .filter-search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-51%);
+        color: #9ca3af;
+        font-size: 18px;
+        pointer-events: none;
+    }
+
+    .filter-search input,
+    .schedule-filter-select,
+    .time-filter input {
+        width: 100%;
+        height: 38px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.82);
+        color: #374151;
+        font-size: 12px;
+        outline: none;
+        transition: 0.18s ease;
+        box-sizing: border-box;
+    }
+
+    .filter-search input {
+        padding: 0 12px 0 34px;
+    }
+
+    .schedule-filter-select {
+        padding: 0 28px 0 11px;
+        cursor: pointer;
+    }
+
+    .filter-search input:focus,
+    .schedule-filter-select:focus,
+    .time-filter input:focus {
+        border-color: rgba(37, 99, 235, 0.4);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.07);
+    }
+
+    .filters-secondary-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    .time-filter {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .time-filter>span:first-child {
+        color: #6b7280;
+        font-size: 11px;
+        margin-right: 2px;
+    }
+
+    .time-filter input {
+        width: 105px;
+        padding: 0 8px;
+    }
+
+    .time-dash {
+        color: #9ca3af;
+        font-size: 12px;
+    }
+
+    .filter-result {
+        color: #6b7280;
+        font-size: 11px;
+        margin-left: auto;
+    }
+
+    .filter-result strong {
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .reset-filters {
+        border: 0;
+        background: transparent;
+        color: #6b7280;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 7px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.18s ease;
+    }
+
+    .reset-filters:hover {
+        color: #2563eb;
+        background: rgba(37, 99, 235, 0.06);
+    }
+
+
+    /* =========================================================
+       ANALYTICS
+       ========================================================= */
+
+    .filter-analytics {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 18px;
+        margin-top: 8px;
+        padding: 2px 3px 0;
+        font-size: 11px;
+    }
+
+    .analytics-muted {
+        color: #9ca3af;
+    }
+
+    .filter-analytics strong {
+        color: #2563eb;
+        font-weight: 700;
+    }
+
+    .analytics-item {
+        color: #374151;
+    }
+
+
+    /* =========================================================
+       DAY
+       ========================================================= */
+
+    .day-card {
+        margin-bottom: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 17px;
+        background: rgba(255, 255, 255, 0.67);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 5px 24px rgba(31, 41, 55, 0.045);
+        overflow: hidden;
+    }
+
+    .day-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 16px;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.75);
+    }
+
+    .day-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .day-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .day-title h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .day-count {
+        display: flex;
+        gap: 4px;
+        color: #9ca3af;
+        font-size: 10px;
+    }
+
+    .day-count span:first-child {
+        color: #6b7280;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       LESSON
+       ========================================================= */
+
+    .lessons-list {
+        padding: 5px 8px 8px;
+    }
+
+    .lesson-card {
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 9px;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.62);
+        transition: 0.18s ease;
+    }
+
+    .lesson-card:last-child {
+        border-bottom: 0;
+    }
+
+    .lesson-card:hover {
+        background: rgba(248, 250, 252, 0.7);
+        border-radius: 11px;
+    }
+
+    .lesson-card.is-filter-hidden {
+        display: none;
+    }
+
+    .lesson-time {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        padding-left: 2px;
+    }
+
+    .lesson-time strong {
+        font-size: 15px;
+        color: #111827;
+        letter-spacing: -0.2px;
+    }
+
+    .lesson-time span {
+        color: #9ca3af;
+        font-size: 11px;
+    }
+
+    .lesson-info {
+        min-width: 0;
+    }
+
+    .lesson-subject {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #111827;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .lesson-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px 13px;
+        margin-top: 4px;
+        color: #6b7280;
+        font-size: 10px;
+    }
+
+    .lesson-meta span {
+        white-space: nowrap;
+    }
+
+    .lesson-actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .lesson-action {
+        padding: 6px 8px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: 600;
+        transition: 0.18s ease;
+    }
+
+    .lesson-action.details {
+        color: #2563eb;
+        background: rgba(37, 99, 235, 0.06);
+    }
+
+    .lesson-action.edit {
+        color: #4b5563;
+        background: rgba(107, 114, 128, 0.07);
+    }
+
+    .lesson-action.delete {
+        color: #dc2626;
+        background: rgba(220, 38, 38, 0.05);
+    }
+
+    .lesson-action:hover {
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+       EMPTY
+       ========================================================= */
+
+    .empty-schedule {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 260px;
+        padding: 35px;
+        border: 1px dashed #d1d5db;
+        border-radius: 17px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.45);
+    }
+
+    .empty-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .empty-schedule h3 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 16px;
+    }
+
+    .empty-schedule p {
+        margin: 7px 0 18px;
+        color: #9ca3af;
+        font-size: 12px;
+    }
+
+    .empty-button {
+        padding: 9px 14px;
+        border-radius: 10px;
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 650;
+    }
+
+
+    /* =========================================================
+       FILTER NO RESULTS
+       ========================================================= */
+
+    .filter-no-results {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-height: 190px;
+        padding: 30px;
+        border: 1px dashed #d1d5db;
+        border-radius: 17px;
+        background: rgba(255, 255, 255, 0.45);
+        text-align: center;
+    }
+
+    .filter-no-results-icon {
+        margin-bottom: 5px;
+        color: #9ca3af;
+        font-size: 28px;
+    }
+
+    .filter-no-results strong {
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .filter-no-results span {
+        color: #9ca3af;
+        font-size: 11px;
+    }
+
+    .filter-no-results button {
+        margin-top: 9px;
+        padding: 7px 11px;
+        border: 0;
+        border-radius: 8px;
+        background: rgba(37, 99, 235, 0.08);
+        color: #2563eb;
+        font-size: 11px;
+        font-weight: 650;
+        cursor: pointer;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @@media (max-width: 1100px) {
+
+        .filters-main-row {
+            grid-template-columns: 1.3fr repeat(3, 1fr);
+        }
+
+        .filter-search {
+            grid-column: span 2;
+        }
+
+        .schedule-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+
+    @@media (max-width: 800px) {
+
+        .schedule-page {
+            padding: 22px 16px 45px;
+        }
+
+        .schedule-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .add-lesson-button {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .filters-main-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-search {
+            grid-column: span 2;
+        }
+
+        .filters-secondary-row {
+            flex-wrap: wrap;
+        }
+
+        .filter-result {
+            margin-left: 0;
+        }
+
+        .lesson-card {
+            grid-template-columns: 65px minmax(0, 1fr);
+            gap: 10px;
+        }
+
+        .lesson-actions {
+            grid-column: 2;
+            justify-content: flex-start;
+        }
+
+    }
+
+
+    @@media (max-width: 520px) {
+
+        .schedule-header h1 {
+            font-size: 28px;
+        }
+
+        .schedule-stats {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .stat-card {
+            padding: 12px;
+        }
+
+        .stat-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 15px;
+        }
+
+        .stat-label {
+            font-size: 9px;
+        }
+
+        .stat-card strong {
+            font-size: 16px;
+        }
+
+        .filters-main-row {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-search {
+            grid-column: auto;
+        }
+
+        .filters-secondary-row {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .filter-result {
+            margin-left: 0;
+        }
+
+        .time-filter {
+            width: 100%;
+        }
+
+        .time-filter input {
+            flex: 1;
+            width: auto;
+        }
+
+        .reset-filters {
+            padding-left: 0;
+        }
+
+        .lesson-meta {
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .lesson-actions {
+            flex-wrap: wrap;
+        }
+
+        .lesson-action {
+            font-size: 9px;
+        }
+
+    }
+
+
+    @@media (prefers-reduced-motion: reduce) {
+
+        .stat-card,
+        .add-lesson-button,
+        .lesson-card,
+        .lesson-action {
+            transition: none;
+        }
+
+    }
+</style>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("scheduleSearch");
+
+        const groupFilter =
+            document.getElementById("filterGroup");
+
+        const teacherFilter =
+            document.getElementById("filterTeacher");
+
+        const subjectFilter =
+            document.getElementById("filterSubject");
+
+        const classroomFilter =
+            document.getElementById("filterClassroom");
+
+        const dayFilter =
+            document.getElementById("filterDay");
+
+        const timeFromFilter =
+            document.getElementById("filterTimeFrom");
+
+        const timeToFilter =
+            document.getElementById("filterTimeTo");
+
+        const resetButton =
+            document.getElementById("resetFilters");
+
+        const resetEmptyButton =
+            document.getElementById("resetFiltersEmpty");
+
+        const lessonCards =
+            Array.from(
+                document.querySelectorAll(
+                    ".lesson-card[data-schedule='true']"
+                )
+            );
+
+        const dayCards =
+            Array.from(
+                document.querySelectorAll(".day-card")
+            );
+
+        const totalLessons =
+            lessonCards.length;
+
+        const totalLessonsElement =
+            document.getElementById("totalLessons");
+
+        const totalLessonsWordElement =
+            document.getElementById("totalLessonsWord");
+
+        const filteredLessonsCount =
+            document.getElementById("filteredLessonsCount");
+
+        const analyticsTotal =
+            document.getElementById("analyticsTotal");
+
+        const analyticsElement =
+            document.getElementById("filterAnalytics");
+
+        const noResults =
+            document.getElementById("filterNoResults");
+
+
+        function getLessonWord(count) {
+
+            if (count % 10 === 1 &&
+                count % 100 !== 11) {
+
+                return "занятие";
+            }
+
+            if (count % 10 >= 2 &&
+                count % 10 <= 4 &&
+                (count % 100 < 10 ||
+                    count % 100 >= 20)) {
+
+                return "занятия";
+            }
+
+            return "занятий";
+        }
+
+
+        function timeToMinutes(value) {
+
+            if (!value)
+                return null;
+
+            const parts = value.split(":");
+
+            if (parts.length < 2)
+                return null;
+
+            return (
+                parseInt(parts[0], 10) * 60 +
+                parseInt(parts[1], 10)
+            );
+        }
+
+
+        function normalize(value) {
+
+            return (value || "")
+                .toLowerCase()
+                .replace(/ё/g, "е")
+                .trim();
+        }
+
+
+        function matchesSearch(card) {
+
+            const query =
+                normalize(searchInput?.value);
+
+            if (!query)
+                return true;
+
+            const text =
+                normalize(card.dataset.search);
+
+            return text.includes(query);
+        }
+
+
+        function matchesTime(card) {
+
+            const from =
+                timeToMinutes(timeFromFilter?.value);
+
+            const to =
+                timeToMinutes(timeToFilter?.value);
+
+            const start =
+                timeToMinutes(card.dataset.start);
+
+            const end =
+                timeToMinutes(card.dataset.end);
+
+            if (start === null || end === null)
+                return true;
+
+            if (from !== null && to !== null) {
+
+                if (to <= from)
+                    return true;
+
+                return (
+                    start < to &&
+                    end > from
+                );
+            }
+
+            if (from !== null)
+                return end > from;
+
+            if (to !== null)
+                return start < to;
+
+            return true;
+        }
+
+
+        function matchesCard(card) {
+
+            if (
+                groupFilter.value &&
+                card.dataset.groupId !== groupFilter.value
+            ) {
+                return false;
+            }
+
+            if (
+                teacherFilter.value &&
+                card.dataset.teacherId !== teacherFilter.value
+            ) {
+                return false;
+            }
+
+            if (
+                subjectFilter.value &&
+                card.dataset.subjectId !== subjectFilter.value
+            ) {
+                return false;
+            }
+
+            if (
+                classroomFilter.value &&
+                card.dataset.classroomId !== classroomFilter.value
+            ) {
+                return false;
+            }
+
+            if (
+                dayFilter.value &&
+                card.dataset.day !== dayFilter.value
+            ) {
+                return false;
+            }
+
+            if (!matchesSearch(card))
+                return false;
+
+            if (!matchesTime(card))
+                return false;
+
+            return true;
+        }
+
+
+        function updateDayCards() {
+
+            dayCards.forEach(dayCard => {
+
+                const lessons =
+                    Array.from(
+                        dayCard.querySelectorAll(
+                            ".lesson-card[data-schedule='true']"
+                        )
+                    );
+
+                const visibleLessons =
+                    lessons.filter(
+                        lesson =>
+                            !lesson.classList.contains(
+                                "is-filter-hidden"
+                            )
+                    );
+
+                const count =
+                    visibleLessons.length;
+
+                dayCard.style.display =
+                    count > 0 ? "" : "none";
+
+                const countElement =
+                    dayCard.querySelector(
+                        ".js-day-count"
+                    );
+
+                const wordElement =
+                    dayCard.querySelector(
+                        ".js-day-word"
+                    );
+
+                if (countElement)
+                    countElement.textContent = count;
+
+                if (wordElement)
+                    wordElement.textContent =
+                        getLessonWord(count);
+
+            });
+
+        }
+
+
+        function getSelectedText(select) {
+
+            if (!select || !select.value)
+                return null;
+
+            const option =
+                select.options[select.selectedIndex];
+
+            return option
+                ? option.textContent.trim()
+                : null;
+        }
+
+
+        function countLessonsBy(
+            attribute,
+            value
+        ) {
+
+            return lessonCards.filter(
+                card =>
+                    card.dataset[attribute] === value
+            ).length;
+
+        }
+
+
+        function updateAnalytics() {
+
+            const visibleLessons =
+                lessonCards.filter(
+                    card =>
+                        !card.classList.contains(
+                            "is-filter-hidden"
+                        )
+                );
+
+            const visibleCount =
+                visibleLessons.length;
+
+            filteredLessonsCount.textContent =
+                visibleCount;
+
+            analyticsTotal.textContent =
+                visibleCount;
+
+
+            /*
+             * Аналитика выбранных сущностей.
+             * Здесь считаются все занятия за неделю
+             * выбранной группы / преподавателя /
+             * предмета / аудитории, независимо
+             * от остальных фильтров.
+             */
+
+            const analyticsParts = [];
+
+
+            if (groupFilter.value) {
+
+                const name =
+                    getSelectedText(groupFilter);
+
+                const count =
+                    countLessonsBy(
+                        "groupId",
+                        groupFilter.value
+                    );
+
+                analyticsParts.push(
+                    `<span class="analytics-item">
+                        Группа «${name}» —
+                        <strong>${count}</strong>
+                        ${getLessonWord(count)} в неделю
+                    </span>`
+                );
+            }
+
+
+            if (teacherFilter.value) {
+
+                const name =
+                    getSelectedText(teacherFilter);
+
+                const count =
+                    countLessonsBy(
+                        "teacherId",
+                        teacherFilter.value
+                    );
+
+                analyticsParts.push(
+                    `<span class="analytics-item">
+                        ${name} —
+                        <strong>${count}</strong>
+                        ${getLessonWord(count)} в неделю
+                    </span>`
+                );
+            }
+
+
+            if (subjectFilter.value) {
+
+                const name =
+                    getSelectedText(subjectFilter);
+
+                const count =
+                    countLessonsBy(
+                        "subjectId",
+                        subjectFilter.value
+                    );
+
+                analyticsParts.push(
+                    `<span class="analytics-item">
+                        «${name}» —
+                        <strong>${count}</strong>
+                        ${getLessonWord(count)} в неделю
+                    </span>`
+                );
+            }
+
+
+            if (classroomFilter.value) {
+
+                const name =
+                    getSelectedText(classroomFilter);
+
+                const count =
+                    countLessonsBy(
+                        "classroomId",
+                        classroomFilter.value
+                    );
+
+                analyticsParts.push(
+                    `<span class="analytics-item">
+                        Аудитория «${name}» —
+                        <strong>${count}</strong>
+                        ${getLessonWord(count)} в неделю
+                    </span>`
+                );
+            }
+
+
+            if (analyticsParts.length > 0) {
+
+                analyticsElement.innerHTML =
+                    analyticsParts.join(
+                        '<span class="analytics-muted"> · </span>'
+                    );
+
+            }
+            else {
+
+                analyticsElement.innerHTML = `
+                    <span class="analytics-muted">
+                        Общая нагрузка:
+                    </span>
+
+                    <strong>${visibleCount}</strong>
+
+                    <span class="analytics-muted">
+                        ${getLessonWord(visibleCount)} в неделю
+                    </span>
+                `;
+            }
+
+        }
+
+
+        function updateTotal() {
+
+            const visibleCount =
+                lessonCards.filter(
+                    card =>
+                        !card.classList.contains(
+                            "is-filter-hidden"
+                        )
+                ).length;
+
+            totalLessonsElement.textContent =
+                visibleCount;
+
+            totalLessonsWordElement.textContent =
+                getLessonWord(visibleCount);
+
+        }
+
+
+        function applyFilters() {
+
+            let visibleCount = 0;
+
+            lessonCards.forEach(card => {
+
+                const match =
+                    matchesCard(card);
+
+                card.classList.toggle(
+                    "is-filter-hidden",
+                    !match
+                );
+
+                if (match)
+                    visibleCount++;
+
+            });
+
+
+            updateDayCards();
+            updateTotal();
+            updateAnalytics();
+
+
+            if (noResults) {
+
+                noResults.style.display =
+                    visibleCount === 0
+                        ? "flex"
+                        : "none";
+
+            }
+
+        }
+
+
+        function resetFilters() {
+
+            searchInput.value = "";
+
+            groupFilter.value = "";
+            teacherFilter.value = "";
+            subjectFilter.value = "";
+            classroomFilter.value = "";
+            dayFilter.value = "";
+
+            timeFromFilter.value = "";
+            timeToFilter.value = "";
+
+            applyFilters();
+
+        }
+
+
+        [
+            searchInput,
+            groupFilter,
+            teacherFilter,
+            subjectFilter,
+            classroomFilter,
+            dayFilter,
+            timeFromFilter,
+            timeToFilter
+        ].forEach(element => {
+
+            if (!element)
+                return;
+
+            element.addEventListener(
+                "input",
+                applyFilters
+            );
+
+            element.addEventListener(
+                "change",
+                applyFilters
+            );
+
+        });
+
+
+        resetButton?.addEventListener(
+            "click",
+            resetFilters
+        );
+
+        resetEmptyButton?.addEventListener(
+            "click",
+            resetFilters
+        );
+
+
+        applyFilters();
+
+    });
+
+</script>
+

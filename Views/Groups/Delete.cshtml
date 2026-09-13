@@ -1,0 +1,603 @@
+@model ScheduleSystem.Models.Group
+
+@{
+    ViewData["Title"] = "Удаление группы";
+}
+
+<div class="delete-page">
+
+    <!-- Заголовок -->
+    <div class="delete-header">
+
+        <div class="delete-icon">
+            ⚠️
+        </div>
+
+        <div>
+            <h1>Удаление группы</h1>
+            <p>Вы действительно хотите удалить эту группу?</p>
+        </div>
+
+    </div>
+
+    <!-- Карточка -->
+    <div class="glass-delete-card">
+
+        <!-- Информация о группе -->
+        <div class="group-info">
+
+            <div class="group-avatar">
+                @(string.IsNullOrWhiteSpace(Model.Name)
+                    ? "?"
+                    : Model.Name.Substring(0, 1).ToUpper())
+            </div>
+
+            <div class="group-details">
+
+                <h2>
+                    @Model.Name
+                </h2>
+
+                <div class="group-specialty">
+                    @if (!string.IsNullOrWhiteSpace(Model.Specialty))
+                    {
+                        @Model.Specialty
+                    }
+                    else
+                    {
+                        <span>Специальность не указана</span>
+                    }
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Данные группы -->
+        <div class="group-stats">
+
+            <div class="stat-item">
+
+                <div class="stat-icon">
+                    🎓
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Специальность
+                    </span>
+
+                    <strong>
+                        @(string.IsNullOrWhiteSpace(Model.Specialty)
+                            ? "Не указана"
+                            : Model.Specialty)
+                    </strong>
+                </div>
+
+            </div>
+
+            <div class="stat-item">
+
+                <div class="stat-icon">
+                    👥
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Количество человек
+                    </span>
+
+                    <strong>
+                        @Model.StudentCount чел.
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Описание -->
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="description-block">
+
+                <span class="description-label">
+                    Описание
+                </span>
+
+                <p>
+                    @Model.Description
+                </p>
+
+            </div>
+        }
+
+        <!-- Предупреждение -->
+        <div class="warning-message">
+
+            <span class="warning-icon">
+                ⚠
+            </span>
+
+            <div>
+
+                <strong>
+                    Внимание
+                </strong>
+
+                <p>
+                    После удаления восстановить данные группы
+                    будет невозможно.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Кнопки -->
+        <form asp-action="Delete" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="delete-actions">
+
+                <button type="submit" class="delete-btn">
+                    Удалить группу
+                </button>
+
+                <a asp-action="Index" class="cancel-btn">
+                    Отмена
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+    /* =========================
+       Страница
+       ========================= */
+
+    .delete-page {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    /* =========================
+       Заголовок
+       ========================= */
+
+    .delete-header {
+        display: flex;
+        align-items: center;
+
+        gap: 15px;
+
+        margin-bottom: 25px;
+    }
+
+    .delete-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 52px;
+        height: 52px;
+
+        flex-shrink: 0;
+
+        border-radius: 16px;
+
+        background:
+            rgba(255, 255, 255, 0.55);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.7);
+
+        backdrop-filter:
+            blur(15px);
+
+        -webkit-backdrop-filter:
+            blur(15px);
+
+        font-size: 24px;
+
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .delete-header h1 {
+        margin: 0 0 5px;
+
+        font-size: 2rem;
+        font-weight: 700;
+
+        letter-spacing: -0.5px;
+    }
+
+    .delete-header p {
+        margin: 0;
+
+        color: #6c757d;
+    }
+
+    /* =========================
+       Glass карточка
+       ========================= */
+
+    .glass-delete-card {
+        padding: 30px;
+
+        border:
+            1px solid rgba(255, 255, 255, 0.7);
+
+        border-radius: 22px;
+
+        background:
+            rgba(255, 255, 255, 0.55);
+
+        backdrop-filter:
+            blur(25px) saturate(160%);
+
+        -webkit-backdrop-filter:
+            blur(25px) saturate(160%);
+
+        box-shadow:
+            0 15px 40px rgba(0, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    /* =========================
+       Информация о группе
+       ========================= */
+
+    .group-info {
+        display: flex;
+        align-items: center;
+
+        gap: 18px;
+
+        padding-bottom: 25px;
+
+        border-bottom:
+            1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .group-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 64px;
+        height: 64px;
+
+        flex-shrink: 0;
+
+        border-radius: 20px;
+
+        background:
+            linear-gradient(135deg, #007aff, #5856d6);
+
+        color: white;
+
+        font-size: 24px;
+        font-weight: 700;
+
+        box-shadow:
+            0 8px 20px rgba(0, 122, 255, 0.2);
+    }
+
+    .group-details {
+        min-width: 0;
+    }
+
+    .group-details h2 {
+        margin: 0 0 5px;
+
+        font-size: 1.3rem;
+        font-weight: 700;
+
+        word-break: break-word;
+    }
+
+    .group-specialty {
+        color: #6c757d;
+
+        font-size: 0.9rem;
+
+        word-break: break-word;
+    }
+
+    /* =========================
+       Статистика
+       ========================= */
+
+    .group-stats {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 12px;
+
+        margin-top: 22px;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        padding: 15px;
+
+        border-radius: 15px;
+
+        background:
+            rgba(255, 255, 255, 0.45);
+
+        border:
+            1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+
+        border-radius: 13px;
+
+        background:
+            rgba(0, 122, 255, 0.08);
+
+        font-size: 19px;
+    }
+
+    .stat-item>div:last-child {
+        min-width: 0;
+    }
+
+    .stat-label {
+        display: block;
+
+        margin-bottom: 3px;
+
+        color: #999;
+
+        font-size: 0.75rem;
+    }
+
+    .stat-item strong {
+        display: block;
+
+        color: #333;
+
+        font-size: 0.88rem;
+
+        word-break: break-word;
+    }
+
+    /* =========================
+       Описание
+       ========================= */
+
+    .description-block {
+        margin-top: 12px;
+
+        padding: 15px;
+
+        border-radius: 15px;
+
+        background:
+            rgba(255, 255, 255, 0.35);
+
+        border:
+            1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .description-label {
+        display: block;
+
+        margin-bottom: 5px;
+
+        color: #999;
+
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .description-block p {
+        margin: 0;
+
+        color: #555;
+
+        font-size: 0.9rem;
+
+        line-height: 1.5;
+
+        word-break: break-word;
+    }
+
+    /* =========================
+       Предупреждение
+       ========================= */
+
+    .warning-message {
+        display: flex;
+
+        gap: 12px;
+
+        margin: 25px 0;
+
+        padding: 16px;
+
+        border-radius: 15px;
+
+        background:
+            rgba(255, 193, 7, 0.10);
+
+        border:
+            1px solid rgba(255, 193, 7, 0.20);
+    }
+
+    .warning-icon {
+        font-size: 20px;
+
+        flex-shrink: 0;
+    }
+
+    .warning-message strong {
+        display: block;
+
+        margin-bottom: 3px;
+    }
+
+    .warning-message p {
+        margin: 0;
+
+        color: #6c757d;
+
+        font-size: 0.9rem;
+
+        line-height: 1.4;
+    }
+
+    /* =========================
+       Кнопки
+       ========================= */
+
+    .delete-actions {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        padding-top: 5px;
+    }
+
+    .delete-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+
+        border-radius: 13px;
+
+        padding: 11px 18px;
+
+        color: white;
+
+        font-weight: 600;
+
+        background:
+            #dc3545;
+
+        box-shadow:
+            0 8px 20px rgba(220, 53, 69, 0.18);
+
+        transition: 0.2s ease;
+
+        cursor: pointer;
+    }
+
+    .delete-btn:hover {
+        color: white;
+
+        background:
+            #c82333;
+
+        transform:
+            translateY(-1px);
+    }
+
+    .cancel-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border:
+            1px solid rgba(255, 255, 255, 0.8);
+
+        border-radius: 13px;
+
+        padding: 11px 18px;
+
+        background:
+            rgba(255, 255, 255, 0.55);
+
+        color: #555;
+
+        text-decoration: none;
+
+        backdrop-filter:
+            blur(10px);
+
+        -webkit-backdrop-filter:
+            blur(10px);
+
+        transition: 0.2s ease;
+    }
+
+    .cancel-btn:hover {
+        background:
+            rgba(255, 255, 255, 0.85);
+
+        color: #222;
+    }
+
+    /* =========================
+       Мобильные устройства
+       ========================= */
+
+    @@media (max-width: 600px) {
+
+        .delete-page {
+            width: 100%;
+        }
+
+        .glass-delete-card {
+            padding: 20px;
+
+            border-radius: 18px;
+        }
+
+        .delete-header {
+            align-items: flex-start;
+        }
+
+        .delete-header h1 {
+            font-size: 1.6rem;
+        }
+
+        .group-info {
+            align-items: flex-start;
+        }
+
+        .group-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .delete-actions {
+            flex-direction: column;
+        }
+
+        .delete-actions .btn,
+        .delete-actions button,
+        .delete-actions a {
+            width: 100%;
+        }
+
+    }
+</style>
+

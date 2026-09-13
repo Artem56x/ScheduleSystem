@@ -1,0 +1,1845 @@
+@model ScheduleSystem.Models.Schedule
+
+@{
+    ViewData["Title"] = "Редактировать занятие";
+
+    bool showTeacherWarning =
+        ViewBag.TeacherSubjectWarning == true;
+
+    var recommendedClassrooms =
+        ViewBag.RecommendedClassrooms
+        as List<ScheduleSystem.Models.Classroom>;
+
+    bool showClassroomRecommendations =
+        recommendedClassrooms != null &&
+        recommendedClassrooms.Any();
+
+    bool showNoClassroomRecommendations =
+        recommendedClassrooms != null &&
+        !recommendedClassrooms.Any();
+}
+
+
+<div class="schedule-create-page">
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="create-header">
+
+        <div>
+
+            <div class="create-badge">
+                РАСПИСАНИЕ
+            </div>
+
+            <h1>
+                Редактировать занятие
+            </h1>
+
+            <p>
+                Изменение информации о занятии
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <a asp-action="Index" class="glass-button secondary-button">
+
+                ← Назад
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN CARD -->
+    <!-- ================================================= -->
+
+    <div class="create-main-card">
+
+        <!-- CARD TOP -->
+
+        <div class="create-card-top">
+
+            <div class="create-icon">
+                ✏️
+            </div>
+
+            <div class="create-title-block">
+
+                <span class="create-label">
+                    РЕДАКТИРОВАНИЕ
+                </span>
+
+                <h2>
+                    Информация о занятии
+                </h2>
+
+                <p>
+                    Измените необходимые данные расписания.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- FORM -->
+        <!-- ================================================= -->
+
+        <form asp-action="Edit" method="post" id="scheduleForm">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <input type="hidden" name="confirmTeacherSubject" id="confirmTeacherSubject" value="false" />
+
+
+            <div asp-validation-summary="ModelOnly" class="glass-validation">
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
+            <!-- ================================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Основная информация
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <!-- ПРЕПОДАВАТЕЛЬ -->
+
+                    <div class="form-group">
+
+                        <label asp-for="TeacherId" class="form-label">
+
+                            Преподаватель
+
+                        </label>
+
+                        <select asp-for="TeacherId" class="form-control glass-input" asp-items="ViewBag.TeacherId">
+
+                            <option value="">
+                                Выберите преподавателя
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="TeacherId" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ПРЕДМЕТ -->
+
+                    <div class="form-group">
+
+                        <label asp-for="SubjectId" class="form-label">
+
+                            Предмет
+
+                        </label>
+
+                        <select asp-for="SubjectId" class="form-control glass-input" asp-items="ViewBag.SubjectId">
+
+                            <option value="">
+                                Выберите предмет
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="SubjectId" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ГРУППА -->
+
+                    <div class="form-group">
+
+                        <label asp-for="GroupId" class="form-label">
+
+                            Группа
+
+                        </label>
+
+                        <select asp-for="GroupId" class="form-control glass-input" asp-items="ViewBag.GroupId">
+
+                            <option value="">
+                                Выберите группу
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="GroupId" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- АУДИТОРИЯ -->
+
+                    <div class="form-group">
+
+                        <label asp-for="ClassroomId" class="form-label">
+
+                            Аудитория
+
+                        </label>
+
+                        <select asp-for="ClassroomId" class="form-control glass-input" asp-items="ViewBag.ClassroomId">
+
+                            <option value="">
+                                Выберите аудиторию
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="ClassroomId" class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ВРЕМЯ -->
+            <!-- ================================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Время занятия
+                </div>
+
+
+                <!-- ДЕНЬ НЕДЕЛИ -->
+
+                <div class="form-group">
+
+                    <label asp-for="DayOfWeek" class="form-label">
+
+                        День недели
+
+                    </label>
+
+                    <select asp-for="DayOfWeek" class="form-control glass-input" asp-items="ViewBag.DayOfWeek">
+
+                        <option value="">
+                            Выберите день недели
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="DayOfWeek" class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- ВРЕМЯ -->
+
+                <div class="time-row">
+
+
+                    <!-- НАЧАЛО -->
+
+                    <div class="form-group">
+
+                        <label asp-for="StartTime" class="form-label">
+
+                            Время начала
+
+                        </label>
+
+                        <div class="time-input-wrapper">
+
+                            <span class="time-input-icon">
+                                🕐
+                            </span>
+
+                            <input asp-for="StartTime" type="time" class="form-control glass-input" />
+
+                        </div>
+
+                        <span asp-validation-for="StartTime" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ОКОНЧАНИЕ -->
+
+                    <div class="form-group">
+
+                        <label asp-for="EndTime" class="form-label">
+
+                            Время окончания
+
+                        </label>
+
+                        <div class="time-input-wrapper">
+
+                            <span class="time-input-icon">
+                                🕐
+                            </span>
+
+                            <input asp-for="EndTime" type="time" class="form-control glass-input" />
+
+                        </div>
+
+                        <span asp-validation-for="EndTime" class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ACTIONS -->
+            <!-- ================================================= -->
+
+            <div class="form-actions">
+
+                <a asp-action="Index" class="footer-button secondary-button">
+
+                    Отмена
+
+                </a>
+
+
+                <button type="submit" class="footer-button primary-button">
+
+                    <span>✓</span>
+
+                    Сохранить изменения
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- ПРЕДУПРЕЖДЕНИЕ ПРЕПОДАВАТЕЛЯ -->
+<!-- ===================================================== -->
+
+@if (showTeacherWarning)
+{
+    <div class="warning-overlay" id="teacherWarning">
+
+        <div class="warning-modal">
+
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+            <h2>
+                Проверьте преподавателя
+            </h2>
+
+            <p>
+
+                Преподаватель
+                <strong>
+                    @ViewBag.TeacherName
+                </strong>
+
+                обычно ведёт предмет
+
+                <strong>
+                    «@ViewBag.TeacherSubjectName»
+                </strong>.
+
+            </p>
+
+            <p>
+
+                Сейчас выбран предмет
+
+                <strong>
+                    «@ViewBag.SelectedSubjectName»
+                </strong>.
+
+            </p>
+
+            <p class="warning-question">
+
+                Вы точно хотите оставить этого преподавателя?
+
+            </p>
+
+
+            <div class="warning-actions">
+
+                <button type="button" class="warning-cancel" onclick="closeTeacherWarning()">
+
+                    Вернуться
+
+                </button>
+
+
+                <button type="button" class="warning-confirm" onclick="confirmTeacher()">
+
+                    Да, оставить
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- РЕКОМЕНДАЦИИ АУДИТОРИЙ -->
+<!-- ===================================================== -->
+
+@if (showClassroomRecommendations)
+{
+    <div class="warning-overlay" id="classroomRecommendationModal">
+
+        <div class="classroom-recommendation-modal">
+
+
+            <!-- ICON -->
+
+            <div class="classroom-recommendation-icon">
+                💡
+            </div>
+
+
+            <h2>
+                Рекомендуем другую аудиторию
+            </h2>
+
+
+            <p class="classroom-recommendation-description">
+
+                Аудитория
+
+                <strong>
+                    «@ViewBag.SelectedClassroomName»
+                </strong>
+
+                не подходит для этого занятия.
+
+            </p>
+
+
+            <p class="classroom-recommendation-subtitle">
+
+                Подходящие свободные аудитории:
+
+            </p>
+
+
+            <!-- ================================================= -->
+            <!-- LIST -->
+            <!-- ================================================= -->
+
+            <div class="recommended-classroom-list">
+
+                @for (int i = 0;
+                      i < recommendedClassrooms!.Count;
+                      i++)
+                {
+                    var classroom =
+                        recommendedClassrooms[i];
+
+                    bool isOptimal = i == 0;
+
+
+                    <div class="recommended-classroom @(isOptimal ? "recommended-optimal" : "")">
+
+
+                        <div class="recommended-classroom-info">
+
+
+                            <div class="recommended-classroom-name-row">
+
+                                <span class="recommended-classroom-name">
+                                    @classroom.Name
+                                </span>
+
+
+                                @if (isOptimal)
+                                {
+                                    <span class="optimal-badge">
+                                        Оптимальный
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <div class="recommended-classroom-details">
+
+                                <span>
+                                    🪑 @classroom.Capacity мест
+                                </span>
+
+
+                                @if (classroom.HasComputers)
+                                {
+                                    <span class="computer-badge">
+                                        💻 Компьютеры
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="button" class="select-classroom-button" onclick="selectClassroom(@classroom.Id)">
+
+                            Выбрать
+
+                        </button>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- CLOSE -->
+            <!-- ================================================= -->
+
+            <div class="classroom-recommendation-actions">
+
+                <button type="button" class="warning-cancel" onclick="closeClassroomRecommendations()">
+
+                    Вернуться
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- НЕТ РЕКОМЕНДАЦИЙ -->
+<!-- ===================================================== -->
+
+@if (showNoClassroomRecommendations)
+{
+    <div class="warning-overlay" id="classroomNoRecommendationModal">
+
+        <div class="warning-modal">
+
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+
+            <h2>
+                Подходящих аудиторий нет
+            </h2>
+
+
+            <p>
+
+                Сейчас нет свободной аудитории,
+                которая подходит по вместимости
+                и требованиям предмета.
+
+            </p>
+
+
+            <div class="warning-actions">
+
+                <button type="button" class="warning-cancel" onclick="closeNoClassroomRecommendations()">
+
+                    Вернуться
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<style>
+    /* ===================================================== */
+    /* PAGE */
+    /* ===================================================== */
+
+    .schedule-create-page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 20px 60px;
+    }
+
+
+    /* ===================================================== */
+    /* HEADER */
+    /* ===================================================== */
+
+    .create-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+        margin-bottom: 28px;
+    }
+
+
+    .create-badge {
+        display: inline-block;
+
+        margin-bottom: 10px;
+
+        padding: 6px 12px;
+
+        border-radius: 999px;
+
+        background: rgba(255, 255, 255, 0.45);
+
+        border: 1px solid rgba(255, 255, 255, 0.7);
+
+        font-size: 11px;
+        font-weight: 700;
+
+        letter-spacing: 1.5px;
+
+        color: #666;
+    }
+
+
+    .create-header h1 {
+        margin: 0;
+
+        font-size: 36px;
+        font-weight: 750;
+
+        letter-spacing: -1px;
+
+        color: #171717;
+    }
+
+
+    .create-header p {
+        margin: 8px 0 0;
+
+        color: #777;
+
+        font-size: 15px;
+    }
+
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+
+    /* ===================================================== */
+    /* BUTTONS */
+    /* ===================================================== */
+
+    .glass-button {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        min-height: 44px;
+
+        padding: 0 18px;
+
+        border-radius: 14px;
+
+        text-decoration: none;
+
+        font-size: 14px;
+        font-weight: 650;
+
+        transition: all 0.2s ease;
+
+        border: 1px solid rgba(255, 255, 255, 0.7);
+
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+
+    .glass-button:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+
+
+    .secondary-button {
+        background: rgba(255, 255, 255, 0.6);
+        color: #333;
+    }
+
+
+    .secondary-button:hover {
+        background: rgba(255, 255, 255, 0.85);
+        color: #111;
+    }
+
+
+    /* ===================================================== */
+    /* MAIN CARD */
+    /* ===================================================== */
+
+    .create-main-card {
+        padding: 30px;
+
+        border-radius: 28px;
+
+        background: rgba(255, 255, 255, 0.48);
+
+        border: 1px solid rgba(255, 255, 255, 0.75);
+
+        box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+    }
+
+
+    /* ===================================================== */
+    /* CARD TOP */
+    /* ===================================================== */
+
+    .create-card-top {
+        display: flex;
+
+        align-items: center;
+
+        gap: 20px;
+
+        padding-bottom: 28px;
+
+        border-bottom:
+            1px solid rgba(0, 0, 0, 0.07);
+    }
+
+
+    .create-icon {
+        width: 68px;
+        height: 68px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 20px;
+
+        background: rgba(255, 255, 255, 0.75);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.9);
+
+        font-size: 30px;
+
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.06);
+    }
+
+
+    .create-label {
+        display: block;
+
+        margin-bottom: 6px;
+
+        font-size: 10px;
+        font-weight: 750;
+
+        letter-spacing: 1.5px;
+
+        color: #888;
+    }
+
+
+    .create-title-block h2 {
+        margin: 0;
+
+        font-size: 28px;
+        font-weight: 750;
+
+        color: #171717;
+    }
+
+
+    .create-title-block p {
+        margin: 6px 0 0;
+
+        color: #777;
+
+        font-size: 14px;
+    }
+
+
+    /* ===================================================== */
+    /* FORM */
+    /* ===================================================== */
+
+    form {
+        margin-top: 28px;
+    }
+
+
+    .form-section {
+        margin-bottom: 28px;
+
+        padding: 24px;
+
+        border-radius: 22px;
+
+        background: rgba(245, 245, 245, 0.38);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.7);
+    }
+
+
+    .form-section-title {
+        margin-bottom: 20px;
+
+        font-size: 16px;
+        font-weight: 700;
+
+        color: #222;
+    }
+
+
+    .form-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 18px;
+    }
+
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+
+    .form-label {
+        display: block;
+
+        margin-bottom: 8px;
+
+        color: #444;
+
+        font-size: 13px;
+        font-weight: 650;
+    }
+
+
+    .glass-input {
+        width: 100%;
+
+        min-height: 48px;
+
+        padding: 11px 14px;
+
+        border:
+            1px solid rgba(0, 0, 0, 0.08);
+
+        border-radius: 13px;
+
+        background: rgba(255, 255, 255, 0.65);
+
+        color: #222;
+
+        transition: all 0.2s ease;
+
+        box-sizing: border-box;
+    }
+
+
+    .glass-input:hover {
+        background:
+            rgba(255, 255, 255, 0.78);
+    }
+
+
+    .glass-input:focus {
+        border-color:
+            rgba(0, 122, 255, 0.45);
+
+        background:
+            rgba(255, 255, 255, 0.85);
+
+        box-shadow:
+            0 0 0 4px rgba(0, 122, 255, 0.10);
+
+        outline: none;
+    }
+
+
+    .text-danger {
+        display: block;
+
+        margin-top: 6px;
+
+        font-size: 0.85rem;
+    }
+
+
+    .glass-validation {
+        margin-bottom: 20px;
+
+        padding: 14px 16px;
+
+        border-radius: 15px;
+
+        background:
+            rgba(220, 53, 69, 0.08);
+
+        border:
+            1px solid rgba(220, 53, 69, 0.12);
+
+        color: #dc3545;
+    }
+
+
+    /* ===================================================== */
+    /* TIME */
+    /* ===================================================== */
+
+    .time-row {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 18px;
+    }
+
+
+    .time-input-wrapper {
+        position: relative;
+    }
+
+
+    .time-input-wrapper .glass-input {
+        padding-left: 44px;
+    }
+
+
+    .time-input-icon {
+        position: absolute;
+
+        left: 14px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        z-index: 2;
+
+        font-size: 17px;
+
+        pointer-events: none;
+    }
+
+
+    /* ===================================================== */
+    /* ACTIONS */
+    /* ===================================================== */
+
+    .form-actions {
+        display: flex;
+
+        justify-content: flex-end;
+
+        gap: 10px;
+
+        margin-top: 28px;
+
+        padding-top: 22px;
+
+        border-top:
+            1px solid rgba(0, 0, 0, 0.07);
+    }
+
+
+    .footer-button {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        min-height: 44px;
+
+        padding: 0 18px;
+
+        border-radius: 14px;
+
+        text-decoration: none;
+
+        font-size: 14px;
+        font-weight: 650;
+
+        transition: all 0.2s ease;
+
+        cursor: pointer;
+    }
+
+
+    .footer-button:hover {
+        transform: translateY(-2px);
+
+        text-decoration: none;
+    }
+
+
+    .primary-button {
+        border: 1px solid #007aff;
+
+        background: #007aff;
+
+        color: white;
+
+        box-shadow:
+            0 8px 25px rgba(0, 122, 255, 0.16);
+    }
+
+
+    .primary-button:hover {
+        background: #007aff;
+        color: white;
+    }
+
+
+    .form-actions .secondary-button {
+        border:
+            1px solid rgba(255, 255, 255, 0.8);
+    }
+
+
+    /* ===================================================== */
+    /* WARNING MODAL */
+    /* ===================================================== */
+
+    .warning-overlay {
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 9999;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+
+        background:
+            rgba(15, 23, 42, 0.38);
+
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+
+        animation:
+            fadeIn 0.2s ease;
+    }
+
+
+    .warning-modal {
+        width: 100%;
+        max-width: 470px;
+
+        padding: 30px;
+
+        border:
+            1px solid rgba(255, 255, 255, 0.8);
+
+        border-radius: 24px;
+
+        background:
+            rgba(255, 255, 255, 0.88);
+
+        backdrop-filter:
+            blur(30px) saturate(160%);
+
+        -webkit-backdrop-filter:
+            blur(30px) saturate(160%);
+
+        box-shadow:
+            0 25px 70px rgba(0, 0, 0, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+        text-align: center;
+
+        animation:
+            modalIn 0.25s ease;
+    }
+
+
+    .warning-icon {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 64px;
+        height: 64px;
+
+        margin: 0 auto 18px;
+
+        border-radius: 20px;
+
+        background:
+            rgba(255, 193, 7, 0.15);
+
+        font-size: 30px;
+    }
+
+
+    .warning-modal h2 {
+        margin: 0 0 15px;
+
+        font-size: 1.35rem;
+        font-weight: 700;
+
+        color: #222;
+    }
+
+
+    .warning-modal p {
+        margin: 8px 0;
+
+        color: #666;
+
+        font-size: 0.95rem;
+
+        line-height: 1.5;
+    }
+
+
+    .warning-modal strong {
+        color: #333;
+    }
+
+
+    .warning-question {
+        margin-top: 18px !important;
+
+        color: #333 !important;
+
+        font-weight: 600;
+    }
+
+
+    .warning-actions {
+        display: flex;
+
+        gap: 10px;
+
+        margin-top: 25px;
+    }
+
+
+    .warning-actions button {
+        flex: 1;
+
+        min-height: 46px;
+
+        border-radius: 13px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+    }
+
+
+    .warning-cancel {
+        border:
+            1px solid rgba(0, 0, 0, 0.08);
+
+        background:
+            rgba(255, 255, 255, 0.7);
+
+        color: #555;
+    }
+
+
+    .warning-cancel:hover {
+        background: white;
+
+        transform: translateY(-1px);
+    }
+
+
+    .warning-confirm {
+        border: none;
+
+        background: #007aff;
+
+        color: white;
+
+        box-shadow:
+            0 7px 18px rgba(0, 122, 255, 0.2);
+
+        cursor: pointer;
+    }
+
+
+    .warning-confirm:hover {
+        transform: translateY(-1px);
+    }
+
+
+    /* ===================================================== */
+    /* CLASSROOM RECOMMENDATION MODAL */
+    /* ===================================================== */
+
+    .classroom-recommendation-modal {
+        width: 100%;
+
+        max-width: 590px;
+
+        max-height: 85vh;
+
+        overflow-y: auto;
+
+        padding: 30px;
+
+        border:
+            1px solid rgba(255, 255, 255, 0.8);
+
+        border-radius: 25px;
+
+        background:
+            rgba(255, 255, 255, 0.92);
+
+        backdrop-filter:
+            blur(30px) saturate(160%);
+
+        -webkit-backdrop-filter:
+            blur(30px) saturate(160%);
+
+        box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.20),
+
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+        animation:
+            modalIn 0.25s ease;
+    }
+
+
+    .classroom-recommendation-icon {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 64px;
+        height: 64px;
+
+        margin: 0 auto 18px;
+
+        border-radius: 20px;
+
+        background:
+            rgba(0, 122, 255, 0.10);
+
+        font-size: 30px;
+    }
+
+
+    .classroom-recommendation-modal h2 {
+        margin: 0;
+
+        text-align: center;
+
+        font-size: 1.4rem;
+
+        font-weight: 700;
+
+        color: #222;
+    }
+
+
+    .classroom-recommendation-description {
+        max-width: 480px;
+
+        margin: 12px auto 0;
+
+        text-align: center;
+
+        color: #666;
+
+        font-size: 0.95rem;
+
+        line-height: 1.5;
+    }
+
+
+    .classroom-recommendation-description strong {
+        color: #333;
+    }
+
+
+    .classroom-recommendation-subtitle {
+        margin: 23px 0 12px;
+
+        color: #444;
+
+        font-size: 14px;
+
+        font-weight: 650;
+    }
+
+
+    /* ===================================================== */
+    /* CLASSROOM LIST */
+    /* ===================================================== */
+
+    .recommended-classroom-list {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+
+    .recommended-classroom {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+
+        padding: 15px;
+
+        border-radius: 16px;
+
+        border:
+            1px solid rgba(0, 0, 0, 0.07);
+
+        background:
+            rgba(248, 250, 252, 0.75);
+
+        transition: all 0.2s ease;
+    }
+
+
+    .recommended-classroom:hover {
+        transform: translateY(-1px);
+
+        border-color:
+            rgba(0, 122, 255, 0.25);
+
+        box-shadow:
+            0 8px 22px rgba(0, 0, 0, 0.07);
+    }
+
+
+    .recommended-optimal {
+        border-color:
+            rgba(0, 122, 255, 0.30);
+
+        background:
+            rgba(0, 122, 255, 0.055);
+    }
+
+
+    .recommended-classroom-info {
+        min-width: 0;
+    }
+
+
+    .recommended-classroom-name-row {
+        display: flex;
+
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: 8px;
+    }
+
+
+    .recommended-classroom-name {
+        color: #222;
+
+        font-size: 17px;
+
+        font-weight: 700;
+    }
+
+
+    .optimal-badge {
+        padding: 4px 8px;
+
+        border-radius: 8px;
+
+        background:
+            rgba(0, 122, 255, 0.10);
+
+        color: #007aff;
+
+        font-size: 10px;
+
+        font-weight: 700;
+    }
+
+
+    .recommended-classroom-details {
+        display: flex;
+
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: 8px;
+
+        margin-top: 7px;
+
+        color: #777;
+
+        font-size: 12px;
+    }
+
+
+    .computer-badge {
+        padding: 4px 8px;
+
+        border-radius: 8px;
+
+        background:
+            rgba(16, 185, 129, 0.10);
+
+        color: #047857;
+
+        font-weight: 600;
+    }
+
+
+    .select-classroom-button {
+        flex-shrink: 0;
+
+        min-height: 42px;
+
+        padding: 0 15px;
+
+        border: 1px solid #007aff;
+
+        border-radius: 13px;
+
+        background: #007aff;
+
+        color: white;
+
+        font-family: inherit;
+
+        font-size: 13px;
+
+        font-weight: 650;
+
+        cursor: pointer;
+
+        transition: all 0.2s ease;
+
+        box-shadow:
+            0 6px 15px rgba(0, 122, 255, 0.15);
+    }
+
+
+    .select-classroom-button:hover {
+        transform: translateY(-1px);
+
+        background: #007aff;
+
+        box-shadow:
+            0 8px 18px rgba(0, 122, 255, 0.20);
+    }
+
+
+    /* ===================================================== */
+    /* RECOMMENDATION ACTIONS */
+    /* ===================================================== */
+
+    .classroom-recommendation-actions {
+        display: flex;
+
+        justify-content: center;
+
+        margin-top: 20px;
+
+        padding-top: 18px;
+
+        border-top:
+            1px solid rgba(0, 0, 0, 0.07);
+    }
+
+
+    .classroom-recommendation-actions button {
+        min-height: 44px;
+
+        padding: 0 20px;
+
+        border-radius: 13px;
+
+        font-family: inherit;
+
+        font-size: 14px;
+
+        font-weight: 650;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+    }
+
+
+    /* ===================================================== */
+    /* ANIMATIONS */
+    /* ===================================================== */
+
+    @@keyframes fadeIn {
+
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+
+    }
+
+
+    @@keyframes modalIn {
+
+        from {
+            opacity: 0;
+
+            transform:
+                scale(0.96) translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+
+            transform:
+                scale(1) translateY(0);
+        }
+
+    }
+
+
+    /* ===================================================== */
+    /* TABLET */
+    /* ===================================================== */
+
+    @@media (max-width: 800px) {
+
+        .create-header {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+
+        .header-actions {
+            width: 100%;
+        }
+
+
+        .header-actions .glass-button {
+            width: 100%;
+        }
+
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+
+    /* ===================================================== */
+    /* MOBILE */
+    /* ===================================================== */
+
+    @@media (max-width: 600px) {
+
+        .schedule-create-page {
+            padding:
+                20px 14px 40px;
+        }
+
+
+        .create-header h1 {
+            font-size: 29px;
+        }
+
+
+        .create-main-card {
+            padding: 20px;
+
+            border-radius: 22px;
+        }
+
+
+        .create-card-top {
+            align-items: flex-start;
+        }
+
+
+        .create-title-block h2 {
+            font-size: 23px;
+        }
+
+
+        .create-icon {
+            width: 58px;
+            height: 58px;
+
+            border-radius: 17px;
+
+            font-size: 26px;
+        }
+
+
+        .form-section {
+            padding: 18px;
+
+            border-radius: 18px;
+        }
+
+
+        .time-row {
+            grid-template-columns: 1fr;
+
+            gap: 18px;
+        }
+
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+
+        .form-actions .footer-button {
+            width: 100%;
+        }
+
+
+        .warning-modal {
+            padding:
+                24px 20px;
+        }
+
+
+        .warning-actions {
+            flex-direction: column-reverse;
+        }
+
+
+        .classroom-recommendation-modal {
+            padding:
+                23px 18px;
+
+            border-radius: 22px;
+        }
+
+
+        .recommended-classroom {
+            align-items: flex-start;
+        }
+
+
+        .select-classroom-button {
+            min-height: 40px;
+
+            padding: 0 12px;
+        }
+
+    }
+</style>
+
+
+<script>
+
+    /* ================================================= */
+    /* ПРЕПОДАВАТЕЛЬ */
+    /* ================================================= */
+
+    function confirmTeacher() {
+
+        const confirmInput =
+            document.getElementById(
+                "confirmTeacherSubject"
+            );
+
+        const form =
+            document.getElementById(
+                "scheduleForm"
+            );
+
+        if (confirmInput) {
+
+            confirmInput.value = "true";
+
+        }
+
+        if (form) {
+
+            form.submit();
+
+        }
+
+    }
+
+
+    function closeTeacherWarning() {
+
+        const warning =
+            document.getElementById(
+                "teacherWarning"
+            );
+
+        if (warning) {
+
+            warning.remove();
+
+        }
+
+    }
+
+
+    /* ================================================= */
+    /* АУДИТОРИИ */
+    /* ================================================= */
+
+    function selectClassroom(classroomId) {
+
+        const classroomSelect =
+            document.getElementById(
+                "ClassroomId"
+            );
+
+        if (!classroomSelect) {
+
+            return;
+
+        }
+
+
+        classroomSelect.value =
+            classroomId;
+
+
+        classroomSelect.dispatchEvent(
+            new Event("change", {
+                bubbles: true
+            })
+        );
+
+
+        classroomSelect.focus();
+
+
+        closeClassroomRecommendations();
+
+    }
+
+
+    function closeClassroomRecommendations() {
+
+        const modal =
+            document.getElementById(
+                "classroomRecommendationModal"
+            );
+
+        if (modal) {
+
+            modal.remove();
+
+        }
+
+    }
+
+
+    function closeNoClassroomRecommendations() {
+
+        const modal =
+            document.getElementById(
+                "classroomNoRecommendationModal"
+            );
+
+        if (modal) {
+
+            modal.remove();
+
+        }
+
+    }
+
+</script>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial"
+        );
+    }
+
+}

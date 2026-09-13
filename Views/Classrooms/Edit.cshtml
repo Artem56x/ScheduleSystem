@@ -1,0 +1,538 @@
+@model ScheduleSystem.Models.Classroom
+
+@{
+    ViewData["Title"] = "Редактировать аудиторию";
+}
+
+<div class="classroom-form-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Редактировать аудиторию</h1>
+            <p>Изменение информации об учебной аудитории</p>
+        </div>
+    </div>
+
+    <div class="glass-form-card">
+
+        <div class="form-icon">
+            ✏️
+        </div>
+
+        <div class="form-title">
+            <h2>Информация об аудитории</h2>
+            <p>Измените номер, категорию, количество мест и оборудование.</p>
+        </div>
+
+        <form asp-action="Edit" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly" class="glass-validation">
+            </div>
+
+            <!-- НОМЕР АУДИТОРИИ -->
+
+            <div class="form-group">
+
+                <label asp-for="Name" class="form-label">
+                    Номер аудитории
+                </label>
+
+                <input asp-for="Name" class="form-control glass-input" placeholder="Например: 305" autocomplete="off" />
+
+                <span asp-validation-for="Name" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- КАТЕГОРИЯ -->
+
+            <div class="form-group">
+
+                <label asp-for="ClassroomCategoryId" class="form-label">
+                    Категория
+                </label>
+
+                <select asp-for="ClassroomCategoryId" asp-items="ViewBag.ClassroomCategories"
+                        class="form-control glass-input">
+
+                    <option value="">
+                        Выберите категорию
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="ClassroomCategoryId" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- КОЛИЧЕСТВО МЕСТ -->
+
+            <div class="form-group">
+
+                <label asp-for="Capacity" class="form-label">
+                    Количество мест
+                </label>
+
+                <input asp-for="Capacity" type="number" min="1" max="500" class="form-control glass-input"
+                       placeholder="Например: 30" />
+
+                <span asp-validation-for="Capacity" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- КОМПЬЮТЕРЫ -->
+
+            <div class="equipment-option">
+
+                <div class="equipment-info">
+
+                    <div class="equipment-icon">
+                        💻
+                    </div>
+
+                    <div>
+
+                        <div class="equipment-title">
+                            Есть компьютеры
+                        </div>
+
+                        <div class="equipment-description">
+                            В аудитории установлены компьютеры
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input asp-for="HasComputers" />
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+            <span asp-validation-for="HasComputers" class="text-danger">
+            </span>
+
+            <!-- КНОПКИ -->
+
+            <div class="form-actions">
+
+                <button type="submit" class="btn save-btn">
+                    Сохранить изменения
+                </button>
+
+                <a asp-action="Index" class="btn cancel-btn">
+                    Отмена
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+    .classroom-form-page {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    /* HEADER */
+
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0 0 5px;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+        margin: 0;
+        color: #6c757d;
+    }
+
+    /* CARD */
+
+    .glass-form-card {
+        padding: 30px;
+
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 22px;
+
+        background: rgba(255, 255, 255, 0.55);
+
+        backdrop-filter: blur(25px) saturate(160%);
+        -webkit-backdrop-filter: blur(25px) saturate(160%);
+
+        box-shadow:
+            0 15px 40px rgba(0, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    /* ICON */
+
+    .form-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 64px;
+        height: 64px;
+
+        margin-bottom: 18px;
+
+        border-radius: 20px;
+
+        background: linear-gradient(135deg, #007aff, #5856d6);
+
+        color: white;
+
+        font-size: 27px;
+
+        box-shadow:
+            0 8px 20px rgba(0, 122, 255, 0.20);
+    }
+
+    /* TITLE */
+
+    .form-title {
+        margin-bottom: 25px;
+    }
+
+    .form-title h2 {
+        margin: 0 0 5px;
+
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .form-title p {
+        margin: 0;
+
+        color: #777;
+
+        font-size: 0.9rem;
+    }
+
+    /* VALIDATION */
+
+    .glass-validation {
+        margin-bottom: 18px;
+
+        color: #dc3545;
+    }
+
+    /* FORM */
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-label {
+        display: block;
+
+        margin-bottom: 8px;
+
+        color: #444;
+
+        font-weight: 600;
+    }
+
+    /* INPUT */
+
+    .glass-input {
+        min-height: 48px;
+
+        padding: 11px 14px;
+
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 13px;
+
+        background: rgba(255, 255, 255, 0.65);
+
+        color: #222;
+
+        box-shadow:
+            inset 0 1px 2px rgba(0, 0, 0, 0.02);
+
+        transition: 0.2s ease;
+    }
+
+    .glass-input:focus {
+        border-color: rgba(0, 122, 255, 0.45);
+
+        background: rgba(255, 255, 255, 0.85);
+
+        box-shadow:
+            0 0 0 4px rgba(0, 122, 255, 0.10),
+            inset 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    /* SELECT */
+
+    select.glass-input {
+        cursor: pointer;
+    }
+
+    /* EQUIPMENT */
+
+    .equipment-option {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+
+        margin-bottom: 22px;
+
+        padding: 16px 18px;
+
+        border: 1px solid rgba(0, 0, 0, 0.07);
+
+        border-radius: 16px;
+
+        background: rgba(255, 255, 255, 0.5);
+
+        transition: 0.2s ease;
+    }
+
+    .equipment-option:hover {
+        background: rgba(255, 255, 255, 0.75);
+
+        border-color: rgba(0, 122, 255, 0.15);
+    }
+
+    .equipment-info {
+        display: flex;
+
+        align-items: center;
+
+        gap: 13px;
+    }
+
+    .equipment-icon {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        width: 44px;
+        height: 44px;
+
+        border-radius: 13px;
+
+        background: rgba(0, 122, 255, 0.10);
+
+        font-size: 21px;
+    }
+
+    .equipment-title {
+        margin-bottom: 3px;
+
+        color: #333;
+
+        font-weight: 600;
+    }
+
+    .equipment-description {
+        color: #777;
+
+        font-size: 0.82rem;
+    }
+
+    /* SWITCH */
+
+    .switch {
+        position: relative;
+
+        display: inline-block;
+
+        width: 50px;
+        height: 28px;
+
+        flex-shrink: 0;
+    }
+
+    .switch input {
+        width: 0;
+        height: 0;
+
+        opacity: 0;
+    }
+
+    .slider {
+        position: absolute;
+
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        cursor: pointer;
+
+        border-radius: 30px;
+
+        background: #d1d1d6;
+
+        transition: 0.25s ease;
+    }
+
+    .slider::before {
+        content: "";
+
+        position: absolute;
+
+        width: 22px;
+        height: 22px;
+
+        top: 3px;
+        left: 3px;
+
+        border-radius: 50%;
+
+        background: white;
+
+        box-shadow:
+            0 2px 5px rgba(0, 0, 0, 0.18);
+
+        transition: 0.25s ease;
+    }
+
+    .switch input:checked+.slider {
+        background: #007aff;
+    }
+
+    .switch input:checked+.slider::before {
+        transform: translateX(22px);
+    }
+
+    /* ERROR */
+
+    .text-danger {
+        display: block;
+
+        margin-top: 6px;
+
+        font-size: 0.85rem;
+    }
+
+    /* BUTTONS */
+
+    .form-actions {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        padding-top: 5px;
+    }
+
+    .save-btn {
+        border: none;
+
+        border-radius: 13px;
+
+        padding: 11px 18px;
+
+        background: linear-gradient(135deg, #007aff, #5856d6);
+
+        color: white;
+
+        font-weight: 600;
+
+        box-shadow:
+            0 8px 20px rgba(0, 122, 255, 0.18);
+
+        transition: 0.2s ease;
+    }
+
+    .save-btn:hover {
+        color: white;
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 10px 25px rgba(0, 122, 255, 0.26);
+    }
+
+    .cancel-btn {
+        border: 1px solid rgba(255, 255, 255, 0.8);
+
+        border-radius: 13px;
+
+        padding: 11px 18px;
+
+        background: rgba(255, 255, 255, 0.55);
+
+        color: #555;
+
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .cancel-btn:hover {
+        background: rgba(255, 255, 255, 0.85);
+
+        color: #222;
+    }
+
+    /* MOBILE */
+
+    @@media (max-width: 600px) {
+
+        .classroom-form-page {
+            width: 100%;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+        }
+
+        .glass-form-card {
+            padding: 20px;
+
+            border-radius: 18px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+        }
+
+        .equipment-option {
+            padding: 14px;
+        }
+
+    }
+</style>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}
