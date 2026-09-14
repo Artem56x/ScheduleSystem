@@ -1,0 +1,447 @@
+@model IEnumerable<ScheduleSystem.Models.Group>
+
+@{
+    ViewData["Title"] = "Экспорт расписания";
+
+    var teachers =
+        ViewBag.Teachers as IEnumerable<ScheduleSystem.Models.Teacher>
+        ?? Enumerable.Empty<ScheduleSystem.Models.Teacher>();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Schedules/Export.css" asp-append-version="true" />
+}
+
+<div class="export-page">
+
+    <!-- HEADER -->
+    <div class="export-header">
+
+        <div class="export-header-content">
+
+            <div class="export-kicker">
+                ЭКСПОРТ
+            </div>
+
+            <h1>
+                Скачать расписание
+            </h1>
+
+            <p>
+                Выберите нужный вариант расписания и формат файла.
+            </p>
+
+        </div>
+
+        <a asp-action="Index" class="back-button">
+            <span>←</span>
+            Назад
+        </a>
+
+    </div>
+
+
+    <!-- ALL SCHEDULE -->
+    <section class="export-section">
+
+        <div class="section-label">
+            <span class="section-number">01</span>
+
+            <div>
+                <h2>Всё расписание</h2>
+
+                <p>
+                    Полное расписание колледжа
+                </p>
+            </div>
+        </div>
+
+
+        <div class="export-card">
+
+            <div class="export-card-main">
+
+                <div class="export-icon blue">
+                    <span>◫</span>
+                </div>
+
+                <div class="export-info">
+
+                    <h3>
+                        Общее расписание
+                    </h3>
+
+                    <p>
+                        Все группы, преподаватели,
+                        предметы и аудитории в одном файле.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="format-buttons">
+
+                <a asp-action="ExportAllExcel" class="format-button excel">
+
+                    <span class="format-icon">
+                        XLS
+                    </span>
+
+                    <span class="format-text">
+                        <strong>Excel</strong>
+                        <small>.xlsx</small>
+                    </span>
+
+                    <span class="download-arrow">
+                        ↓
+                    </span>
+
+                </a>
+
+
+                <a asp-action="ExportAllPdf" class="format-button pdf">
+
+                    <span class="format-icon">
+                        PDF
+                    </span>
+
+                    <span class="format-text">
+                        <strong>PDF</strong>
+                        <small>.pdf</small>
+                    </span>
+
+                    <span class="download-arrow">
+                        ↓
+                    </span>
+
+                </a>
+
+
+                <a asp-action="ExportAllCsv" class="format-button csv">
+
+                    <span class="format-icon">
+                        CSV
+                    </span>
+
+                    <span class="format-text">
+                        <strong>CSV</strong>
+                        <small>.csv</small>
+                    </span>
+
+                    <span class="download-arrow">
+                        ↓
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- GROUP -->
+    <section class="export-section">
+
+        <div class="section-label">
+
+            <span class="section-number">
+                02
+            </span>
+
+            <div>
+
+                <h2>
+                    Расписание группы
+                </h2>
+
+                <p>
+                    Индивидуальное расписание группы
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="export-card">
+
+            <div class="export-card-main">
+
+                <div class="export-icon purple">
+                    <span>◎</span>
+                </div>
+
+                <div class="export-info">
+
+                    <h3>
+                        Выберите группу
+                    </h3>
+
+                    <p>
+                        Скачайте расписание только
+                        выбранной группы.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form asp-action="ExportGroupExcel" method="get" class="export-form" id="groupExportForm">
+
+                <select name="id" id="groupSelect" class="export-select" required>
+
+                    <option value="">
+                        Выберите группу
+                    </option>
+
+                    @foreach (var group in Model)
+                    {
+                        <option value="@group.Id">
+                            @group.Name
+                        </option>
+                    }
+
+                </select>
+
+
+                <div class="format-buttons">
+
+                    <button type="button" class="format-button excel" onclick="submitExport('group', 'excel')">
+
+                        <span class="format-icon">
+                            XLS
+                        </span>
+
+                        <span class="format-text">
+                            <strong>Excel</strong>
+                            <small>.xlsx</small>
+                        </span>
+
+                        <span class="download-arrow">
+                            ↓
+                        </span>
+
+                    </button>
+
+
+                    <button type="button" class="format-button pdf" onclick="submitExport('group', 'pdf')">
+
+                        <span class="format-icon">
+                            PDF
+                        </span>
+
+                        <span class="format-text">
+                            <strong>PDF</strong>
+                            <small>.pdf</small>
+                        </span>
+
+                        <span class="download-arrow">
+                            ↓
+                        </span>
+
+                    </button>
+
+
+                    <button type="button" class="format-button csv" onclick="submitExport('group', 'csv')">
+
+                        <span class="format-icon">
+                            CSV
+                        </span>
+
+                        <span class="format-text">
+                            <strong>CSV</strong>
+                            <small>.csv</small>
+                        </span>
+
+                        <span class="download-arrow">
+                            ↓
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- TEACHER -->
+    <section class="export-section">
+
+        <div class="section-label">
+
+            <span class="section-number">
+                03
+            </span>
+
+            <div>
+
+                <h2>
+                    Расписание преподавателя
+                </h2>
+
+                <p>
+                    Индивидуальное расписание преподавателя
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="export-card">
+
+            <div class="export-card-main">
+
+                <div class="export-icon orange">
+                    <span>◉</span>
+                </div>
+
+                <div class="export-info">
+
+                    <h3>
+                        Выберите преподавателя
+                    </h3>
+
+                    <p>
+                        Скачайте расписание выбранного
+                        преподавателя.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form asp-action="ExportTeacherExcel" method="get" class="export-form" id="teacherExportForm">
+
+                <select name="id" id="teacherSelect" class="export-select" required>
+
+                    <option value="">
+                        Выберите преподавателя
+                    </option>
+
+                    @foreach (var teacher in teachers)
+                    {
+                        <option value="@teacher.Id">
+                            @teacher.FullName
+                        </option>
+                    }
+
+                </select>
+
+
+                <div class="format-buttons">
+
+                    <button type="button" class="format-button excel" onclick="submitExport('teacher', 'excel')">
+
+                        <span class="format-icon">
+                            XLS
+                        </span>
+
+                        <span class="format-text">
+                            <strong>Excel</strong>
+                            <small>.xlsx</small>
+                        </span>
+
+                        <span class="download-arrow">
+                            ↓
+                        </span>
+
+                    </button>
+
+
+                    <button type="button" class="format-button pdf" onclick="submitExport('teacher', 'pdf')">
+
+                        <span class="format-icon">
+                            PDF
+                        </span>
+
+                        <span class="format-text">
+                            <strong>PDF</strong>
+                            <small>.pdf</small>
+                        </span>
+
+                        <span class="download-arrow">
+                            ↓
+                        </span>
+
+                    </button>
+
+
+                    <button type="button" class="format-button csv" onclick="submitExport('teacher', 'csv')">
+
+                        <span class="format-icon">
+                            CSV
+                        </span>
+
+                        <span class="format-text">
+                            <strong>CSV</strong>
+                            <small>.csv</small>
+                        </span>
+
+                        <span class="download-arrow">
+                            ↓
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+    function submitExport(type, format) {
+
+        let select;
+        let action;
+
+        if (type === "group") {
+
+            select =
+                document.getElementById("groupSelect");
+
+            action =
+                "ExportGroup";
+
+        } else if (type === "teacher") {
+
+            select =
+                document.getElementById("teacherSelect");
+
+            action =
+                "ExportTeacher";
+        }
+
+        if (!select || !select.value) {
+
+            select?.focus();
+
+            return;
+        }
+
+        const id = select.value;
+
+        window.location.href =
+            `/Schedules/${action}${format.charAt(0).toUpperCase() + format.slice(1)}?id=${encodeURIComponent(id)}`;
+    }
+
+</script>

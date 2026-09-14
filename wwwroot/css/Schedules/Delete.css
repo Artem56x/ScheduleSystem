@@ -1,0 +1,679 @@
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .schedule-details-page {
+        max-width: 1100px;
+
+        margin: 0 auto;
+
+        padding: 32px 20px 60px;
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .details-header {
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: flex-end;
+
+        gap: 24px;
+
+        margin-bottom: 28px;
+    }
+
+
+    .details-badge {
+        display: inline-block;
+
+        margin-bottom: 10px;
+
+        padding: 6px 12px;
+
+        border-radius: 999px;
+
+        background:
+            rgba(255, 255, 255, 0.45);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.7);
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        letter-spacing: 1.5px;
+
+        color: #666;
+    }
+
+
+    .details-header h1 {
+        margin: 0;
+
+        font-size: 36px;
+
+        font-weight: 750;
+
+        letter-spacing: -1px;
+
+        color: #171717;
+    }
+
+
+    .details-header p {
+        margin: 8px 0 0;
+
+        color: #777;
+
+        font-size: 15px;
+    }
+
+
+    /* =========================================================
+       HEADER BUTTONS
+       ========================================================= */
+
+    .header-actions {
+        display: flex;
+
+        gap: 10px;
+
+        flex-wrap: wrap;
+    }
+
+
+    .glass-button {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        min-height: 44px;
+
+        padding: 0 18px;
+
+        border-radius: 14px;
+
+        text-decoration: none;
+
+        font-size: 14px;
+
+        font-weight: 650;
+
+        transition: all 0.2s ease;
+
+        border:
+            1px solid rgba(255, 255, 255, 0.7);
+
+        backdrop-filter: blur(16px);
+
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+
+    .glass-button:hover {
+        transform: translateY(-2px);
+
+        text-decoration: none;
+    }
+
+
+    .secondary-button {
+        background:
+            rgba(255, 255, 255, 0.6);
+
+        color: #333;
+    }
+
+
+    .secondary-button:hover {
+        color: #111;
+
+        background:
+            rgba(255, 255, 255, 0.85);
+    }
+
+
+    /* =========================================================
+       MAIN CARD
+       ========================================================= */
+
+    .lesson-main-card {
+        padding: 30px;
+
+        border-radius: 28px;
+
+        background:
+            rgba(255, 255, 255, 0.48);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.75);
+
+        box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+        backdrop-filter: blur(25px);
+
+        -webkit-backdrop-filter: blur(25px);
+    }
+
+
+    /* =========================================================
+       CARD TOP
+       ========================================================= */
+
+    .lesson-card-top {
+        display: flex;
+
+        align-items: center;
+
+        gap: 20px;
+
+        padding-bottom: 28px;
+
+        border-bottom:
+            1px solid rgba(0, 0, 0, 0.07);
+    }
+
+
+    /* =========================================================
+       DELETE ICON
+       ========================================================= */
+
+    .lesson-icon {
+        width: 68px;
+        height: 68px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 20px;
+
+        font-size: 30px;
+    }
+
+
+    .delete-icon {
+        background:
+            rgba(220, 53, 69, 0.10);
+
+        border:
+            1px solid rgba(220, 53, 69, 0.12);
+
+        box-shadow:
+            0 8px 25px rgba(220, 53, 69, 0.08);
+    }
+
+
+    .lesson-label {
+        display: block;
+
+        margin-bottom: 6px;
+
+        font-size: 10px;
+
+        font-weight: 750;
+
+        letter-spacing: 1.5px;
+
+        color: #888;
+    }
+
+
+    .delete-label {
+        color: #c82333;
+    }
+
+
+    .lesson-title-block {
+        min-width: 0;
+    }
+
+
+    .lesson-title-block h2 {
+        margin: 0;
+
+        font-size: 28px;
+
+        font-weight: 750;
+
+        color: #171717;
+    }
+
+
+    .lesson-title-block p {
+        margin: 6px 0 0;
+
+        color: #777;
+
+        font-size: 14px;
+
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       INFO GRID
+       ========================================================= */
+
+    .lesson-info-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 14px;
+
+        margin-top: 24px;
+    }
+
+
+    .info-card {
+        display: flex;
+
+        align-items: center;
+
+        gap: 14px;
+
+        min-width: 0;
+
+        padding: 18px;
+
+        border-radius: 20px;
+
+        background:
+            rgba(255, 255, 255, 0.48);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.65);
+    }
+
+
+    .info-icon {
+        width: 44px;
+        height: 44px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 14px;
+
+        background:
+            rgba(255, 255, 255, 0.75);
+
+        font-size: 20px;
+    }
+
+
+    .info-content {
+        min-width: 0;
+    }
+
+
+    .info-label {
+        display: block;
+
+        margin-bottom: 5px;
+
+        font-size: 11px;
+
+        color: #888;
+
+        font-weight: 600;
+    }
+
+
+    .info-content strong {
+        display: block;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+
+        color: #222;
+
+        font-size: 15px;
+
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       WARNING
+       ========================================================= */
+
+    .warning-section {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 14px;
+
+        margin-top: 24px;
+
+        padding: 18px;
+
+        border-radius: 20px;
+
+        background:
+            rgba(220, 53, 69, 0.07);
+
+        border:
+            1px solid rgba(220, 53, 69, 0.13);
+    }
+
+
+    .warning-icon {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        width: 44px;
+        height: 44px;
+
+        flex-shrink: 0;
+
+        border-radius: 14px;
+
+        background:
+            rgba(220, 53, 69, 0.11);
+
+        color: #c82333;
+
+        font-size: 22px;
+
+        font-weight: 700;
+    }
+
+
+    .warning-content {
+        min-width: 0;
+    }
+
+
+    .warning-content strong {
+        display: block;
+
+        margin-bottom: 4px;
+
+        color: #a71d2a;
+
+        font-size: 14px;
+
+        font-weight: 750;
+    }
+
+
+    .warning-content p {
+        margin: 0;
+
+        color: #b02a37;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .details-footer {
+        display: flex;
+
+        justify-content: flex-end;
+
+        gap: 10px;
+
+        margin-top: 28px;
+
+        padding-top: 22px;
+
+        border-top:
+            1px solid rgba(0, 0, 0, 0.07);
+    }
+
+
+    .footer-button {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        min-height: 44px;
+
+        padding: 0 18px;
+
+        border-radius: 14px;
+
+        text-decoration: none;
+
+        font-size: 14px;
+
+        font-weight: 650;
+
+        transition: all 0.2s ease;
+
+        cursor: pointer;
+    }
+
+
+    .footer-button:hover {
+        transform: translateY(-2px);
+
+        text-decoration: none;
+    }
+
+
+    /* =========================================================
+       DELETE BUTTON
+       ========================================================= */
+
+    .delete-button {
+        border:
+            1px solid rgba(220, 53, 69, 0.15);
+
+        background:
+            linear-gradient(135deg,
+                #dc3545,
+                #c82333);
+
+        color: white;
+
+        box-shadow:
+            0 8px 25px rgba(220, 53, 69, 0.18);
+    }
+
+
+    .delete-button:hover {
+        color: white;
+
+        background:
+            linear-gradient(135deg,
+                #d62f40,
+                #bd2130);
+
+        box-shadow:
+            0 11px 30px rgba(220, 53, 69, 0.26);
+    }
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 800px) {
+
+        .details-header {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+
+        .header-actions {
+            width: 100%;
+        }
+
+
+        .header-actions .glass-button {
+            flex: 1;
+        }
+
+
+        .lesson-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+        .schedule-details-page {
+            padding: 20px 14px 40px;
+        }
+
+
+        .lesson-main-card {
+            padding: 20px;
+
+            border-radius: 22px;
+        }
+
+
+        .details-header h1 {
+            font-size: 29px;
+        }
+
+
+        .lesson-title-block h2 {
+            font-size: 23px;
+        }
+
+
+        .lesson-card-top {
+            align-items: flex-start;
+        }
+
+
+        .info-card {
+            padding: 15px;
+        }
+
+
+        .warning-section {
+            padding: 15px;
+        }
+
+
+        .details-footer {
+            flex-direction: column;
+        }
+
+
+        .details-footer .footer-button {
+            width: 100%;
+        }
+
+    }
+
+
+    /* =========================================================
+       SMALL MOBILE
+       ========================================================= */
+
+    @media (max-width: 420px) {
+
+        .details-header h1 {
+            font-size: 26px;
+        }
+
+
+        .lesson-main-card {
+            padding: 16px;
+        }
+
+
+        .lesson-card-top {
+            flex-direction: column;
+        }
+
+
+        .lesson-icon {
+            width: 58px;
+            height: 58px;
+
+            font-size: 25px;
+        }
+
+
+        .lesson-title-block h2 {
+            font-size: 21px;
+        }
+
+
+        .info-card {
+            gap: 10px;
+
+            padding: 13px;
+        }
+
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+
+            font-size: 18px;
+        }
+
+
+        .warning-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .schedule-details-page *,
+        .schedule-details-page *::before,
+        .schedule-details-page *::after {
+            transition: none !important;
+        }
+
+    }
