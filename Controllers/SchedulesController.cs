@@ -868,6 +868,19 @@ public class SchedulesController : Controller
         {
             ViewBag.TeacherSubjectWarning = true;
 
+            ViewBag.TeacherName = teacher.FullName;
+
+            var teacherSubject = await _context.Subjects
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s =>
+                    s.Id == teacher.SubjectId.Value);
+
+            ViewBag.TeacherSubjectName =
+                teacherSubject?.Name ?? "неизвестный предмет";
+
+            ViewBag.SelectedSubjectName =
+                subject.Name;
+
             if (!confirmTeacherSubject)
             {
                 ModelState.AddModelError(

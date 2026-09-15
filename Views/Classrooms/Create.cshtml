@@ -5,11 +5,12 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/Classrooms/Create.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="~/css/Classrooms/Create.css"
+          asp-append-version="true" />
 }
 
 <div class="classroom-form-page">
-
 
     <div class="page-header">
         <div>
@@ -25,9 +26,7 @@
         </div>
 
         <div class="form-title">
-            <h2>
-                Информация об аудитории
-            </h2>
+            <h2>Информация об аудитории</h2>
 
             <p>
                 Укажите номер, категорию, количество мест и оборудование.
@@ -49,9 +48,13 @@
                     Номер аудитории
                 </label>
 
-                <input asp-for="Name" class="form-control glass-input" placeholder="Например: 305" autocomplete="off" />
+                <input asp-for="Name"
+                       class="form-control glass-input"
+                       placeholder="Например: 305"
+                       autocomplete="off" />
 
-                <span asp-validation-for="Name" class="text-danger">
+                <span asp-validation-for="Name"
+                      class="text-danger">
                 </span>
 
             </div>
@@ -60,14 +63,17 @@
 
             <div class="form-group">
 
-                <label asp-for="ClassroomCategoryId" class="form-label">
+                <label asp-for="ClassroomCategoryId"
+                       class="form-label">
                     Категория
                 </label>
 
                 <div class="category-row">
 
-                    <select asp-for="ClassroomCategoryId" asp-items="ViewBag.ClassroomCategories"
-                            class="form-control glass-input" id="classroomCategorySelect">
+                    <select asp-for="ClassroomCategoryId"
+                            asp-items="ViewBag.ClassroomCategories"
+                            class="form-control glass-input"
+                            id="classroomCategorySelect">
 
                         <option value="">
                             Выберите категорию
@@ -75,7 +81,9 @@
 
                     </select>
 
-                    <button type="button" class="add-category-btn" id="openCategoryModal">
+                    <button type="button"
+                            class="add-category-btn"
+                            id="openCategoryModal">
 
                         <span>＋</span>
 
@@ -85,7 +93,8 @@
 
                 </div>
 
-                <span asp-validation-for="ClassroomCategoryId" class="text-danger">
+                <span asp-validation-for="ClassroomCategoryId"
+                      class="text-danger">
                 </span>
 
             </div>
@@ -94,14 +103,20 @@
 
             <div class="form-group">
 
-                <label asp-for="Capacity" class="form-label">
+                <label asp-for="Capacity"
+                       class="form-label">
                     Количество мест
                 </label>
 
-                <input asp-for="Capacity" type="number" min="1" max="500" class="form-control glass-input"
+                <input asp-for="Capacity"
+                       type="number"
+                       min="1"
+                       max="500"
+                       class="form-control glass-input"
                        placeholder="Например: 30" />
 
-                <span asp-validation-for="Capacity" class="text-danger">
+                <span asp-validation-for="Capacity"
+                      class="text-danger">
                 </span>
 
             </div>
@@ -140,18 +155,21 @@
 
             </div>
 
-            <span asp-validation-for="HasComputers" class="text-danger">
+            <span asp-validation-for="HasComputers"
+                  class="text-danger">
             </span>
 
             <!-- КНОПКИ -->
 
             <div class="form-actions">
 
-                <button type="submit" class="btn save-btn">
+                <button type="submit"
+                        class="btn save-btn">
                     Добавить аудиторию
                 </button>
 
-                <a asp-action="Index" class="btn cancel-btn">
+                <a asp-action="Index"
+                   class="btn cancel-btn">
                     Отмена
                 </a>
 
@@ -161,20 +179,20 @@
 
     </div>
 
-   
 </div>
 
 <!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ КАТЕГОРИИ -->
 
-<div class="category-modal-overlay" id="categoryModal">
+<div class="category-modal-overlay"
+     id="categoryModal"
+     data-create-category-url="@Url.Action("CreateCategory", "Classrooms")">
 
-   
     <div class="category-modal">
 
-        <button type="button" class="category-modal-close" id="closeCategoryModal">
-
+        <button type="button"
+                class="category-modal-close"
+                id="closeCategoryModal">
             ×
-
         </button>
 
         <div class="modal-icon">
@@ -195,296 +213,46 @@
                 Название категории
             </label>
 
-            <input type="text" id="newCategoryName" class="form-control glass-input" placeholder="Например: Лаборатория"
-                   maxlength="100" autocomplete="off" />
+            <input type="text"
+                   id="newCategoryName"
+                   class="form-control glass-input"
+                   placeholder="Например: Лаборатория"
+                   maxlength="100"
+                   autocomplete="off" />
 
-            <div class="category-error" id="categoryError">
+            <div class="category-error"
+                 id="categoryError">
             </div>
 
         </div>
 
         <div class="modal-actions">
 
-            <button type="button" class="modal-cancel-btn" id="cancelCategory">
-
+            <button type="button"
+                    class="modal-cancel-btn"
+                    id="cancelCategory">
                 Отмена
-
             </button>
 
-            <button type="button" class="modal-save-btn" id="saveCategory">
-
+            <button type="button"
+                    class="modal-save-btn"
+                    id="saveCategory">
                 Добавить категорию
-
             </button>
 
         </div>
 
     </div>
 
-
 </div>
 
 @section Scripts {
-
 
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script>
-
-        const modal =
-            document.getElementById("categoryModal");
-
-        const openModalButton =
-            document.getElementById("openCategoryModal");
-
-        const closeModalButton =
-            document.getElementById("closeCategoryModal");
-
-        const cancelButton =
-            document.getElementById("cancelCategory");
-
-        const saveButton =
-            document.getElementById("saveCategory");
-
-        const categoryInput =
-            document.getElementById("newCategoryName");
-
-        const categorySelect =
-            document.getElementById("classroomCategorySelect");
-
-        const categoryError =
-            document.getElementById("categoryError");
-
-        const antiForgeryToken =
-            document.querySelector(
-                'input[name="__RequestVerificationToken"]'
-            ).value;
-
-
-        // Открытие окна
-
-        function openCategoryModal() {
-
-            modal.classList.add("active");
-
-            categoryInput.value = "";
-
-            categoryError.textContent = "";
-
-            categoryError.classList.remove("visible");
-
-            setTimeout(function () {
-
-                categoryInput.focus();
-
-            }, 100);
-        }
-
-
-        // Закрытие окна
-
-        function closeCategoryModal() {
-
-            modal.classList.remove("active");
-
-            categoryInput.value = "";
-
-            categoryError.textContent = "";
-
-            categoryError.classList.remove("visible");
-        }
-
-
-        openModalButton.addEventListener(
-            "click",
-            openCategoryModal
-        );
-
-
-        closeModalButton.addEventListener(
-            "click",
-            closeCategoryModal
-        );
-
-
-        cancelButton.addEventListener(
-            "click",
-            closeCategoryModal
-        );
-
-
-        // Закрытие по клику на фон
-
-        modal.addEventListener(
-            "click",
-            function (event) {
-
-                if (event.target === modal) {
-
-                    closeCategoryModal();
-
-                }
-
-            }
-        );
-
-
-        // Закрытие по Escape
-
-        document.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (
-                    event.key === "Escape" &&
-                    modal.classList.contains("active")
-                ) {
-
-                    closeCategoryModal();
-
-                }
-
-            }
-        );
-
-
-        // Добавление категории
-
-        saveButton.addEventListener(
-            "click",
-            async function () {
-
-                const name =
-                    categoryInput.value.trim();
-
-
-                if (!name) {
-
-                    categoryError.textContent =
-                        "Введите название категории.";
-
-                    categoryError.classList.add("visible");
-
-                    categoryInput.focus();
-
-                    return;
-                }
-
-
-                saveButton.disabled = true;
-
-                saveButton.textContent =
-                    "Добавление...";
-
-
-                try {
-
-                    const response = await fetch(
-                        "@Url.Action("CreateCategory", "Classrooms")",
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type": "application/json",
-                                "RequestVerificationToken":
-                                    antiForgeryToken
-                            },
-
-                            body: JSON.stringify({
-                                name: name
-                            })
-                        }
-                    );
-
-
-                    const data =
-                        await response.json();
-
-
-                    if (
-                        !response.ok ||
-                        !data.success
-                    ) {
-
-                        categoryError.textContent =
-                            data.message ||
-                            "Не удалось добавить категорию.";
-
-                        categoryError.classList.add(
-                            "visible"
-                        );
-
-                        return;
-                    }
-
-
-                    // Создаём новый пункт списка
-
-                    const option =
-                        document.createElement("option");
-
-                    option.value = data.id;
-
-                    option.textContent = data.name;
-
-
-                    categorySelect.appendChild(
-                        option
-                    );
-
-
-                    // Автоматически выбираем новую категорию
-
-                    categorySelect.value =
-                        data.id;
-
-
-                    closeCategoryModal();
-
-                }
-                catch (error) {
-
-                    categoryError.textContent =
-                        "Произошла ошибка. Попробуйте ещё раз.";
-
-                    categoryError.classList.add(
-                        "visible"
-                    );
-
-                }
-                finally {
-
-                    saveButton.disabled = false;
-
-                    saveButton.textContent =
-                        "Добавить категорию";
-
-                }
-
-            }
-        );
-
-
-        // Добавление категории по Enter
-
-        categoryInput.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (event.key === "Enter") {
-
-                    event.preventDefault();
-
-                    saveButton.click();
-
-                }
-
-            }
-        );
-
-    </script>
-
-
+    <script src="~/js/Classrooms/Create.js"
+            asp-append-version="true"></script>
 }
+
