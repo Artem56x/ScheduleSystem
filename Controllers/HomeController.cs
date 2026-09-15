@@ -19,14 +19,29 @@ public class HomeController : Controller
         _context = context;
     }
 
+    // GET: Home
     public async Task<IActionResult> Index()
     {
-        ViewBag.TeachersCount = await _context.Teachers.CountAsync();
-        ViewBag.GroupsCount = await _context.Groups.CountAsync();
-        ViewBag.SubjectsCount = await _context.Subjects.CountAsync();
-        ViewBag.ClassroomsCount = await _context.Classrooms.CountAsync();
+        // Статистика
+        ViewBag.TeachersCount = await _context.Teachers
+            .AsNoTracking()
+            .CountAsync();
 
+        ViewBag.GroupsCount = await _context.Groups
+            .AsNoTracking()
+            .CountAsync();
+
+        ViewBag.SubjectsCount = await _context.Subjects
+            .AsNoTracking()
+            .CountAsync();
+
+        ViewBag.ClassroomsCount = await _context.Classrooms
+            .AsNoTracking()
+            .CountAsync();
+
+        // Расписание
         var schedule = await _context.Schedules
+            .AsNoTracking()
             .Include(s => s.Teacher)
             .Include(s => s.Group)
             .Include(s => s.Subject)
@@ -38,17 +53,24 @@ public class HomeController : Controller
         return View(schedule);
     }
 
+    // GET: Home/Privacy
     public IActionResult Privacy()
     {
         return View();
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    // GET: Home/Error
+    [ResponseCache(
+        Duration = 0,
+        Location = ResponseCacheLocation.None,
+        NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel
         {
-            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            RequestId =
+                Activity.Current?.Id ??
+                HttpContext.TraceIdentifier
         });
     }
 }

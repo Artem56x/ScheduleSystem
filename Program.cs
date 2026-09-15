@@ -11,6 +11,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<ScheduleExportService>();
+builder.Services.AddScoped<ScheduleValidationService>();
+builder.Services.AddScoped<ClassroomRecommendationService>();
+
 
 builder.Services.AddControllersWithViews(options =>
 {

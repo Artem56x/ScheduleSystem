@@ -18,6 +18,7 @@ public class ClassroomsController : Controller
     public async Task<IActionResult> Index(string? search)
     {
         var classrooms = _context.Classrooms
+            .AsNoTracking()
             .Include(c => c.ClassroomCategory)
             .AsQueryable();
 
@@ -50,6 +51,7 @@ public class ClassroomsController : Controller
         }
 
         var classroom = await _context.Classrooms
+            .AsNoTracking()
             .Include(c => c.ClassroomCategory)
             .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -74,40 +76,35 @@ public class ClassroomsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
         [Bind("Id,Name,ClassroomCategoryId,Capacity,HasComputers")]
-    Classroom classroom)
+        Classroom classroom)
     {
-        // Проверяем категорию
-        if (classroom.ClassroomCategoryId <= 0)
+        await ValidateCategoryAsync(classroom.ClassroomCategoryId);
+
+        if (!ModelState.IsValid)
+        {
+            await LoadCategoriesAsync(classroom.ClassroomCategoryId);
+
+            return View(classroom);
+        }
+
+        _context.Classrooms.Add(classroom);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
         {
             ModelState.AddModelError(
-                nameof(classroom.ClassroomCategoryId),
-                "Выберите категорию аудитории.");
-        }
-        else
-        {
-            var categoryExists = await _context.ClassroomCategories
-                .AnyAsync(c => c.Id == classroom.ClassroomCategoryId);
+                string.Empty,
+                "Не удалось создать аудиторию. Проверьте введённые данные.");
 
-            if (!categoryExists)
-            {
-                ModelState.AddModelError(
-                    nameof(classroom.ClassroomCategoryId),
-                    "Выбранная категория не существует.");
-            }
+            await LoadCategoriesAsync(classroom.ClassroomCategoryId);
+
+            return View(classroom);
         }
 
-        if (ModelState.IsValid)
-        {
-            _context.Classrooms.Add(classroom);
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        await LoadCategoriesAsync(classroom.ClassroomCategoryId);
-
-        return View(classroom);
+        return RedirectToAction(nameof(Index));
     }
 
     // POST: Classrooms/CreateCategory
@@ -130,6 +127,7 @@ public class ClassroomsController : Controller
 
         // Проверяем, нет ли такой категории
         var exists = await _context.ClassroomCategories
+            .AsNoTracking()
             .AnyAsync(c => c.Name.ToLower() == name.ToLower());
 
         if (exists)
@@ -148,7 +146,18 @@ public class ClassroomsController : Controller
 
         _context.ClassroomCategories.Add(category);
 
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Не удалось создать категорию. Возможно, такая категория уже существует."
+            });
+        }
 
         return Ok(new
         {
@@ -167,6 +176,7 @@ public class ClassroomsController : Controller
         }
 
         var classroom = await _context.Classrooms
+            .AsNoTracking()
             .Include(c => c.ClassroomCategory)
             .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -186,57 +196,60 @@ public class ClassroomsController : Controller
     public async Task<IActionResult> Edit(
         int id,
         [Bind("Id,Name,ClassroomCategoryId,Capacity,HasComputers")]
-    Classroom classroom)
+        Classroom classroom)
     {
         if (id != classroom.Id)
         {
             return NotFound();
         }
 
-        // Проверяем категорию
-        if (classroom.ClassroomCategoryId <= 0)
+        await ValidateCategoryAsync(classroom.ClassroomCategoryId);
+
+        if (!ModelState.IsValid)
+        {
+            await LoadCategoriesAsync(classroom.ClassroomCategoryId);
+
+            return View(classroom);
+        }
+
+        var existingClassroom = await _context.Classrooms
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (existingClassroom == null)
+        {
+            return NotFound();
+        }
+
+        existingClassroom.Name = classroom.Name;
+        existingClassroom.ClassroomCategoryId = classroom.ClassroomCategoryId;
+        existingClassroom.Capacity = classroom.Capacity;
+        existingClassroom.HasComputers = classroom.HasComputers;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ClassroomExists(classroom.Id))
+            {
+                return NotFound();
+            }
+
+            throw;
+        }
+        catch (DbUpdateException)
         {
             ModelState.AddModelError(
-                nameof(classroom.ClassroomCategoryId),
-                "Выберите категорию аудитории.");
-        }
-        else
-        {
-            var categoryExists = await _context.ClassroomCategories
-                .AnyAsync(c => c.Id == classroom.ClassroomCategoryId);
+                string.Empty,
+                "Не удалось сохранить изменения аудитории.");
 
-            if (!categoryExists)
-            {
-                ModelState.AddModelError(
-                    nameof(classroom.ClassroomCategoryId),
-                    "Выбранная категория не существует.");
-            }
+            await LoadCategoriesAsync(classroom.ClassroomCategoryId);
+
+            return View(classroom);
         }
 
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                _context.Classrooms.Update(classroom);
-
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ClassroomExists(classroom.Id))
-                {
-                    return NotFound();
-                }
-
-                throw;
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        await LoadCategoriesAsync(classroom.ClassroomCategoryId);
-
-        return View(classroom);
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: Classrooms/Delete/5
@@ -248,6 +261,7 @@ public class ClassroomsController : Controller
         }
 
         var classroom = await _context.Classrooms
+            .AsNoTracking()
             .Include(c => c.ClassroomCategory)
             .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -266,7 +280,7 @@ public class ClassroomsController : Controller
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var classroom = await _context.Classrooms
-            .FirstOrDefaultAsync(c => c.Id == id);
+            .FindAsync(id);
 
         if (classroom == null)
         {
@@ -274,10 +288,11 @@ public class ClassroomsController : Controller
         }
 
         // Проверяем, используется ли аудитория в расписании
-        var isUsed = await _context.Schedules
+        var isUsedInSchedule = await _context.Schedules
+            .AsNoTracking()
             .AnyAsync(s => s.ClassroomId == id);
 
-        if (isUsed)
+        if (isUsedInSchedule)
         {
             TempData["ErrorMessage"] =
                 "Нельзя удалить аудиторию: она используется в расписании.";
@@ -287,15 +302,50 @@ public class ClassroomsController : Controller
 
         _context.Classrooms.Remove(classroom);
 
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            TempData["ErrorMessage"] =
+                "Нельзя удалить аудиторию: она используется в других данных системы.";
+
+            return RedirectToAction(nameof(Index));
+        }
 
         return RedirectToAction(nameof(Index));
+    }
+
+    // Проверка существования категории
+    private async Task ValidateCategoryAsync(int? categoryId)
+    {
+        if (!categoryId.HasValue || categoryId.Value <= 0)
+        {
+            ModelState.AddModelError(
+                nameof(Classroom.ClassroomCategoryId),
+                "Выберите категорию аудитории.");
+
+            return;
+        }
+
+        var categoryExists = await _context.ClassroomCategories
+            .AsNoTracking()
+            .AnyAsync(c => c.Id == categoryId.Value);
+
+        if (!categoryExists)
+        {
+            ModelState.AddModelError(
+                nameof(Classroom.ClassroomCategoryId),
+                "Выбранная категория не существует.");
+        }
     }
 
     // Загружает категории для выпадающего списка
     private async Task LoadCategoriesAsync(int? selectedCategoryId = null)
     {
         var categories = await _context.ClassroomCategories
+            .AsNoTracking()
             .OrderBy(c => c.Name)
             .ToListAsync();
 
@@ -318,6 +368,4 @@ public class ClassroomsController : Controller
     {
         public string Name { get; set; } = string.Empty;
     }
-
-
 }

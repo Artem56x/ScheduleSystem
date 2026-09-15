@@ -19,6 +19,7 @@ public class TeachersController : Controller
     public async Task<IActionResult> Index(string? search)
     {
         var teachers = _context.Teachers
+            .AsNoTracking()
             .Include(t => t.Subject)
             .AsQueryable();
 
@@ -50,6 +51,7 @@ public class TeachersController : Controller
         }
 
         var teacher = await _context.Teachers
+            .AsNoTracking()
             .Include(t => t.Subject)
             .FirstOrDefaultAsync(t => t.Id == id);
 
@@ -73,19 +75,34 @@ public class TeachersController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Id,FullName,SubjectId,Email")] Teacher teacher)
+        [Bind("Id,FullName,SubjectId,Email")]
+        Teacher teacher)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            _context.Teachers.Add(teacher);
-            await _context.SaveChangesAsync();
+            await PopulateSubjectsAsync(teacher.SubjectId);
 
-            return RedirectToAction(nameof(Index));
+            return View(teacher);
         }
 
-        await PopulateSubjectsAsync(teacher.SubjectId);
+        _context.Teachers.Add(teacher);
 
-        return View(teacher);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Не удалось создать преподавателя. Проверьте введённые данные.");
+
+            await PopulateSubjectsAsync(teacher.SubjectId);
+
+            return View(teacher);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: Teachers/Edit/5
@@ -96,7 +113,9 @@ public class TeachersController : Controller
             return NotFound();
         }
 
-        var teacher = await _context.Teachers.FindAsync(id);
+        var teacher = await _context.Teachers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == id);
 
         if (teacher == null)
         {
@@ -113,36 +132,58 @@ public class TeachersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
         int id,
-        [Bind("Id,FullName,SubjectId,Email")] Teacher teacher)
+        [Bind("Id,FullName,SubjectId,Email")]
+        Teacher teacher)
     {
         if (id != teacher.Id)
         {
             return NotFound();
         }
 
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            try
-            {
-                _context.Teachers.Update(teacher);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TeacherExists(teacher.Id))
-                {
-                    return NotFound();
-                }
+            await PopulateSubjectsAsync(teacher.SubjectId);
 
-                throw;
-            }
-
-            return RedirectToAction(nameof(Index));
+            return View(teacher);
         }
 
-        await PopulateSubjectsAsync(teacher.SubjectId);
+        var existingTeacher = await _context.Teachers
+            .FirstOrDefaultAsync(t => t.Id == id);
 
-        return View(teacher);
+        if (existingTeacher == null)
+        {
+            return NotFound();
+        }
+
+        existingTeacher.FullName = teacher.FullName;
+        existingTeacher.SubjectId = teacher.SubjectId;
+        existingTeacher.Email = teacher.Email;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TeacherExists(teacher.Id))
+            {
+                return NotFound();
+            }
+
+            throw;
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Не удалось сохранить изменения преподавателя.");
+
+            await PopulateSubjectsAsync(teacher.SubjectId);
+
+            return View(teacher);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: Teachers/Delete/5
@@ -154,6 +195,7 @@ public class TeachersController : Controller
         }
 
         var teacher = await _context.Teachers
+            .AsNoTracking()
             .Include(t => t.Subject)
             .FirstOrDefaultAsync(t => t.Id == id);
 
@@ -166,25 +208,55 @@ public class TeachersController : Controller
     }
 
     // POST: Teachers/Delete/5
-    [HttpPost, ActionName("Delete")]
+    [HttpPost]
+    [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var teacher = await _context.Teachers.FindAsync(id);
+        var teacher = await _context.Teachers
+            .FindAsync(id);
 
-        if (teacher != null)
+        if (teacher == null)
         {
-            _context.Teachers.Remove(teacher);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Проверяем, используется ли преподаватель в расписании
+        var isUsedInSchedule = await _context.Schedules
+            .AsNoTracking()
+            .AnyAsync(s => s.TeacherId == id);
+
+        if (isUsedInSchedule)
+        {
+            TempData["ErrorMessage"] =
+                "Нельзя удалить преподавателя: он используется в расписании.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        _context.Teachers.Remove(teacher);
+
+        try
+        {
             await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            TempData["ErrorMessage"] =
+                "Нельзя удалить преподавателя: он используется в других данных системы.";
+
+            return RedirectToAction(nameof(Index));
         }
 
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task PopulateSubjectsAsync(int? selectedSubjectId = null)
+    private async Task PopulateSubjectsAsync(
+        int? selectedSubjectId = null)
     {
         ViewData["SubjectId"] = new SelectList(
             await _context.Subjects
+                .AsNoTracking()
                 .OrderBy(s => s.Name)
                 .ToListAsync(),
             "Id",

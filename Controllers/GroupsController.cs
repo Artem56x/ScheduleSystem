@@ -17,7 +17,9 @@ public class GroupsController : Controller
     // GET: Groups
     public async Task<IActionResult> Index(string? search)
     {
-        var groups = _context.Groups.AsQueryable();
+        var groups = _context.Groups
+            .AsNoTracking()
+            .AsQueryable();
 
         // Поиск по названию группы и специальности
         if (!string.IsNullOrWhiteSpace(search))
@@ -47,6 +49,7 @@ public class GroupsController : Controller
         }
 
         var group = await _context.Groups
+            .AsNoTracking()
             .FirstOrDefaultAsync(g => g.Id == id);
 
         if (group == null)
@@ -67,17 +70,30 @@ public class GroupsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Id,Name,Specialty,StudentCount,Description")] Group group)
+        [Bind("Id,Name,Specialty,StudentCount,Description")]
+        Group group)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            _context.Groups.Add(group);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
+            return View(group);
         }
 
-        return View(group);
+        _context.Groups.Add(group);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Не удалось создать группу. Проверьте введённые данные.");
+
+            return View(group);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: Groups/Edit/5
@@ -88,7 +104,9 @@ public class GroupsController : Controller
             return NotFound();
         }
 
-        var group = await _context.Groups.FindAsync(id);
+        var group = await _context.Groups
+            .AsNoTracking()
+            .FirstOrDefaultAsync(g => g.Id == id);
 
         if (group == null)
         {
@@ -103,34 +121,55 @@ public class GroupsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
         int id,
-        [Bind("Id,Name,Specialty,StudentCount,Description")] Group group)
+        [Bind("Id,Name,Specialty,StudentCount,Description")]
+        Group group)
     {
         if (id != group.Id)
         {
             return NotFound();
         }
 
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            try
-            {
-                _context.Groups.Update(group);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GroupExists(group.Id))
-                {
-                    return NotFound();
-                }
-
-                throw;
-            }
-
-            return RedirectToAction(nameof(Index));
+            return View(group);
         }
 
-        return View(group);
+        var existingGroup = await _context.Groups
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+        if (existingGroup == null)
+        {
+            return NotFound();
+        }
+
+        existingGroup.Name = group.Name;
+        existingGroup.Specialty = group.Specialty;
+        existingGroup.StudentCount = group.StudentCount;
+        existingGroup.Description = group.Description;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!GroupExists(group.Id))
+            {
+                return NotFound();
+            }
+
+            throw;
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Не удалось сохранить изменения группы.");
+
+            return View(group);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: Groups/Delete/5
@@ -142,6 +181,7 @@ public class GroupsController : Controller
         }
 
         var group = await _context.Groups
+            .AsNoTracking()
             .FirstOrDefaultAsync(g => g.Id == id);
 
         if (group == null)
@@ -158,12 +198,39 @@ public class GroupsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var group = await _context.Groups.FindAsync(id);
+        var group = await _context.Groups
+            .FindAsync(id);
 
-        if (group != null)
+        if (group == null)
         {
-            _context.Groups.Remove(group);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Проверяем, используется ли группа в расписании
+        var isUsedInSchedule = await _context.Schedules
+            .AsNoTracking()
+            .AnyAsync(s => s.GroupId == id);
+
+        if (isUsedInSchedule)
+        {
+            TempData["ErrorMessage"] =
+                "Нельзя удалить группу: она используется в расписании.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        _context.Groups.Remove(group);
+
+        try
+        {
             await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            TempData["ErrorMessage"] =
+                "Нельзя удалить группу: она используется в других данных системы.";
+
+            return RedirectToAction(nameof(Index));
         }
 
         return RedirectToAction(nameof(Index));
@@ -174,4 +241,3 @@ public class GroupsController : Controller
         return _context.Groups.Any(g => g.Id == id);
     }
 }
-

@@ -58,6 +58,15 @@ namespace ScheduleSystem.Data
                 .HasForeignKey(schedule => schedule.SubjectId);
 
             // ==============================
+            // Teacher → Subject
+            // ==============================
+            modelBuilder.Entity<Teacher>()
+                .HasOne(teacher => teacher.Subject)
+                .WithMany()
+                .HasForeignKey(teacher => teacher.SubjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ==============================
             // Schedule → Classroom
             // ==============================
             modelBuilder.Entity<Schedule>()

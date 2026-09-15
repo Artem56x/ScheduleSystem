@@ -11,13 +11,19 @@ public class SchedulesController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ScheduleExportService _exportService;
+    private readonly ScheduleValidationService _validationService;
+    private readonly ClassroomRecommendationService _classroomRecommendationService;
 
     public SchedulesController(
         ApplicationDbContext context,
-        ScheduleExportService exportService)
+        ScheduleExportService exportService,
+        ScheduleValidationService validationService,
+        ClassroomRecommendationService classroomRecommendationService)
     {
         _context = context;
         _exportService = exportService;
+        _validationService = validationService;
+        _classroomRecommendationService = classroomRecommendationService;
     }
 
 
@@ -146,6 +152,7 @@ public class SchedulesController : Controller
         return View(schedules);
     }
 
+
     // ============================================================
     // GROUP SCHEDULE
     // ============================================================
@@ -170,7 +177,9 @@ public class SchedulesController : Controller
             .FirstOrDefaultAsync(g => g.Id == id);
 
         if (group == null)
+        {
             return NotFound();
+        }
 
         ViewBag.SelectedGroupId = group.Id;
         ViewBag.SelectedGroupName = group.Name;
@@ -214,7 +223,9 @@ public class SchedulesController : Controller
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (teacher == null)
+        {
             return NotFound();
+        }
 
         ViewBag.SelectedTeacherId = teacher.Id;
         ViewBag.SelectedTeacherName = teacher.FullName;
@@ -232,6 +243,7 @@ public class SchedulesController : Controller
 
         return View(schedules);
     }
+
 
     // ============================================================
     // EXPORT PAGE
@@ -265,8 +277,7 @@ public class SchedulesController : Controller
     {
         var schedules = await GetAllSchedulesForExportAsync();
 
-        var fileBytes =
-            _exportService.CreateAllExcel(schedules);
+        var fileBytes = _exportService.CreateAllExcel(schedules);
 
         return File(
             fileBytes,
@@ -283,14 +294,15 @@ public class SchedulesController : Controller
             .FirstOrDefaultAsync(g => g.Id == id);
 
         if (group == null)
+        {
             return NotFound();
+        }
 
         var schedules = await GetGroupSchedulesForExportAsync(id);
 
-        var fileBytes =
-            _exportService.CreateGroupExcel(
-                group.Name,
-                schedules);
+        var fileBytes = _exportService.CreateGroupExcel(
+            group.Name,
+            schedules);
 
         var fileName =
             $"Расписание_{MakeSafeFileName(group.Name)}.xlsx";
@@ -310,15 +322,16 @@ public class SchedulesController : Controller
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (teacher == null)
+        {
             return NotFound();
+        }
 
         var schedules =
             await GetTeacherSchedulesForExportAsync(id);
 
-        var fileBytes =
-            _exportService.CreateTeacherExcel(
-                teacher.FullName,
-                schedules);
+        var fileBytes = _exportService.CreateTeacherExcel(
+            teacher.FullName,
+            schedules);
 
         var fileName =
             $"Расписание_{MakeSafeFileName(teacher.FullName)}.xlsx";
@@ -337,11 +350,9 @@ public class SchedulesController : Controller
     [HttpGet]
     public async Task<IActionResult> ExportAllPdf()
     {
-        var schedules =
-            await GetAllSchedulesForExportAsync();
+        var schedules = await GetAllSchedulesForExportAsync();
 
-        var fileBytes =
-            _exportService.CreateAllPdf(schedules);
+        var fileBytes = _exportService.CreateAllPdf(schedules);
 
         return File(
             fileBytes,
@@ -358,15 +369,15 @@ public class SchedulesController : Controller
             .FirstOrDefaultAsync(g => g.Id == id);
 
         if (group == null)
+        {
             return NotFound();
+        }
 
-        var schedules =
-            await GetGroupSchedulesForExportAsync(id);
+        var schedules = await GetGroupSchedulesForExportAsync(id);
 
-        var fileBytes =
-            _exportService.CreateGroupPdf(
-                group.Name,
-                schedules);
+        var fileBytes = _exportService.CreateGroupPdf(
+            group.Name,
+            schedules);
 
         var fileName =
             $"Расписание_{MakeSafeFileName(group.Name)}.pdf";
@@ -386,15 +397,16 @@ public class SchedulesController : Controller
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (teacher == null)
+        {
             return NotFound();
+        }
 
         var schedules =
             await GetTeacherSchedulesForExportAsync(id);
 
-        var fileBytes =
-            _exportService.CreateTeacherPdf(
-                teacher.FullName,
-                schedules);
+        var fileBytes = _exportService.CreateTeacherPdf(
+            teacher.FullName,
+            schedules);
 
         var fileName =
             $"Расписание_{MakeSafeFileName(teacher.FullName)}.pdf";
@@ -413,11 +425,9 @@ public class SchedulesController : Controller
     [HttpGet]
     public async Task<IActionResult> ExportAllCsv()
     {
-        var schedules =
-            await GetAllSchedulesForExportAsync();
+        var schedules = await GetAllSchedulesForExportAsync();
 
-        var fileBytes =
-            _exportService.CreateAllCsv(schedules);
+        var fileBytes = _exportService.CreateAllCsv(schedules);
 
         return File(
             fileBytes,
@@ -434,15 +444,15 @@ public class SchedulesController : Controller
             .FirstOrDefaultAsync(g => g.Id == id);
 
         if (group == null)
+        {
             return NotFound();
+        }
 
-        var schedules =
-            await GetGroupSchedulesForExportAsync(id);
+        var schedules = await GetGroupSchedulesForExportAsync(id);
 
-        var fileBytes =
-            _exportService.CreateGroupCsv(
-                group.Name,
-                schedules);
+        var fileBytes = _exportService.CreateGroupCsv(
+            group.Name,
+            schedules);
 
         var fileName =
             $"Расписание_{MakeSafeFileName(group.Name)}.csv";
@@ -462,15 +472,16 @@ public class SchedulesController : Controller
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (teacher == null)
+        {
             return NotFound();
+        }
 
         var schedules =
             await GetTeacherSchedulesForExportAsync(id);
 
-        var fileBytes =
-            _exportService.CreateTeacherCsv(
-                teacher.FullName,
-                schedules);
+        var fileBytes = _exportService.CreateTeacherCsv(
+            teacher.FullName,
+            schedules);
 
         var fileName =
             $"Расписание_{MakeSafeFileName(teacher.FullName)}.csv";
@@ -489,12 +500,16 @@ public class SchedulesController : Controller
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
+        {
             return NotFound();
+        }
 
         var schedule = await FindScheduleAsync(id.Value);
 
         if (schedule == null)
+        {
             return NotFound();
+        }
 
         return View(schedule);
     }
@@ -504,6 +519,7 @@ public class SchedulesController : Controller
     // CREATE
     // ============================================================
 
+    [HttpGet]
     public async Task<IActionResult> Create()
     {
         await PopulateSelectListsAsync();
@@ -521,47 +537,62 @@ public class SchedulesController : Controller
         RemoveDefaultValidationErrors();
 
         var validationResult =
-            await ValidateScheduleAsync(
+            await _validationService.ValidateAsync(
                 schedule,
                 confirmTeacherSubject);
 
+        ApplyValidationResult(validationResult);
+
         if (!validationResult.IsValid)
         {
-            await PopulateSelectListsAsync(schedule);
+            await PrepareValidationViewAsync(
+                schedule,
+                validationResult);
+
             return View(schedule);
         }
 
-        await SetTeacherSubjectWarningAsync(schedule);
-
-        if (ViewBag.TeacherSubjectWarning == true &&
-            !confirmTeacherSubject)
+        try
         {
-            await PopulateSelectListsAsync(schedule);
+            _context.Schedules.Add(schedule);
+
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Не удалось сохранить расписание. Проверьте выбранные данные и попробуйте ещё раз.");
+
+            await PrepareValidationViewAsync(
+                schedule,
+                validationResult);
+
             return View(schedule);
         }
-
-        _context.Schedules.Add(schedule);
-
-        await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
     }
-
 
 
     // ============================================================
     // EDIT
     // ============================================================
 
+    [HttpGet]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
+        {
             return NotFound();
+        }
 
         var schedule = await FindScheduleAsync(id.Value);
 
         if (schedule == null)
+        {
             return NotFound();
+        }
 
         await PopulateSelectListsAsync(schedule);
 
@@ -577,42 +608,68 @@ public class SchedulesController : Controller
         bool confirmTeacherSubject = false)
     {
         if (id != schedule.Id)
+        {
             return NotFound();
+        }
 
         RemoveDefaultValidationErrors();
 
         var validationResult =
-            await ValidateScheduleAsync(
+            await _validationService.ValidateAsync(
                 schedule,
                 confirmTeacherSubject);
 
+        ApplyValidationResult(validationResult);
+
         if (!validationResult.IsValid)
         {
-            await PopulateSelectListsAsync(schedule);
+            await PrepareValidationViewAsync(
+                schedule,
+                validationResult);
+
             return View(schedule);
         }
 
-        await SetTeacherSubjectWarningAsync(schedule);
+        var existingSchedule = await _context.Schedules
+            .FirstOrDefaultAsync(s => s.Id == id);
 
-        if (ViewBag.TeacherSubjectWarning == true &&
-            !confirmTeacherSubject)
+        if (existingSchedule == null)
         {
-            await PopulateSelectListsAsync(schedule);
-            return View(schedule);
+            return NotFound();
         }
+
+        existingSchedule.TeacherId = schedule.TeacherId;
+        existingSchedule.GroupId = schedule.GroupId;
+        existingSchedule.SubjectId = schedule.SubjectId;
+        existingSchedule.ClassroomId = schedule.ClassroomId;
+        existingSchedule.DayOfWeek = schedule.DayOfWeek;
+        existingSchedule.StartTime = schedule.StartTime;
+        existingSchedule.EndTime = schedule.EndTime;
 
         try
         {
-            _context.Update(schedule);
-
             await _context.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
             if (!await ScheduleExistsAsync(schedule.Id))
+            {
                 return NotFound();
+            }
 
             throw;
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Не удалось сохранить изменения расписания.");
+
+            await PrepareValidationViewAsync(
+                schedule,
+                validationResult);
+
+            return View(schedule);
         }
 
         return RedirectToAction(nameof(Index));
@@ -623,33 +680,50 @@ public class SchedulesController : Controller
     // DELETE
     // ============================================================
 
+    [HttpGet]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
+        {
             return NotFound();
+        }
 
         var schedule = await FindScheduleAsync(id.Value);
 
         if (schedule == null)
+        {
             return NotFound();
+        }
 
         return View(schedule);
     }
 
 
-    [HttpPost, ActionName("Delete")]
+    [HttpPost]
+    [ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(
-        int id)
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var schedule =
-            await _context.Schedules
-                .FirstOrDefaultAsync(s => s.Id == id);
+        var schedule = await _context.Schedules
+            .FirstOrDefaultAsync(s => s.Id == id);
 
-        if (schedule != null)
+        if (schedule == null)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        try
         {
             _context.Schedules.Remove(schedule);
+
             await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            TempData["ErrorMessage"] =
+                "Не удалось удалить занятие. Попробуйте ещё раз.";
+
+            return RedirectToAction(nameof(Index));
         }
 
         return RedirectToAction(nameof(Index));
@@ -669,6 +743,8 @@ public class SchedulesController : Controller
             .Include(s => s.Group)
             .Include(s => s.Subject)
             .Include(s => s.Classroom)
+            .OrderBy(s => s.DayOfWeek)
+            .ThenBy(s => s.StartTime)
             .ToListAsync();
     }
 
@@ -683,6 +759,8 @@ public class SchedulesController : Controller
             .Include(s => s.Subject)
             .Include(s => s.Classroom)
             .Where(s => s.GroupId == groupId)
+            .OrderBy(s => s.DayOfWeek)
+            .ThenBy(s => s.StartTime)
             .ToListAsync();
     }
 
@@ -697,6 +775,8 @@ public class SchedulesController : Controller
             .Include(s => s.Subject)
             .Include(s => s.Classroom)
             .Where(s => s.TeacherId == teacherId)
+            .OrderBy(s => s.DayOfWeek)
+            .ThenBy(s => s.StartTime)
             .ToListAsync();
     }
 
@@ -705,10 +785,10 @@ public class SchedulesController : Controller
     // FIND SCHEDULE
     // ============================================================
 
-    private async Task<Schedule?> FindScheduleAsync(
-        int id)
+    private async Task<Schedule?> FindScheduleAsync(int id)
     {
         return await _context.Schedules
+            .AsNoTracking()
             .Include(s => s.Teacher)
             .Include(s => s.Group)
             .Include(s => s.Subject)
@@ -724,57 +804,88 @@ public class SchedulesController : Controller
     private async Task PopulateSelectListsAsync(
         Schedule? schedule = null)
     {
-        ViewBag.TeacherId =
-            new SelectList(
-                await _context.Teachers
-                    .AsNoTracking()
-                    .OrderBy(t => t.FullName)
-                    .ToListAsync(),
-                "Id",
-                "FullName",
-                schedule?.TeacherId);
+        var teachers = await _context.Teachers
+            .AsNoTracking()
+            .OrderBy(t => t.FullName)
+            .ToListAsync();
 
-        ViewBag.GroupId =
-            new SelectList(
-                await _context.Groups
-                    .AsNoTracking()
-                    .OrderBy(g => g.Name)
-                    .ToListAsync(),
-                "Id",
-                "Name",
-                schedule?.GroupId);
+        var groups = await _context.Groups
+            .AsNoTracking()
+            .OrderBy(g => g.Name)
+            .ToListAsync();
 
-        ViewBag.SubjectId =
-            new SelectList(
-                await _context.Subjects
-                    .AsNoTracking()
-                    .OrderBy(s => s.Name)
-                    .ToListAsync(),
-                "Id",
-                "Name",
-                schedule?.SubjectId);
+        var subjects = await _context.Subjects
+            .AsNoTracking()
+            .OrderBy(s => s.Name)
+            .ToListAsync();
 
-        ViewBag.ClassroomId =
-            new SelectList(
-                await _context.Classrooms
-                    .AsNoTracking()
-                    .OrderBy(c => c.Name)
-                    .ToListAsync(),
-                "Id",
-                "Name",
-                schedule?.ClassroomId);
+        var classrooms = await _context.Classrooms
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .ToListAsync();
 
-        ViewBag.DayOfWeek =
-        new SelectList(
+        ViewBag.TeacherId = new SelectList(
+            teachers,
+            "Id",
+            "FullName",
+            schedule?.TeacherId);
+
+        ViewBag.GroupId = new SelectList(
+            groups,
+            "Id",
+            "Name",
+            schedule?.GroupId);
+
+        ViewBag.SubjectId = new SelectList(
+            subjects,
+            "Id",
+            "Name",
+            schedule?.SubjectId);
+
+        ViewBag.ClassroomId = new SelectList(
+            classrooms,
+            "Id",
+            "Name",
+            schedule?.ClassroomId);
+
+        ViewBag.DayOfWeek = new SelectList(
             new[]
             {
-            new { Value = DayOfWeek.Monday, Name = "Понедельник" },
-            new { Value = DayOfWeek.Tuesday, Name = "Вторник" },
-            new { Value = DayOfWeek.Wednesday, Name = "Среда" },
-            new { Value = DayOfWeek.Thursday, Name = "Четверг" },
-            new { Value = DayOfWeek.Friday, Name = "Пятница" },
-            new { Value = DayOfWeek.Saturday, Name = "Суббота" },
-            new { Value = DayOfWeek.Sunday, Name = "Воскресенье" }
+                new
+                {
+                    Value = DayOfWeek.Monday,
+                    Name = "Понедельник"
+                },
+                new
+                {
+                    Value = DayOfWeek.Tuesday,
+                    Name = "Вторник"
+                },
+                new
+                {
+                    Value = DayOfWeek.Wednesday,
+                    Name = "Среда"
+                },
+                new
+                {
+                    Value = DayOfWeek.Thursday,
+                    Name = "Четверг"
+                },
+                new
+                {
+                    Value = DayOfWeek.Friday,
+                    Name = "Пятница"
+                },
+                new
+                {
+                    Value = DayOfWeek.Saturday,
+                    Name = "Суббота"
+                },
+                new
+                {
+                    Value = DayOfWeek.Sunday,
+                    Name = "Воскресенье"
+                }
             },
             "Value",
             "Name",
@@ -783,7 +894,7 @@ public class SchedulesController : Controller
 
 
     // ============================================================
-    // VALIDATION
+    // VALIDATION SUPPORT
     // ============================================================
 
     private void RemoveDefaultValidationErrors()
@@ -795,346 +906,70 @@ public class SchedulesController : Controller
     }
 
 
-    private async Task<ValidationResult>
-        ValidateScheduleAsync(
-            Schedule schedule,
-            bool confirmTeacherSubject)
+    private void ApplyValidationResult(
+        ScheduleValidationResult result)
     {
-        if (!ValidateBasicData(schedule))
+        foreach (var error in result.Errors)
         {
-            return new ValidationResult(false);
+            ModelState.AddModelError(
+                error.Key,
+                error.Message);
         }
 
-        var teacher = await _context.Teachers
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                t => t.Id == schedule.TeacherId);
+        ViewBag.TeacherSubjectWarning =
+            result.TeacherSubjectWarning;
 
-        var group = await _context.Groups
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                g => g.Id == schedule.GroupId);
+        ViewBag.TeacherName =
+            result.TeacherName;
+
+        ViewBag.TeacherSubjectName =
+            result.TeacherSubjectName;
+
+        ViewBag.SelectedSubjectName =
+            result.SelectedSubjectName;
+    }
+
+
+    private async Task PrepareValidationViewAsync(
+        Schedule schedule,
+        ScheduleValidationResult validationResult)
+    {
+        await PopulateSelectListsAsync(schedule);
+
+        if (!validationResult.ClassroomRecommendationNeeded)
+        {
+            return;
+        }
 
         var subject = await _context.Subjects
             .AsNoTracking()
             .FirstOrDefaultAsync(
                 s => s.Id == schedule.SubjectId);
 
-        var classroom = await _context.Classrooms
+        var group = await _context.Groups
             .AsNoTracking()
-            .Include(c => c.ClassroomCategory)
             .FirstOrDefaultAsync(
-                c => c.Id == schedule.ClassroomId);
+                g => g.Id == schedule.GroupId);
 
-        if (teacher == null)
+        if (subject == null || group == null)
         {
-            ModelState.AddModelError(
-                "TeacherId",
-                "Преподаватель не найден.");
+            return;
         }
 
-        if (group == null)
-        {
-            ModelState.AddModelError(
-                "GroupId",
-                "Группа не найдена.");
-        }
-
-        if (subject == null)
-        {
-            ModelState.AddModelError(
-                "SubjectId",
-                "Предмет не найден.");
-        }
-
-        if (classroom == null)
-        {
-            ModelState.AddModelError(
-                "ClassroomId",
-                "Аудитория не найдена.");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return new ValidationResult(false);
-        }
-
-        // --------------------------------------------------------
-        // Преподаватель / предмет
-        // --------------------------------------------------------
-
-        if (teacher!.SubjectId.HasValue &&
-            teacher.SubjectId.Value != subject!.Id)
-        {
-            ViewBag.TeacherSubjectWarning = true;
-
-            ViewBag.TeacherName = teacher.FullName;
-
-            var teacherSubject = await _context.Subjects
-                .AsNoTracking()
-                .FirstOrDefaultAsync(s =>
-                    s.Id == teacher.SubjectId.Value);
-
-            ViewBag.TeacherSubjectName =
-                teacherSubject?.Name ?? "неизвестный предмет";
-
-            ViewBag.SelectedSubjectName =
-                subject.Name;
-
-            if (!confirmTeacherSubject)
-            {
-                ModelState.AddModelError(
-                    "",
-                    $"Преподаватель «{teacher.FullName}» обычно ведёт " +
-                    $"другой предмет. Проверьте выбор.");
-            }
-        }
-
-
-        // --------------------------------------------------------
-        // Вместимость группы / аудитории
-        // --------------------------------------------------------
-
-        if (group!.StudentCount > classroom!.Capacity)
-        {
-            ModelState.AddModelError(
-                "ClassroomId",
-                $"В аудитории «{classroom.Name}» недостаточно мест. " +
-                $"Вместимость: {classroom.Capacity}, " +
-                $"в группе: {group.StudentCount} человек.");
-
-            await BuildClassroomRecommendationsAsync(
-                schedule,
-                subject!,
-                group!);
-        }
-
-
-        // --------------------------------------------------------
-        // Требование компьютеров
-        // --------------------------------------------------------
-
-        if (subject!.RequiresComputers &&
-            !classroom.HasComputers)
-        {
-            ModelState.AddModelError(
-                "ClassroomId",
-                $"Предмет «{subject.Name}» требует компьютерную " +
-                $"аудиторию. В аудитории «{classroom.Name}» " +
-                $"компьютеров нет.");
-
-            await BuildClassroomRecommendationsAsync(
-                schedule,
-                subject,
-                group);
-        }
-
-
-        // --------------------------------------------------------
-        // Конфликт аудитории
-        // --------------------------------------------------------
-
-        if (await HasClassroomConflictAsync(schedule))
-        {
-            ModelState.AddModelError(
-                "ClassroomId",
-                $"Аудитория «{classroom.Name}» уже занята " +
-                $"в выбранное время.");
-
-            await BuildClassroomRecommendationsAsync(
-                schedule,
-                subject,
-                group);
-        }
-
-
-        // --------------------------------------------------------
-        // Конфликт группы
-        // --------------------------------------------------------
-
-        if (await HasGroupConflictAsync(schedule))
-        {
-            ModelState.AddModelError(
-                "GroupId",
-                $"У группы «{group.Name}» уже есть занятие " +
-                $"в выбранное время.");
-        }
-
-
-        // --------------------------------------------------------
-        // Конфликт преподавателя
-        // --------------------------------------------------------
-
-        if (await HasTeacherConflictAsync(schedule))
-        {
-            ModelState.AddModelError(
-                "TeacherId",
-                $"У преподавателя «{teacher.FullName}» уже есть " +
-                $"занятие в выбранное время.");
-        }
-
-
-        return new ValidationResult(
-            ModelState.IsValid);
-    }
-
-
-    private bool ValidateBasicData(
-        Schedule schedule)
-    {
-        if (!schedule.DayOfWeek.HasValue)
-        {
-            ModelState.AddModelError(
-                "DayOfWeek",
-                "Выберите день недели.");
-        }
-
-        if (!schedule.StartTime.HasValue ||
-            !schedule.EndTime.HasValue)
-        {
-            ModelState.AddModelError(
-                "",
-                "Укажите время начала и окончания занятия.");
-
-            return false;
-        }
-
-        if (schedule.StartTime >= schedule.EndTime)
-        {
-            ModelState.AddModelError(
-                "",
-                "Время окончания должно быть позже времени начала.");
-        }
-
-        return ModelState.IsValid;
-    }
-
-
-    // ============================================================
-    // CONFLICTS
-    // ============================================================
-
-    private async Task<bool> HasClassroomConflictAsync(
-        Schedule schedule)
-    {
-        return await _context.Schedules
-            .AsNoTracking()
-            .AnyAsync(s =>
-                s.Id != schedule.Id &&
-                s.ClassroomId == schedule.ClassroomId &&
-                s.DayOfWeek == schedule.DayOfWeek &&
-                s.StartTime < schedule.EndTime &&
-                s.EndTime > schedule.StartTime);
-    }
-
-
-    private async Task<bool> HasGroupConflictAsync(
-        Schedule schedule)
-    {
-        return await _context.Schedules
-            .AsNoTracking()
-            .AnyAsync(s =>
-                s.Id != schedule.Id &&
-                s.GroupId == schedule.GroupId &&
-                s.DayOfWeek == schedule.DayOfWeek &&
-                s.StartTime < schedule.EndTime &&
-                s.EndTime > schedule.StartTime);
-    }
-
-
-    private async Task<bool> HasTeacherConflictAsync(
-        Schedule schedule)
-    {
-        return await _context.Schedules
-            .AsNoTracking()
-            .AnyAsync(s =>
-                s.Id != schedule.Id &&
-                s.TeacherId == schedule.TeacherId &&
-                s.DayOfWeek == schedule.DayOfWeek &&
-                s.StartTime < schedule.EndTime &&
-                s.EndTime > schedule.StartTime);
-    }
-
-
-    // ============================================================
-    // CLASSROOM RECOMMENDATIONS
-    // ============================================================
-
-    private async Task BuildClassroomRecommendationsAsync(
-        Schedule schedule,
-        Subject subject,
-        Group group)
-    {
-        var classrooms = await _context.Classrooms
-            .AsNoTracking()
-            .Include(c => c.ClassroomCategory)
-            .Where(c =>
-                c.Id != schedule.ClassroomId &&
-                c.Capacity >= group.StudentCount &&
-                (!subject.RequiresComputers ||
-                 c.HasComputers))
-            .OrderBy(c => c.Capacity)
-            .ThenBy(c => c.Name)
-            .ToListAsync();
-
-        var recommendedClassrooms =
-            new List<Classroom>();
-
-        foreach (var classroom in classrooms)
-        {
-            var busy = await _context.Schedules
-                .AsNoTracking()
-                .AnyAsync(s =>
-                    s.Id != schedule.Id &&
-                    s.ClassroomId == classroom.Id &&
-                    s.DayOfWeek == schedule.DayOfWeek &&
-                    s.StartTime < schedule.EndTime &&
-                    s.EndTime > schedule.StartTime);
-
-            if (!busy)
-            {
-                recommendedClassrooms.Add(classroom);
-            }
-        }
+        var recommendations =
+            await _classroomRecommendationService
+                .GetRecommendationsAsync(
+                    schedule,
+                    subject,
+                    group);
 
         ViewBag.RecommendedClassrooms =
-            recommendedClassrooms;
-
-        var selectedClassroom =
-            await _context.Classrooms
-                .AsNoTracking()
-                .FirstOrDefaultAsync(
-                    c => c.Id == schedule.ClassroomId);
+            recommendations;
 
         ViewBag.SelectedClassroomName =
-            selectedClassroom?.Name;
-    }
-
-
-    // ============================================================
-    // TEACHER / SUBJECT WARNING
-    // ============================================================
-
-    private async Task SetTeacherSubjectWarningAsync(
-        Schedule schedule)
-    {
-        if (schedule.TeacherId <= 0 ||
-            schedule.SubjectId <= 0)
-        {
-            return;
-        }
-
-        var teacher = await _context.Teachers
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                t => t.Id == schedule.TeacherId);
-
-        if (teacher == null)
-            return;
-
-        ViewBag.TeacherSubjectWarning =
-            teacher.SubjectId.HasValue &&
-            teacher.SubjectId.Value != schedule.SubjectId;
+            await _classroomRecommendationService
+                .GetSelectedClassroomNameAsync(
+                    schedule.ClassroomId);
     }
 
 
@@ -1142,10 +977,10 @@ public class SchedulesController : Controller
     // EXISTS
     // ============================================================
 
-    private async Task<bool> ScheduleExistsAsync(
-        int id)
+    private async Task<bool> ScheduleExistsAsync(int id)
     {
         return await _context.Schedules
+            .AsNoTracking()
             .AnyAsync(e => e.Id == id);
     }
 
@@ -1154,37 +989,21 @@ public class SchedulesController : Controller
     // FILE NAME
     // ============================================================
 
-    private static string MakeSafeFileName(
-        string fileName)
+    private static string MakeSafeFileName(string fileName)
     {
         var invalidChars =
             Path.GetInvalidFileNameChars();
 
         var result = new string(
-            fileName
-                .Select(c =>
-                    invalidChars.Contains(c)
-                        ? '_'
-                        : c)
-                .ToArray());
+            fileName.Select(c =>
+                invalidChars.Contains(c)
+                    ? '_'
+                    : c)
+            .ToArray());
 
         return string.IsNullOrWhiteSpace(result)
             ? "Расписание"
             : result;
     }
-
-
-    // ============================================================
-    // VALIDATION RESULT
-    // ============================================================
-
-    private sealed class ValidationResult
-    {
-        public bool IsValid { get; }
-
-        public ValidationResult(bool isValid)
-        {
-            IsValid = isValid;
-        }
-    }
 }
+

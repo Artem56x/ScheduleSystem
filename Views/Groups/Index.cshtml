@@ -25,6 +25,13 @@
 
     </div>
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="error-message-glass">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     <!-- Поиск -->
     <form asp-action="Index" method="get" class="search-card">
 
