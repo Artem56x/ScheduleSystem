@@ -146,6 +146,92 @@ public class SchedulesController : Controller
         return View(schedules);
     }
 
+    // ============================================================
+    // GROUP SCHEDULE
+    // ============================================================
+
+    [HttpGet]
+    public async Task<IActionResult> GroupSchedule(int? id)
+    {
+        var groups = await _context.Groups
+            .AsNoTracking()
+            .OrderBy(g => g.Name)
+            .ToListAsync();
+
+        ViewBag.Groups = groups;
+
+        if (id == null)
+        {
+            return View(new List<Schedule>());
+        }
+
+        var group = await _context.Groups
+            .AsNoTracking()
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+        if (group == null)
+            return NotFound();
+
+        ViewBag.SelectedGroupId = group.Id;
+        ViewBag.SelectedGroupName = group.Name;
+
+        var schedules = await _context.Schedules
+            .AsNoTracking()
+            .Include(s => s.Teacher)
+            .Include(s => s.Group)
+            .Include(s => s.Subject)
+            .Include(s => s.Classroom)
+            .Where(s => s.GroupId == id)
+            .OrderBy(s => s.DayOfWeek)
+            .ThenBy(s => s.StartTime)
+            .ToListAsync();
+
+        return View(schedules);
+    }
+
+
+    // ============================================================
+    // TEACHER SCHEDULE
+    // ============================================================
+
+    [HttpGet]
+    public async Task<IActionResult> TeacherSchedule(int? id)
+    {
+        var teachers = await _context.Teachers
+            .AsNoTracking()
+            .OrderBy(t => t.FullName)
+            .ToListAsync();
+
+        ViewBag.Teachers = teachers;
+
+        if (id == null)
+        {
+            return View(new List<Schedule>());
+        }
+
+        var teacher = await _context.Teachers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == id);
+
+        if (teacher == null)
+            return NotFound();
+
+        ViewBag.SelectedTeacherId = teacher.Id;
+        ViewBag.SelectedTeacherName = teacher.FullName;
+
+        var schedules = await _context.Schedules
+            .AsNoTracking()
+            .Include(s => s.Teacher)
+            .Include(s => s.Group)
+            .Include(s => s.Subject)
+            .Include(s => s.Classroom)
+            .Where(s => s.TeacherId == id)
+            .OrderBy(s => s.DayOfWeek)
+            .ThenBy(s => s.StartTime)
+            .ToListAsync();
+
+        return View(schedules);
+    }
 
     // ============================================================
     // EXPORT PAGE
@@ -462,6 +548,7 @@ public class SchedulesController : Controller
     }
 
 
+
     // ============================================================
     // EDIT
     // ============================================================
@@ -676,6 +763,22 @@ public class SchedulesController : Controller
                 "Id",
                 "Name",
                 schedule?.ClassroomId);
+
+        ViewBag.DayOfWeek =
+        new SelectList(
+            new[]
+            {
+            new { Value = DayOfWeek.Monday, Name = "Понедельник" },
+            new { Value = DayOfWeek.Tuesday, Name = "Вторник" },
+            new { Value = DayOfWeek.Wednesday, Name = "Среда" },
+            new { Value = DayOfWeek.Thursday, Name = "Четверг" },
+            new { Value = DayOfWeek.Friday, Name = "Пятница" },
+            new { Value = DayOfWeek.Saturday, Name = "Суббота" },
+            new { Value = DayOfWeek.Sunday, Name = "Воскресенье" }
+            },
+            "Value",
+            "Name",
+            schedule?.DayOfWeek);
     }
 
 
