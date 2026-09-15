@@ -80,6 +80,65 @@
         transform: translateY(-1px);
     }
 
+    /* =========================================================
+   PRINT BUTTON
+   ========================================================= */
+
+.print-header-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 11px 15px;
+
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #e5e7eb;
+
+    color: #374151;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.print-header-button:hover {
+    color: #2563eb;
+
+    border-color: rgba(37, 99, 235, 0.25);
+
+    background: rgba(255, 255, 255, 0.95);
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 5px 16px rgba(37, 99, 235, 0.08);
+}
+
+.print-header-button:active {
+    transform: translateY(0);
+}
+
+.print-header-button:focus-visible {
+    outline: none;
+
+    border-color: rgba(37, 99, 235, 0.4);
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.08);
+}
 
     /* =========================================================
        ADD BUTTON
@@ -800,3 +859,350 @@
         }
 
     }
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+@media print {
+
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+
+    /* ---------------------------------------------------------
+       BODY
+       --------------------------------------------------------- */
+
+    html,
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       HIDE UI
+       --------------------------------------------------------- */
+
+    .no-print {
+        display: none !important;
+    }
+
+
+    /*
+       Если в _Layout.cshtml у навигации есть эти классы —
+       они тоже автоматически исчезнут.
+    */
+
+    nav,
+    header,
+    footer,
+    .navbar,
+    .site-header,
+    .site-footer {
+        display: none !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       MAIN PAGE
+       --------------------------------------------------------- */
+
+    .schedule-page {
+        max-width: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       PRINT HEADER
+       --------------------------------------------------------- */
+
+    .schedule-header {
+        display: block !important;
+        margin-bottom: 20px !important;
+        padding-bottom: 12px !important;
+        border-bottom: 2px solid #111827 !important;
+    }
+
+
+    .schedule-kicker {
+        color: #555555 !important;
+        font-size: 9px !important;
+        letter-spacing: 1.5px !important;
+    }
+
+
+    .schedule-header h1 {
+        margin: 0 !important;
+        color: #000000 !important;
+        font-size: 24px !important;
+    }
+
+
+    .schedule-header p {
+        margin-top: 4px !important;
+        color: #555555 !important;
+        font-size: 10px !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       HIDE STATS
+       --------------------------------------------------------- */
+
+    .schedule-stats {
+        display: none !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       SECTION HEADER
+       --------------------------------------------------------- */
+
+    .schedule-section-header {
+        margin-bottom: 12px !important;
+    }
+
+
+    .schedule-section-header h2 {
+        color: #000000 !important;
+        font-size: 18px !important;
+    }
+
+
+    .section-label {
+        color: #555555 !important;
+        font-size: 9px !important;
+    }
+
+
+    .total-lessons {
+        color: #555555 !important;
+    }
+
+
+    .total-lessons span:first-child {
+        color: #000000 !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       DAY CARD
+       --------------------------------------------------------- */
+
+    .day-card {
+        margin-bottom: 12px !important;
+        border: 1px solid #bdbdbd !important;
+        border-radius: 0 !important;
+        background: #ffffff !important;
+
+        box-shadow: none !important;
+
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+
+        overflow: visible !important;
+
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+
+    .day-header {
+        padding: 8px 10px !important;
+
+        background: #f3f4f6 !important;
+
+        border-bottom: 1px solid #bdbdbd !important;
+
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+
+    .day-title {
+        gap: 7px !important;
+    }
+
+
+    .day-dot {
+        width: 6px !important;
+        height: 6px !important;
+
+        background: #000000 !important;
+
+        box-shadow: none !important;
+    }
+
+
+    .day-title h3 {
+        color: #000000 !important;
+        font-size: 13px !important;
+    }
+
+
+    .day-count {
+        color: #555555 !important;
+    }
+
+
+    .day-count span:first-child {
+        color: #000000 !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       LESSON LIST
+       --------------------------------------------------------- */
+
+    .lessons-list {
+        padding: 0 !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       LESSON CARD
+       --------------------------------------------------------- */
+
+    .lesson-card {
+        grid-template-columns: 70px minmax(0, 1fr) !important;
+
+        gap: 12px !important;
+
+        padding: 9px 10px !important;
+
+        border-bottom: 1px solid #dddddd !important;
+
+        background: #ffffff !important;
+
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+
+    .lesson-card:last-child {
+        border-bottom: 0 !important;
+    }
+
+
+    .lesson-card:hover {
+        background: #ffffff !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       TIME
+       --------------------------------------------------------- */
+
+    .lesson-time {
+        padding-left: 0 !important;
+    }
+
+
+    .lesson-time strong {
+        color: #000000 !important;
+        font-size: 12px !important;
+    }
+
+
+    .lesson-time span {
+        color: #555555 !important;
+        font-size: 9px !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       SUBJECT
+       --------------------------------------------------------- */
+
+    .lesson-subject {
+        color: #000000 !important;
+        font-size: 11px !important;
+        white-space: normal !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       META
+       --------------------------------------------------------- */
+
+    .lesson-meta {
+        gap: 5px 12px !important;
+        margin-top: 3px !important;
+
+        color: #444444 !important;
+
+        font-size: 9px !important;
+    }
+
+
+    .lesson-meta span {
+        white-space: nowrap !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       REMOVE GLASS EFFECTS
+       --------------------------------------------------------- */
+
+    .schedule-page *,
+    .day-card,
+    .lesson-card {
+        text-shadow: none !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       COLORS
+       --------------------------------------------------------- */
+
+    .schedule-page * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+
+    /* ---------------------------------------------------------
+       EMPTY / NO RESULTS
+       --------------------------------------------------------- */
+
+    .empty-schedule,
+    .filter-no-results {
+        background: #ffffff !important;
+        border: 1px dashed #999999 !important;
+
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+
+    /* ---------------------------------------------------------
+       PAGE BREAKS
+       --------------------------------------------------------- */
+
+    .day-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+
+    .day-header {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+
+    .lesson-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+}

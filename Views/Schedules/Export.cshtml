@@ -12,68 +12,67 @@
     <link rel="stylesheet" href="~/css/Schedules/Export.css" asp-append-version="true" />
 }
 
-<div class="export-page">
+<div class="form-page">
 
     <!-- HEADER -->
-    <div class="export-header">
 
-        <div class="export-header-content">
+    <div class="form-header">
 
-            <div class="export-kicker">
-                ЭКСПОРТ
-            </div>
-
-            <h1>
-                Скачать расписание
-            </h1>
-
-            <p>
-                Выберите нужный вариант расписания и формат файла.
-            </p>
-
+        <div class="form-icon">
+            ↓
         </div>
 
-        <a asp-action="Index" class="back-button">
-            <span>←</span>
-            Назад
-        </a>
+        <div>
+            <h1>Экспорт расписания</h1>
+
+            <p>
+                Скачайте расписание в удобном формате.
+            </p>
+        </div>
 
     </div>
 
 
-    <!-- ALL SCHEDULE -->
-    <section class="export-section">
+    <!-- GLASS CARD -->
 
-        <div class="section-label">
-            <span class="section-number">01</span>
+    <div class="glass-form-card">
 
-            <div>
-                <h2>Всё расписание</h2>
 
-                <p>
-                    Полное расписание колледжа
-                </p>
-            </div>
+        <!-- DESCRIPTION -->
+
+        <div class="export-description">
+
+            <h2>
+                Выберите расписание
+            </h2>
+
+            <p>
+                Вы можете скачать всё расписание колледжа
+                или расписание конкретной группы
+                или преподавателя.
+            </p>
+
         </div>
 
 
-        <div class="export-card">
+        <!-- ALL SCHEDULE -->
 
-            <div class="export-card-main">
+        <div class="export-block">
 
-                <div class="export-icon blue">
-                    <span>◫</span>
+            <div class="export-block-header">
+
+                <div class="export-block-icon blue">
+                    ◫
                 </div>
 
-                <div class="export-info">
+                <div>
 
                     <h3>
-                        Общее расписание
+                        Всё расписание
                     </h3>
 
                     <p>
-                        Все группы, преподаватели,
-                        предметы и аудитории в одном файле.
+                        Полное расписание колледжа
                     </p>
 
                 </div>
@@ -81,110 +80,97 @@
             </div>
 
 
-            <div class="format-buttons">
+            <div class="export-info-text">
 
-                <a asp-action="ExportAllExcel" class="format-button excel">
-
-                    <span class="format-icon">
-                        XLS
-                    </span>
-
-                    <span class="format-text">
-                        <strong>Excel</strong>
-                        <small>.xlsx</small>
-                    </span>
-
-                    <span class="download-arrow">
-                        ↓
-                    </span>
-
-                </a>
-
-
-                <a asp-action="ExportAllPdf" class="format-button pdf">
-
-                    <span class="format-icon">
-                        PDF
-                    </span>
-
-                    <span class="format-text">
-                        <strong>PDF</strong>
-                        <small>.pdf</small>
-                    </span>
-
-                    <span class="download-arrow">
-                        ↓
-                    </span>
-
-                </a>
-
-
-                <a asp-action="ExportAllCsv" class="format-button csv">
-
-                    <span class="format-icon">
-                        CSV
-                    </span>
-
-                    <span class="format-text">
-                        <strong>CSV</strong>
-                        <small>.csv</small>
-                    </span>
-
-                    <span class="download-arrow">
-                        ↓
-                    </span>
-
-                </a>
+                Все группы, преподаватели, предметы
+                и аудитории в одном файле.
 
             </div>
 
-        </div>
 
-    </section>
+            <div class="export-formats">
 
-
-
-    <!-- GROUP -->
-    <section class="export-section">
-
-        <div class="section-label">
-
-            <span class="section-number">
-                02
-            </span>
-
-            <div>
-
-                <h2>
-                    Расписание группы
-                </h2>
-
-                <p>
-                    Индивидуальное расписание группы
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="export-card">
-
-            <div class="export-card-main">
-
-                <div class="export-icon purple">
-                    <span>◎</span>
+                <div class="export-formats-title">
+                    Формат файла
                 </div>
 
-                <div class="export-info">
+                <div class="format-buttons">
+
+                    <a asp-action="ExportAllExcel" class="format-button excel">
+
+                        <span class="format-icon">
+                            XLS
+                        </span>
+
+                        <span>
+                            Excel
+                        </span>
+
+                        <span class="format-arrow">
+                            ↓
+                        </span>
+
+                    </a>
+
+
+                    <a asp-action="ExportAllPdf" class="format-button pdf">
+
+                        <span class="format-icon">
+                            PDF
+                        </span>
+
+                        <span>
+                            PDF
+                        </span>
+
+                        <span class="format-arrow">
+                            ↓
+                        </span>
+
+                    </a>
+
+
+                    <a asp-action="ExportAllCsv" class="format-button csv">
+
+                        <span class="format-icon">
+                            CSV
+                        </span>
+
+                        <span>
+                            CSV
+                        </span>
+
+                        <span class="format-arrow">
+                            ↓
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- GROUP -->
+
+        <div class="export-block">
+
+            <div class="export-block-header">
+
+                <div class="export-block-icon purple">
+                    ◎
+                </div>
+
+                <div>
 
                     <h3>
-                        Выберите группу
+                        Расписание группы
                     </h3>
 
                     <p>
-                        Скачайте расписание только
-                        выбранной группы.
+                        Индивидуальное расписание группы
                     </p>
 
                 </div>
@@ -192,9 +178,13 @@
             </div>
 
 
-            <form asp-action="ExportGroupExcel" method="get" class="export-form" id="groupExportForm">
+            <div class="form-field">
 
-                <select name="id" id="groupSelect" class="export-select" required>
+                <label for="groupSelect">
+                    Группа
+                </label>
+
+                <select id="groupSelect" class="form-control" required>
 
                     <option value="">
                         Выберите группу
@@ -209,6 +199,14 @@
 
                 </select>
 
+            </div>
+
+
+            <div class="export-formats">
+
+                <div class="export-formats-title">
+                    Формат файла
+                </div>
 
                 <div class="format-buttons">
 
@@ -218,12 +216,11 @@
                             XLS
                         </span>
 
-                        <span class="format-text">
-                            <strong>Excel</strong>
-                            <small>.xlsx</small>
+                        <span>
+                            Excel
                         </span>
 
-                        <span class="download-arrow">
+                        <span class="format-arrow">
                             ↓
                         </span>
 
@@ -236,12 +233,11 @@
                             PDF
                         </span>
 
-                        <span class="format-text">
-                            <strong>PDF</strong>
-                            <small>.pdf</small>
+                        <span>
+                            PDF
                         </span>
 
-                        <span class="download-arrow">
+                        <span class="format-arrow">
                             ↓
                         </span>
 
@@ -254,12 +250,11 @@
                             CSV
                         </span>
 
-                        <span class="format-text">
-                            <strong>CSV</strong>
-                            <small>.csv</small>
+                        <span>
+                            CSV
                         </span>
 
-                        <span class="download-arrow">
+                        <span class="format-arrow">
                             ↓
                         </span>
 
@@ -267,55 +262,29 @@
 
                 </div>
 
-            </form>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- TEACHER -->
-    <section class="export-section">
-
-        <div class="section-label">
-
-            <span class="section-number">
-                03
-            </span>
-
-            <div>
-
-                <h2>
-                    Расписание преподавателя
-                </h2>
-
-                <p>
-                    Индивидуальное расписание преподавателя
-                </p>
-
             </div>
 
         </div>
 
 
-        <div class="export-card">
+        <!-- TEACHER -->
 
-            <div class="export-card-main">
+        <div class="export-block">
 
-                <div class="export-icon orange">
-                    <span>◉</span>
+            <div class="export-block-header">
+
+                <div class="export-block-icon orange">
+                    ◉
                 </div>
 
-                <div class="export-info">
+                <div>
 
                     <h3>
-                        Выберите преподавателя
+                        Расписание преподавателя
                     </h3>
 
                     <p>
-                        Скачайте расписание выбранного
-                        преподавателя.
+                        Индивидуальное расписание преподавателя
                     </p>
 
                 </div>
@@ -323,9 +292,13 @@
             </div>
 
 
-            <form asp-action="ExportTeacherExcel" method="get" class="export-form" id="teacherExportForm">
+            <div class="form-field">
 
-                <select name="id" id="teacherSelect" class="export-select" required>
+                <label for="teacherSelect">
+                    Преподаватель
+                </label>
+
+                <select id="teacherSelect" class="form-control" required>
 
                     <option value="">
                         Выберите преподавателя
@@ -340,6 +313,14 @@
 
                 </select>
 
+            </div>
+
+
+            <div class="export-formats">
+
+                <div class="export-formats-title">
+                    Формат файла
+                </div>
 
                 <div class="format-buttons">
 
@@ -349,12 +330,11 @@
                             XLS
                         </span>
 
-                        <span class="format-text">
-                            <strong>Excel</strong>
-                            <small>.xlsx</small>
+                        <span>
+                            Excel
                         </span>
 
-                        <span class="download-arrow">
+                        <span class="format-arrow">
                             ↓
                         </span>
 
@@ -367,12 +347,11 @@
                             PDF
                         </span>
 
-                        <span class="format-text">
-                            <strong>PDF</strong>
-                            <small>.pdf</small>
+                        <span>
+                            PDF
                         </span>
 
-                        <span class="download-arrow">
+                        <span class="format-arrow">
                             ↓
                         </span>
 
@@ -385,12 +364,11 @@
                             CSV
                         </span>
 
-                        <span class="format-text">
-                            <strong>CSV</strong>
-                            <small>.csv</small>
+                        <span>
+                            CSV
                         </span>
 
-                        <span class="download-arrow">
+                        <span class="format-arrow">
                             ↓
                         </span>
 
@@ -398,11 +376,41 @@
 
                 </div>
 
-            </form>
+            </div>
 
         </div>
 
-    </section>
+
+        <!-- HINT -->
+
+        <div class="export-hint">
+
+            <span class="export-hint-icon">
+                ⓘ
+            </span>
+
+            <span>
+                Excel подходит для дальнейшего редактирования,
+                PDF — для печати, а CSV — для работы с данными
+                в других программах.
+            </span>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="form-actions">
+
+            <a asp-action="Index" class="glass-secondary-btn">
+
+                ← Назад к расписанию
+
+            </a>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -411,37 +419,40 @@
 
     function submitExport(type, format) {
 
-        let select;
-        let action;
+    let select;
+    let action;
 
-        if (type === "group") {
+    if (type === "group") {
 
-            select =
-                document.getElementById("groupSelect");
+    select =
+    document.getElementById("groupSelect");
 
-            action =
-                "ExportGroup";
+    action =
+    "ExportGroup";
 
-        } else if (type === "teacher") {
+    }
+    else if (type === "teacher") {
 
-            select =
-                document.getElementById("teacherSelect");
+    select =
+    document.getElementById("teacherSelect");
 
-            action =
-                "ExportTeacher";
-        }
-
-        if (!select || !select.value) {
-
-            select?.focus();
-
-            return;
-        }
-
-        const id = select.value;
-
-        window.location.href =
-            `/Schedules/${action}${format.charAt(0).toUpperCase() + format.slice(1)}?id=${encodeURIComponent(id)}`;
+    action =
+    "ExportTeacher";
     }
 
-</script>
+    if (!select || !select.value) {
+
+    select?.focus();
+
+    return;
+    }
+
+    const id = select.value;
+
+    const formattedFormat =
+    format.charAt(0).toUpperCase() +
+    format.slice(1);
+
+    window.location.href =
+    `/Schedules/${action}${formattedFormat}?id=${encodeURIComponent(id)}`;
+    }
