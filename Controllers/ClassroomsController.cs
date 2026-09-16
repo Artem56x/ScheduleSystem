@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
-
 namespace ScheduleSystem.Controllers;
 
 public class ClassroomsController : Controller
@@ -64,6 +64,8 @@ public class ClassroomsController : Controller
     }
 
     // GET: Classrooms/Create
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create()
     {
         await LoadCategoriesAsync();
@@ -73,9 +75,10 @@ public class ClassroomsController : Controller
 
     // POST: Classrooms/Create
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Id,Name,ClassroomCategoryId,Capacity,HasComputers")]
+            [Bind("Id,Name,ClassroomCategoryId,Capacity,HasComputers")]
         Classroom classroom)
     {
         await ValidateCategoryAsync(classroom.ClassroomCategoryId);
@@ -110,6 +113,7 @@ public class ClassroomsController : Controller
     // POST: Classrooms/CreateCategory
     // Создание категории прямо из формы добавления аудитории
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateCategory(
         [FromBody] CreateCategoryRequest request)
@@ -168,6 +172,8 @@ public class ClassroomsController : Controller
     }
 
     // GET: Classrooms/Edit/5
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -192,10 +198,11 @@ public class ClassroomsController : Controller
 
     // POST: Classrooms/Edit/5
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-        int id,
-        [Bind("Id,Name,ClassroomCategoryId,Capacity,HasComputers")]
+            int id,
+            [Bind("Id,Name,ClassroomCategoryId,Capacity,HasComputers")]
         Classroom classroom)
     {
         if (id != classroom.Id)
@@ -253,6 +260,8 @@ public class ClassroomsController : Controller
     }
 
     // GET: Classrooms/Delete/5
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -275,6 +284,7 @@ public class ClassroomsController : Controller
 
     // POST: Classrooms/Delete/5
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)

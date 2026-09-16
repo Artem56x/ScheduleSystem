@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
-
 namespace ScheduleSystem.Controllers;
 
 public class GroupsController : Controller
@@ -61,6 +61,8 @@ public class GroupsController : Controller
     }
 
     // GET: Groups/Create
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         return View();
@@ -68,9 +70,11 @@ public class GroupsController : Controller
 
     // POST: Groups/Create
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Id,Name,Specialty,StudentCount,Description")]
+
+         [Bind("Id,Name,Specialty,StudentCount,Description")]
         Group group)
     {
         if (!ModelState.IsValid)
@@ -97,6 +101,8 @@ public class GroupsController : Controller
     }
 
     // GET: Groups/Edit/5
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -118,10 +124,11 @@ public class GroupsController : Controller
 
     // POST: Groups/Edit/5
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-        int id,
-        [Bind("Id,Name,Specialty,StudentCount,Description")]
+            int id,
+            [Bind("Id,Name,Specialty,StudentCount,Description")]
         Group group)
     {
         if (id != group.Id)
@@ -173,6 +180,8 @@ public class GroupsController : Controller
     }
 
     // GET: Groups/Delete/5
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -194,6 +203,7 @@ public class GroupsController : Controller
 
     // POST: Groups/Delete/5
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)

@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Вход";
+}
+
+<div class="account-page">
+    <div class="account-card">
+
+        <div class="account-header">
+            <div class="account-icon">
+                <span>↗</span>
+            </div>
+
+            <h1>Вход</h1>
+            <p>Войдите в ScheduleSystem</p>
+        </div>
+
+        <form asp-action="Login" method="post">
+
+            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+            <div asp-validation-summary="ModelOnly" class="validation-message"></div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+
+                <input type="email" id="email" name="email" placeholder="Введите email" autocomplete="email" required />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+
+                <input type="password" id="password" name="password" placeholder="Введите пароль"
+                       autocomplete="current-password" required />
+            </div>
+
+            <button type="submit" class="login-button">
+                Войти
+            </button>
+
+            <div style="text-align: center; margin-top: 18px;">
+                <span style="color: #6b7280;">
+                    Нет аккаунта?
+                </span>
+
+                <a asp-action="Register" style="color: #0a84ff; font-weight: 600; text-decoration: none;">
+                    Зарегистрироваться
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Account.css" asp-append-version="true" />
+}

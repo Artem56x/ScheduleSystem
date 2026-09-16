@@ -1,9 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
-
 namespace ScheduleSystem.Controllers;
 
 public class TeachersController : Controller
@@ -64,6 +64,8 @@ public class TeachersController : Controller
     }
 
     // GET: Teachers/Create
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create()
     {
         await PopulateSubjectsAsync();
@@ -73,9 +75,10 @@ public class TeachersController : Controller
 
     // POST: Teachers/Create
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Id,FullName,SubjectId,Email")]
+            [Bind("Id,FullName,SubjectId,Email")]
         Teacher teacher)
     {
         if (!ModelState.IsValid)
@@ -106,6 +109,8 @@ public class TeachersController : Controller
     }
 
     // GET: Teachers/Edit/5
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -129,10 +134,11 @@ public class TeachersController : Controller
 
     // POST: Teachers/Edit/5
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-        int id,
-        [Bind("Id,FullName,SubjectId,Email")]
+          int id,
+          [Bind("Id,FullName,SubjectId,Email")]
         Teacher teacher)
     {
         if (id != teacher.Id)
@@ -187,6 +193,8 @@ public class TeachersController : Controller
     }
 
     // GET: Teachers/Delete/5
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -209,6 +217,7 @@ public class TeachersController : Controller
 
     // POST: Teachers/Delete/5
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)

@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Доступ запрещён";
+}
+
+<div class="account-page">
+    <div class="account-card access-denied">
+
+        <div class="account-icon">
+            🔒
+        </div>
+
+        <h1>Доступ запрещён</h1>
+
+        <p>
+            У вас недостаточно прав для просмотра этой страницы.
+        </p>
+
+        <a asp-controller="Home" asp-action="Index" class="login-button">
+            Вернуться на главную
+        </a>
+
+    </div>
+</div>

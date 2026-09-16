@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Models;
 
 namespace ScheduleSystem.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options)
@@ -56,15 +57,6 @@ namespace ScheduleSystem.Data
                 .HasOne(schedule => schedule.Subject)
                 .WithMany()
                 .HasForeignKey(schedule => schedule.SubjectId);
-
-            // ==============================
-            // Teacher → Subject
-            // ==============================
-            modelBuilder.Entity<Teacher>()
-                .HasOne(teacher => teacher.Subject)
-                .WithMany()
-                .HasForeignKey(teacher => teacher.SubjectId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             // ==============================
             // Schedule → Classroom

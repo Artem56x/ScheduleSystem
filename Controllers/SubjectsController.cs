@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
-
 namespace ScheduleSystem.Controllers;
 
 public class SubjectsController : Controller
@@ -57,6 +57,8 @@ public class SubjectsController : Controller
     }
 
     // GET: Subjects/Create
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         return View();
@@ -64,9 +66,10 @@ public class SubjectsController : Controller
 
     // POST: Subjects/Create
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Id,Name,RequiresComputers")] Subject subject)
+            [Bind("Id,Name,RequiresComputers")] Subject subject)
     {
         if (!ModelState.IsValid)
         {
@@ -81,6 +84,8 @@ public class SubjectsController : Controller
     }
 
     // GET: Subjects/Edit/5
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -102,10 +107,11 @@ public class SubjectsController : Controller
 
     // POST: Subjects/Edit/5
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-        int id,
-        [Bind("Id,Name,RequiresComputers")] Subject subject)
+            int id,
+            [Bind("Id,Name,RequiresComputers")] Subject subject)
     {
         if (id != subject.Id)
         {
@@ -146,6 +152,8 @@ public class SubjectsController : Controller
     }
 
     // GET: Subjects/Delete/5
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -167,6 +175,7 @@ public class SubjectsController : Controller
 
     // POST: Subjects/Delete/5
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)

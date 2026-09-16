@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -520,6 +521,7 @@ public class SchedulesController : Controller
     // ============================================================
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create()
     {
         await PopulateSelectListsAsync();
@@ -529,10 +531,11 @@ public class SchedulesController : Controller
 
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        Schedule schedule,
-        bool confirmTeacherSubject = false)
+           Schedule schedule,
+           bool confirmTeacherSubject = false)
     {
         RemoveDefaultValidationErrors();
 
@@ -580,6 +583,7 @@ public class SchedulesController : Controller
     // ============================================================
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -601,6 +605,7 @@ public class SchedulesController : Controller
 
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
         int id,
@@ -681,6 +686,7 @@ public class SchedulesController : Controller
     // ============================================================
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -700,6 +706,7 @@ public class SchedulesController : Controller
 
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)

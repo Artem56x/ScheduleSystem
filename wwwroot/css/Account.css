@@ -1,0 +1,112 @@
+.account-page {
+    min-height: calc(100vh - 100px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.account-card {
+    width: 100%;
+    max-width: 430px;
+    padding: 36px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 60px rgba(30, 100, 180, 0.12);
+    backdrop-filter: blur(24px);
+}
+
+.account-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.account-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a84ff, #5e5ce6);
+    color: white;
+    font-size: 28px;
+    box-shadow: 0 10px 30px rgba(10, 132, 255, 0.25);
+}
+
+.account-header h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.account-header p {
+    margin: 8px 0 0;
+    color: #6b7280;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 15px;
+    border: 1px solid #d9e1ec;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #0a84ff;
+    box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.1);
+}
+
+.login-button {
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+    padding: 14px 18px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0a84ff, #5e5ce6);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.login-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(10, 132, 255, 0.22);
+}
+
+.validation-message {
+    margin-bottom: 16px;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+.access-denied {
+    text-align: center;
+}
+
+.access-denied p {
+    color: #6b7280;
+    margin-bottom: 24px;
+}
