@@ -118,17 +118,20 @@
                 ↓ Экспорт
             </a>
 
-            <a asp-action="Create" class="add-lesson-button no-print">
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="add-lesson-button no-print">
 
-                <span class="button-icon">
-                    +
-                </span>
+                    <span class="button-icon">
+                        +
+                    </span>
 
-                <span>
-                    Добавить занятие
-                </span>
+                    <span>
+                        Добавить занятие
+                    </span>
 
-            </a>
+                </a>
+            }
 
         </div>
 
@@ -468,11 +471,14 @@
                     Добавьте первое занятие, чтобы оно появилось здесь.
                 </p>
 
-                <a asp-action="Create" class="empty-button">
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="empty-button">
 
-                    Добавить занятие
+                        Добавить занятие
 
-                </a>
+                    </a>
+                }
 
             </div>
         }
@@ -576,19 +582,20 @@
 
                                         </a>
 
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="lesson-action edit">
 
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="lesson-action edit">
+                                                Изменить
 
-                                            Изменить
+                                            </a>
 
-                                        </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="lesson-action delete">
 
+                                                Удалить
 
-                                        <a asp-action="Delete" asp-route-id="@item.Id" class="lesson-action delete">
-
-                                            Удалить
-
-                                        </a>
+                                            </a>
+                                        }
 
                                     </div>
 

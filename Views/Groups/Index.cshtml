@@ -18,10 +18,13 @@
             <p>Управление учебными группами системы</p>
         </div>
 
-        <a asp-action="Create" class="add-group-btn">
-            <span>＋</span>
-            Добавить группу
-        </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="add-group-btn">
+                <span>＋</span>
+                Добавить группу
+            </a>
+        }
 
     </div>
 
@@ -143,13 +146,16 @@
                             Подробнее
                         </a>
 
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
-                            Изменить
-                        </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                                Изменить
+                            </a>
 
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
-                            Удалить
-                        </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                                Удалить
+                            </a>
+                        }
 
                     </div>
 
@@ -193,10 +199,13 @@
                     чтобы она появилась в системе.
                 </p>
 
-                <a asp-action="Create" class="add-group-btn">
-                    <span>＋</span>
-                    Добавить группу
-                </a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="add-group-btn">
+                        <span>＋</span>
+                        Добавить группу
+                    </a>
+                }
             }
 
         </div>

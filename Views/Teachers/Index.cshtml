@@ -19,10 +19,13 @@
             <p>Управление преподавателями системы</p>
         </div>
 
-        <a asp-action="Create" class="add-teacher-btn">
-            <span>＋</span>
-            Добавить преподавателя
-        </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="add-teacher-btn">
+                <span>＋</span>
+                Добавить преподавателя
+            </a>
+        }
 
     </div>
 
@@ -167,13 +170,16 @@
                             Подробнее
                         </a>
 
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
-                            Изменить
-                        </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                                Изменить
+                            </a>
 
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
-                            Удалить
-                        </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                                Удалить
+                            </a>
+                        }
 
                     </div>
 
@@ -227,10 +233,13 @@
                     чтобы он появился в системе.
                 </p>
 
-                <a asp-action="Create" class="add-teacher-btn">
-                    <span>＋</span>
-                    Добавить преподавателя
-                </a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="add-teacher-btn">
+                        <span>＋</span>
+                        Добавить преподавателя
+                    </a>
+                }
             }
 
         </div>
