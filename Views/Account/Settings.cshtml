@@ -1,0 +1,302 @@
+@{
+    ViewData["Title"] = "Настройки профиля";
+
+    var email = ViewBag.Email as string ?? "";
+    var userName = ViewBag.UserName as string ?? email;
+    var displayName = ViewBag.DisplayName as string ?? "";
+
+    var firstLetter = !string.IsNullOrWhiteSpace(email)
+        ? email.Substring(0, 1).ToUpper()
+        : "U";
+
+    bool isAdmin = ViewBag.IsAdmin == true;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Account/Settings.css" asp-append-version="true" />
+}
+
+<div class="settings-page">
+
+    <div class="settings-container">
+
+        <!-- HEADER -->
+
+        <div class="settings-header">
+
+            <a asp-controller="Account" asp-action="Profile" class="settings-back">
+
+                ← Профиль
+
+            </a>
+
+            <h1>Настройки профиля</h1>
+
+            <p>
+                Управление данными и безопасностью вашей учётной записи
+            </p>
+
+        </div>
+
+
+        <!-- SUCCESS MESSAGE -->
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="settings-success">
+
+                <span>✓</span>
+
+                <span>
+                    @TempData["SuccessMessage"]
+                </span>
+
+            </div>
+        }
+
+
+        <!-- ACCOUNT -->
+
+        <div class="glass-settings-card">
+
+            <div class="settings-card-header">
+
+                <div class="settings-icon">
+                    👤
+                </div>
+
+                <div>
+
+                    <h2>Учётная запись</h2>
+
+                    <p>
+                        Основная информация вашего аккаунта
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form asp-controller="Account" asp-action="UpdateProfile" method="post" class="settings-form">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="settings-validation-summary">
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="settings-field">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <div class="settings-input-wrapper">
+
+                        <span class="settings-avatar">
+                            @firstLetter
+                        </span>
+
+                        <input type="email" id="email" name="email" value="@email" class="settings-input"
+                               autocomplete="email" placeholder="Введите Email" required />
+
+                    </div>
+
+                    <small class="settings-description">
+                        Используется для входа в аккаунт.
+                    </small>
+
+                </div>
+
+
+                <!-- DISPLAY NAME -->
+
+                <div class="settings-field">
+
+                    <label for="displayName">
+                        Имя пользователя
+                    </label>
+
+                    <input type="text" id="displayName" name="displayName" value="@displayName" class="settings-input"
+                           maxlength="100" autocomplete="name" placeholder="Например, Артём" required />
+
+                    <small class="settings-description">
+                        Это имя будет отображаться в вашем профиле.
+                    </small>
+
+                </div>
+
+
+                <!-- ROLE -->
+
+                <div class="settings-field">
+
+                    <label>
+                        Роль
+                    </label>
+
+                    <div class="settings-static-value">
+
+                        @if (isAdmin)
+                        {
+                            <span class="settings-role admin">
+                                Администратор
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="settings-role">
+                                Пользователь
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <!-- SAVE -->
+
+                <div class="settings-save-container">
+
+                    <button type="submit" class="settings-save-button">
+
+                        Сохранить изменения
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- SECURITY -->
+
+        <div class="glass-settings-card">
+
+            <div class="settings-card-header">
+
+                <div class="settings-icon">
+                    🔐
+                </div>
+
+                <div>
+
+                    <h2>Безопасность</h2>
+
+                    <p>
+                        Управление доступом к аккаунту
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-option">
+
+                <div class="option-left">
+
+                    <div class="option-icon">
+                        🔑
+                    </div>
+
+                    <div class="option-text">
+
+                        <strong>
+                            Пароль
+                        </strong>
+
+                        <span>
+                            Измените пароль для защиты аккаунта
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <a asp-controller="Account" asp-action="ChangePassword" class="settings-button">
+
+                    Изменить
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- APPEARANCE -->
+
+        <div class="glass-settings-card">
+
+            <div class="settings-card-header">
+
+                <div class="settings-icon">
+                    🎨
+                </div>
+
+                <div>
+
+                    <h2>Внешний вид</h2>
+
+                    <p>
+                        Настройки интерфейса ScheduleSystem
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-option">
+
+                <div class="option-left">
+
+                    <div class="option-icon">
+                        ☀️
+                    </div>
+
+                    <div class="option-text">
+
+                        <strong>
+                            Тема оформления
+                        </strong>
+
+                        <span>
+                            Светлая тема
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <span class="coming-soon">
+                    Скоро
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- BACK -->
+
+        <div class="settings-footer">
+
+            <a asp-controller="Home" asp-action="Index" class="back-home-button">
+
+                Вернуться на главную
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

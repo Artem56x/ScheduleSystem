@@ -1,0 +1,242 @@
+@{
+    ViewData["Title"] = "Профиль";
+
+    var email = ViewBag.Email as string ?? "";
+    var displayName = ViewBag.DisplayName as string ?? "Пользователь";
+
+    var firstLetter = !string.IsNullOrWhiteSpace(displayName)
+        ? displayName.Substring(0, 1).ToUpper()
+        : "U";
+
+    bool isAdmin = ViewBag.IsAdmin == true;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Account/Profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+
+    <div class="profile-container">
+
+        <!-- HEADER -->
+
+        <div class="profile-hero glass-profile-card">
+
+            <div class="profile-main-avatar">
+                @firstLetter
+            </div>
+
+            <div class="profile-main-info">
+
+                <h1>
+                    @displayName
+                </h1>
+
+                <div class="profile-email">
+                    @email
+                </div>
+
+                @if (isAdmin)
+                {
+                    <span class="profile-role-badge admin">
+                        Администратор
+                    </span>
+                }
+                else
+                {
+                    <span class="profile-role-badge">
+                        Пользователь
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- ACCOUNT INFORMATION -->
+
+        <div class="glass-profile-card">
+
+            <div class="profile-section-title">
+
+                <div class="section-icon">
+                    👤
+                </div>
+
+                <div>
+
+                    <h2>Информация об аккаунте</h2>
+
+                    <p>
+                        Основные данные вашей учётной записи
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-info-grid">
+
+                <!-- DISPLAY NAME -->
+
+                <div class="profile-info-item">
+
+                    <span class="info-label">
+                        Имя пользователя
+                    </span>
+
+                    <span class="info-value">
+                        @displayName
+                    </span>
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="profile-info-item">
+
+                    <span class="info-label">
+                        Email
+                    </span>
+
+                    <span class="info-value">
+                        @email
+                    </span>
+
+                </div>
+
+
+                <!-- ROLE -->
+
+                <div class="profile-info-item">
+
+                    <span class="info-label">
+                        Роль
+                    </span>
+
+                    <span class="info-value">
+
+                        @if (isAdmin)
+                        {
+                            <span class="role-text admin">
+                                Администратор
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="role-text">
+                                Пользователь
+                            </span>
+                        }
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACCOUNT ACTIONS -->
+
+        <div class="glass-profile-card">
+
+            <div class="profile-section-title">
+
+                <div class="section-icon">
+                    ⚙
+                </div>
+
+                <div>
+
+                    <h2>Аккаунт</h2>
+
+                    <p>
+                        Управление вашей учётной записью
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-actions">
+
+                <!-- PASSWORD -->
+
+                <a asp-controller="Account" asp-action="ChangePassword" class="profile-action">
+
+                    <div class="action-icon">
+                        🔐
+                    </div>
+
+                    <div class="action-content">
+
+                        <strong>
+                            Изменить пароль
+                        </strong>
+
+                        <span>
+                            Обновить пароль вашей учётной записи
+                        </span>
+
+                    </div>
+
+                    <span class="action-arrow">
+                        ›
+                    </span>
+
+                </a>
+
+
+                <!-- SETTINGS -->
+
+                <a asp-controller="Account" asp-action="Settings" class="profile-action">
+
+                    <div class="action-icon">
+                        ✨
+                    </div>
+
+                    <div class="action-content">
+
+                        <strong>
+                            Настройки профиля
+                        </strong>
+
+                        <span>
+                            Email, имя пользователя и другие настройки
+                        </span>
+
+                    </div>
+
+                    <span class="action-arrow">
+                        ›
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- BACK -->
+
+        <div class="profile-back">
+
+            <a asp-controller="Home" asp-action="Index" class="back-button">
+
+                ← Вернуться на главную
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

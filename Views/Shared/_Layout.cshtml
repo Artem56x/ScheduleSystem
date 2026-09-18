@@ -143,6 +143,53 @@
                                         <hr class="dropdown-divider" />
                                     </li>
 
+
+                                    <!-- ПРОФИЛЬ -->
+
+                                    <li>
+                                        <a asp-controller="Account" asp-action="Profile" class="dropdown-item">
+
+                                            <span class="menu-icon">👤</span>
+                                            <span>Профиль</span>
+
+                                        </a>
+                                    </li>
+
+
+                                    <!-- НАСТРОЙКИ ПРОФИЛЯ -->
+
+                                    <li>
+                                        <a asp-controller="Account" asp-action="Settings" class="dropdown-item">
+
+                                            <span class="menu-icon">⚙</span>
+                                            <span>Настройки профиля</span>
+
+                                        </a>
+                                    </li>
+
+
+                                    <!-- НАСТРОЙКИ ПРОГРАММЫ ТОЛЬКО ДЛЯ ADMIN -->
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a asp-controller="Account" asp-action="Settings" class="dropdown-item">
+
+                                                <span class="menu-icon">⚙</span>
+                                                <span>Настройки профиля</span>
+
+                                            </a>
+                                        </li>
+                                    }
+
+
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+
+
+                                    <!-- ВЫХОД -->
+
                                     <li>
                                         <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
 
