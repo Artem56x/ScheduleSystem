@@ -16,6 +16,10 @@ namespace ScheduleSystem.Models
         [Display(Name = "Специальность")]
         public string Specialty { get; set; } = string.Empty;
 
+        [Range(1, 5, ErrorMessage = "Курс должен быть от 1 до 5")]
+        [Display(Name = "Курс")]
+        public int Course { get; set; }
+
         [Range(1, 100, ErrorMessage = "Количество человек должно быть от 1 до 100")]
         [Display(Name = "Количество человек")]
         public int StudentCount { get; set; }
@@ -23,4 +27,3 @@ namespace ScheduleSystem.Models
         public string? Description { get; set; }
     }
 }
-

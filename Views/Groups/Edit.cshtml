@@ -65,6 +65,29 @@
 
             </div>
 
+            <!-- Курс -->
+            <div class="form-field">
+
+                <label asp-for="Course">
+                    Курс
+                </label>
+
+                <div class="number-wrapper">
+
+                    <input asp-for="Course" type="number" min="1" max="5" class="form-control"
+                           placeholder="Например: 3" />
+
+                    <span class="number-suffix">
+                        курс
+                    </span>
+
+                </div>
+
+                <span asp-validation-for="Course" class="text-danger">
+                </span>
+
+            </div>
+
             <!-- Количество человек -->
             <div class="form-field">
 
@@ -93,6 +116,7 @@
 
                 <label asp-for="Description">
                     Описание
+
                     <span class="optional">
                         необязательно
                     </span>
@@ -117,9 +141,7 @@
                 </button>
 
                 <a asp-action="Index" class="btn glass-secondary-btn">
-
                     Отмена
-
                 </a>
 
             </div>

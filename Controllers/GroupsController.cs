@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
+
 namespace ScheduleSystem.Controllers;
 
 public class GroupsController : Controller
@@ -73,8 +74,7 @@ public class GroupsController : Controller
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-
-         [Bind("Id,Name,Specialty,StudentCount,Description")]
+        [Bind("Id,Name,Specialty,Course,StudentCount,Description")]
         Group group)
     {
         if (!ModelState.IsValid)
@@ -127,8 +127,8 @@ public class GroupsController : Controller
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-            int id,
-            [Bind("Id,Name,Specialty,StudentCount,Description")]
+        int id,
+        [Bind("Id,Name,Specialty,Course,StudentCount,Description")]
         Group group)
     {
         if (id != group.Id)
@@ -151,6 +151,7 @@ public class GroupsController : Controller
 
         existingGroup.Name = group.Name;
         existingGroup.Specialty = group.Specialty;
+        existingGroup.Course = group.Course;
         existingGroup.StudentCount = group.StudentCount;
         existingGroup.Description = group.Description;
 
@@ -251,3 +252,4 @@ public class GroupsController : Controller
         return _context.Groups.Any(g => g.Id == id);
     }
 }
+
