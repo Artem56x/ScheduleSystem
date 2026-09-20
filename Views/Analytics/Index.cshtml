@@ -1,0 +1,701 @@
+@model ScheduleSystem.ViewModels.AnalyticsViewModel
+
+@{
+    ViewData["Title"] = "Аналитика";
+
+    var maxDayCount = Model.LessonsByDay.Any()
+        ? Model.LessonsByDay.Max(x => x.Count)
+        : 1;
+
+    var maxTimeCount = Model.LessonsByTime.Any()
+        ? Model.LessonsByTime.Max(x => x.Count)
+        : 1;
+
+    var maxTeacherCount = Model.TeacherLoad.Any()
+        ? Model.TeacherLoad.Max(x => x.LessonsCount)
+        : 1;
+
+    var maxGroupCount = Model.GroupLoad.Any()
+        ? Model.GroupLoad.Max(x => x.LessonsCount)
+        : 1;
+
+    var maxClassroomCount = Model.ClassroomUsage.Any()
+        ? Model.ClassroomUsage.Max(x => x.LessonsCount)
+        : 1;
+
+    var maxSubjectCount = Model.SubjectUsage.Any()
+        ? Model.SubjectUsage.Max(x => x.LessonsCount)
+        : 1;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Analytics/Index.css" asp-append-version="true" />
+}
+
+<div class="analytics-page">
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="analytics-header">
+
+        <div>
+            <div class="analytics-eyebrow">
+                Система расписания
+            </div>
+
+            <h1>
+                📊 Аналитика
+            </h1>
+
+            <p>
+                Статистика и распределение занятий в расписании
+            </p>
+        </div>
+
+        <a asp-controller="Home" asp-action="Index" class="analytics-back">
+            ← На главную
+        </a>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ОБЩАЯ СТАТИСТИКА -->
+    <!-- ========================================================= -->
+
+    <section class="analytics-section">
+
+        <div class="section-title">
+            <span>📌</span>
+            Общая статистика
+        </div>
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon">👨‍🏫</div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Преподаватели
+                    </span>
+
+                    <strong>
+                        @Model.TeachersCount
+                    </strong>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Группы
+                    </span>
+
+                    <strong>
+                        @Model.GroupsCount
+                    </strong>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Предметы
+                    </span>
+
+                    <strong>
+                        @Model.SubjectsCount
+                    </strong>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon">🏫</div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Аудитории
+                    </span>
+
+                    <strong>
+                        @Model.ClassroomsCount
+                    </strong>
+                </div>
+            </div>
+
+
+            <div class="stat-card stat-card-wide">
+                <div class="stat-icon">🗓️</div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Всего занятий
+                    </span>
+
+                    <strong>
+                        @Model.SchedulesCount
+                    </strong>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- КЛЮЧЕВЫЕ ПОКАЗАТЕЛИ -->
+    <!-- ========================================================= -->
+
+    <section class="analytics-section">
+
+        <div class="section-title">
+            <span>⚡</span>
+            Ключевые показатели
+        </div>
+
+        <div class="insights-grid">
+
+            <div class="insight-card">
+
+                <div class="insight-icon">
+                    📅
+                </div>
+
+                <div class="insight-content">
+
+                    <span>
+                        В среднем занятий в день
+                    </span>
+
+                    <strong>
+                        @Model.AverageLessonsPerDay.ToString("0.0")
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="insight-card">
+
+                <div class="insight-icon">
+                    👨‍🏫
+                </div>
+
+                <div class="insight-content">
+
+                    <span>
+                        В среднем на преподавателя
+                    </span>
+
+                    <strong>
+                        @Model.AverageLessonsPerTeacher.ToString("0.0")
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="insight-card">
+
+                <div class="insight-icon">
+                    👥
+                </div>
+
+                <div class="insight-content">
+
+                    <span>
+                        В среднем на группу
+                    </span>
+
+                    <strong>
+                        @Model.AverageLessonsPerGroup.ToString("0.0")
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="insight-card">
+
+                <div class="insight-icon">
+                    🔥
+                </div>
+
+                <div class="insight-content">
+
+                    <span>
+                        Самый загруженный день
+                    </span>
+
+                    <strong>
+                        @Model.BusiestDay
+                    </strong>
+
+                    @if (Model.BusiestDayCount > 0)
+                    {
+                        <small>
+                            @Model.BusiestDayCount занятий
+                        </small>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <div class="insight-card">
+
+                <div class="insight-icon">
+                    🕐
+                </div>
+
+                <div class="insight-content">
+
+                    <span>
+                        Самое загруженное время
+                    </span>
+
+                    <strong>
+                        @Model.BusiestTime
+                    </strong>
+
+                    @if (Model.BusiestTimeCount > 0)
+                    {
+                        <small>
+                            @Model.BusiestTimeCount занятий
+                        </small>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- ГРАФИКИ: ДНИ И ВРЕМЯ -->
+    <!-- ========================================================= -->
+
+    <div class="charts-grid">
+
+        <!-- ЗАНЯТИЯ ПО ДНЯМ -->
+
+        <section class="chart-card">
+
+            <div class="chart-header">
+
+                <div>
+                    <h2>
+                        Занятия по дням
+                    </h2>
+
+                    <p>
+                        Распределение нагрузки по неделе
+                    </p>
+                </div>
+
+                <div class="chart-icon">
+                    📅
+                </div>
+
+            </div>
+
+
+            <div class="bar-chart vertical-chart">
+
+                @foreach (var item in Model.LessonsByDay)
+                {
+                    var height = maxDayCount > 0
+                        ? Math.Max(5, (item.Count * 100) / maxDayCount)
+                        : 5;
+
+                    <div class="bar-column">
+
+                        <div class="bar-value">
+                            @item.Count
+                        </div>
+
+                        <div class="bar-wrapper">
+
+                            <div class="bar" style="height: @height%;">
+                            </div>
+
+                        </div>
+
+                        <div class="bar-label">
+                            @item.DayName.Substring(0, 2)
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- ЗАНЯТИЯ ПО ВРЕМЕНИ -->
+
+        <section class="chart-card">
+
+            <div class="chart-header">
+
+                <div>
+                    <h2>
+                        Занятия по времени
+                    </h2>
+
+                    <p>
+                        Время начала занятий
+                    </p>
+                </div>
+
+                <div class="chart-icon">
+                    🕐
+                </div>
+
+            </div>
+
+
+            @if (Model.LessonsByTime.Any())
+            {
+                <div class="horizontal-chart time-chart">
+
+                    @foreach (var item in Model.LessonsByTime)
+                    {
+                        var width = maxTimeCount > 0
+                            ? Math.Max(4, (item.Count * 100) / maxTimeCount)
+                            : 4;
+
+                        <div class="horizontal-item">
+
+                            <div class="horizontal-label">
+                                @item.Time
+                            </div>
+
+                            <div class="horizontal-bar-wrapper">
+
+                                <div class="horizontal-bar" style="width: @width%;">
+                                </div>
+
+                            </div>
+
+                            <div class="horizontal-value">
+                                @item.Count
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-chart">
+                    Нет данных о времени занятий
+                </div>
+            }
+
+        </section>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ПРЕПОДАВАТЕЛИ -->
+    <!-- ========================================================= -->
+
+    <section class="chart-card full-width">
+
+        <div class="chart-header">
+
+            <div>
+                <h2>
+                    👨‍🏫 Нагрузка преподавателей
+                </h2>
+
+                <p>
+                    Количество занятий у каждого преподавателя
+                </p>
+            </div>
+
+        </div>
+
+
+        @if (Model.TeacherLoad.Any())
+        {
+            <div class="horizontal-chart">
+
+                @foreach (var item in Model.TeacherLoad)
+                {
+                    var width = maxTeacherCount > 0
+                        ? Math.Max(3, (item.LessonsCount * 100) / maxTeacherCount)
+                        : 3;
+
+                    <div class="horizontal-item">
+
+                        <div class="horizontal-name" title="@item.Name">
+                            @item.Name
+                        </div>
+
+                        <div class="horizontal-bar-wrapper">
+
+                            <div class="horizontal-bar" style="width: @width%;">
+                            </div>
+
+                        </div>
+
+                        <div class="horizontal-value">
+                            @item.LessonsCount
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-chart">
+                Нет данных о преподавателях
+            </div>
+        }
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- ГРУППЫ -->
+    <!-- ========================================================= -->
+
+    <section class="chart-card full-width">
+
+        <div class="chart-header">
+
+            <div>
+                <h2>
+                    👥 Нагрузка групп
+                </h2>
+
+                <p>
+                    Количество занятий у каждой группы
+                </p>
+            </div>
+
+        </div>
+
+
+        @if (Model.GroupLoad.Any())
+        {
+            <div class="horizontal-chart">
+
+                @foreach (var item in Model.GroupLoad)
+                {
+                    var width = maxGroupCount > 0
+                        ? Math.Max(3, (item.LessonsCount * 100) / maxGroupCount)
+                        : 3;
+
+                    <div class="horizontal-item">
+
+                        <div class="horizontal-name" title="@item.Name">
+                            @item.Name
+                        </div>
+
+                        <div class="horizontal-bar-wrapper">
+
+                            <div class="horizontal-bar" style="width: @width%;">
+                            </div>
+
+                        </div>
+
+                        <div class="horizontal-value">
+                            @item.LessonsCount
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-chart">
+                Нет данных о группах
+            </div>
+        }
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- АУДИТОРИИ И ПРЕДМЕТЫ -->
+    <!-- ========================================================= -->
+
+    <div class="charts-grid">
+
+        <!-- АУДИТОРИИ -->
+
+        <section class="chart-card">
+
+            <div class="chart-header">
+
+                <div>
+                    <h2>
+                        🏫 Использование аудиторий
+                    </h2>
+
+                    <p>
+                        Количество занятий в аудитории
+                    </p>
+                </div>
+
+                <div class="chart-icon">
+                    🏫
+                </div>
+
+            </div>
+
+
+            @if (Model.ClassroomUsage.Any())
+            {
+                <div class="horizontal-chart compact-chart">
+
+                    @foreach (var item in Model.ClassroomUsage)
+                    {
+                        var width = maxClassroomCount > 0
+                            ? Math.Max(3, (item.LessonsCount * 100) / maxClassroomCount)
+                            : 3;
+
+                        <div class="horizontal-item">
+
+                            <div class="horizontal-name" title="@item.Name">
+                                @item.Name
+                            </div>
+
+                            <div class="horizontal-bar-wrapper">
+
+                                <div class="horizontal-bar" style="width: @width%;">
+                                </div>
+
+                            </div>
+
+                            <div class="horizontal-value">
+                                @item.LessonsCount
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-chart">
+                    Нет данных об аудиториях
+                </div>
+            }
+
+        </section>
+
+
+        <!-- ПРЕДМЕТЫ -->
+
+        <section class="chart-card">
+
+            <div class="chart-header">
+
+                <div>
+                    <h2>
+                        📚 Предметы
+                    </h2>
+
+                    <p>
+                        Распределение занятий по предметам
+                    </p>
+                </div>
+
+                <div class="chart-icon">
+                    📚
+                </div>
+
+            </div>
+
+
+            @if (Model.SubjectUsage.Any())
+            {
+                <div class="horizontal-chart compact-chart">
+
+                    @foreach (var item in Model.SubjectUsage)
+                    {
+                        var width = maxSubjectCount > 0
+                            ? Math.Max(3, (item.LessonsCount * 100) / maxSubjectCount)
+                            : 3;
+
+                        <div class="horizontal-item">
+
+                            <div class="horizontal-name" title="@item.Name">
+                                @item.Name
+                            </div>
+
+                            <div class="horizontal-bar-wrapper">
+
+                                <div class="horizontal-bar" style="width: @width%;">
+                                </div>
+
+                            </div>
+
+                            <div class="horizontal-value">
+                                @item.LessonsCount
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-chart">
+                    Нет данных о предметах
+                </div>
+            }
+
+        </section>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- FOOTER -->
+    <!-- ========================================================= -->
+
+    <div class="analytics-footer">
+
+        <span>
+            Данные сформированы на основе текущего расписания
+        </span>
+
+        <a asp-controller="Home" asp-action="Index">
+            Вернуться на главную →
+        </a>
+
+    </div>
+
+</div>

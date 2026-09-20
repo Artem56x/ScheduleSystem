@@ -69,6 +69,19 @@
 
                         </li>
 
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <!-- АНАЛИТИКА -->
+                            <li class="nav-item">
+
+                                <a class="nav-link" asp-controller="Analytics" asp-action="Index">
+
+                                    <span>Аналитика</span>
+
+                                </a>
+
+                            </li>
+                        }
 
                         <!-- ПРЕПОДАВАТЕЛИ -->
                         <li class="nav-item">
