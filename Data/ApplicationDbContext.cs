@@ -30,6 +30,9 @@ namespace ScheduleSystem.Data
         // Категории аудиторий
         public DbSet<ClassroomCategory> ClassroomCategories { get; set; }
 
+        /// Уведомления
+        public DbSet<Notification> Notifications { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

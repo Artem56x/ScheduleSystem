@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -534,8 +535,8 @@ public class SchedulesController : Controller
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-           Schedule schedule,
-           bool confirmTeacherSubject = false)
+        Schedule schedule,
+        bool confirmTeacherSubject = false)
     {
         RemoveDefaultValidationErrors();
 
@@ -560,6 +561,22 @@ public class SchedulesController : Controller
             _context.Schedules.Add(schedule);
 
             await _context.SaveChangesAsync();
+
+            var createdSchedule =
+                await FindScheduleAsync(schedule.Id);
+
+            if (createdSchedule != null)
+            {
+                await CreateScheduleNotificationsAsync(
+                    "Расписание изменено",
+                    $"Добавлено новое занятие:\n\n" +
+                    $"{createdSchedule.Subject?.Name}\n" +
+                    $"{createdSchedule.Group?.Name}\n" +
+                    $"{GetRussianDayName(createdSchedule.DayOfWeek)}, " +
+                    $"{createdSchedule.StartTime:hh\\:mm}\n" +
+                    $"Аудитория: {createdSchedule.Classroom?.Name}",
+                    "success");
+            }
         }
         catch (DbUpdateException)
         {
@@ -643,6 +660,25 @@ public class SchedulesController : Controller
             return NotFound();
         }
 
+        // --------------------------------------------------------
+        // Сохраняем старое состояние занятия
+        // --------------------------------------------------------
+
+        var oldSchedule = new ScheduleSnapshot
+        {
+            TeacherId = existingSchedule.TeacherId,
+            GroupId = existingSchedule.GroupId,
+            SubjectId = existingSchedule.SubjectId,
+            ClassroomId = existingSchedule.ClassroomId,
+            DayOfWeek = existingSchedule.DayOfWeek,
+            StartTime = existingSchedule.StartTime,
+            EndTime = existingSchedule.EndTime
+        };
+
+        // --------------------------------------------------------
+        // Применяем новые значения
+        // --------------------------------------------------------
+
         existingSchedule.TeacherId = schedule.TeacherId;
         existingSchedule.GroupId = schedule.GroupId;
         existingSchedule.SubjectId = schedule.SubjectId;
@@ -654,6 +690,27 @@ public class SchedulesController : Controller
         try
         {
             await _context.SaveChangesAsync();
+
+            var updatedSchedule =
+                await FindScheduleAsync(id);
+
+            if (updatedSchedule != null)
+            {
+                var changes =
+                    await BuildScheduleChangesMessageAsync(
+                        oldSchedule,
+                        updatedSchedule);
+
+                if (!string.IsNullOrWhiteSpace(changes))
+                {
+                    await CreateScheduleNotificationsAsync(
+                        "Расписание изменено",
+                        $"{updatedSchedule.Subject?.Name}\n" +
+                        $"{updatedSchedule.Group?.Name}\n\n" +
+                        $"{changes}",
+                        "info");
+                }
+            }
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -711,8 +768,7 @@ public class SchedulesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var schedule = await _context.Schedules
-            .FirstOrDefaultAsync(s => s.Id == id);
+        var schedule = await FindScheduleAsync(id);
 
         if (schedule == null)
         {
@@ -721,9 +777,29 @@ public class SchedulesController : Controller
 
         try
         {
-            _context.Schedules.Remove(schedule);
+            var notificationMessage =
+                $"Удалено занятие:\n\n" +
+                $"{schedule.Subject?.Name}\n" +
+                $"{schedule.Group?.Name}\n" +
+                $"{GetRussianDayName(schedule.DayOfWeek)}, " +
+                $"{schedule.StartTime:hh\\:mm}\n" +
+                $"Аудитория: {schedule.Classroom?.Name}";
 
-            await _context.SaveChangesAsync();
+            var scheduleToDelete =
+                await _context.Schedules
+                    .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (scheduleToDelete != null)
+            {
+                _context.Schedules.Remove(scheduleToDelete);
+
+                await _context.SaveChangesAsync();
+
+                await CreateScheduleNotificationsAsync(
+                    "Расписание изменено",
+                    notificationMessage,
+                    "warning");
+            }
         }
         catch (DbUpdateException)
         {
@@ -981,6 +1057,207 @@ public class SchedulesController : Controller
 
 
     // ============================================================
+    // NOTIFICATIONS
+    // ============================================================
+
+    private sealed class ScheduleSnapshot
+    {
+        public int TeacherId { get; init; }
+
+        public int GroupId { get; init; }
+
+        public int SubjectId { get; init; }
+
+        public int ClassroomId { get; init; }
+
+        public DayOfWeek? DayOfWeek { get; init; }
+
+        public TimeSpan? StartTime { get; init; }
+
+        public TimeSpan? EndTime { get; init; }
+    }
+
+
+    private async Task CreateScheduleNotificationsAsync(
+        string title,
+        string message,
+        string type)
+    {
+        var currentUserId =
+            User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var userIds = await _context.Users
+            .AsNoTracking()
+            .Where(u => u.Id != currentUserId)
+            .Select(u => u.Id)
+            .ToListAsync();
+
+        if (userIds.Count == 0)
+        {
+            return;
+        }
+
+        var notifications = userIds
+            .Select(userId => new Notification
+            {
+                UserId = userId,
+                Title = title,
+                Message = message,
+                Type = type,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            })
+            .ToList();
+
+        await _context.Notifications
+            .AddRangeAsync(notifications);
+
+        await _context.SaveChangesAsync();
+    }
+
+
+    private async Task<string> BuildScheduleChangesMessageAsync(
+        ScheduleSnapshot oldSchedule,
+        Schedule updatedSchedule)
+    {
+        var changes = new List<string>();
+
+        // --------------------------------------------------------
+        // Преподаватель
+        // --------------------------------------------------------
+
+        if (oldSchedule.TeacherId != updatedSchedule.TeacherId)
+        {
+            var oldTeacher = await _context.Teachers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    t => t.Id == oldSchedule.TeacherId);
+
+            changes.Add(
+                $"Преподаватель: " +
+                $"{oldTeacher?.FullName ?? "—"} → " +
+                $"{updatedSchedule.Teacher?.FullName ?? "—"}");
+        }
+
+        // --------------------------------------------------------
+        // Группа
+        // --------------------------------------------------------
+
+        if (oldSchedule.GroupId != updatedSchedule.GroupId)
+        {
+            var oldGroup = await _context.Groups
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    g => g.Id == oldSchedule.GroupId);
+
+            changes.Add(
+                $"Группа: " +
+                $"{oldGroup?.Name ?? "—"} → " +
+                $"{updatedSchedule.Group?.Name ?? "—"}");
+        }
+
+        // --------------------------------------------------------
+        // Предмет
+        // --------------------------------------------------------
+
+        if (oldSchedule.SubjectId != updatedSchedule.SubjectId)
+        {
+            var oldSubject = await _context.Subjects
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    s => s.Id == oldSchedule.SubjectId);
+
+            changes.Add(
+                $"Предмет: " +
+                $"{oldSubject?.Name ?? "—"} → " +
+                $"{updatedSchedule.Subject?.Name ?? "—"}");
+        }
+
+        // --------------------------------------------------------
+        // Аудитория
+        // --------------------------------------------------------
+
+        if (oldSchedule.ClassroomId != updatedSchedule.ClassroomId)
+        {
+            var oldClassroom = await _context.Classrooms
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    c => c.Id == oldSchedule.ClassroomId);
+
+            changes.Add(
+                $"Аудитория: " +
+                $"{oldClassroom?.Name ?? "—"} → " +
+                $"{updatedSchedule.Classroom?.Name ?? "—"}");
+        }
+
+        // --------------------------------------------------------
+        // День недели
+        // --------------------------------------------------------
+
+        if (oldSchedule.DayOfWeek != updatedSchedule.DayOfWeek)
+        {
+            changes.Add(
+                $"День: " +
+                $"{GetRussianDayName(oldSchedule.DayOfWeek)} → " +
+                $"{GetRussianDayName(updatedSchedule.DayOfWeek)}");
+        }
+
+        // --------------------------------------------------------
+        // Время
+        // --------------------------------------------------------
+
+        if (oldSchedule.StartTime != updatedSchedule.StartTime ||
+            oldSchedule.EndTime != updatedSchedule.EndTime)
+        {
+            changes.Add(
+                $"Время: " +
+                $"{FormatTimeRange(
+                    oldSchedule.StartTime,
+                    oldSchedule.EndTime)} → " +
+                $"{FormatTimeRange(
+                    updatedSchedule.StartTime,
+                    updatedSchedule.EndTime)}");
+        }
+
+        return string.Join("\n", changes);
+    }
+
+
+    private static string GetRussianDayName(DayOfWeek? day)
+    {
+        return day switch
+        {
+            DayOfWeek.Monday => "Понедельник",
+            DayOfWeek.Tuesday => "Вторник",
+            DayOfWeek.Wednesday => "Среда",
+            DayOfWeek.Thursday => "Четверг",
+            DayOfWeek.Friday => "Пятница",
+            DayOfWeek.Saturday => "Суббота",
+            DayOfWeek.Sunday => "Воскресенье",
+            _ => "Неизвестный день"
+        };
+    }
+
+
+    private static string FormatTimeRange(
+        TimeSpan? startTime,
+        TimeSpan? endTime)
+    {
+        var start =
+            startTime.HasValue
+                ? startTime.Value.ToString(@"hh\:mm")
+                : "—";
+
+        var end =
+            endTime.HasValue
+                ? endTime.Value.ToString(@"hh\:mm")
+                : "—";
+
+        return $"{start}–{end}";
+    }
+
+
+    // ============================================================
     // EXISTS
     // ============================================================
 
@@ -1013,4 +1290,3 @@ public class SchedulesController : Controller
             : result;
     }
 }
-

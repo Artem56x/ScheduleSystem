@@ -1,0 +1,14 @@
+@model int
+
+<a asp-controller="Notifications" asp-action="Index" class="notification-button" aria-label="Уведомления">
+
+    <span class="notification-icon">🔔</span>
+
+    @if (Model > 0)
+    {
+        <span class="notification-badge">
+            @(Model > 99 ? "99+" : Model.ToString())
+        </span>
+    }
+
+</a>

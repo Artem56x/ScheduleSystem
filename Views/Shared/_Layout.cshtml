@@ -132,8 +132,16 @@
 
 
                         @if (User.Identity?.IsAuthenticated == true)
-                        {
 
+                        {
+                            <!-- УВЕДОМЛЕНИЯ -->
+
+                            <li class="nav-item ms-lg-2">
+
+                                @await Component.InvokeAsync("NotificationBell")
+
+                            </li>
+                           
                             <!-- USER MENU -->
                             <li class="nav-item dropdown ms-lg-2">
 

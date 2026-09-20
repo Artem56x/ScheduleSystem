@@ -1,0 +1,205 @@
+@model IEnumerable<ScheduleSystem.Models.Notification>
+
+@{
+    ViewData["Title"] = "Уведомления";
+
+    var notifications = Model.ToList();
+    var unreadCount = notifications.Count(n => !n.IsRead);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Notifications/Index.css" asp-append-version="true" />
+}
+
+<div class="notifications-page">
+
+    <div class="notifications-container">
+
+        <!-- HEADER -->
+        <div class="notifications-header">
+
+            <div class="notifications-heading">
+
+                <div class="notifications-title-row">
+
+                    <div class="notifications-title-icon">
+                        🔔
+                    </div>
+
+                    <div>
+                        <div class="notifications-title-line">
+
+                            <h1>Уведомления</h1>
+
+                            @if (unreadCount > 0)
+                            {
+                                <span class="notifications-count">
+                                    @unreadCount
+                                </span>
+                            }
+
+                        </div>
+
+                        <p>
+                            Здесь отображаются изменения и события расписания.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            @if (unreadCount > 0)
+            {
+                <form asp-action="MarkAllAsRead" method="post" class="mark-all-form">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit" class="mark-all-button">
+
+                        <span class="mark-all-icon">✓</span>
+
+                        <span>Прочитать всё</span>
+
+                    </button>
+
+                </form>
+            }
+
+        </div>
+
+
+        <!-- EMPTY STATE -->
+
+        @if (!notifications.Any())
+        {
+            <div class="empty-notifications">
+
+                <div class="empty-icon">
+                    🔔
+                </div>
+
+                <h2>Уведомлений пока нет</h2>
+
+                <p>
+                    Здесь будут появляться изменения расписания
+                    и другие важные события.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            <!-- NOTIFICATIONS LIST -->
+
+            <div class="notifications-list">
+
+                @foreach (var notification in notifications)
+                {
+                    <div class="notification-card
+                        @(notification.IsRead ? "is-read" : "is-unread")
+                        notification-@notification.Type">
+
+                        <!-- ICON -->
+
+                        <div class="notification-icon-wrapper">
+
+                            <div class="notification-card-icon">
+
+                                @switch (notification.Type)
+                                {
+                                    case "success":
+                                        <span>✓</span>
+                                        break;
+
+                                    case "warning":
+                                        <span>!</span>
+                                        break;
+
+                                    case "danger":
+                                        <span>×</span>
+                                        break;
+
+                                    default:
+                                        <span>i</span>
+                                        break;
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CONTENT -->
+
+                        <div class="notification-content">
+
+                            <div class="notification-card-header">
+
+                                <div class="notification-title-wrapper">
+
+                                    <h3>
+                                        @notification.Title
+                                    </h3>
+
+                                    @if (!notification.IsRead)
+                                    {
+                                        <span class="unread-label">
+                                            Новое
+                                        </span>
+                                    }
+
+                                </div>
+
+                                @if (!notification.IsRead)
+                                {
+                                    <span class="unread-dot"></span>
+                                }
+
+                            </div>
+
+
+                            <p class="notification-message">
+                                @notification.Message
+                            </p>
+
+
+                            <div class="notification-footer">
+
+                                <span class="notification-date">
+                                    <span class="date-icon">◷</span>
+                                    @(notification.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm"))
+                                </span>
+
+
+                                @if (!notification.IsRead)
+                                {
+                                    <form asp-action="MarkAsRead" asp-route-id="@notification.Id" method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit" class="mark-read-button">
+
+                                            <span>✓</span>
+
+                                            <span>Прочитать</span>
+
+                                        </button>
+
+                                    </form>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</div>
