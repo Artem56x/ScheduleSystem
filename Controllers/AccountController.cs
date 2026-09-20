@@ -24,11 +24,12 @@ namespace ScheduleSystem.Controllers
         }
 
 
+
         // =========================================================
         // PROGRAM SETTINGS
         // =========================================================
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> ProgramSettings()
         {
@@ -47,8 +48,12 @@ namespace ScheduleSystem.Controllers
             ViewBag.ScheduleCount =
                 await _context.Schedules.CountAsync();
 
+            ViewBag.IsAdmin =
+                User.IsInRole("Admin");
+
             return View();
         }
+
 
 
         // =========================================================
@@ -550,46 +555,31 @@ namespace ScheduleSystem.Controllers
         // SETTINGS
         // =========================================================
 
-        [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Settings()
         {
-            if (User.Identity?.IsAuthenticated != true)
-            {
-                return RedirectToAction(
-                    nameof(Login));
-            }
-
-
-            var user =
-                await _userManager.GetUserAsync(
-                    User);
-
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
+                return Challenge();
+
+            ViewBag.Email = user.Email ?? "";
+            ViewBag.UserName = user.UserName ?? user.Email ?? "";
+            ViewBag.DisplayName = user.DisplayName ?? "";
+            ViewBag.IsAdmin = User.IsInRole("Admin");
+
+            // Данные программы нужны только администратору
+            if (User.IsInRole("Admin"))
             {
-                return RedirectToAction(
-                    nameof(Login));
+                ViewBag.TeacherCount = await _context.Teachers.CountAsync();
+                ViewBag.GroupCount = await _context.Groups.CountAsync();
+                ViewBag.SubjectCount = await _context.Subjects.CountAsync();
+                ViewBag.ClassroomCount = await _context.Classrooms.CountAsync();
+                ViewBag.ScheduleCount = await _context.Schedules.CountAsync();
             }
-
-
-            ViewBag.Email =
-                user.Email;
-
-            ViewBag.UserName =
-                user.UserName;
-
-            ViewBag.DisplayName =
-                user.DisplayName;
-
-            ViewBag.IsAdmin =
-                await _userManager.IsInRoleAsync(
-                    user,
-                    "Admin");
-
 
             return View();
         }
-
 
         // =========================================================
         // UPDATE PROFILE

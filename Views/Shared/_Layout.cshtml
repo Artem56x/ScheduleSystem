@@ -30,6 +30,7 @@
 
                 </a>
 
+
                 <!-- MOBILE MENU -->
                 <button class="navbar-toggler glass-button" type="button" data-bs-toggle="collapse"
                         data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false"
@@ -39,61 +40,87 @@
 
                 </button>
 
+
                 <div class="collapse navbar-collapse" id="mainNavigation">
 
                     <!-- MAIN NAVIGATION -->
                     <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
 
+                        <!-- ГЛАВНАЯ -->
                         <li class="nav-item">
+
                             <a class="nav-link" asp-controller="Home" asp-action="Index">
 
                                 <span>Главная</span>
 
                             </a>
+
                         </li>
 
+
+                        <!-- РАСПИСАНИЕ -->
                         <li class="nav-item">
+
                             <a class="nav-link" asp-controller="Schedules" asp-action="Index">
 
                                 <span>Расписание</span>
 
                             </a>
+
                         </li>
 
+
+                        <!-- ПРЕПОДАВАТЕЛИ -->
                         <li class="nav-item">
+
                             <a class="nav-link" asp-controller="Teachers" asp-action="Index">
 
                                 <span>Преподаватели</span>
 
                             </a>
+
                         </li>
 
+
+                        <!-- ГРУППЫ -->
                         <li class="nav-item">
+
                             <a class="nav-link" asp-controller="Groups" asp-action="Index">
 
                                 <span>Группы</span>
 
                             </a>
+
                         </li>
 
+
+                        <!-- ПРЕДМЕТЫ -->
                         <li class="nav-item">
+
                             <a class="nav-link" asp-controller="Subjects" asp-action="Index">
 
                                 <span>Предметы</span>
 
                             </a>
+
                         </li>
 
+
+                        <!-- АУДИТОРИИ -->
                         <li class="nav-item">
+
                             <a class="nav-link" asp-controller="Classrooms" asp-action="Index">
 
                                 <span>Аудитории</span>
 
                             </a>
+
                         </li>
+
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
+
                             <!-- USER MENU -->
                             <li class="nav-item dropdown ms-lg-2">
 
@@ -101,43 +128,63 @@
                                         aria-expanded="false">
 
                                     <span class="profile-avatar">
+
                                         @(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")
+
                                     </span>
 
                                     <span class="profile-name">
+
                                         @(User.Identity.Name ?? "Пользователь")
+
                                     </span>
 
                                 </button>
 
+
                                 <ul class="dropdown-menu dropdown-menu-end glass-dropdown">
 
+
+                                    <!-- USER INFORMATION -->
                                     <li class="profile-dropdown-header">
 
                                         <div class="profile-avatar large">
+
                                             @(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")
+
                                         </div>
 
+
                                         <div>
+
                                             <div class="profile-email">
+
                                                 @(User.Identity.Name ?? "Пользователь")
+
                                             </div>
+
 
                                             @if (User.IsInRole("Admin"))
                                             {
                                                 <div class="profile-role admin">
+
                                                     Администратор
+
                                                 </div>
                                             }
                                             else
                                             {
                                                 <div class="profile-role">
+
                                                     Пользователь
+
                                                 </div>
                                             }
+
                                         </div>
 
                                     </li>
+
 
                                     <li>
                                         <hr class="dropdown-divider" />
@@ -147,46 +194,39 @@
                                     <!-- ПРОФИЛЬ -->
 
                                     <li>
+
                                         <a asp-controller="Account" asp-action="Profile" class="dropdown-item">
 
                                             <span class="menu-icon">👤</span>
+
                                             <span>Профиль</span>
 
                                         </a>
+
                                     </li>
 
 
-                                    <!-- НАСТРОЙКИ ПРОФИЛЯ -->
+                  
+
+                                    <!-- НАСТРОЙКИ -->
 
                                     <li>
+
                                         <a asp-controller="Account" asp-action="Settings" class="dropdown-item">
 
-                                            <span class="menu-icon">⚙</span>
-                                            <span>Настройки профиля</span>
+                                            <span class="menu-icon">⚙️</span>
+
+                                            <span>Настройки</span>
 
                                         </a>
-                                    </li>
 
-
-                                    <!-- НАСТРОЙКИ ПРОГРАММЫ ТОЛЬКО ДЛЯ ADMIN -->
-
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <a asp-controller="Account" asp-action="ProgramSettings" class="dropdown-item">
-                                            ⚙️
-                                            <span>Настройки программы</span>
-                                        </a>
-                                    }
-
-
-                                    <li>
-                                        <hr class="dropdown-divider" />
                                     </li>
 
 
                                     <!-- ВЫХОД -->
 
                                     <li>
+
                                         <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
 
                                             @Html.AntiForgeryToken()
@@ -194,56 +234,81 @@
                                             <button type="submit" class="dropdown-item logout-item">
 
                                                 <span class="menu-icon">↪</span>
+
                                                 <span>Выйти</span>
 
                                             </button>
 
                                         </form>
+
                                     </li>
 
                                 </ul>
 
                             </li>
+
                         }
                         else
                         {
+
                             <!-- GUEST AUTH BUTTONS -->
+
                             <li class="nav-item ms-lg-2">
+
                                 <a class="auth-button login-button" asp-controller="Account" asp-action="Login">
 
                                     <span>Войти</span>
 
                                 </a>
+
                             </li>
 
+
                             <li class="nav-item">
+
                                 <a class="auth-button register-button" asp-controller="Account" asp-action="Register">
 
                                     <span>Регистрация</span>
 
                                 </a>
+
                             </li>
+
                         }
 
                     </ul>
 
                 </div>
+
             </div>
+
         </nav>
+
     </header>
 
+
     <main class="main-content">
+
         @RenderBody()
+
     </main>
 
+
     <footer class="glass-footer">
+
         <div class="container text-center">
+
             <span>© 2026 ScheduleSystem</span>
+
         </div>
+
     </footer>
 
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
