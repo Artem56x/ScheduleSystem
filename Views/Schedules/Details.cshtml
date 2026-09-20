@@ -62,13 +62,18 @@
         </div>
 
         <div class="header-actions">
+
             <a asp-action="Index" class="glass-button secondary-button">
                 ← Назад
             </a>
 
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button primary-button">
-                ✎ Редактировать
-            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button primary-button">
+                    ✎ Редактировать
+                </a>
+            }
+
         </div>
     </div>
 
@@ -253,9 +258,12 @@
                 ← Вернуться к расписанию
             </a>
 
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="footer-button primary-button">
-                ✎ Изменить занятие
-            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="footer-button primary-button">
+                    ✎ Изменить занятие
+                </a>
+            }
 
         </div>
 

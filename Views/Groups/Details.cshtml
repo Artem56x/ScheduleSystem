@@ -138,13 +138,16 @@
         <!-- Кнопки -->
         <div class="details-actions">
 
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn glass-primary-btn">
-                Изменить
-            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn glass-primary-btn">
+                    Изменить
+                </a>
 
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn glass-danger-btn">
-                Удалить
-            </a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn glass-danger-btn">
+                    Удалить
+                </a>
+            }
 
             <a asp-action="Index" class="btn glass-secondary-btn">
                 Назад к списку

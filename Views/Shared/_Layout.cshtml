@@ -172,14 +172,10 @@
 
                                     @if (User.IsInRole("Admin"))
                                     {
-                                        <li>
-                                            <a asp-controller="Account" asp-action="Settings" class="dropdown-item">
-
-                                                <span class="menu-icon">⚙</span>
-                                                <span>Настройки профиля</span>
-
-                                            </a>
-                                        </li>
+                                        <a asp-controller="Account" asp-action="ProgramSettings" class="dropdown-item">
+                                            ⚙️
+                                            <span>Настройки программы</span>
+                                        </a>
                                     }
 
 

@@ -192,13 +192,16 @@
         <!-- ACTIONS -->
         <div class="details-footer">
 
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button primary-button">
-                ✏️ Изменить
-            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button primary-button">
+                    ✏️ Изменить
+                </a>
 
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="glass-button delete-button">
-                🗑 Удалить
-            </a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="glass-button delete-button">
+                    🗑 Удалить
+                </a>
+            }
 
             <a asp-action="Index" class="glass-button secondary-button">
                 ← Назад

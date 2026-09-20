@@ -122,13 +122,16 @@
 
         <div class="form-actions">
 
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn edit-btn">
-                Изменить
-            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn edit-btn">
+                    Изменить
+                </a>
 
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn delete-btn">
-                Удалить
-            </a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn delete-btn">
+                    Удалить
+                </a>
+            }
 
             <a asp-action="Index" class="btn cancel-btn">
                 Назад
