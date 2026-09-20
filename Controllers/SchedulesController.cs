@@ -567,6 +567,19 @@ public class SchedulesController : Controller
 
             if (createdSchedule != null)
             {
+                await CreateAuditLogAsync(
+                    "Добавлено занятие",
+                    $"{createdSchedule.Subject?.Name}\n" +
+                    $"{createdSchedule.Group?.Name}\n" +
+                    $"{GetRussianDayName(createdSchedule.DayOfWeek)}, " +
+                    $"{FormatTimeRange(
+                        createdSchedule.StartTime,
+                        createdSchedule.EndTime)}\n" +
+                    $"Аудитория: {createdSchedule.Classroom?.Name}");
+            }
+
+            if (createdSchedule != null)
+            {
                 await CreateScheduleNotificationsAsync(
                     "Расписание изменено",
                     $"Добавлено новое занятие:\n\n" +
@@ -594,11 +607,6 @@ public class SchedulesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-
-    // ============================================================
-    // EDIT
-    // ============================================================
-
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
@@ -620,6 +628,9 @@ public class SchedulesController : Controller
         return View(schedule);
     }
 
+    // ============================================================
+    // EDIT
+    // ============================================================
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
@@ -703,6 +714,20 @@ public class SchedulesController : Controller
 
                 if (!string.IsNullOrWhiteSpace(changes))
                 {
+                    // ------------------------------------------------
+                    // История изменений
+                    // ------------------------------------------------
+
+                    await CreateAuditLogAsync(
+                        "Изменено занятие",
+                        $"{updatedSchedule.Subject?.Name}\n" +
+                        $"{updatedSchedule.Group?.Name}\n\n" +
+                        $"{changes}");
+
+                    // ------------------------------------------------
+                    // Уведомления пользователей
+                    // ------------------------------------------------
+
                     await CreateScheduleNotificationsAsync(
                         "Расписание изменено",
                         $"{updatedSchedule.Subject?.Name}\n" +
@@ -794,6 +819,16 @@ public class SchedulesController : Controller
                 _context.Schedules.Remove(scheduleToDelete);
 
                 await _context.SaveChangesAsync();
+
+                await CreateAuditLogAsync(
+                    "Удалено занятие",
+                    $"{schedule.Subject?.Name}\n" +
+                    $"{schedule.Group?.Name}\n" +
+                    $"{GetRussianDayName(schedule.DayOfWeek)}, " +
+                    $"{FormatTimeRange(
+                        schedule.StartTime,
+                        schedule.EndTime)}\n" +
+                    $"Аудитория: {schedule.Classroom?.Name}");
 
                 await CreateScheduleNotificationsAsync(
                     "Расписание изменено",
@@ -1077,6 +1112,29 @@ public class SchedulesController : Controller
         public TimeSpan? EndTime { get; init; }
     }
 
+    private async Task CreateAuditLogAsync(
+        string action,
+        string description)
+    {
+        var currentUserId =
+            User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            return;
+        }
+
+        var auditLog = new AuditLog
+        {
+            UserId = currentUserId,
+            Action = action,
+            Description = description,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _context.AuditLogs.AddAsync(auditLog);
+        await _context.SaveChangesAsync();
+    }
 
     private async Task CreateScheduleNotificationsAsync(
         string title,

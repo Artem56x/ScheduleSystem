@@ -33,6 +33,9 @@ namespace ScheduleSystem.Data
         /// Уведомления
         public DbSet<Notification> Notifications { get; set; }
 
+        // Журнал
+        public DbSet<AuditLog> AuditLogs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
