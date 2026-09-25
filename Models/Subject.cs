@@ -14,7 +14,16 @@ public class Subject
     [Display(Name = "Название предмета")]
     public string Name { get; set; } = string.Empty;
 
-    [Display(Name = "Требуются компьютеры")]
-    public bool RequiresComputers { get; set; }
+    [Display(Name = "Курс")]
+    [Range(1, 5, ErrorMessage = "Курс должен быть от 1 до 5")]
+    public int Course { get; set; } = 1;
+
+    [Display(Name = "Тип предмета")]
+    public SubjectType Type { get; set; } = SubjectType.General;
+
+    public ICollection<SubjectClassroomCategory> ClassroomCategoryRequirements { get; set; }
+    = new List<SubjectClassroomCategory>();
+
+
 }
 

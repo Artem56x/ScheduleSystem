@@ -1,175 +1,263 @@
-    .subject-details-page {
-        max-width: 760px;
-        margin: 0 auto;
-    }
+.subject-details-page {
+max-width: 760px;
+margin: 0 auto;
+}
 
-    .page-header {
-        margin-bottom: 25px;
-    }
+.page-header {
+margin-bottom: 25px;
+}
 
-    .page-header h1 {
-        margin: 0 0 5px;
-        font-size: 2rem;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
+.page-header h1 {
+margin: 0 0 5px;
+font-size: 2rem;
+font-weight: 700;
+letter-spacing: -0.5px;
+}
 
-    .page-header p {
-        margin: 0;
-        color: #6c757d;
-    }
+.page-header p {
+margin: 0;
+color: #6c757d;
+}
 
-    .glass-details-card {
-        padding: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 22px;
-        background: rgba(255, 255, 255, 0.55);
-        backdrop-filter: blur(25px) saturate(160%);
-        -webkit-backdrop-filter: blur(25px) saturate(160%);
-        box-shadow:
-            0 15px 40px rgba(0, 0, 0, 0.06),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    }
+.glass-details-card {
+padding: 30px;
+border: 1px solid rgba(255, 255, 255, 0.7);
+border-radius: 22px;
+background: rgba(255, 255, 255, 0.55);
+backdrop-filter: blur(25px) saturate(160%);
+-webkit-backdrop-filter: blur(25px) saturate(160%);
+box-shadow:
+0 15px 40px rgba(0, 0, 0, 0.06),
+inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
 
-    .subject-profile {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        padding-bottom: 25px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    }
+/* =========================================================
+PROFILE
+========================================================= */
 
-    .subject-avatar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 64px;
-        height: 64px;
-        flex-shrink: 0;
-        border-radius: 20px;
-        background: linear-gradient(135deg, #007aff, #5856d6);
-        color: white;
-        font-size: 24px;
-        font-weight: 700;
-        box-shadow: 0 8px 20px rgba(0, 122, 255, 0.20);
-    }
+.subject-profile {
+display: flex;
+align-items: center;
+gap: 18px;
+padding-bottom: 25px;
+border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
 
-    .subject-profile h2 {
-        margin: 0 0 5px;
-        font-size: 1.3rem;
-        font-weight: 700;
-    }
+.subject-avatar {
+display: flex;
+align-items: center;
+justify-content: center;
+width: 64px;
+height: 64px;
+flex-shrink: 0;
+border-radius: 20px;
+background: linear-gradient(135deg, #007aff, #5856d6);
+color: white;
+font-size: 24px;
+font-weight: 700;
+box-shadow: 0 8px 20px rgba(0, 122, 255, 0.20);
+}
 
-    .subject-profile p {
-        margin: 0;
-        color: #777;
-    }
+.subject-profile h2 {
+margin: 0 0 5px;
+font-size: 1.3rem;
+font-weight: 700;
+}
 
-    .details-list {
-        padding: 5px 0;
-    }
+.subject-profile p {
+margin: 0;
+color: #777;
+}
 
-    .detail-row {
-        display: grid;
-        grid-template-columns: 180px 1fr;
-        gap: 20px;
-        padding: 18px 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
+/* =========================================================
+DETAILS
+========================================================= */
 
-    .detail-row:last-child {
-        border-bottom: none;
-    }
+.details-list {
+padding: 5px 0;
+}
 
-    .detail-label {
-        color: #888;
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
+.detail-row {
+display: grid;
+grid-template-columns: 180px 1fr;
+gap: 20px;
+padding: 18px 0;
+border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
 
-    .detail-value {
-        color: #252525;
-        font-weight: 600;
-        word-break: break-word;
-    }
+.detail-row:last-child {
+border-bottom: none;
+}
 
-    .details-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding-top: 20px;
-    }
+.detail-label {
+color: #888;
+font-size: 0.9rem;
+font-weight: 600;
+}
 
-    .details-actions .btn {
-        border-radius: 13px;
-        padding: 11px 18px;
-        font-weight: 600;
-        transition: 0.2s ease;
-    }
+.detail-value {
+color: #252525;
+font-weight: 600;
+word-break: break-word;
+}
 
-    .edit-btn {
-        border: none;
-        background: rgba(0, 122, 255, 0.10);
-        color: #007aff;
-    }
+/* =========================================================
+COMPUTER STATUS
+========================================================= */
 
-    .edit-btn:hover {
-        background: rgba(0, 122, 255, 0.16);
-        color: #0066d6;
-        transform: translateY(-1px);
-    }
+.status-badge {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+padding: 6px 11px;
+border-radius: 999px;
+font-size: 13px;
+font-weight: 600;
+white-space: nowrap;
+}
 
-    .delete-btn {
-        border: none;
-        background: rgba(220, 53, 69, 0.09);
-        color: #dc3545;
-    }
+.status-yes {
+background: rgba(72, 187, 120, 0.12);
+color: #25834d;
+}
 
-    .delete-btn:hover {
-        background: rgba(220, 53, 69, 0.15);
-        color: #c82333;
-        transform: translateY(-1px);
-    }
+.status-no {
+background: rgba(120, 130, 150, 0.10);
+color: #697386;
+}
 
-    .cancel-btn {
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        background: rgba(255, 255, 255, 0.55);
-        color: #555;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
+/* =========================================================
+CLASSROOM REQUIREMENTS
+========================================================= */
 
-    .cancel-btn:hover {
-        background: rgba(255, 255, 255, 0.85);
-        color: #222;
-    }
+.requirements-row {
+align-items: flex-start;
+}
 
-    @media (max-width: 600px) {
+.requirements-details {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+}
 
-        .subject-details-page {
-            width: 100%;
-        }
+.requirement-badge {
+display: inline-flex;
+align-items: center;
+padding: 7px 12px;
+border-radius: 12px;
+background: rgba(77, 143, 232, 0.10);
+border: 1px solid rgba(77, 143, 232, 0.14);
+color: #315f9e;
+font-size: 13px;
+font-weight: 600;
+}
 
-        .page-header h1 {
-            font-size: 1.6rem;
-        }
+.no-requirements {
+color: #7a8494;
+font-size: 14px;
+font-weight: 500;
+}
 
-        .glass-details-card {
-            padding: 20px;
-            border-radius: 18px;
-        }
+/* =========================================================
+ACTIONS
+========================================================= */
 
-        .detail-row {
-            grid-template-columns: 1fr;
-            gap: 6px;
-        }
+.details-actions {
+display: flex;
+align-items: center;
+gap: 10px;
+padding-top: 20px;
+}
 
-        .details-actions {
-            flex-direction: column;
-        }
+.details-actions .btn {
+border-radius: 13px;
+padding: 11px 18px;
+font-weight: 600;
+transition: 0.2s ease;
+}
 
-        .details-actions .btn {
-            width: 100%;
-        }
+.edit-btn {
+border: none;
+background: rgba(0, 122, 255, 0.10);
+color: #007aff;
+}
 
-    }
+.edit-btn:hover {
+background: rgba(0, 122, 255, 0.16);
+color: #0066d6;
+transform: translateY(-1px);
+}
+
+.delete-btn {
+border: none;
+background: rgba(220, 53, 69, 0.09);
+color: #dc3545;
+}
+
+.delete-btn:hover {
+background: rgba(220, 53, 69, 0.15);
+color: #c82333;
+transform: translateY(-1px);
+}
+
+.cancel-btn {
+border: 1px solid rgba(255, 255, 255, 0.8);
+background: rgba(255, 255, 255, 0.55);
+color: #555;
+backdrop-filter: blur(10px);
+-webkit-backdrop-filter: blur(10px);
+}
+
+.cancel-btn:hover {
+background: rgba(255, 255, 255, 0.85);
+color: #222;
+}
+
+/* =========================================================
+MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+
+.subject-details-page {
+    width: 100%;
+}
+
+.page-header h1 {
+    font-size: 1.6rem;
+}
+
+.glass-details-card {
+    padding: 20px;
+    border-radius: 18px;
+}
+
+.detail-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+.requirements-details {
+    gap: 6px;
+}
+
+.requirement-badge {
+    font-size: 12px;
+    padding: 6px 10px;
+}
+
+.status-badge {
+    font-size: 12px;
+}
+
+.details-actions {
+    flex-direction: column;
+}
+
+.details-actions .btn {
+    width: 100%;
+}
+
+
+}

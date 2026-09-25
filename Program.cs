@@ -33,7 +33,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<ScheduleExportService>();
 builder.Services.AddScoped<ScheduleValidationService>();
 builder.Services.AddScoped<ClassroomRecommendationService>();
-
+builder.Services.AddScoped<ScheduleGeneratorService>();
 
 builder.Services.AddControllersWithViews(options =>
 {

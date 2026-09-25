@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
+
 namespace ScheduleSystem.Controllers;
 
 public class SubjectsController : Controller
@@ -14,11 +15,16 @@ public class SubjectsController : Controller
         _context = context;
     }
 
-    // GET: Subjects
+    // ============================================================
+    // INDEX
+    // ============================================================
+
     public async Task<IActionResult> Index(string? search)
     {
         var subjects = _context.Subjects
             .AsNoTracking()
+            .Include(s => s.ClassroomCategoryRequirements)
+                .ThenInclude(x => x.ClassroomCategory)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -36,7 +42,10 @@ public class SubjectsController : Controller
             .ToListAsync());
     }
 
-    // GET: Subjects/Details/5
+    // ============================================================
+    // DETAILS
+    // ============================================================
+
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
@@ -46,6 +55,8 @@ public class SubjectsController : Controller
 
         var subject = await _context.Subjects
             .AsNoTracking()
+            .Include(s => s.ClassroomCategoryRequirements)
+                .ThenInclude(x => x.ClassroomCategory)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (subject == null)
@@ -56,34 +67,89 @@ public class SubjectsController : Controller
         return View(subject);
     }
 
-    // GET: Subjects/Create
+    // ============================================================
+    // CREATE - GET
+    // ============================================================
+
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        return View();
+        await LoadClassroomCategoriesAsync();
+
+        return View(new Subject());
     }
 
-    // POST: Subjects/Create
+    // ============================================================
+    // CREATE - POST
+    // ============================================================
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-            [Bind("Id,Name,RequiresComputers")] Subject subject)
+        [Bind("Id,Name,Course,Type")]
+        Subject subject,
+        int[]? selectedClassroomCategoryIds)
     {
+        var categoryIds = selectedClassroomCategoryIds?
+            .Distinct()
+            .ToList()
+            ?? new List<int>();
+
         if (!ModelState.IsValid)
         {
+            await LoadClassroomCategoriesAsync();
+
+            ViewBag.SelectedClassroomCategoryIds = categoryIds;
+
             return View(subject);
         }
 
+        // Проверяем, что все переданные категории действительно существуют
+        if (categoryIds.Count > 0)
+        {
+            var validCategoryIds = await _context.ClassroomCategories
+                .AsNoTracking()
+                .Where(c => categoryIds.Contains(c.Id))
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            if (validCategoryIds.Count != categoryIds.Count)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Одна или несколько выбранных категорий аудиторий не существуют.");
+
+                await LoadClassroomCategoriesAsync();
+
+                ViewBag.SelectedClassroomCategoryIds = categoryIds;
+
+                return View(subject);
+            }
+        }
+
         _context.Subjects.Add(subject);
+
+        foreach (var categoryId in categoryIds)
+        {
+            subject.ClassroomCategoryRequirements.Add(
+                new SubjectClassroomCategory
+                {
+                    Subject = subject,
+                    ClassroomCategoryId = categoryId
+                });
+        }
 
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: Subjects/Edit/5
+    // ============================================================
+    // EDIT - GET
+    // ============================================================
+
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
@@ -95,6 +161,7 @@ public class SubjectsController : Controller
 
         var subject = await _context.Subjects
             .AsNoTracking()
+            .Include(s => s.ClassroomCategoryRequirements)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (subject == null)
@@ -102,28 +169,50 @@ public class SubjectsController : Controller
             return NotFound();
         }
 
+        await LoadClassroomCategoriesAsync();
+
+        ViewBag.SelectedClassroomCategoryIds =
+            subject.ClassroomCategoryRequirements
+                .Select(x => x.ClassroomCategoryId)
+                .ToList();
+
         return View(subject);
     }
 
-    // POST: Subjects/Edit/5
+    // ============================================================
+    // EDIT - POST
+    // ============================================================
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-            int id,
-            [Bind("Id,Name,RequiresComputers")] Subject subject)
+        int id,
+        [Bind("Id,Name,Course,Type")]
+        Subject subject,
+        int[]? selectedClassroomCategoryIds)
     {
         if (id != subject.Id)
         {
             return NotFound();
         }
 
+        var categoryIds = selectedClassroomCategoryIds?
+            .Distinct()
+            .ToList()
+            ?? new List<int>();
+
         if (!ModelState.IsValid)
         {
+            await LoadClassroomCategoriesAsync();
+
+            ViewBag.SelectedClassroomCategoryIds = categoryIds;
+
             return View(subject);
         }
 
         var existingSubject = await _context.Subjects
+            .Include(s => s.ClassroomCategoryRequirements)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (existingSubject == null)
@@ -131,8 +220,46 @@ public class SubjectsController : Controller
             return NotFound();
         }
 
+        // Проверяем существование выбранных категорий
+        if (categoryIds.Count > 0)
+        {
+            var validCategoryIds = await _context.ClassroomCategories
+                .AsNoTracking()
+                .Where(c => categoryIds.Contains(c.Id))
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            if (validCategoryIds.Count != categoryIds.Count)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Одна или несколько выбранных категорий аудиторий не существуют.");
+
+                await LoadClassroomCategoriesAsync();
+
+                ViewBag.SelectedClassroomCategoryIds = categoryIds;
+
+                return View(subject);
+            }
+        }
+
+        // Обновляем основные данные
         existingSubject.Name = subject.Name;
-        existingSubject.RequiresComputers = subject.RequiresComputers;
+        existingSubject.Course = subject.Course;
+        existingSubject.Type = subject.Type;
+
+        // Полностью пересобираем требования к аудиториям
+        existingSubject.ClassroomCategoryRequirements.Clear();
+
+        foreach (var categoryId in categoryIds)
+        {
+            existingSubject.ClassroomCategoryRequirements.Add(
+                new SubjectClassroomCategory
+                {
+                    SubjectId = existingSubject.Id,
+                    ClassroomCategoryId = categoryId
+                });
+        }
 
         try
         {
@@ -151,7 +278,10 @@ public class SubjectsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: Subjects/Delete/5
+    // ============================================================
+    // DELETE - GET
+    // ============================================================
+
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
@@ -163,6 +293,8 @@ public class SubjectsController : Controller
 
         var subject = await _context.Subjects
             .AsNoTracking()
+            .Include(s => s.ClassroomCategoryRequirements)
+                .ThenInclude(x => x.ClassroomCategory)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (subject == null)
@@ -173,21 +305,26 @@ public class SubjectsController : Controller
         return View(subject);
     }
 
-    // POST: Subjects/Delete/5
+    // ============================================================
+    // DELETE - POST
+    // ============================================================
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var subject = await _context.Subjects.FindAsync(id);
+        var subject = await _context.Subjects
+            .Include(s => s.ClassroomCategoryRequirements)
+            .FirstOrDefaultAsync(s => s.Id == id);
 
         if (subject == null)
         {
             return NotFound();
         }
 
-        // Проверяем использование предмета в расписании
+        // Проверяем использование в расписании
         var isUsedInSchedule = await _context.Schedules
             .AsNoTracking()
             .AnyAsync(schedule => schedule.SubjectId == id);
@@ -200,7 +337,7 @@ public class SubjectsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        // Проверяем использование предмета у преподавателей
+        // Проверяем использование преподавателями
         var isUsedByTeacher = await _context.Teachers
             .AsNoTracking()
             .AnyAsync(teacher => teacher.SubjectId == id);
@@ -230,9 +367,21 @@ public class SubjectsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // ============================================================
+    // HELPERS
+    // ============================================================
+
+    private async Task LoadClassroomCategoriesAsync()
+    {
+        ViewBag.ClassroomCategories = await _context.ClassroomCategories
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .ToListAsync();
+    }
+
     private bool SubjectExists(int id)
     {
-        return _context.Subjects.Any(e => e.Id == id);
+        return _context.Subjects
+            .Any(e => e.Id == id);
     }
 }
-

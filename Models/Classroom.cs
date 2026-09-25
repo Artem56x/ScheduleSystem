@@ -28,7 +28,4 @@ public class Classroom
     )]
     [Display(Name = "Количество мест")]
     public int Capacity { get; set; }
-
-    [Display(Name = "Есть компьютеры")]
-    public bool HasComputers { get; set; }
 }

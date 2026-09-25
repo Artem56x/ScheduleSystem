@@ -50,9 +50,7 @@
         <div class="header-actions">
 
             <a asp-action="Index" class="glass-button secondary-button">
-
                 ← Назад
-
             </a>
 
         </div>
@@ -101,10 +99,14 @@
 
             @Html.AntiForgeryToken()
 
-            <input type="hidden" name="confirmTeacherSubject" id="confirmTeacherSubject" value="false" />
+            <input type="hidden"
+                   name="confirmTeacherSubject"
+                   id="confirmTeacherSubject"
+                   value="false" />
 
 
-            <div asp-validation-summary="ModelOnly" class="glass-validation">
+            <div asp-validation-summary="ModelOnly"
+                 class="glass-validation">
             </div>
 
 
@@ -121,18 +123,20 @@
 
                 <div class="form-grid">
 
-
                     <!-- ПРЕПОДАВАТЕЛЬ -->
 
                     <div class="form-group">
 
-                        <label asp-for="TeacherId" class="form-label">
+                        <label asp-for="TeacherId"
+                               class="form-label">
 
                             Преподаватель
 
                         </label>
 
-                        <select asp-for="TeacherId" class="form-control glass-input" asp-items="ViewBag.TeacherId">
+                        <select asp-for="TeacherId"
+                                class="form-control glass-input"
+                                asp-items="ViewBag.TeacherId">
 
                             <option value="">
                                 Выберите преподавателя
@@ -140,7 +144,8 @@
 
                         </select>
 
-                        <span asp-validation-for="TeacherId" class="text-danger">
+                        <span asp-validation-for="TeacherId"
+                              class="text-danger">
                         </span>
 
                     </div>
@@ -150,13 +155,16 @@
 
                     <div class="form-group">
 
-                        <label asp-for="SubjectId" class="form-label">
+                        <label asp-for="SubjectId"
+                               class="form-label">
 
                             Предмет
 
                         </label>
 
-                        <select asp-for="SubjectId" class="form-control glass-input" asp-items="ViewBag.SubjectId">
+                        <select asp-for="SubjectId"
+                                class="form-control glass-input"
+                                asp-items="ViewBag.SubjectId">
 
                             <option value="">
                                 Выберите предмет
@@ -164,7 +172,8 @@
 
                         </select>
 
-                        <span asp-validation-for="SubjectId" class="text-danger">
+                        <span asp-validation-for="SubjectId"
+                              class="text-danger">
                         </span>
 
                     </div>
@@ -174,13 +183,16 @@
 
                     <div class="form-group">
 
-                        <label asp-for="GroupId" class="form-label">
+                        <label asp-for="GroupId"
+                               class="form-label">
 
                             Группа
 
                         </label>
 
-                        <select asp-for="GroupId" class="form-control glass-input" asp-items="ViewBag.GroupId">
+                        <select asp-for="GroupId"
+                                class="form-control glass-input"
+                                asp-items="ViewBag.GroupId">
 
                             <option value="">
                                 Выберите группу
@@ -188,7 +200,8 @@
 
                         </select>
 
-                        <span asp-validation-for="GroupId" class="text-danger">
+                        <span asp-validation-for="GroupId"
+                              class="text-danger">
                         </span>
 
                     </div>
@@ -198,13 +211,16 @@
 
                     <div class="form-group">
 
-                        <label asp-for="ClassroomId" class="form-label">
+                        <label asp-for="ClassroomId"
+                               class="form-label">
 
                             Аудитория
 
                         </label>
 
-                        <select asp-for="ClassroomId" class="form-control glass-input" asp-items="ViewBag.ClassroomId">
+                        <select asp-for="ClassroomId"
+                                class="form-control glass-input"
+                                asp-items="ViewBag.ClassroomId">
 
                             <option value="">
                                 Выберите аудиторию
@@ -212,7 +228,8 @@
 
                         </select>
 
-                        <span asp-validation-for="ClassroomId" class="text-danger">
+                        <span asp-validation-for="ClassroomId"
+                              class="text-danger">
                         </span>
 
                     </div>
@@ -237,13 +254,16 @@
 
                 <div class="form-group">
 
-                    <label asp-for="DayOfWeek" class="form-label">
+                    <label asp-for="DayOfWeek"
+                           class="form-label">
 
                         День недели
 
                     </label>
 
-                    <select asp-for="DayOfWeek" class="form-control glass-input" asp-items="ViewBag.DayOfWeek">
+                    <select asp-for="DayOfWeek"
+                            class="form-control glass-input"
+                            asp-items="ViewBag.DayOfWeek">
 
                         <option value="">
                             Выберите день недели
@@ -251,7 +271,8 @@
 
                     </select>
 
-                    <span asp-validation-for="DayOfWeek" class="text-danger">
+                    <span asp-validation-for="DayOfWeek"
+                          class="text-danger">
                     </span>
 
                 </div>
@@ -261,12 +282,12 @@
 
                 <div class="time-row">
 
-
                     <!-- НАЧАЛО -->
 
                     <div class="form-group">
 
-                        <label asp-for="StartTime" class="form-label">
+                        <label asp-for="StartTime"
+                               class="form-label">
 
                             Время начала
 
@@ -278,11 +299,14 @@
                                 🕐
                             </span>
 
-                            <input asp-for="StartTime" type="time" class="form-control glass-input" />
+                            <input asp-for="StartTime"
+                                   type="time"
+                                   class="form-control glass-input" />
 
                         </div>
 
-                        <span asp-validation-for="StartTime" class="text-danger">
+                        <span asp-validation-for="StartTime"
+                              class="text-danger">
                         </span>
 
                     </div>
@@ -292,7 +316,8 @@
 
                     <div class="form-group">
 
-                        <label asp-for="EndTime" class="form-label">
+                        <label asp-for="EndTime"
+                               class="form-label">
 
                             Время окончания
 
@@ -304,11 +329,14 @@
                                 🕐
                             </span>
 
-                            <input asp-for="EndTime" type="time" class="form-control glass-input" />
+                            <input asp-for="EndTime"
+                                   type="time"
+                                   class="form-control glass-input" />
 
                         </div>
 
-                        <span asp-validation-for="EndTime" class="text-danger">
+                        <span asp-validation-for="EndTime"
+                              class="text-danger">
                         </span>
 
                     </div>
@@ -324,14 +352,16 @@
 
             <div class="form-actions">
 
-                <a asp-action="Index" class="footer-button secondary-button">
+                <a asp-action="Index"
+                   class="footer-button secondary-button">
 
                     Отмена
 
                 </a>
 
 
-                <button type="submit" class="footer-button primary-button">
+                <button type="submit"
+                        class="footer-button primary-button">
 
                     <span>✓</span>
 
@@ -354,7 +384,8 @@
 
 @if (showTeacherWarning)
 {
-    <div class="warning-overlay" id="teacherWarning">
+    <div class="warning-overlay"
+         id="teacherWarning">
 
         <div class="warning-modal">
 
@@ -393,22 +424,24 @@
             </p>
 
             <p class="warning-question">
-
                 Продолжить создание занятия?
-
             </p>
 
 
             <div class="warning-actions">
 
-                <button type="button" class="warning-cancel" onclick="closeTeacherWarning()">
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeTeacherWarning()">
 
                     Вернуться
 
                 </button>
 
 
-                <button type="button" class="warning-confirm" onclick="confirmTeacher()">
+                <button type="button"
+                        class="warning-confirm"
+                        onclick="confirmTeacher()">
 
                     Да, оставить
 
@@ -428,10 +461,10 @@
 
 @if (showClassroomRecommendations)
 {
-    <div class="warning-overlay" id="classroomRecommendationModal">
+    <div class="warning-overlay"
+         id="classroomRecommendationModal">
 
         <div class="classroom-recommendation-modal">
-
 
             <div class="classroom-recommendation-icon">
                 💡
@@ -477,7 +510,6 @@
 
                     <div class="recommended-classroom @(isOptimal ? "recommended-optimal" : "")">
 
-
                         <div class="recommended-classroom-info">
 
                             <div class="recommended-classroom-name-row">
@@ -503,20 +535,14 @@
                                     🪑 @classroom.Capacity мест
                                 </span>
 
-
-                                @if (classroom.HasComputers)
-                                {
-                                    <span class="computer-badge">
-                                        💻 Компьютеры
-                                    </span>
-                                }
-
                             </div>
 
                         </div>
 
 
-                        <button type="button" class="select-classroom-button" onclick="selectClassroom(@classroom.Id)">
+                        <button type="button"
+                                class="select-classroom-button"
+                                onclick="selectClassroom(@classroom.Id)">
 
                             Выбрать
 
@@ -530,7 +556,9 @@
 
             <div class="classroom-recommendation-actions">
 
-                <button type="button" class="warning-cancel" onclick="closeClassroomRecommendations()">
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeClassroomRecommendations()">
 
                     Оставить выбранную
 
@@ -550,7 +578,8 @@
 
 @if (showNoClassroomRecommendations)
 {
-    <div class="warning-overlay" id="classroomNoRecommendationModal">
+    <div class="warning-overlay"
+         id="classroomNoRecommendationModal">
 
         <div class="warning-modal">
 
@@ -575,7 +604,9 @@
 
             <div class="warning-actions">
 
-                <button type="button" class="warning-cancel" onclick="closeNoClassroomRecommendations()">
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeNoClassroomRecommendations()">
 
                     Вернуться
 
@@ -600,3 +631,4 @@
     <script src="~/js/Schedules/Create.js"
             asp-append-version="true"></script>
 }
+

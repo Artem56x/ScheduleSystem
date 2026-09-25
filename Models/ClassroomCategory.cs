@@ -13,4 +13,7 @@ public class ClassroomCategory
 
     public ICollection<Classroom> Classrooms { get; set; }
         = new List<Classroom>();
+
+    public ICollection<SubjectClassroomCategory> SubjectRequirements { get; set; }
+= new List<SubjectClassroomCategory>();
 }

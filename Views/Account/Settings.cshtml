@@ -1,21 +1,34 @@
+@using ScheduleSystem.Models
+
 @{
     ViewData["Title"] = "Настройки";
 
     var email = ViewBag.Email as string ?? "";
-    var userName = ViewBag.UserName as string ?? email;
-    var displayName = ViewBag.DisplayName as string ?? "";
+    var userName = ViewBag.UserName as string ?? "";
+    var displayName = ViewBag.DisplayName as string ?? userName;
 
-    var firstLetter = !string.IsNullOrWhiteSpace(email)
-        ? email.Substring(0, 1).ToUpper()
-        : "U";
+    var firstLetter = string.IsNullOrWhiteSpace(displayName)
+        ? "?"
+        : displayName.Substring(0, 1).ToUpper();
 
-    bool isAdmin = ViewBag.IsAdmin == true;
+    var isAdmin = User.IsInRole("Admin");
 
     var teacherCount = ViewBag.TeacherCount ?? 0;
     var groupCount = ViewBag.GroupCount ?? 0;
     var subjectCount = ViewBag.SubjectCount ?? 0;
     var classroomCount = ViewBag.ClassroomCount ?? 0;
-    var scheduleCount = ViewBag.ScheduleCount ?? 0;
+
+    var groups =
+        ViewBag.Groups as IEnumerable<Group>
+        ?? Enumerable.Empty<Group>();
+
+    var subjects =
+        ViewBag.Subjects as IEnumerable<Subject>
+        ?? Enumerable.Empty<Subject>();
+
+    var groupSubjects =
+        ViewBag.GroupSubjects as IEnumerable<GroupSubject>
+        ?? Enumerable.Empty<GroupSubject>();
 }
 
 @section Styles {
@@ -24,152 +37,158 @@
 
 <div class="settings-page">
 
-    <div class="settings-container">
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <header class="settings-header">
+
+        <div class="settings-header-left">
+
+            <a asp-controller="Account" asp-action="Profile" class="settings-back-button" aria-label="Назад">
+
+                <span>‹</span>
+
+            </a>
+
+            <div class="settings-header-title">
+
+                <h1>Настройки</h1>
+
+                <p>
+                    Управление профилем и параметрами ScheduleSystem
+                </p>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         MESSAGES
+         ========================================================= -->
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="settings-message settings-message-success">
+
+            <span class="settings-message-icon">
+                ✓
+            </span>
+
+            <span>
+                @TempData["SuccessMessage"]
+            </span>
+
+        </div>
+    }
+
+    @if (TempData["ProgramMessage"] != null)
+    {
+        <div class="settings-message settings-message-success">
+
+            <span class="settings-message-icon">
+                ✓
+            </span>
+
+            <span>
+                @TempData["ProgramMessage"]
+            </span>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         MAIN TABS
+         ========================================================= -->
+
+    <nav class="settings-tabs" aria-label="Разделы настроек">
+
+        <button type="button" class="settings-tab active" data-tab="profile">
+
+            <span class="settings-tab-icon">👤</span>
+
+            <span>Профиль</span>
+
+        </button>
+
+        @if (isAdmin)
+        {
+            <button type="button" class="settings-tab" data-tab="program">
+
+                <span class="settings-tab-icon">⚙️</span>
+
+                <span>Программа</span>
+
+            </button>
+        }
+
+        <button type="button" class="settings-tab" data-tab="about">
+
+            <span class="settings-tab-icon">ⓘ</span>
+
+            <span>О программе</span>
+
+        </button>
+
+    </nav>
+
+
+    <!-- =========================================================
+         PROFILE
+         ========================================================= -->
+
+    <section class="settings-tab-content active" data-tab-content="profile">
 
         <!-- =====================================================
-             HEADER
+             PROFILE
              ===================================================== -->
 
-        <div class="settings-header">
+        <div class="settings-section">
 
-            <div class="settings-header-left">
+            <div class="settings-section-header">
 
-                <a asp-controller="Account" asp-action="Profile" class="settings-back" title="Вернуться в профиль">
-                    ←
-                </a>
+                <div>
 
-                <div class="settings-title-block">
-
-                    <h1>
-                        Настройки
-                    </h1>
+                    <h2>Профиль</h2>
 
                     <p>
-                        Управление аккаунтом и параметрами ScheduleSystem
+                        Основная информация вашей учётной записи
                     </p>
 
                 </div>
 
             </div>
 
-        </div>
 
+            <div class="settings-card">
 
-        <!-- =====================================================
-             SUCCESS MESSAGES
-             ===================================================== -->
+                <div class="settings-profile-preview">
 
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="settings-alert settings-alert-success">
-
-                <span>✓</span>
-
-                <span>
-                    @TempData["SuccessMessage"]
-                </span>
-
-            </div>
-        }
-
-        @if (TempData["ProgramMessage"] != null)
-        {
-            <div class="settings-alert settings-alert-success">
-
-                <span>✓</span>
-
-                <span>
-                    @TempData["ProgramMessage"]
-                </span>
-
-            </div>
-        }
-
-
-        <!-- =====================================================
-             TABS
-             ===================================================== -->
-
-        <div class="settings-tabs">
-
-            <!-- PROFILE -->
-
-            <button type="button" class="settings-tab active" data-tab="profile">
-
-                <span class="settings-tab-icon">
-                    👤
-                </span>
-
-                <span>
-                    Настройки профиля
-                </span>
-
-            </button>
-
-
-            <!-- PROGRAM — ADMIN ONLY -->
-
-            @if (isAdmin)
-            {
-                <button type="button" class="settings-tab" data-tab="program">
-
-                    <span class="settings-tab-icon">
-                        ⚙️
-                    </span>
-
-                    <span>
-                        Настройки программы
-                    </span>
-
-                </button>
-            }
-
-
-            <!-- ABOUT -->
-
-            <button type="button" class="settings-tab" data-tab="about">
-
-                <span class="settings-tab-icon">
-                    ℹ️
-                </span>
-
-                <span>
-                    О программе
-                </span>
-
-            </button>
-
-        </div>
-
-
-        <!-- =====================================================
-             TAB: PROFILE
-             ===================================================== -->
-
-        <div class="settings-tab-content active" id="tab-profile">
-
-
-            <!-- =================================================
-                 ACCOUNT
-                 ================================================= -->
-
-            <div class="glass-settings-card">
-
-                <div class="settings-card-header">
-
-                    <div class="settings-icon">
-                        👤
+                    <div class="settings-avatar">
+                        @firstLetter
                     </div>
 
-                    <div>
+                    <div class="settings-profile-info">
 
-                        <h2>
-                            Учётная запись
-                        </h2>
+                        <strong>
+                            @displayName
+                        </strong>
 
-                        <p>
-                            Основная информация вашего аккаунта
-                        </p>
+                        <span>
+                            @email
+                        </span>
+
+                        <span class="settings-role">
+
+                            @(isAdmin
+                                ? "Администратор"
+                                : "Пользователь")
+
+                        </span>
 
                     </div>
 
@@ -180,89 +199,40 @@
 
                     @Html.AntiForgeryToken()
 
-                    <div asp-validation-summary="ModelOnly" class="settings-validation-summary">
-                    </div>
+                    <div class="settings-form-grid">
 
+                        <div class="settings-field">
 
-                    <!-- EMAIL -->
+                            <label for="displayName">
+                                Имя
+                            </label>
 
-                    <div class="settings-field">
-
-                        <label for="email">
-                            Email
-                        </label>
-
-                        <div class="settings-input-wrapper">
-
-                            <span class="settings-avatar">
-                                @firstLetter
-                            </span>
-
-                            <input type="email" id="email" name="email" value="@email" class="settings-input"
-                                   autocomplete="email" placeholder="Введите Email" required />
+                            <input type="text" id="displayName" name="displayName" class="settings-input"
+                                   value="@displayName" maxlength="100" />
 
                         </div>
 
-                        <small class="settings-description">
-                            Используется для входа в аккаунт.
-                        </small>
 
-                    </div>
+                        <div class="settings-field">
 
+                            <label for="email">
+                                Электронная почта
+                            </label>
 
-                    <!-- DISPLAY NAME -->
-
-                    <div class="settings-field">
-
-                        <label for="displayName">
-                            Имя пользователя
-                        </label>
-
-                        <input type="text" id="displayName" name="displayName" value="@displayName"
-                               class="settings-input" maxlength="100" autocomplete="name" placeholder="Например, Артём"
-                               required />
-
-                        <small class="settings-description">
-                            Это имя будет отображаться в вашем профиле.
-                        </small>
-
-                    </div>
-
-
-                    <!-- ROLE -->
-
-                    <div class="settings-field">
-
-                        <label>
-                            Роль
-                        </label>
-
-                        <div class="settings-static-value">
-
-                            @if (isAdmin)
-                            {
-                                <span class="settings-role admin">
-                                    Администратор
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="settings-role">
-                                    Пользователь
-                                </span>
-                            }
+                            <input type="email" id="email" name="email" class="settings-input" value="@email"
+                                   maxlength="254" />
 
                         </div>
 
                     </div>
 
 
-                    <!-- SAVE -->
-
-                    <div class="settings-save-container">
+                    <div class="settings-form-actions">
 
                         <button type="submit" class="settings-save-button">
+
                             Сохранить изменения
+
                         </button>
 
                     </div>
@@ -271,27 +241,134 @@
 
             </div>
 
+        </div>
+
+
+        <!-- =====================================================
+             SECURITY
+             ===================================================== -->
+
+        <div class="settings-section">
+
+            <div class="settings-section-header">
+
+                <div>
+
+                    <h2>Безопасность</h2>
+
+                    <p>
+                        Управление паролем учётной записи
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-card settings-action-card">
+
+                <div class="settings-action-icon">
+                    🔐
+                </div>
+
+                <div class="settings-action-content">
+
+                    <strong>
+                        Изменить пароль
+                    </strong>
+
+                    <span>
+                        Обновите пароль вашей учётной записи
+                    </span>
+
+                </div>
+
+                <a asp-controller="Account" asp-action="ChangePassword" class="settings-secondary-button">
+
+                    Изменить
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             APPEARANCE
+             ===================================================== -->
+
+        <div class="settings-section">
+
+            <div class="settings-section-header">
+
+                <div>
+
+                    <h2>Внешний вид</h2>
+
+                    <p>
+                        Настройка интерфейса приложения
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-card settings-action-card">
+
+                <div class="settings-action-icon">
+                    ✨
+                </div>
+
+                <div class="settings-action-content">
+
+                    <strong>
+                        Интерфейс
+                    </strong>
+
+                    <span>
+                        Дополнительные настройки внешнего вида
+                    </span>
+
+                </div>
+
+                <span class="settings-soon">
+                    Скоро
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         PROGRAM
+         ========================================================= -->
+
+    @if (isAdmin)
+    {
+        <section class="settings-tab-content" data-tab-content="program">
+
 
             <!-- =================================================
-                 SECURITY
+                 STUDY LOAD
                  ================================================= -->
 
-            <div class="glass-settings-card">
+            <div class="settings-section">
 
-                <div class="settings-card-header">
-
-                    <div class="settings-icon">
-                        🔐
-                    </div>
+                <div class="settings-section-header">
 
                     <div>
 
-                        <h2>
-                            Безопасность
-                        </h2>
+                        <h2>Учебная нагрузка</h2>
 
                         <p>
-                            Управление доступом к аккаунту
+                            Добавляйте и изменяйте учебную нагрузку.
+                            Все изменения сохраняются одновременно
+                            после нажатия кнопки «Сохранить изменения».
                         </p>
 
                     </div>
@@ -299,30 +376,283 @@
                 </div>
 
 
-                <div class="settings-option">
+                <div class="settings-card study-load-card">
 
-                    <div class="option-left">
 
-                        <div class="option-icon">
-                            🔑
-                        </div>
+                    <!-- =============================================
+                         GROUP SELECT
+                         ============================================= -->
 
-                        <div class="option-text">
+                    <div class="study-load-toolbar">
+
+                        <div class="study-load-toolbar-text">
 
                             <strong>
-                                Пароль
+                                Выберите группу
                             </strong>
 
                             <span>
-                                Измените пароль для защиты аккаунта
+                                После выбора появится вся её учебная нагрузка.
+                            </span>
+
+                        </div>
+
+
+                        <div class="study-load-group-field">
+
+                            <select id="loadGroupSelect" class="settings-input study-load-select">
+
+                                <option value="">
+                                    Выберите группу
+                                </option>
+
+                                @foreach (var group in groups
+                                    .OrderBy(g => g.Course)
+                                    .ThenBy(g => g.Name))
+                                {
+                                    <option value="@group.Id">
+
+                                        @group.Name
+
+                                        @if (group.Course > 0)
+                                        {
+                                            <text>
+                                                · @group.Course курс
+                                            </text>
+                                        }
+
+                                    </option>
+                                }
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         LOAD CONTENT
+                         ============================================= -->
+
+                    <div id="studyLoadContainer" class="study-load-container">
+
+                        <div class="study-load-placeholder">
+
+                            <div class="study-load-placeholder-icon">
+                                👥
+                            </div>
+
+                            <strong>
+                                Выберите группу
+                            </strong>
+
+                            <span>
+                                Здесь появятся предметы и количество
+                                занятий в неделю.
                             </span>
 
                         </div>
 
                     </div>
 
-                    <a asp-controller="Account" asp-action="ChangePassword" class="settings-button">
-                        Изменить
+
+                    <!-- =============================================
+                         ADD BUTTON
+                         ============================================= -->
+
+                    <div id="addSubjectArea" class="study-load-add-area" style="display:none;">
+
+                        <button type="button" id="addSubjectButton" class="settings-secondary-button study-load-add-button">
+
+                            <span>＋</span>
+
+                            Добавить предмет
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         ADD FORM
+                         ============================================= -->
+
+                    <div id="addSubjectForm" class="study-load-add-form" style="display:none;">
+
+                        <div class="study-load-add-form-header">
+
+                            <div>
+
+                                <strong>
+                                    Добавить предмет
+                                </strong>
+
+                                <span>
+                                    Предмет будет добавлен в список.
+                                    В базу данных он попадёт только
+                                    после нажатия «Сохранить изменения».
+                                </span>
+
+                            </div>
+
+                            <button type="button" id="cancelAddSubject" class="study-load-close-button"
+                                    aria-label="Закрыть">
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="settings-form">
+
+                            <div class="settings-form-grid">
+
+                                <div class="settings-field">
+
+                                    <label for="addSubjectId">
+                                        Предмет
+                                    </label>
+
+                                    <select id="addSubjectId" class="settings-input">
+
+                                        <option value="">
+                                            Выберите предмет
+                                        </option>
+
+                                        @foreach (var subject in subjects
+                                            .OrderBy(s => s.Name))
+                                        {
+                                            <option value="@subject.Id">
+                                                @subject.Name
+                                            </option>
+                                        }
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="settings-field">
+
+                                    <label for="addWeeklyLessons">
+                                        Пар в неделю
+                                    </label>
+
+                                    <input type="number" id="addWeeklyLessons" class="settings-input" value="2" min="1"
+                                           max="20" required />
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="settings-form-actions">
+
+                                <button type="button" id="confirmAddSubject" class="settings-save-button">
+
+                                    Добавить в список
+
+                                </button>
+
+                                <button type="button" id="cancelAddSubjectSecondary" class="settings-secondary-button">
+
+                                    Отмена
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         SAVE FORM
+                         ============================================= -->
+
+                    <form id="saveStudyLoadForm" asp-controller="Account" asp-action="SaveGroupSubjects" method="post"
+                          class="study-load-save-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <div id="studyLoadHiddenInputs"></div>
+
+                        <div class="study-load-save-area">
+
+                            <div class="study-load-unsaved-status" id="studyLoadUnsavedStatus">
+
+                                <span class="study-load-status-dot"></span>
+
+                                <span id="studyLoadStatusText">
+                                    Нет несохранённых изменений
+                                </span>
+
+                            </div>
+
+
+                            <button type="submit" id="saveStudyLoadButton" class="settings-save-button" disabled>
+
+                                Сохранить изменения
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 HISTORY
+                 ================================================= -->
+
+            <div class="settings-section">
+
+                <div class="settings-section-header">
+
+                    <div>
+
+                        <h2>История изменений</h2>
+
+                        <p>
+                            Просмотр действий пользователей системы.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-card settings-action-card">
+
+                    <div class="settings-action-icon">
+                        🕘
+                    </div>
+
+                    <div class="settings-action-content">
+
+                        <strong>
+                            Журнал действий
+                        </strong>
+
+                        <span>
+                            Просмотр истории изменений расписания
+                            и данных системы.
+                        </span>
+
+                    </div>
+
+                    <a asp-controller="AuditLogs" asp-action="Index" class="settings-secondary-button">
+
+                        Открыть
+
                     </a>
 
                 </div>
@@ -331,25 +661,19 @@
 
 
             <!-- =================================================
-                 APPEARANCE
+                 MAINTENANCE
                  ================================================= -->
 
-            <div class="glass-settings-card">
+            <div class="settings-section">
 
-                <div class="settings-card-header">
-
-                    <div class="settings-icon">
-                        🎨
-                    </div>
+                <div class="settings-section-header">
 
                     <div>
 
-                        <h2>
-                            Внешний вид
-                        </h2>
+                        <h2>Обслуживание</h2>
 
                         <p>
-                            Настройки интерфейса ScheduleSystem
+                            Управление и очистка данных программы.
                         </p>
 
                     </div>
@@ -357,315 +681,109 @@
                 </div>
 
 
-                <div class="settings-option">
+                <div class="settings-card settings-maintenance-card">
 
-                    <div class="option-left">
 
-                        <div class="option-icon">
-                            ☀️
+                    <!-- CLEAR SCHEDULE -->
+
+                    <div class="settings-action-card">
+
+                        <div class="settings-action-icon">
+                            🗑️
                         </div>
 
-                        <div class="option-text">
+                        <div class="settings-action-content">
 
                             <strong>
-                                Тема оформления
+                                Очистить расписание
                             </strong>
 
                             <span>
-                                Светлая тема
+                                Удалить все созданные занятия,
+                                сохранив группы, преподавателей,
+                                предметы и аудитории.
                             </span>
 
                         </div>
 
-                    </div>
+                        <button type="button" class="settings-danger-button" data-modal-open="clearScheduleModal">
 
-                    <span class="coming-soon">
-                        Скоро
-                    </span>
+                            Очистить
 
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             TAB: PROGRAM SETTINGS
-             ADMIN ONLY
-             ===================================================== -->
-
-        @if (isAdmin)
-        {
-            <div class="settings-tab-content" id="tab-program">
-
-
-                <!-- =================================================
-                     CHANGE HISTORY
-                     ================================================= -->
-
-                <div class="glass-settings-card">
-
-                    <div class="settings-card-header">
-
-                        <div class="settings-icon">
-                            🕘
-                        </div>
-
-                        <div>
-
-                            <h2>
-                                История изменений
-                            </h2>
-
-                            <p>
-                                Журнал действий администратора и изменений расписания
-                            </p>
-
-                        </div>
+                        </button>
 
                     </div>
 
 
-                    <div class="maintenance-item">
+                    <!-- CLEAR ALL DATA -->
 
-                        <div class="maintenance-item-info">
+                    <div class="settings-action-card">
 
-                            <div class="maintenance-item-icon">
-                                📋
-                            </div>
+                        <div class="settings-action-icon">
+                            ⚠️
+                        </div>
 
-                            <div>
+                        <div class="settings-action-content">
 
-                                <h3 class="maintenance-item-title">
-                                    Журнал действий
-                                </h3>
+                            <strong>
+                                Очистить все данные
+                            </strong>
 
-                                <p class="maintenance-item-description">
-                                    Просмотр истории добавления, изменения и удаления
-                                    занятий в системе.
-                                </p>
-
-                            </div>
+                            <span>
+                                Полностью удалить данные программы.
+                                Это действие нельзя отменить.
+                            </span>
 
                         </div>
 
+                        <button type="button" class="settings-danger-button" data-modal-open="clearAllDataModal">
 
-                        <a asp-controller="AuditLogs" asp-action="Index" class="settings-button">
-                            Открыть историю
-                        </a>
+                            Очистить всё
 
-                    </div>
-
-                </div>
-
-
-                <!-- =================================================
-                     MAINTENANCE
-                     ================================================= -->
-
-                <div class="glass-settings-card">
-
-                    <div class="settings-card-header">
-
-                        <div class="settings-icon">
-                            🛠️
-                        </div>
-
-                        <div>
-
-                            <h2>
-                                Обслуживание
-                            </h2>
-
-                            <p>
-                                Управление данными расписания
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="maintenance-list">
-
-
-                        <!-- CLEAR SCHEDULE -->
-
-                        <div class="maintenance-item">
-
-                            <div class="maintenance-item-info">
-
-                                <div class="maintenance-item-icon">
-                                    🗑️
-                                </div>
-
-                                <div>
-
-                                    <h3 class="maintenance-item-title">
-                                        Очистить расписание
-                                    </h3>
-
-                                    <p class="maintenance-item-description">
-                                        Удалить все занятия, сохранив преподавателей,
-                                        группы, предметы и аудитории.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <button type="button" class="maintenance-danger-button" onclick="openClearScheduleModal()">
-
-                                Очистить
-
-                            </button>
-
-                        </div>
-
-
-                        <!-- CLEAR ALL DATA -->
-
-                        <div class="maintenance-item">
-
-                            <div class="maintenance-item-info">
-
-                                <div class="maintenance-item-icon">
-                                    ⚠️
-                                </div>
-
-                                <div>
-
-                                    <h3 class="maintenance-item-title">
-                                        Сбросить все данные
-                                    </h3>
-
-                                    <p class="maintenance-item-description">
-                                        Полностью удалить расписание, преподавателей,
-                                        группы, предметы и аудитории.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <button type="button" class="maintenance-danger-button" onclick="openClearAllDataModal()">
-
-                                Сбросить
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="admin-notice">
-
-                        <span class="admin-notice-icon">
-                            🛡️
-                        </span>
-
-                        <p>
-                            Эти действия доступны только администраторам.
-                            Перед удалением данных убедитесь, что они больше не нужны.
-                        </p>
+                        </button>
 
                     </div>
 
                 </div>
 
             </div>
-        }
+
+        </section>
+    }
 
 
-        <!-- =====================================================
-             TAB: ABOUT
-             ===================================================== -->
+    <!-- =========================================================
+         ABOUT PROGRAM
+         ========================================================= -->
 
-        <div class="settings-tab-content" id="tab-about">
+    <section class="settings-tab-content" data-tab-content="about">
 
+        <div class="settings-section">
 
-            <!-- =================================================
-                 PROGRAM INFO
-                 ================================================= -->
+            <div class="settings-section-header">
 
-            <div class="glass-settings-card">
+                <div>
 
-                <div class="settings-card-header">
+                    <h2>О программе</h2>
 
-                    <div class="settings-icon">
-                        ℹ️
-                    </div>
-
-                    <div>
-
-                        <h2>
-                            Информация о системе
-                        </h2>
-
-                        <p>
-                            Основные сведения о ScheduleSystem
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="program-info-row">
-
-                    <span class="program-info-label">
-                        Название системы
-                    </span>
-
-                    <span class="program-info-value">
-                        ScheduleSystem
-                    </span>
-
-                </div>
-
-
-                <div class="program-info-row">
-
-                    <span class="program-info-label">
-                        Версия
-                    </span>
-
-                    <span class="program-info-value">
-                        1.0
-                    </span>
-
-                </div>
-
-
-                <div class="program-info-row">
-
-                    <span class="program-info-label">
-                        Статус
-                    </span>
-
-                    <span class="program-info-value program-status">
-                        Работает
-                    </span>
+                    <p>
+                        Информация о системе ScheduleSystem
+                    </p>
 
                 </div>
 
             </div>
 
 
-            <!-- =================================================
-                 PROGRAM HEADER
-                 ================================================= -->
+            <div class="settings-about-card settings-card">
 
-            <div class="glass-settings-card">
 
-                <div class="about-program-header">
+                <!-- HERO -->
 
-                    <div class="about-program-logo">
-                        S
+                <div class="settings-about-hero">
+
+                    <div class="settings-about-logo">
+                        📅
                     </div>
 
                     <div>
@@ -675,152 +793,12 @@
                         </h2>
 
                         <p>
-                            Система управления расписанием
+                            Система управления учебным расписанием
+                            образовательного учреждения.
                         </p>
 
-                    </div>
-
-                </div>
-
-
-                <div class="about-program-description">
-
-                    ScheduleSystem — веб-приложение для создания,
-                    управления и просмотра учебного расписания.
-                    Система позволяет работать с преподавателями,
-                    группами, предметами, аудиториями и занятиями
-                    в едином интерфейсе.
-
-                </div>
-
-
-                <!-- =================================================
-                     FEATURES
-                     ================================================= -->
-
-                <div class="about-program-features">
-
-                    <div class="about-program-feature">
-
-                        <span class="about-program-feature-icon">
-                            👨‍🏫
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Преподаватели
-                            </strong>
-
-                            <span>
-                                Управление преподавателями и их предметами.
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="about-program-feature">
-
-                        <span class="about-program-feature-icon">
-                            👥
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Группы
-                            </strong>
-
-                            <span>
-                                Управление учебными группами и количеством студентов.
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="about-program-feature">
-
-                        <span class="about-program-feature-icon">
-                            📚
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Предметы
-                            </strong>
-
-                            <span>
-                                Хранение учебных дисциплин и их требований.
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="about-program-feature">
-
-                        <span class="about-program-feature-icon">
-                            🏫
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Аудитории
-                            </strong>
-
-                            <span>
-                                Управление аудиториями, категориями и вместимостью.
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="about-program-feature">
-
-                        <span class="about-program-feature-icon">
-                            📅
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Расписание
-                            </strong>
-
-                            <span>
-                                Создание занятий с проверкой конфликтов и ограничений.
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="about-program-feature">
-
-                        <span class="about-program-feature-icon">
-                            📤
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Экспорт
-                            </strong>
-
-                            <span>
-                                Экспорт расписания в доступные форматы.
-                            </span>
-
+                        <div class="settings-about-version">
+                            Версия 1.0
                         </div>
 
                     </div>
@@ -828,320 +806,1650 @@
                 </div>
 
 
-                <div class="about-program-version">
-                    ScheduleSystem · Версия 1.0
+                <!-- DESCRIPTION -->
+
+                <div class="settings-about-description">
+
+                    <h3>
+                        О системе
+                    </h3>
+
+                    <p>
+                        ScheduleSystem предназначена для создания,
+                        управления и просмотра учебного расписания.
+                        Система объединяет данные о группах,
+                        преподавателях, предметах и аудиториях
+                        в едином интерфейсе.
+                    </p>
+
+                    <p>
+                        Программа позволяет создавать расписание
+                        вручную, проверять конфликты, учитывать
+                        ограничения аудиторий, преподавателей и
+                        учебных групп.
+                    </p>
+
                 </div>
 
-            </div>
 
-        </div>
+                <!-- FEATURES -->
 
+                <div class="settings-about-features">
 
-        <!-- =====================================================
-             FOOTER
-             ===================================================== -->
-
-        <div class="settings-footer">
-
-            <a asp-controller="Home" asp-action="Index" class="back-home-button">
-
-                Вернуться на главную
-
-            </a>
-
-        </div>
-
-    </div>
-
-</div>
+                    <h3>
+                        Основные возможности
+                    </h3>
 
 
-<!-- ============================================================
+                    <div class="settings-about-feature-grid">
+
+
+                        <!-- SCHEDULE -->
+
+                        <div class="settings-about-feature">
+
+                            <span>📅</span>
+
+                            <div>
+
+                                <strong>
+                                    Расписание
+                                </strong>
+
+                                <p>
+                                    Создание, просмотр и управление
+                                    учебными занятиями.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- GROUPS -->
+
+                        <div class="settings-about-feature">
+
+                            <span>👥</span>
+
+                            <div>
+
+                                <strong>
+                                    Группы
+                                </strong>
+
+                                <p>
+                                    Управление учебными группами
+                                    и их учебной нагрузкой.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TEACHERS -->
+
+                        <div class="settings-about-feature">
+
+                            <span>👨‍🏫</span>
+
+                            <div>
+
+                                <strong>
+                                    Преподаватели
+                                </strong>
+
+                                <p>
+                                    Хранение информации о преподавателях
+                                    и их предметах.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CLASSROOMS -->
+
+                        <div class="settings-about-feature">
+
+                            <span>🏫</span>
+
+                            <div>
+
+                                <strong>
+                                    Аудитории
+                                </strong>
+
+                                <p>
+                                    Учёт помещений, вместимости
+                                    и оборудования.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- VALIDATION -->
+
+                        <div class="settings-about-feature">
+
+                            <span>🛡️</span>
+
+                            <div>
+
+                                <strong>
+                                    Проверка конфликтов
+                                </strong>
+
+                                <p>
+                                    Контроль пересечений занятий,
+                                    вместимости и требований аудиторий.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- EXPORT -->
+
+                        <div class="settings-about-feature">
+
+                            <span>📊</span>
+
+                            <div>
+
+                                <strong>
+                                    Экспорт
+                                </strong>
+
+                                <p>
+                                    Подготовка расписания
+                                    в различных форматах.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TECHNOLOGIES -->
+
+                <div class="settings-about-tech">
+
+                    <h3>
+                        Технологии
+                    </h3>
+
+                    <div class="settings-tech-list">
+
+                        <span>ASP.NET Core</span>
+                        <span>C#</span>
+                        <span>Entity Framework Core</span>
+                        <span>PostgreSQL</span>
+                        <span>HTML / CSS / JavaScript</span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================================
      CLEAR SCHEDULE MODAL
-     ============================================================ -->
+     ============================================================= -->
 
-@if (isAdmin)
-{
-    <div id="clearScheduleModal" class="program-modal">
+                @if (isAdmin)
+                {
+                    <div id="clearScheduleModal" class="settings-modal">
 
-        <div class="program-modal-content">
-
-            <div class="program-modal-header">
-
-                <h2 class="program-modal-title">
-                    Очистить расписание?
-                </h2>
-
-                <button type="button" class="program-modal-close" onclick="closeClearScheduleModal()">
-                    ×
-                </button>
-
-            </div>
+                        <div class="settings-modal-backdrop" data-modal-close></div>
 
 
-            <p class="program-modal-text">
+                        <div class="settings-modal-content">
 
-                Все занятия будут удалены.
-                Преподаватели, группы, предметы и аудитории
-                останутся без изменений.
+                            <button type="button" class="settings-modal-close" data-modal-close>
 
-            </p>
+                                ×
 
-
-            <div class="program-modal-actions">
-
-                <button type="button" class="program-modal-cancel" onclick="closeClearScheduleModal()">
-
-                    Отмена
-
-                </button>
+                            </button>
 
 
-                <form asp-controller="Account" asp-action="ClearSchedule" method="post">
-
-                    @Html.AntiForgeryToken()
-
-                    <button type="submit" class="program-modal-danger">
-
-                        Очистить расписание
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
+                            <div class="settings-modal-icon">
+                                ⚠️
+                            </div>
 
 
-    <!-- =========================================================
+                            <h2>
+                                Очистить расписание?
+                            </h2>
+
+
+                            <p>
+                                Все созданные занятия будут удалены.
+                                Группы, преподаватели, предметы и аудитории
+                                останутся в системе.
+                            </p>
+
+
+                            <form asp-controller="Account" asp-action="ClearSchedule" method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <div class="settings-modal-actions">
+
+                                    <button type="button" class="settings-secondary-button" data-modal-close>
+
+                                        Отмена
+
+                                    </button>
+
+                                    <button type="submit" class="settings-danger-button">
+
+                                        Очистить расписание
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================================
          CLEAR ALL DATA MODAL
          ========================================================= -->
 
-    <div id="clearAllDataModal" class="program-modal">
+                    <div id="clearAllDataModal" class="settings-modal">
 
-        <div class="program-modal-content">
-
-            <div class="program-modal-header">
-
-                <h2 class="program-modal-title">
-                    Сбросить все данные?
-                </h2>
-
-                <button type="button" class="program-modal-close" onclick="closeClearAllDataModal()">
-
-                    ×
-
-                </button>
-
-            </div>
+                        <div class="settings-modal-backdrop" data-modal-close></div>
 
 
-            <p class="program-modal-text">
+                        <div class="settings-modal-content">
 
-                Будут удалены все расписания, преподаватели,
-                группы, предметы, аудитории и категории аудиторий.
-                Пользователи и роли системы не будут удалены.
+                            <button type="button" class="settings-modal-close" data-modal-close>
 
-            </p>
+                                ×
 
-
-            <div class="program-modal-actions">
-
-                <button type="button" class="program-modal-cancel" onclick="closeClearAllDataModal()">
-
-                    Отмена
-
-                </button>
+                            </button>
 
 
-                <form asp-controller="Account" asp-action="ClearAllData" method="post">
-
-                    @Html.AntiForgeryToken()
-
-                    <button type="submit" class="program-modal-danger">
-
-                        Сбросить все данные
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-}
+                            <div class="settings-modal-icon">
+                                🛑
+                            </div>
 
 
-@section Scripts {
-
-    <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-
-            const tabs =
-                document.querySelectorAll(".settings-tab");
-
-            const contents =
-                document.querySelectorAll(".settings-tab-content");
+                            <h2>
+                                Удалить все данные?
+                            </h2>
 
 
-            tabs.forEach(tab => {
-
-                tab.addEventListener("click", function () {
-
-                    const target =
-                        this.dataset.tab;
-
-
-                    tabs.forEach(item => {
-
-                        item.classList.remove("active");
-
-                    });
+                            <p>
+                                Будут удалены расписание, группы, преподаватели,
+                                предметы и аудитории.
+                                Это действие нельзя отменить.
+                            </p>
 
 
-                    contents.forEach(content => {
+                            <form asp-controller="Account" asp-action="ClearAllData" method="post">
 
-                        content.classList.remove("active");
+                                @Html.AntiForgeryToken()
 
-                    });
+                                <div class="settings-modal-actions">
 
+                                    <button type="button" class="settings-secondary-button" data-modal-close>
 
-                    this.classList.add("active");
+                                        Отмена
 
+                                    </button>
 
-                    const targetContent =
-                        document.getElementById(
-                            "tab-" + target
-                        );
+                                    <button type="submit" class="settings-danger-button">
 
+                                        Удалить всё
 
-                    if (targetContent) {
+                                    </button>
 
-                        targetContent.classList.add("active");
+                                </div>
 
-                    }
+                            </form>
 
-                });
+                        </div>
 
-            });
-
-
-            // Закрытие модального окна
-            // при клике вне содержимого
-
-            document.addEventListener("click", function (event) {
-
-                if (event.target.classList.contains("program-modal")) {
-
-                    event.target.classList.remove("active");
-
+                    </div>
                 }
 
-            });
+
+                <!-- =============================================================
+     JAVASCRIPT
+     ============================================================= -->
+
+                <script>
+
+                                    document.addEventListener("DOMContentLoaded", function () {
+
+                                        /* ============================================================
+                                           DATA
+                                           ============================================================ */
+
+                                        const groups = @Html.Raw(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                System.Text.Json.JsonSerializer.Serialize(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                groups.Select(g => new
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                id = g.Id,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            name = g.Name,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            course = g.Course
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })
+                                                                        )
+                                                                        );
 
 
-            // Закрытие по ESC
-
-            document.addEventListener("keydown", function (event) {
-
-                if (event.key === "Escape") {
-
-                    document
-                        .querySelectorAll(".program-modal.active")
-                        .forEach(modal => {
-
-                            modal.classList.remove("active");
-
-                        });
-
-                }
-
-            });
-
-        });
+                                        const subjects = @Html.Raw(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                System.Text.Json.JsonSerializer.Serialize(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                subjects.Select(s => new
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                id = s.Id,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            name = s.Name
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })
+                                                                        )
+                                                                        );
 
 
-        // ========================================================
-        // CLEAR SCHEDULE
-        // ========================================================
-
-        function openClearScheduleModal() {
-
-            const modal =
-                document.getElementById(
-                    "clearScheduleModal"
-                );
-
-
-            if (modal) {
-
-                modal.classList.add("active");
-
-            }
-
-        }
+                                        const groupSubjects = @Html.Raw(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                System.Text.Json.JsonSerializer.Serialize(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                groupSubjects.Select(gs => new
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                id = gs.Id,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            groupId = gs.GroupId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            subjectId = gs.SubjectId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            weeklyLessons = gs.WeeklyLessons,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            subjectName = gs.Subject != null
+                                                                        ? gs.Subject.Name
+                                                                        : ""
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })
+                                                                        )
+                                                                        );
 
 
-        function closeClearScheduleModal() {
+                                        /* ============================================================
+                                           STUDY LOAD ELEMENTS
+                                           ============================================================ */
 
-            const modal =
-                document.getElementById(
-                    "clearScheduleModal"
-                );
+                                        const groupSelect =
+                                            document.getElementById("loadGroupSelect");
+
+                                        const container =
+                                            document.getElementById("studyLoadContainer");
+
+                                        const addSubjectArea =
+                                            document.getElementById("addSubjectArea");
+
+                                        const addSubjectForm =
+                                            document.getElementById("addSubjectForm");
+
+                                        const addSubjectButton =
+                                            document.getElementById("addSubjectButton");
+
+                                        const confirmAddSubject =
+                                            document.getElementById("confirmAddSubject");
+
+                                        const cancelAddSubject =
+                                            document.getElementById("cancelAddSubject");
+
+                                        const cancelAddSubjectSecondary =
+                                            document.getElementById("cancelAddSubjectSecondary");
+
+                                        const addSubjectSelect =
+                                            document.getElementById("addSubjectId");
+
+                                        const addWeeklyLessons =
+                                            document.getElementById("addWeeklyLessons");
+
+                                        const saveStudyLoadForm =
+                                            document.getElementById("saveStudyLoadForm");
+
+                                        const hiddenInputs =
+                                            document.getElementById("studyLoadHiddenInputs");
+
+                                        const saveStudyLoadButton =
+                                            document.getElementById("saveStudyLoadButton");
+
+                                        const unsavedStatus =
+                                            document.getElementById("studyLoadUnsavedStatus");
+
+                                        const statusText =
+                                            document.getElementById("studyLoadStatusText");
 
 
-            if (modal) {
+                                        /* ============================================================
+                                           WORKING COPY
+                                           ============================================================ */
 
-                modal.classList.remove("active");
+                                        let workingLoad = [];
 
-            }
+                                        let selectedGroupId = null;
 
-        }
+                                        let hasUnsavedChanges = false;
 
-
-        // ========================================================
-        // CLEAR ALL DATA
-        // ========================================================
-
-        function openClearAllDataModal() {
-
-            const modal =
-                document.getElementById(
-                    "clearAllDataModal"
-                );
-
-
-            if (modal) {
-
-                modal.classList.add("active");
-
-            }
-
-        }
+                                        /*
+                                         * ID уже сохранённых записей GroupSubject,
+                                         * которые пользователь удалил.
+                                         *
+                                         * Они отправятся на сервер только после
+                                         * нажатия "Сохранить изменения".
+                                         */
+                                        let deletedGroupSubjectIds = [];
 
 
-        function closeClearAllDataModal() {
+                                        /* ============================================================
+                                           HELPERS
+                                           ============================================================ */
 
-            const modal =
-                document.getElementById(
-                    "clearAllDataModal"
-                );
+                                        function getLessonWord(number) {
+
+                                            const n =
+                                                Math.abs(number) % 100;
+
+                                            const n1 =
+                                                n % 10;
+
+                                            if (n >= 11 && n <= 19) {
+                                                return "пар";
+                                            }
+
+                                            if (n1 === 1) {
+                                                return "пара";
+                                            }
+
+                                            if (n1 >= 2 && n1 <= 4) {
+                                                return "пары";
+                                            }
+
+                                            return "пар";
+                                        }
 
 
-            if (modal) {
+                                        function getSubjectIcon(name) {
 
-                modal.classList.remove("active");
+                                            const value =
+                                                (name || "").toLowerCase();
 
-            }
 
-        }
+                                            if (
+                                                value.includes("программ") ||
+                                                value.includes("python") ||
+                                                value.includes("c#") ||
+                                                value.includes("javascript") ||
+                                                value.includes("web")
+                                            ) {
+                                                return "💻";
+                                            }
 
-    </script>
 
-}
+                                            if (
+                                                value.includes("математ") ||
+                                                value.includes("алгебр") ||
+                                                value.includes("геометр")
+                                            ) {
+                                                return "📐";
+                                            }
+
+
+                                            if (
+                                                value.includes("англий") ||
+                                                value.includes("русск") ||
+                                                value.includes("язык")
+                                            ) {
+                                                return "🌐";
+                                            }
+
+
+                                            if (
+                                                value.includes("физик") ||
+                                                value.includes("хим")
+                                            ) {
+                                                return "🔬";
+                                            }
+
+
+                                            if (
+                                                value.includes("истор") ||
+                                                value.includes("обществ")
+                                            ) {
+                                                return "📚";
+                                            }
+
+
+                                            return "📖";
+                                        }
+
+
+                                        function escapeHtml(value) {
+
+                                            const div =
+                                                document.createElement("div");
+
+                                            div.textContent =
+                                                value ?? "";
+
+                                            return div.innerHTML;
+                                        }
+
+
+                                        function setUnsavedChanges(value) {
+
+                                            hasUnsavedChanges =
+                                                value;
+
+
+                                            if (
+                                                !unsavedStatus ||
+                                                !saveStudyLoadButton
+                                            ) {
+                                                return;
+                                            }
+
+
+                                            if (value) {
+
+                                                unsavedStatus.classList.add(
+                                                    "has-changes"
+                                                );
+
+                                                saveStudyLoadButton.disabled =
+                                                    false;
+
+                                                if (statusText) {
+
+                                                    statusText.textContent =
+                                                        "Есть несохранённые изменения";
+
+                                                }
+
+                                            }
+                                            else {
+
+                                                unsavedStatus.classList.remove(
+                                                    "has-changes"
+                                                );
+
+                                                saveStudyLoadButton.disabled =
+                                                    true;
+
+                                                if (statusText) {
+
+                                                    statusText.textContent =
+                                                        "Нет несохранённых изменений";
+
+                                                }
+
+                                            }
+
+                                        }
+
+
+                                        function getSelectedGroup() {
+
+                                            return groups.find(
+                                                group =>
+                                                    Number(group.id) ===
+                                                    Number(selectedGroupId)
+                                            );
+
+                                        }
+
+
+                                        /* ============================================================
+                                           LOAD GROUP
+                                           ============================================================ */
+
+                                        function loadWorkingGroup(groupId) {
+
+                                            selectedGroupId =
+                                                Number(groupId);
+
+                                            deletedGroupSubjectIds = [];
+
+                                            workingLoad =
+                                                groupSubjects
+                                                    .filter(item =>
+                                                        Number(item.groupId) ===
+                                                        Number(groupId)
+                                                    )
+                                                    .map(item => ({
+                                                        id: Number(item.id),
+                                                        groupId: Number(item.groupId),
+                                                        subjectId: Number(item.subjectId),
+                                                        weeklyLessons:
+                                                            Number(item.weeklyLessons),
+                                                        subjectName:
+                                                            item.subjectName || ""
+                                                    }));
+
+
+                                            setUnsavedChanges(false);
+
+                                            renderGroupLoad();
+
+                                            updateAvailableSubjects();
+
+                                        }
+
+
+                                        /* ============================================================
+                                           RENDER GROUP LOAD
+                                           ============================================================ */
+
+                                        function renderGroupLoad() {
+
+                                            if (!selectedGroupId) {
+
+                                                container.innerHTML = `
+                                                                                                    <div class="study-load-placeholder">
+
+                                                                                                        <div class="study-load-placeholder-icon">
+                                                                                                            👥
+                                                                                                        </div>
+
+                                                                                                        <strong>
+                                                                                                            Выберите группу
+                                                                                                        </strong>
+
+                                                                                                        <span>
+                                                                                                            Здесь появятся предметы и количество
+                                                                                                            занятий в неделю.
+                                                                                                        </span>
+
+                                                                                                    </div>
+                                                                                                `;
+
+                                                addSubjectArea.style.display =
+                                                    "none";
+
+                                                addSubjectForm.style.display =
+                                                    "none";
+
+                                                return;
+                                            }
+
+
+                                            const selectedGroup =
+                                                getSelectedGroup();
+
+
+                                            const groupName =
+                                                selectedGroup?.name ||
+                                                "Группа";
+
+
+                                            const totalLessons =
+                                                workingLoad.reduce(
+                                                    (sum, item) =>
+                                                        sum +
+                                                        Number(item.weeklyLessons || 0),
+                                                    0
+                                                );
+
+
+                                            container.innerHTML = `
+
+                                                                                                <div class="study-load-selected-header">
+
+                                                                                                    <div>
+
+                                                                                                        <span class="study-load-label">
+                                                                                                            Учебная нагрузка группы
+                                                                                                        </span>
+
+                                                                                                        <strong>
+                                                                                                            ${escapeHtml(groupName)}
+                                                                                                        </strong>
+
+                                                                                                    </div>
+
+                                                                                                    <div class="study-load-total">
+
+                                                                                                        <strong>
+                                                                                                            ${totalLessons}
+                                                                                                        </strong>
+
+                                                                                                        <span>
+                                                                                                            ${getLessonWord(totalLessons)}
+                                                                                                            в неделю
+                                                                                                        </span>
+
+                                                                                                    </div>
+
+                                                                                                </div>
+
+                                                                                            `;
+
+
+                                            if (workingLoad.length === 0) {
+
+                                                container.innerHTML += `
+
+                                                                                                    <div class="study-load-empty">
+
+                                                                                                        <div class="study-load-empty-icon">
+                                                                                                            📚
+                                                                                                        </div>
+
+                                                                                                        <strong>
+                                                                                                            Учебная нагрузка не настроена
+                                                                                                        </strong>
+
+                                                                                                        <span>
+                                                                                                            Добавьте предметы ниже.
+                                                                                                        </span>
+
+                                                                                                    </div>
+
+                                                                                                `;
+
+                                            }
+                                            else {
+
+                                                const list =
+                                                    document.createElement("div");
+
+                                                list.className =
+                                                    "study-load-list";
+
+
+                                                workingLoad.forEach(item => {
+
+                                                    const itemElement =
+                                                        document.createElement("div");
+
+                                                    itemElement.className =
+                                                        "study-load-item";
+
+
+                                                    itemElement.dataset.id =
+                                                        item.id || "";
+
+
+                                                    itemElement.innerHTML = `
+
+                                                                                                        <div class="study-load-item-icon">
+                                                                                                            ${getSubjectIcon(item.subjectName)}
+                                                                                                        </div>
+
+                                                                                                        <div class="study-load-item-content">
+
+                                                                                                            <strong>
+                                                                                                                ${escapeHtml(item.subjectName)}
+                                                                                                            </strong>
+
+                                                                                                            <span>
+                                                                                                                Учебная нагрузка
+                                                                                                            </span>
+
+                                                                                                        </div>
+
+                                                                                                        <div class="study-load-item-value">
+
+                                                                                                            <strong>
+                                                                                                                ${item.weeklyLessons}
+                                                                                                            </strong>
+
+                                                                                                            <span>
+                                                                                                                ${getLessonWord(item.weeklyLessons)}
+                                                                                                                в неделю
+                                                                                                            </span>
+
+                                                                                                        </div>
+
+                                <div class="study-load-item-edit">
+
+                                    <input
+                                        type="number"
+                                        class="settings-input study-load-lessons-input"
+                                        value="${item.weeklyLessons}"
+                                        min="1"
+                                        max="20"
+                                        data-subject-id="${item.subjectId}"
+                                    />
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="study-load-delete-button"
+                                    title="Удалить предмет"
+                                    aria-label="Удалить ${escapeHtml(item.subjectName)}">
+
+                                    🗑️
+
+                                </button>
+
+                                                                                                    `;
+
+
+                                                    const input =
+                                                        itemElement.querySelector(
+                                                            ".study-load-lessons-input"
+                                                        );
+
+                                                    const deleteButton =
+                                                        itemElement.querySelector(
+                                                            ".study-load-delete-button"
+                                                        );
+
+                                                    deleteButton?.addEventListener(
+                                                        "click",
+                                                        function () {
+
+                                                            const index =
+                                                                workingLoad.findIndex(
+                                                                    loadItem =>
+                                                                        loadItem === item
+                                                                );
+
+                                                            if (index === -1) {
+                                                                return;
+                                                            }
+
+                                                            /*
+                                                             * Если запись уже существует в БД,
+                                                             * запоминаем её ID для удаления
+                                                             * после нажатия "Сохранить изменения".
+                                                             */
+                                                            if (
+                                                                item.id &&
+                                                                Number(item.id) > 0
+                                                            ) {
+
+                                                                const id =
+                                                                    Number(item.id);
+
+                                                                if (
+                                                                    !deletedGroupSubjectIds.includes(id)
+                                                                ) {
+
+                                                                    deletedGroupSubjectIds.push(id);
+
+                                                                }
+                                                            }
+
+                                                            /*
+                                                             * Удаляем предмет из локального списка.
+                                                             */
+                                                            workingLoad.splice(index, 1);
+
+                                                            setUnsavedChanges(true);
+
+                                                            renderGroupLoad();
+
+                                                            updateAvailableSubjects();
+                                                        }
+                                                    );
+
+                                                    input.addEventListener(
+                                                        "input",
+                                                        function () {
+
+                                                            let value =
+                                                                parseInt(
+                                                                    this.value,
+                                                                    10
+                                                                );
+
+
+                                                            if (
+                                                                Number.isNaN(value)
+                                                            ) {
+                                                                return;
+                                                            }
+
+
+                                                            if (value < 1) {
+                                                                value = 1;
+                                                            }
+
+                                                            if (value > 20) {
+                                                                value = 20;
+                                                            }
+
+
+                                                            item.weeklyLessons =
+                                                                value;
+
+
+                                                            setUnsavedChanges(true);
+
+                                                            updateStudyLoadTotal();
+
+                                                        }
+                                                    );
+
+
+                                                    input.addEventListener(
+                                                        "change",
+                                                        function () {
+
+                                                            let value =
+                                                                parseInt(
+                                                                    this.value,
+                                                                    10
+                                                                );
+
+
+                                                            if (
+                                                                Number.isNaN(value) ||
+                                                                value < 1
+                                                            ) {
+                                                                value = 1;
+                                                            }
+
+
+                                                            if (value > 20) {
+                                                                value = 20;
+                                                            }
+
+
+                                                            this.value =
+                                                                value;
+
+                                                            item.weeklyLessons =
+                                                                value;
+
+
+                                                            setUnsavedChanges(true);
+
+                                                            updateStudyLoadTotal();
+
+                                                        }
+                                                    );
+
+
+                                                    list.appendChild(
+                                                        itemElement
+                                                    );
+
+                                                });
+
+
+                                                container.appendChild(
+                                                    list
+                                                );
+
+                                            }
+
+
+                                            addSubjectArea.style.display =
+                                                "flex";
+
+
+                                            updateAvailableSubjects();
+
+                                        }
+
+
+                                        /* ============================================================
+                                           UPDATE TOTAL
+                                           ============================================================ */
+
+                                        function updateStudyLoadTotal() {
+
+                                            const total =
+                                                workingLoad.reduce(
+                                                    (sum, item) =>
+                                                        sum +
+                                                        Number(item.weeklyLessons || 0),
+                                                    0
+                                                );
+
+
+                                            const totalElement =
+                                                container.querySelector(
+                                                    ".study-load-total strong"
+                                                );
+
+
+                                            const totalWordElement =
+                                                container.querySelector(
+                                                    ".study-load-total span"
+                                                );
+
+
+                                            if (totalElement) {
+
+                                                totalElement.textContent =
+                                                    total;
+
+                                            }
+
+
+                                            if (totalWordElement) {
+
+                                                totalWordElement.textContent =
+                                                    `${getLessonWord(total)} в неделю`;
+
+                                            }
+
+                                        }
+
+
+                                        /* ============================================================
+                                           AVAILABLE SUBJECTS
+                                           ============================================================ */
+
+                                        function updateAvailableSubjects() {
+
+                                            if (!addSubjectSelect) {
+                                                return;
+                                            }
+
+
+                                            const existingSubjectIds =
+                                                workingLoad.map(
+                                                    item =>
+                                                        Number(item.subjectId)
+                                                );
+
+
+                                            const availableSubjects =
+                                                subjects.filter(
+                                                    subject =>
+                                                        !existingSubjectIds.includes(
+                                                            Number(subject.id)
+                                                        )
+                                                );
+
+
+                                            addSubjectSelect.innerHTML = `
+
+                                                                                                <option value="">
+                                                                                                    Выберите предмет
+                                                                                                </option>
+
+                                                                                            `;
+
+
+                                            availableSubjects.forEach(subject => {
+
+                                                const option =
+                                                    document.createElement("option");
+
+                                                option.value =
+                                                    subject.id;
+
+                                                option.textContent =
+                                                    subject.name;
+
+                                                addSubjectSelect.appendChild(
+                                                    option
+                                                );
+
+                                            });
+
+
+                                            if (availableSubjects.length === 0) {
+
+                                                addSubjectButton.disabled =
+                                                    true;
+
+                                                addSubjectButton.title =
+                                                    "Все предметы уже добавлены для этой группы";
+
+                                            }
+                                            else {
+
+                                                addSubjectButton.disabled =
+                                                    false;
+
+                                                addSubjectButton.removeAttribute(
+                                                    "title"
+                                                );
+
+                                            }
+
+                                        }
+
+
+                                        /* ============================================================
+                                           GROUP CHANGE
+                                           ============================================================ */
+
+                                        groupSelect?.addEventListener(
+                                            "change",
+                                            function () {
+
+                                                closeAddForm();
+
+
+                                                if (!this.value) {
+
+                                                    selectedGroupId =
+                                                        null;
+
+                                                    workingLoad = [];
+
+                                                    setUnsavedChanges(false);
+
+                                                    renderGroupLoad();
+
+                                                    return;
+
+                                                }
+
+
+                                                loadWorkingGroup(
+                                                    this.value
+                                                );
+
+                                            }
+                                        );
+
+
+                                        /* ============================================================
+                                           OPEN ADD SUBJECT
+                                           ============================================================ */
+
+                                        addSubjectButton?.addEventListener(
+                                            "click",
+                                            function () {
+
+                                                if (!selectedGroupId) {
+                                                    return;
+                                                }
+
+
+                                                addSubjectForm.style.display =
+                                                    "block";
+
+                                                addSubjectArea.style.display =
+                                                    "none";
+
+
+                                                addWeeklyLessons.value =
+                                                    2;
+
+
+                                                updateAvailableSubjects();
+
+                                            }
+                                        );
+
+
+                                        /* ============================================================
+                                           ADD SUBJECT
+                                           ============================================================ */
+
+                                        confirmAddSubject?.addEventListener(
+                                            "click",
+                                            function () {
+
+                                                const subjectId =
+                                                    Number(
+                                                        addSubjectSelect.value
+                                                    );
+
+
+                                                let lessons =
+                                                    parseInt(
+                                                        addWeeklyLessons.value,
+                                                        10
+                                                    );
+
+
+                                                if (!subjectId) {
+
+                                                    alert(
+                                                        "Выберите предмет."
+                                                    );
+
+                                                    return;
+
+                                                }
+
+
+                                                if (
+                                                    Number.isNaN(lessons) ||
+                                                    lessons < 1 ||
+                                                    lessons > 20
+                                                ) {
+
+                                                    alert(
+                                                        "Количество пар должно быть от 1 до 20."
+                                                    );
+
+                                                    return;
+
+                                                }
+
+
+                                                const subject =
+                                                    subjects.find(
+                                                        item =>
+                                                            Number(item.id) ===
+                                                            subjectId
+                                                    );
+
+
+                                                if (!subject) {
+
+                                                    alert(
+                                                        "Выбранный предмет не найден."
+                                                    );
+
+                                                    return;
+
+                                                }
+
+
+                                                const alreadyExists =
+                                                    workingLoad.some(
+                                                        item =>
+                                                            Number(item.subjectId) ===
+                                                            subjectId
+                                                    );
+
+
+                                                if (alreadyExists) {
+
+                                                    alert(
+                                                        "Этот предмет уже добавлен для группы."
+                                                    );
+
+                                                    return;
+
+                                                }
+
+
+                                                workingLoad.push({
+
+                                                    id: 0,
+
+                                                    groupId:
+                                                        Number(selectedGroupId),
+
+                                                    subjectId:
+                                                        subjectId,
+
+                                                    weeklyLessons:
+                                                        lessons,
+
+                                                    subjectName:
+                                                        subject.name
+
+                                                });
+
+
+                                                setUnsavedChanges(true);
+
+                                                closeAddForm();
+
+                                                renderGroupLoad();
+
+                                                updateAvailableSubjects();
+
+                                            }
+                                        );
+
+
+                                        /* ============================================================
+                                           CLOSE ADD FORM
+                                           ============================================================ */
+
+                                        function closeAddForm() {
+
+                                            if (!addSubjectForm) {
+                                                return;
+                                            }
+
+
+                                            addSubjectForm.style.display =
+                                                "none";
+
+
+                                            if (addSubjectArea) {
+
+                                                addSubjectArea.style.display =
+                                                    selectedGroupId
+                                                        ? "flex"
+                                                        : "none";
+
+                                            }
+
+
+                                            if (addSubjectSelect) {
+
+                                                addSubjectSelect.value =
+                                                    "";
+
+                                            }
+
+
+                                            if (addWeeklyLessons) {
+
+                                                addWeeklyLessons.value =
+                                                    2;
+
+                                            }
+
+                                        }
+
+
+                                        cancelAddSubject?.addEventListener(
+                                            "click",
+                                            closeAddForm
+                                        );
+
+
+                                        cancelAddSubjectSecondary?.addEventListener(
+                                            "click",
+                                            closeAddForm
+                                        );
+
+
+                                        /* ============================================================
+                                           PREPARE SAVE DATA
+                                           ============================================================ */
+
+                                        saveStudyLoadForm?.addEventListener(
+                                            "submit",
+                                            function (event) {
+
+                                                if (!hasUnsavedChanges) {
+
+                                                    event.preventDefault();
+
+                                                    return;
+
+                                                }
+
+
+                                                if (!selectedGroupId) {
+
+                                                    event.preventDefault();
+
+                                                    alert(
+                                                        "Сначала выберите группу."
+                                                    );
+
+                                                    return;
+
+                                                }
+
+
+                                                hiddenInputs.innerHTML =
+                                                    "";
+
+/*
+ * Передаём серверу ID существующих записей,
+ * которые пользователь удалил.
+ */
+deletedGroupSubjectIds.forEach(id => {
+
+    const deletedInput =
+        document.createElement("input");
+
+    deletedInput.type =
+        "hidden";
+
+    deletedInput.name =
+        "deletedGroupSubjectId";
+
+    deletedInput.value =
+        id;
+
+    hiddenInputs.appendChild(
+        deletedInput
+    );
+
+});
+
+                                                workingLoad.forEach(item => {
+
+                                                    const groupInput =
+                                                        document.createElement("input");
+
+                                                    groupInput.type =
+                                                        "hidden";
+
+                                                    groupInput.name =
+                                                        "groupId";
+
+                                                    groupInput.value =
+                                                        item.groupId;
+
+
+                                                    const subjectInput =
+                                                        document.createElement("input");
+
+                                                    subjectInput.type =
+                                                        "hidden";
+
+                                                    subjectInput.name =
+                                                        "subjectId";
+
+                                                    subjectInput.value =
+                                                        item.subjectId;
+
+
+                                                    const lessonsInput =
+                                                        document.createElement("input");
+
+                                                    lessonsInput.type =
+                                                        "hidden";
+
+                                                    lessonsInput.name =
+                                                        "weeklyLessons";
+
+                                                    lessonsInput.value =
+                                                        item.weeklyLessons;
+
+
+                                                    hiddenInputs.appendChild(
+                                                        groupInput
+                                                    );
+
+                                                    hiddenInputs.appendChild(
+                                                        subjectInput
+                                                    );
+
+                                                    hiddenInputs.appendChild(
+                                                        lessonsInput
+                                                    );
+
+                                                });
+
+
+                                                saveStudyLoadButton.disabled =
+                                                    true;
+
+                                            }
+                                        );
+
+
+                                        /* ============================================================
+                                           TABS
+                                           ============================================================ */
+
+                                        const tabs =
+                                            document.querySelectorAll(
+                                                ".settings-tab"
+                                            );
+
+
+                                        const tabContents =
+                                            document.querySelectorAll(
+                                                ".settings-tab-content"
+                                            );
+
+
+                                        tabs.forEach(tab => {
+
+                                            tab.addEventListener(
+                                                "click",
+                                                function () {
+
+                                                    const target =
+                                                        this.dataset.tab;
+
+
+                                                    tabs.forEach(item =>
+                                                        item.classList.remove(
+                                                            "active"
+                                                        )
+                                                    );
+
+
+                                                    tabContents.forEach(content =>
+                                                        content.classList.remove(
+                                                            "active"
+                                                        )
+                                                    );
+
+
+                                                    this.classList.add(
+                                                        "active"
+                                                    );
+
+
+                                                    const content =
+                                                        document.querySelector(
+                                                            `[data-tab-content="${target}"]`
+                                                        );
+
+
+                                                    content?.classList.add(
+                                                        "active"
+                                                    );
+
+
+                                                    window.scrollTo({
+
+                                                        top: 0,
+
+                                                        behavior: "smooth"
+
+                                                    });
+
+                                                }
+                                            );
+
+                                        });
+
+
+                                        /* ============================================================
+                                           MODALS
+                                           ============================================================ */
+
+                                        const modalOpenButtons =
+                                            document.querySelectorAll(
+                                                "[data-modal-open]"
+                                            );
+
+
+                                        const modalCloseButtons =
+                                            document.querySelectorAll(
+                                                "[data-modal-close]"
+                                            );
+
+
+                                        modalOpenButtons.forEach(button => {
+
+                                            button.addEventListener(
+                                                "click",
+                                                function () {
+
+                                                    const modalId =
+                                                        this.dataset.modalOpen;
+
+
+                                                    const modal =
+                                                        document.getElementById(
+                                                            modalId
+                                                        );
+
+
+                                                    modal?.classList.add(
+                                                        "active"
+                                                    );
+
+
+                                                    document.body.classList.add(
+                                                        "modal-open"
+                                                    );
+
+                                                }
+                                            );
+
+                                        });
+
+
+                                        modalCloseButtons.forEach(button => {
+
+                                            button.addEventListener(
+                                                "click",
+                                                function () {
+
+                                                    const modal =
+                                                        this.closest(
+                                                            ".settings-modal"
+                                                        );
+
+
+                                                    modal?.classList.remove(
+                                                        "active"
+                                                    );
+
+
+                                                    document.body.classList.remove(
+                                                        "modal-open"
+                                                    );
+
+                                                }
+                                            );
+
+                                        });
+
+
+                                        /* ============================================================
+                                           ESCAPE
+                                           ============================================================ */
+
+                                        document.addEventListener(
+                                            "keydown",
+                                            function (event) {
+
+                                                if (event.key !== "Escape") {
+                                                    return;
+                                                }
+
+
+                                                document
+                                                    .querySelectorAll(
+                                                        ".settings-modal.active"
+                                                    )
+                                                    .forEach(modal => {
+
+                                                        modal.classList.remove(
+                                                            "active"
+                                                        );
+
+                                                    });
+
+
+                                                document.body.classList.remove(
+                                                    "modal-open"
+                                                );
+
+                                            }
+                                        );
+
+                                    });
+
+                </script>

@@ -13,10 +13,15 @@
 <div class="classroom-form-page">
 
     <div class="page-header">
+
         <div>
             <h1>Добавить аудиторию</h1>
-            <p>Создание новой учебной аудитории</p>
+
+            <p>
+                Создание новой учебной аудитории
+            </p>
         </div>
+
     </div>
 
     <div class="glass-form-card">
@@ -26,25 +31,33 @@
         </div>
 
         <div class="form-title">
-            <h2>Информация об аудитории</h2>
+
+            <h2>
+                Информация об аудитории
+            </h2>
 
             <p>
-                Укажите номер, категорию, количество мест и оборудование.
+                Укажите номер, категорию и количество мест.
             </p>
+
         </div>
 
-        <form asp-action="Create" method="post">
+        <form asp-action="Create"
+              method="post">
 
             @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="ModelOnly" class="glass-validation">
+            <div asp-validation-summary="ModelOnly"
+                 class="glass-validation">
             </div>
+
 
             <!-- НОМЕР АУДИТОРИИ -->
 
             <div class="form-group">
 
-                <label asp-for="Name" class="form-label">
+                <label asp-for="Name"
+                       class="form-label">
                     Номер аудитории
                 </label>
 
@@ -58,6 +71,7 @@
                 </span>
 
             </div>
+
 
             <!-- КАТЕГОРИЯ -->
 
@@ -99,6 +113,7 @@
 
             </div>
 
+
             <!-- КОЛИЧЕСТВО МЕСТ -->
 
             <div class="form-group">
@@ -121,43 +136,6 @@
 
             </div>
 
-            <!-- КОМПЬЮТЕРЫ -->
-
-            <div class="equipment-option">
-
-                <div class="equipment-info">
-
-                    <div class="equipment-icon">
-                        💻
-                    </div>
-
-                    <div>
-
-                        <div class="equipment-title">
-                            Есть компьютеры
-                        </div>
-
-                        <div class="equipment-description">
-                            В аудитории установлены компьютеры
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <label class="switch">
-
-                    <input asp-for="HasComputers" />
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-            <span asp-validation-for="HasComputers"
-                  class="text-danger">
-            </span>
 
             <!-- КНОПКИ -->
 
@@ -165,12 +143,16 @@
 
                 <button type="submit"
                         class="btn save-btn">
+
                     Добавить аудиторию
+
                 </button>
 
                 <a asp-action="Index"
                    class="btn cancel-btn">
+
                     Отмена
+
                 </a>
 
             </div>
@@ -180,6 +162,7 @@
     </div>
 
 </div>
+
 
 <!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ КАТЕГОРИИ -->
 
@@ -192,7 +175,9 @@
         <button type="button"
                 class="category-modal-close"
                 id="closeCategoryModal">
+
             ×
+
         </button>
 
         <div class="modal-icon">
@@ -231,13 +216,17 @@
             <button type="button"
                     class="modal-cancel-btn"
                     id="cancelCategory">
+
                 Отмена
+
             </button>
 
             <button type="button"
                     class="modal-save-btn"
                     id="saveCategory">
+
                 Добавить категорию
+
             </button>
 
         </div>
@@ -245,6 +234,7 @@
     </div>
 
 </div>
+
 
 @section Scripts {
 

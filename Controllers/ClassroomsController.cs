@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
+
 namespace ScheduleSystem.Controllers;
 
 public class ClassroomsController : Controller
 {
     private readonly ApplicationDbContext _context;
+
 
     public ClassroomsController(ApplicationDbContext context)
     {
@@ -78,8 +80,8 @@ public class ClassroomsController : Controller
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-            [Bind("Id,Name,ClassroomCategoryId,Capacity,HasComputers")]
-        Classroom classroom)
+        [Bind("Id,Name,ClassroomCategoryId,Capacity")]
+    Classroom classroom)
     {
         await ValidateCategoryAsync(classroom.ClassroomCategoryId);
 
@@ -201,9 +203,9 @@ public class ClassroomsController : Controller
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-            int id,
-            [Bind("Id,Name,ClassroomCategoryId,Capacity,HasComputers")]
-        Classroom classroom)
+        int id,
+        [Bind("Id,Name,ClassroomCategoryId,Capacity")]
+    Classroom classroom)
     {
         if (id != classroom.Id)
         {
@@ -230,7 +232,6 @@ public class ClassroomsController : Controller
         existingClassroom.Name = classroom.Name;
         existingClassroom.ClassroomCategoryId = classroom.ClassroomCategoryId;
         existingClassroom.Capacity = classroom.Capacity;
-        existingClassroom.HasComputers = classroom.HasComputers;
 
         try
         {
@@ -378,4 +379,6 @@ public class ClassroomsController : Controller
     {
         public string Name { get; set; } = string.Empty;
     }
+
+
 }

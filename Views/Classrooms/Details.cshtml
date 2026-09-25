@@ -10,6 +10,7 @@
 
 <div class="classroom-details-page">
 
+
     <div class="page-header">
         <div>
             <h1>Информация об аудитории</h1>
@@ -91,33 +92,6 @@
 
             </div>
 
-            <!-- КОМПЬЮТЕРЫ -->
-
-            <div class="detail-row">
-
-                <div class="detail-label">
-                    Компьютеры
-                </div>
-
-                <div class="detail-value">
-
-                    @if (Model.HasComputers)
-                    {
-                        <span class="equipment-badge available">
-                            ✓ Есть
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="equipment-badge unavailable">
-                            Нет
-                        </span>
-                    }
-
-                </div>
-
-            </div>
-
         </div>
 
         <div class="form-actions">
@@ -140,5 +114,6 @@
         </div>
 
     </div>
+
 
 </div>

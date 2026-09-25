@@ -1,740 +1,811 @@
-   /* ================================
-       PAGE
-    ================================= */
+/* =========================================================
+   CLASSROOMS INDEX
+   iOS 26 / LIQUID GLASS
+   ========================================================= */
 
-    .classrooms-page {
-        width: 100%;
-    }
 
-    /* ================================
-       HEADER
-    ================================= */
+/* ================================
+   PAGE
+================================ */
 
-    .page-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 22px;
-    }
+.classrooms-page {
+    width: 100%;
+}
 
-    .page-header h1 {
-        margin: 0 0 5px;
-        font-size: 2rem;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
 
-    .page-header p {
-        margin: 0;
-        color: #6c757d;
-    }
+/* ================================
+   HEADER
+================================ */
 
-    /* ================================
-       ADD BUTTON
-    ================================= */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    .add-classroom-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
+    gap: 20px;
+    margin-bottom: 22px;
+}
 
-        padding: 11px 17px;
+.page-header h1 {
+    margin: 0 0 5px;
 
-        border: none;
-        border-radius: 13px;
+    font-size: 2rem;
+    font-weight: 700;
 
-        background: linear-gradient(135deg, #007aff, #5856d6);
+    letter-spacing: -0.5px;
+}
 
-        color: white;
-        font-weight: 600;
-        text-decoration: none;
+.page-header p {
+    margin: 0;
 
-        box-shadow:
-            0 8px 20px rgba(0, 122, 255, 0.20);
+    color: #6c757d;
+}
 
-        transition: 0.2s ease;
-    }
 
-    .add-classroom-btn:hover {
-        color: white;
+/* ================================
+   ADD BUTTON
+================================ */
 
-        transform: translateY(-1px);
+.add-classroom-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-        box-shadow:
-            0 10px 25px rgba(0, 122, 255, 0.28);
-    }
+    gap: 6px;
 
-    .add-classroom-btn span {
-        font-size: 18px;
-        line-height: 1;
-    }
+    padding: 11px 17px;
 
-    /* ================================
-       SEARCH
-    ================================= */
+    border: none;
+    border-radius: 13px;
 
-    .search-card {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+    background: linear-gradient(
+        135deg,
+        #007aff,
+        #5856d6
+    );
 
-        margin-bottom: 22px;
-        padding: 10px;
+    color: white;
 
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 17px;
+    font-weight: 600;
+    text-decoration: none;
 
-        background: rgba(255, 255, 255, 0.55);
+    box-shadow:
+        0 8px 20px rgba(0, 122, 255, 0.20);
 
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
 
-        box-shadow:
-            0 10px 30px rgba(0, 0, 0, 0.04),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    }
+.add-classroom-btn:hover {
+    color: white;
 
-    .search-wrapper {
-        position: relative;
+    transform: translateY(-1px);
 
-        display: flex;
-        align-items: center;
+    box-shadow:
+        0 10px 25px rgba(0, 122, 255, 0.28);
+}
 
-        flex: 1;
-        min-width: 0;
-    }
+.add-classroom-btn span {
+    font-size: 18px;
+    line-height: 1;
+}
 
-    .search-icon {
-        position: absolute;
-        left: 15px;
 
-        color: #888;
-        font-size: 22px;
-        line-height: 1;
+/* ================================
+   SEARCH
+================================ */
 
-        pointer-events: none;
-    }
+.search-card {
+    display: flex;
+    align-items: center;
 
-    .search-input {
-        width: 100%;
-        height: 44px;
+    gap: 10px;
 
-        padding: 0 42px 0 44px;
+    margin-bottom: 22px;
+    padding: 10px;
 
-        border: 1px solid rgba(0, 0, 0, 0.07);
-        border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 17px;
 
-        outline: none;
+    background: rgba(255, 255, 255, 0.55);
 
-        background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 
-        color: #252525;
-        font-size: 0.92rem;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
 
-        transition: 0.2s ease;
-    }
+.search-wrapper {
+    position: relative;
 
-    .search-input::placeholder {
-        color: #999;
-    }
+    display: flex;
+    align-items: center;
 
-    .search-input:focus {
-        border-color: rgba(0, 122, 255, 0.35);
+    flex: 1;
+    min-width: 0;
+}
 
-        background: rgba(255, 255, 255, 0.85);
+.search-icon {
+    position: absolute;
 
-        box-shadow:
-            0 0 0 3px rgba(0, 122, 255, 0.08);
-    }
+    left: 15px;
 
-    .clear-search {
-        position: absolute;
-        right: 14px;
+    color: #888;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    font-size: 22px;
+    line-height: 1;
 
-        width: 25px;
-        height: 25px;
+    pointer-events: none;
+}
 
-        border-radius: 50%;
+.search-input {
+    width: 100%;
+    height: 44px;
 
-        color: #888;
+    padding: 0 42px 0 44px;
 
-        font-size: 20px;
-        text-decoration: none;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 12px;
 
-        transition: 0.2s ease;
-    }
+    outline: none;
 
-    .clear-search:hover {
-        background: rgba(0, 0, 0, 0.06);
-        color: #333;
-    }
+    background: rgba(255, 255, 255, 0.65);
 
-    .search-btn {
-        height: 44px;
+    color: #252525;
 
-        padding: 0 19px;
+    font-size: 0.92rem;
 
-        border: none;
-        border-radius: 12px;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
 
-        background: rgba(0, 122, 255, 0.10);
+.search-input::placeholder {
+    color: #999;
+}
 
-        color: #007aff;
+.search-input:focus {
+    border-color: rgba(0, 122, 255, 0.35);
 
-        font-size: 0.88rem;
-        font-weight: 650;
+    background: rgba(255, 255, 255, 0.85);
 
-        cursor: pointer;
+    box-shadow:
+        0 0 0 3px rgba(0, 122, 255, 0.08);
+}
 
-        transition: 0.2s ease;
-    }
+.clear-search {
+    position: absolute;
+    right: 14px;
 
-    .search-btn:hover {
-        background: rgba(0, 122, 255, 0.16);
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    /* ================================
-       ALERT
-    ================================= */
+    width: 25px;
+    height: 25px;
 
-    .glass-alert {
+    border-radius: 50%;
+
+    color: #888;
+
+    font-size: 20px;
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.clear-search:hover {
+    background: rgba(0, 0, 0, 0.06);
+
+    color: #333;
+}
+
+.search-btn {
+    height: 44px;
+
+    padding: 0 19px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: rgba(0, 122, 255, 0.10);
+
+    color: #007aff;
+
+    font-size: 0.88rem;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease;
+}
+
+.search-btn:hover {
+    background: rgba(0, 122, 255, 0.16);
+}
+
+
+/* ================================
+   ALERT
+================================ */
+
+.glass-alert {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
     padding: 16px 20px;
     margin-bottom: 20px;
-    border-radius: 18px;
-    background: rgba(255, 59, 48, 0.12);
+
     border: 1px solid rgba(255, 59, 48, 0.25);
+    border-radius: 18px;
+
+    background: rgba(255, 59, 48, 0.12);
+
     color: #ff3b30;
+
     font-weight: 600;
 }
 
-    /* ================================
-       COUNT
-    ================================= */
 
-    .classrooms-count {
-        margin: 0 0 12px 4px;
+/* ================================
+   COUNT
+================================ */
 
-        color: #777;
-        font-size: 0.88rem;
-    }
+.classrooms-count {
+    margin: 0 0 12px 4px;
 
-    .classrooms-count strong {
-        color: #252525;
-        font-weight: 700;
-    }
+    color: #777;
 
-    /* ================================
-       TABLE
-    ================================= */
+    font-size: 0.88rem;
+}
 
-    .glass-table-card {
-        overflow: hidden;
+.classrooms-count strong {
+    color: #252525;
 
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 22px;
+    font-weight: 700;
+}
 
-        background: rgba(255, 255, 255, 0.55);
 
-        backdrop-filter: blur(25px) saturate(160%);
-        -webkit-backdrop-filter: blur(25px) saturate(160%);
+/* ================================
+   TABLE
+================================ */
 
-        box-shadow:
-            0 15px 40px rgba(0, 0, 0, 0.06),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    }
+.glass-table-card {
+    overflow: hidden;
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.55);
+
+    backdrop-filter: blur(25px) saturate(160%);
+    -webkit-backdrop-filter: blur(25px) saturate(160%);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+
+/* ================================
+   TABLE GRID
+================================ */
+
+/*
+    4 колонки:
+
+    1. Аудитория
+    2. Категория
+    3. Места
+    4. Действия
+*/
+
+.table-header,
+.classroom-row {
+    display: grid;
+
+    grid-template-columns:
+        1.3fr
+        1.2fr
+        0.7fr
+        1.5fr;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 16px 22px;
+}
+
+
+/* ================================
+   TABLE HEADER
+================================ */
+
+.table-header {
+    color: #777;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    background: rgba(255, 255, 255, 0.25);
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.table-header > div:last-child {
+    text-align: right;
+}
+
+
+/* ================================
+   TABLE ROW
+================================ */
+
+.classroom-row {
+    min-height: 82px;
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+    transition:
+        background 0.2s ease;
+}
+
+.classroom-row:last-child {
+    border-bottom: none;
+}
+
+.classroom-row:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+
+/* ================================
+   CLASSROOM
+================================ */
+
+.classroom-info {
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    min-width: 0;
+}
+
+.classroom-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border-radius: 15px;
+
+    background: linear-gradient(
+        135deg,
+        #007aff,
+        #5856d6
+    );
+
+    color: white;
+
+    font-size: 19px;
+    font-weight: 700;
+
+    box-shadow:
+        0 6px 16px rgba(0, 122, 255, 0.18);
+}
+
+.classroom-text {
+    min-width: 0;
+}
+
+.classroom-name {
+    color: #252525;
+
+    font-weight: 650;
+
+    word-break: break-word;
+}
+
+.classroom-label {
+    margin-top: 3px;
+
+    color: #999;
+
+    font-size: 0.78rem;
+}
+
+
+/* ================================
+   CATEGORY
+================================ */
+
+.category-info {
+    min-width: 0;
+}
+
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+
+    max-width: 100%;
+
+    padding: 7px 11px;
+
+    border: 1px solid rgba(88, 86, 214, 0.12);
+    border-radius: 10px;
+
+    background: rgba(88, 86, 214, 0.08);
+
+    color: #5856d6;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    word-break: break-word;
+}
+
+
+/* ================================
+   EMPTY VALUE
+================================ */
+
+.empty-value {
+    color: #999;
+
+    font-size: 0.85rem;
+}
+
+
+/* ================================
+   CAPACITY
+================================ */
+
+.capacity-info {
+    display: flex;
+    align-items: baseline;
+
+    gap: 6px;
+}
+
+.capacity-number {
+    color: #252525;
+
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.capacity-label {
+    color: #888;
+
+    font-size: 0.85rem;
+}
+
+
+/* ================================
+   ACTIONS
+================================ */
+
+.classroom-actions {
+    display: flex;
+    flex-wrap: wrap;
+
+    justify-content: flex-end;
+
+    gap: 7px;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 12px;
+
+    border-radius: 10px;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* ================================
+   DETAILS
+================================ */
+
+.details-btn {
+    background: rgba(88, 86, 214, 0.08);
+
+    color: #5856d6;
+
+    border: 1px solid rgba(88, 86, 214, 0.12);
+}
+
+.details-btn:hover {
+    background: rgba(88, 86, 214, 0.14);
+
+    color: #4644b8;
+}
+
+
+/* ================================
+   EDIT
+================================ */
+
+.edit-btn {
+    background: rgba(0, 122, 255, 0.08);
+
+    color: #007aff;
+
+    border: 1px solid rgba(0, 122, 255, 0.12);
+}
+
+.edit-btn:hover {
+    background: rgba(0, 122, 255, 0.14);
+
+    color: #0066d6;
+}
+
+
+/* ================================
+   DELETE
+================================ */
+
+.delete-btn {
+    background: rgba(220, 53, 69, 0.08);
+
+    color: #dc3545;
+
+    border: 1px solid rgba(220, 53, 69, 0.12);
+}
+
+.delete-btn:hover {
+    background: rgba(220, 53, 69, 0.14);
+
+    color: #c82333;
+}
+
+
+/* ================================
+   SEARCH RESULT
+================================ */
+
+.search-result-info {
+    margin-top: 12px;
+
+    padding-left: 4px;
+
+    color: #777;
+
+    font-size: 0.86rem;
+}
+
+.search-result-info strong {
+    color: #252525;
+}
+
+
+/* ================================
+   EMPTY STATE
+================================ */
+
+.empty-state {
+    padding: 70px 25px;
+
+    text-align: center;
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.55);
+
+    backdrop-filter: blur(25px) saturate(160%);
+    -webkit-backdrop-filter: blur(25px) saturate(160%);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.7);
+
+    font-size: 30px;
+}
+
+.empty-state h2 {
+    margin-bottom: 8px;
+
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.empty-state p {
+    max-width: 420px;
+
+    margin: 0 auto 22px;
+
+    color: #777;
+}
+
+.clear-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 11px 17px;
+
+    border: 1px solid rgba(0, 122, 255, 0.12);
+    border-radius: 13px;
+
+    background: rgba(0, 122, 255, 0.10);
+
+    color: #007aff;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.clear-btn:hover {
+    background: rgba(0, 122, 255, 0.16);
+
+    color: #0066d6;
+}
+
+
+/* ================================
+   TABLET
+================================ */
+
+@media (max-width: 1200px) {
 
     .table-header,
     .classroom-row {
-        display: grid;
-
         grid-template-columns:
-            1.1fr 1.1fr 0.7fr 0.8fr 1.6fr;
-
-        align-items: center;
-
-        gap: 20px;
-
-        padding: 16px 22px;
-    }
-
-    .table-header {
-        color: #777;
-
-        font-size: 0.8rem;
-        font-weight: 700;
-
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        background: rgba(255, 255, 255, 0.25);
-
-        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    }
-
-    .table-header>div:last-child {
-        text-align: right;
-    }
-
-    .classroom-row {
-        min-height: 82px;
-
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-
-        transition: background 0.2s ease;
-    }
-
-    .classroom-row:last-child {
-        border-bottom: none;
-    }
-
-    .classroom-row:hover {
-        background: rgba(255, 255, 255, 0.35);
-    }
-
-    /* ================================
-       CLASSROOM
-    ================================= */
-
-    .classroom-info {
-        display: flex;
-        align-items: center;
-
-        gap: 13px;
-
-        min-width: 0;
-    }
-
-    .classroom-avatar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        width: 48px;
-        height: 48px;
-
-        flex-shrink: 0;
-
-        border-radius: 15px;
-
-        background: linear-gradient(135deg, #007aff, #5856d6);
-
-        color: white;
-
-        font-size: 19px;
-        font-weight: 700;
-
-        box-shadow:
-            0 6px 16px rgba(0, 122, 255, 0.18);
-    }
-
-    .classroom-text {
-        min-width: 0;
-    }
-
-    .classroom-name {
-        color: #252525;
-
-        font-weight: 650;
-
-        word-break: break-word;
-    }
-
-    .classroom-label {
-        margin-top: 3px;
-
-        color: #999;
-
-        font-size: 0.78rem;
-    }
-
-    /* ================================
-       CATEGORY
-    ================================= */
-
-    .category-info {
-        min-width: 0;
-    }
-
-    .category-badge {
-        display: inline-flex;
-        align-items: center;
-
-        max-width: 100%;
-
-        padding: 7px 11px;
-
-        border: 1px solid rgba(88, 86, 214, 0.12);
-        border-radius: 10px;
-
-        background: rgba(88, 86, 214, 0.08);
-
-        color: #5856d6;
-
-        font-size: 0.82rem;
-        font-weight: 600;
-
-        word-break: break-word;
-    }
-
-    /* ================================
-       EMPTY VALUE
-    ================================= */
-
-    .empty-value {
-        color: #999;
-        font-size: 0.85rem;
-    }
-
-    /* ================================
-       CAPACITY
-    ================================= */
-
-    .capacity-info {
-        display: flex;
-        align-items: baseline;
-
-        gap: 6px;
-    }
-
-    .capacity-number {
-        color: #252525;
-
-        font-size: 1.05rem;
-        font-weight: 700;
-    }
-
-    .capacity-label {
-        color: #888;
-        font-size: 0.85rem;
-    }
-
-    /* ================================
-       EQUIPMENT
-    ================================= */
-
-    .equipment-info {
-        min-width: 0;
-    }
-
-    .equipment-badge {
-        display: inline-flex;
-        align-items: center;
-
-        padding: 7px 11px;
-
-        border-radius: 10px;
-
-        font-size: 0.82rem;
-        font-weight: 600;
-    }
-
-    .equipment-badge.available {
-        border: 1px solid rgba(25, 135, 84, 0.12);
-
-        background: rgba(25, 135, 84, 0.08);
-
-        color: #198754;
-    }
-
-    .equipment-badge.unavailable {
-        border: 1px solid rgba(108, 117, 125, 0.12);
-
-        background: rgba(108, 117, 125, 0.08);
-
-        color: #6c757d;
-    }
-
-    /* ================================
-       ACTIONS
-    ================================= */
-
-    .classroom-actions {
-        display: flex;
-
-        flex-wrap: wrap;
-
-        justify-content: flex-end;
-
-        gap: 7px;
+            1.25fr
+            1.1fr
+            0.7fr
+            1.4fr;
+
+        gap: 14px;
+
+        padding-left: 18px;
+        padding-right: 18px;
     }
 
     .action-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        padding: 7px 9px;
 
-        padding: 8px 12px;
+        font-size: 0.78rem;
+    }
+}
 
-        border-radius: 10px;
 
-        font-size: 0.82rem;
-        font-weight: 600;
+/* ================================
+   MOBILE / TABLET
+================================ */
 
-        text-decoration: none;
+@media (max-width: 950px) {
 
-        transition: 0.2s ease;
+    .table-header {
+        display: none;
     }
 
-    /* Подробнее */
+    .classroom-row {
+        display: grid;
 
-    .details-btn {
-        background: rgba(88, 86, 214, 0.08);
+        grid-template-columns: 1fr;
 
-        color: #5856d6;
+        gap: 14px;
 
-        border: 1px solid rgba(88, 86, 214, 0.12);
+        padding: 20px;
     }
 
-    .details-btn:hover {
-        background: rgba(88, 86, 214, 0.14);
-        color: #4644b8;
+    .category-info,
+    .capacity-info {
+        margin-left: 61px;
     }
 
-    /* Изменить */
+    .classroom-actions {
+        justify-content: flex-start;
 
-    .edit-btn {
-        background: rgba(0, 122, 255, 0.08);
+        margin-left: 61px;
+    }
+}
 
-        color: #007aff;
 
-        border: 1px solid rgba(0, 122, 255, 0.12);
+/* ================================
+   SMALL MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+    .page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
     }
 
-    .edit-btn:hover {
-        background: rgba(0, 122, 255, 0.14);
-        color: #0066d6;
+    .add-classroom-btn {
+        width: 100%;
     }
 
-    /* Удалить */
+    .search-card {
+        flex-direction: column;
 
-    .delete-btn {
-        background: rgba(220, 53, 69, 0.08);
-
-        color: #dc3545;
-
-        border: 1px solid rgba(220, 53, 69, 0.12);
+        align-items: stretch;
     }
 
-    .delete-btn:hover {
-        background: rgba(220, 53, 69, 0.14);
-        color: #c82333;
+    .search-btn {
+        width: 100%;
     }
 
-    /* ================================
-       SEARCH RESULT
-    ================================= */
-
-    .search-result-info {
-        margin-top: 12px;
-
-        padding-left: 4px;
-
-        color: #777;
-
-        font-size: 0.86rem;
+    .glass-table-card {
+        border-radius: 18px;
     }
 
-    .search-result-info strong {
-        color: #252525;
+    .classroom-row {
+        padding: 18px;
     }
 
-    /* ================================
-       EMPTY STATE
-    ================================= */
+    .category-info,
+    .capacity-info,
+    .classroom-actions {
+        margin-left: 0;
+    }
+
+    .classroom-actions {
+        display: grid;
+
+        grid-template-columns: 1fr;
+    }
+
+    .action-btn {
+        width: 100%;
+    }
 
     .empty-state {
-        padding: 70px 25px;
-
-        text-align: center;
-
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 22px;
-
-        background: rgba(255, 255, 255, 0.55);
-
-        backdrop-filter: blur(25px) saturate(160%);
-        -webkit-backdrop-filter: blur(25px) saturate(160%);
-
-        box-shadow:
-            0 15px 40px rgba(0, 0, 0, 0.06),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        padding: 55px 18px;
     }
+}
 
-    .empty-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        width: 70px;
-        height: 70px;
-
-        margin: 0 auto 18px;
-
-        border-radius: 22px;
-
-        background: rgba(255, 255, 255, 0.7);
-
-        font-size: 30px;
-    }
-
-    .empty-state h2 {
-        margin-bottom: 8px;
-
-        font-size: 1.3rem;
-        font-weight: 700;
-    }
-
-    .empty-state p {
-        max-width: 420px;
-
-        margin: 0 auto 22px;
-
-        color: #777;
-    }
-
-    .clear-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: 11px 17px;
-
-        border-radius: 13px;
-
-        background: rgba(0, 122, 255, 0.10);
-
-        color: #007aff;
-
-        border: 1px solid rgba(0, 122, 255, 0.12);
-
-        font-weight: 600;
-
-        text-decoration: none;
-
-        transition: 0.2s ease;
-    }
-
-    .clear-btn:hover {
-        background: rgba(0, 122, 255, 0.16);
-        color: #0066d6;
-    }
-
-    /* ================================
-       TABLET
-    ================================= */
-
-    @media (max-width: 1200px) {
-
-        .table-header,
-        .classroom-row {
-            grid-template-columns:
-                1.1fr 1fr 0.7fr 0.8fr 1.5fr;
-
-            gap: 14px;
-
-            padding-left: 18px;
-            padding-right: 18px;
-        }
-
-        .action-btn {
-            padding: 7px 9px;
-
-            font-size: 0.78rem;
-        }
-
-    }
-
-    /* ================================
-       MOBILE / TABLET
-    ================================= */
-
-    @media (max-width: 950px) {
-
-        .table-header {
-            display: none;
-        }
-
-        .classroom-row {
-            grid-template-columns: 1fr;
-
-            gap: 14px;
-
-            padding: 20px;
-        }
-
-        .category-info,
-        .capacity-info,
-        .equipment-info {
-            margin-left: 61px;
-        }
-
-        .classroom-actions {
-            justify-content: flex-start;
-
-            margin-left: 61px;
-        }
-
-    }
-
-    /* ================================
-       SMALL MOBILE
-    ================================= */
-
-    @media (max-width: 600px) {
-
-        .page-header {
-            align-items: flex-start;
-
-            flex-direction: column;
-        }
-
-        .add-classroom-btn {
-            width: 100%;
-        }
-
-        .search-card {
-            flex-direction: column;
-
-            align-items: stretch;
-        }
-
-        .search-btn {
-            width: 100%;
-        }
-
-        .glass-table-card {
-            border-radius: 18px;
-        }
-
-        .classroom-row {
-            padding: 18px;
-        }
-
-        .category-info,
-        .capacity-info,
-        .equipment-info,
-        .classroom-actions {
-            margin-left: 0;
-        }
-
-        .classroom-actions {
-            display: grid;
-
-            grid-template-columns: 1fr;
-        }
-
-        .action-btn {
-            width: 100%;
-        }
-
-        .empty-state {
-            padding: 55px 18px;
-        }
-
-    }

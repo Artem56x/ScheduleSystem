@@ -1,0 +1,1977 @@
+@model ScheduleSystem.Models.Generator.ScheduleGenerationRequest
+
+@using ScheduleSystem.Models
+@using ScheduleSystem.Models.Generator
+
+@{
+    ViewData["Title"] = "Генерация расписания";
+
+    var groups = ViewBag.Groups as List<Group> ?? new();
+
+    var selectedGroupIds =
+        Model.SelectedGroupIds ?? new List<int>();
+
+    var selectedDays =
+        Model.Days ?? new List<DayOfWeek>();
+
+    var timeSlots =
+        Model.TimeSlots ?? new List<GenerationTimeSlot>();
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/ScheduleGenerator/Index.css"
+          asp-append-version="true" />
+}
+
+<div class="generator-page">
+
+    <div class="generator-container">
+
+        <!-- =========================================================
+             HERO
+             ========================================================= -->
+
+        <header class="generator-hero">
+
+            <div class="hero-main">
+
+                <div class="hero-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3v4" />
+                        <path d="M12 17v4" />
+                        <path d="M3 12h4" />
+                        <path d="M17 12h4" />
+                        <path d="m5.64 5.64 2.83 2.83" />
+                        <path d="m15.53 15.53 2.83 2.83" />
+                        <path d="m5.64 18.36 2.83-2.83" />
+                        <path d="m15.53 8.47 2.83-2.83" />
+                        <circle cx="12" cy="12" r="3.5" />
+                    </svg>
+                </div>
+
+                <div class="hero-copy">
+
+                    <div class="generator-eyebrow">
+                        АВТОМАТИЧЕСКОЕ СОЗДАНИЕ
+                    </div>
+
+                    <h1>
+                        Генерация расписания
+                    </h1>
+
+                    <p>
+                        Задайте группы, учебные дни и доступные временные интервалы.
+                        Система автоматически распределит занятия с учётом преподавателей,
+                        аудиторий и ограничений.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="hero-status">
+                <span class="status-dot"></span>
+                Автоматический режим
+            </div>
+
+        </header>
+
+
+        <!-- =========================================================
+             ERRORS
+             ========================================================= -->
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="generator-alert generator-alert-error">
+
+                <div class="alert-icon">
+                    !
+                </div>
+
+                <div>
+
+                    <div class="alert-title">
+                        Не удалось подготовить генерацию
+                    </div>
+
+                    <div class="alert-content">
+
+                        @foreach (var error in ViewData.ModelState.Values
+                            .SelectMany(v => v.Errors)
+                            .Where(e => !string.IsNullOrWhiteSpace(e.ErrorMessage)))
+                        {
+                            <div>
+                                @error.ErrorMessage
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+
+        <!-- =========================================================
+             WORKFLOW
+             ========================================================= -->
+
+        <div class="generator-layout">
+
+            <main class="generator-main">
+
+                <!-- =================================================
+                     STEP NAVIGATION
+                     ================================================= -->
+
+                <nav class="generator-steps"
+                     aria-label="Этапы генерации">
+
+                    <a class="generator-step is-active"
+                       href="#step-groups"
+                       data-step-link="step-groups">
+
+                        <span class="step-number">
+                            01
+                        </span>
+
+                        <span class="step-label">
+                            Группы
+                        </span>
+
+                    </a>
+
+                    <span class="step-line"></span>
+
+                    <a class="generator-step"
+                       href="#step-days"
+                       data-step-link="step-days">
+
+                        <span class="step-number">
+                            02
+                        </span>
+
+                        <span class="step-label">
+                            Дни
+                        </span>
+
+                    </a>
+
+                    <span class="step-line"></span>
+
+                    <a class="generator-step"
+                       href="#step-times"
+                       data-step-link="step-times">
+
+                        <span class="step-number">
+                            03
+                        </span>
+
+                        <span class="step-label">
+                            Интервалы
+                        </span>
+
+                    </a>
+
+                    <span class="step-line"></span>
+
+                    <a class="generator-step"
+                       href="#step-rules"
+                       data-step-link="step-rules">
+
+                        <span class="step-number">
+                            04
+                        </span>
+
+                        <span class="step-label">
+                            Ограничения
+                        </span>
+
+                    </a>
+
+                </nav>
+
+
+                <!--
+                    ВАЖНО:
+                    POST отправляется на Generate(),
+                    потому что контроллер использует:
+                    [HttpPost] Generate(ScheduleGenerationRequest model)
+                -->
+
+                <form asp-action="Generate"
+                      asp-controller="ScheduleGenerator"
+                      method="post"
+                      id="generatorForm">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- =================================================
+                         STEP 01 — GROUPS
+                         ================================================= -->
+
+                    <section class="generator-section"
+                             id="step-groups"
+                             data-step="step-groups">
+
+                        <div class="section-heading">
+
+                            <div class="section-heading-left">
+
+                                <span class="section-index">
+                                    01
+                                </span>
+
+                                <div>
+
+                                    <h2>
+                                        Выберите группы
+                                    </h2>
+
+                                    <p>
+                                        Группы, для которых необходимо построить расписание.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <button type="button"
+                                    class="select-all-button"
+                                    id="selectAllGroups">
+
+                                Выбрать все
+
+                            </button>
+
+                        </div>
+
+
+                        @if (groups.Count == 0)
+                        {
+                            <div class="empty-state">
+
+                                <div class="empty-state-icon">
+                                    —
+                                </div>
+
+                                <strong>
+                                    Группы отсутствуют
+                                </strong>
+
+                                <span>
+                                    Добавьте хотя бы одну группу перед запуском генерации.
+                                </span>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="groups-grid"
+                                 id="groupsGrid">
+
+                                @foreach (var group in groups)
+                                {
+                                    var isSelected =
+                                        selectedGroupIds.Contains(group.Id);
+
+                                    <label class="group-card @(isSelected ? "is-selected" : "")">
+
+                                        <input type="checkbox"
+                                               class="group-checkbox-input"
+                                               name="SelectedGroupIds"
+                                               value="@group.Id"
+                                               @(isSelected ? "checked" : null) />
+
+                                        <span class="group-card-check">
+
+                                            <svg viewBox="0 0 24 24"
+                                                 aria-hidden="true">
+
+                                                <path d="m5 12 4 4L19 6" />
+
+                                            </svg>
+
+                                        </span>
+
+                                        <span class="group-card-content">
+
+                                            <span class="group-card-top">
+
+                                                <span class="group-card-name">
+                                                    @group.Name
+                                                </span>
+
+                                                <span class="group-course">
+                                                    @group.Course курс
+                                                </span>
+
+                                            </span>
+
+                                            <span class="group-card-specialty">
+                                                @group.Specialty
+                                            </span>
+
+                                            <span class="group-card-footer">
+
+                                                <span>
+                                                    Группа
+                                                </span>
+
+                                                <span class="group-card-arrow">
+                                                    →
+                                                </span>
+
+                                            </span>
+
+                                        </span>
+
+                                    </label>
+                                }
+
+                            </div>
+                        }
+
+                    </section>
+
+
+                    <!-- =================================================
+                         AUTOMATIC LOAD INFO
+                         ================================================= -->
+
+                    <section class="automatic-load-card">
+
+                        <div class="automatic-load-icon">
+
+                            <svg viewBox="0 0 24 24"
+                                 aria-hidden="true">
+
+                                <path d="M4 19V5" />
+                                <path d="M4 19h16" />
+                                <path d="M8 16v-4" />
+                                <path d="M12 16V8" />
+                                <path d="M16 16v-7" />
+
+                            </svg>
+
+                        </div>
+
+                        <div class="automatic-load-content">
+
+                            <div class="automatic-load-title">
+                                Учебная нагрузка определяется автоматически
+                            </div>
+
+                            <div class="automatic-load-text">
+                                Генератор автоматически использует недельную нагрузку,
+                                установленную для предметов выбранных групп.
+                                Изменение нагрузки выполняется в настройках программы.
+                            </div>
+
+                        </div>
+
+                        <a class="automatic-load-button"
+                           href="/Account/Settings">
+
+                            <span>
+                                Настройки нагрузки
+                            </span>
+
+                            <svg viewBox="0 0 24 24"
+                                 aria-hidden="true">
+
+                                <path d="M5 12h14" />
+                                <path d="m13 6 6 6-6 6" />
+
+                            </svg>
+
+                        </a>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         STEP 02 — DAYS
+                         ================================================= -->
+
+                    <section class="generator-section"
+                             id="step-days"
+                             data-step="step-days">
+
+                        <div class="section-heading">
+
+                            <div class="section-heading-left">
+
+                                <span class="section-index">
+                                    02
+                                </span>
+
+                                <div>
+
+                                    <h2>
+                                        Учебные дни
+                                    </h2>
+
+                                    <p>
+                                        Выберите дни, в которые система сможет размещать занятия.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <span class="section-hint">
+                                Можно выбрать несколько
+                            </span>
+
+                        </div>
+
+
+                        <div class="days-grid">
+
+                            @{
+                                var days = new[]
+                                {
+                                    (DayOfWeek.Monday, "Пн", "Понедельник"),
+                                    (DayOfWeek.Tuesday, "Вт", "Вторник"),
+                                    (DayOfWeek.Wednesday, "Ср", "Среда"),
+                                    (DayOfWeek.Thursday, "Чт", "Четверг"),
+                                    (DayOfWeek.Friday, "Пт", "Пятница"),
+                                    (DayOfWeek.Saturday, "Сб", "Суббота")
+                                };
+                            }
+
+                            @foreach (var day in days)
+                            {
+                                var isSelected =
+                                    selectedDays.Contains(day.Item1);
+
+                                <label class="day-card @(isSelected ? "is-selected" : "")">
+
+                                    <input type="checkbox"
+                                           name="Days"
+                                           value="@day.Item1"
+                                           @(isSelected ? "checked" : null) />
+
+                                    <span class="day-short">
+                                        @day.Item2
+                                    </span>
+
+                                    <span class="day-full">
+                                        @day.Item3
+                                    </span>
+
+                                    <span class="day-check">
+
+                                        <svg viewBox="0 0 24 24"
+                                             aria-hidden="true">
+
+                                            <path d="m5 12 4 4L19 6" />
+
+                                        </svg>
+
+                                    </span>
+
+                                </label>
+                            }
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         STEP 03 — TIME SLOTS
+                         ================================================= -->
+
+                    <section class="generator-section"
+                             id="step-times"
+                             data-step="step-times">
+
+                        <div class="section-heading">
+
+                            <div class="section-heading-left">
+
+                                <span class="section-index">
+                                    03
+                                </span>
+
+                                <div>
+
+                                    <h2>
+                                        Временные интервалы
+                                    </h2>
+
+                                    <p>
+                                        Укажите точное время начала и окончания каждой пары.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <button type="button"
+                                    class="add-slot-button"
+                                    id="addTimeSlot">
+
+                                <span class="add-slot-plus">
+                                    +
+                                </span>
+
+                                Добавить интервал
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="time-note">
+
+                            <div class="time-note-icon">
+                                i
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Интервалы задаются вручную
+                                </strong>
+
+                                <span>
+                                    Генератор не изменяет продолжительность пар
+                                    и не создаёт собственное расписание времени.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="time-slots-list"
+                             id="timeSlotsList">
+
+                            @if (timeSlots.Count == 0)
+                            {
+                                <div class="time-slot-row"
+                                     data-slot-row>
+
+                                    <span class="slot-number">
+                                        01
+                                    </span>
+
+                                    <div class="time-input-group">
+
+                                        <label>
+                                            Начало
+                                        </label>
+
+                                        <input type="time"
+                                               class="time-input"
+                                               data-time-start
+                                               name="TimeSlots[0].StartTime"
+                                               value="08:00"
+                                               required />
+
+                                    </div>
+
+                                    <span class="time-dash">
+                                        —
+                                    </span>
+
+                                    <div class="time-input-group">
+
+                                        <label>
+                                            Окончание
+                                        </label>
+
+                                        <input type="time"
+                                               class="time-input"
+                                               data-time-end
+                                               name="TimeSlots[0].EndTime"
+                                               value="09:30"
+                                               required />
+
+                                    </div>
+
+                                    <button type="button"
+                                            class="remove-slot-button"
+                                            data-remove-slot
+                                            aria-label="Удалить интервал"
+                                            disabled>
+
+                                        <svg viewBox="0 0 24 24"
+                                             aria-hidden="true">
+
+                                            <path d="M6 6l12 12" />
+                                            <path d="M18 6 6 18" />
+
+                                        </svg>
+
+                                    </button>
+
+                                </div>
+                            }
+                            else
+                            {
+                                for (var i = 0; i < timeSlots.Count; i++)
+                                {
+                                    var slot = timeSlots[i];
+
+                                    <div class="time-slot-row"
+                                         data-slot-row>
+
+                                        <span class="slot-number">
+                                            @((i + 1).ToString("00"))
+                                        </span>
+
+                                        <div class="time-input-group">
+
+                                            <label>
+                                                Начало
+                                            </label>
+
+                                            <input type="time"
+                                                   class="time-input"
+                                                   data-time-start
+                                                   name="TimeSlots[@i].StartTime"
+                                                   value="@slot.StartTime.ToString(@"hh\:mm")"
+                                                   required />
+
+                                        </div>
+
+                                        <span class="time-dash">
+                                            —
+                                        </span>
+
+                                        <div class="time-input-group">
+
+                                            <label>
+                                                Окончание
+                                            </label>
+
+                                            <input type="time"
+                                                   class="time-input"
+                                                   data-time-end
+                                                   name="TimeSlots[@i].EndTime"
+                                                   value="@slot.EndTime.ToString(@"hh\:mm")"
+                                                   required />
+
+                                        </div>
+
+                                        <button type="button"
+                                                class="remove-slot-button"
+                                                data-remove-slot
+                                                aria-label="Удалить интервал">
+
+                                            <svg viewBox="0 0 24 24"
+                                                 aria-hidden="true">
+
+                                                <path d="M6 6l12 12" />
+                                                <path d="M18 6 6 18" />
+
+                                            </svg>
+
+                                        </button>
+
+                                    </div>
+                                }
+                            }
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         STEP 04 — RULES
+                         ================================================= -->
+
+                    <section class="generator-section"
+                             id="step-rules"
+                             data-step="step-rules">
+
+                        <div class="section-heading">
+
+                            <div class="section-heading-left">
+
+                                <span class="section-index">
+                                    04
+                                </span>
+
+                                <div>
+
+                                    <h2>
+                                        Ограничения генерации
+                                    </h2>
+
+                                    <p>
+                                        Настройте правила, которыми система будет руководствоваться.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="rules-grid">
+
+                            <div class="rule-card">
+
+                                <div class="rule-card-icon">
+                                    ≡
+                                </div>
+
+                                <div class="rule-card-content">
+
+                                    <label for="MaxLessonsPerDay">
+                                        Максимум занятий в день
+                                    </label>
+
+                                    <span>
+                                        Ограничивает количество пар для одной группы
+                                        в течение учебного дня.
+                                    </span>
+
+                                </div>
+
+                                <input type="number"
+                                       id="MaxLessonsPerDay"
+                                       name="MaxLessonsPerDay"
+                                       class="rule-number-input"
+                                       min="1"
+                                       max="10"
+                                       value="@Model.MaxLessonsPerDay"
+                                       required />
+
+                            </div>
+
+
+                            <div class="rule-card">
+
+                                <div class="rule-card-icon">
+                                    ↕
+                                </div>
+
+                                <div class="rule-card-content">
+
+                                    <label for="MaxConsecutiveLessons">
+                                        Максимум подряд
+                                    </label>
+
+                                    <span>
+                                        Сколько занятий одна группа может иметь
+                                        последовательно без перерыва.
+                                    </span>
+
+                                </div>
+
+                                <input type="number"
+                                       id="MaxConsecutiveLessons"
+                                       name="MaxConsecutiveLessons"
+                                       class="rule-number-input"
+                                       min="1"
+                                       max="10"
+                                       value="@Model.MaxConsecutiveLessons"
+                                       required />
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="rule-options">
+
+                            <label class="switch-card">
+
+                                <input type="checkbox"
+                                       name="DistributeLessons"
+                                       value="true"
+                                       @(Model.DistributeLessons ? "checked" : null) />
+
+                                <span class="switch-control">
+                                    <span></span>
+                                </span>
+
+                                <span class="switch-copy">
+
+                                    <strong>
+                                        Равномерно распределять занятия
+                                    </strong>
+
+                                    <small>
+                                        Стараться распределить нагрузку между выбранными днями.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+
+                            <label class="switch-card">
+
+                                <input type="checkbox"
+                                       name="UseClassroomRecommendations"
+                                       value="true"
+                                       @(Model.UseClassroomRecommendations ? "checked" : null) />
+
+                                <span class="switch-control">
+                                    <span></span>
+                                </span>
+
+                                <span class="switch-copy">
+
+                                    <strong>
+                                        Использовать рекомендации аудиторий
+                                    </strong>
+
+                                    <small>
+                                        Учитывать вместимость и требования предметов
+                                        при выборе аудитории.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         ACTIONS
+                         ================================================= -->
+
+                    <div class="generator-submit-area">
+
+                        <div class="submit-info">
+
+                            <span class="submit-info-icon">
+                                ✓
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Всё готово к генерации
+                                </strong>
+
+                                <span>
+                                    Перед созданием расписания система дополнительно
+                                    проверит доступность ресурсов.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <button type="submit"
+                                class="generate-button">
+
+                            <span class="generate-button-icon">
+
+                                <svg viewBox="0 0 24 24"
+                                     aria-hidden="true">
+
+                                    <path d="M12 3v4" />
+                                    <path d="M12 17v4" />
+                                    <path d="M3 12h4" />
+                                    <path d="M17 12h4" />
+                                    <path d="m5.64 5.64 2.83 2.83" />
+                                    <path d="m15.53 15.53 2.83 2.83" />
+                                    <path d="m5.64 18.36 2.83-2.83" />
+                                    <path d="m15.53 8.47 2.83-2.83" />
+                                    <circle cx="12" cy="12" r="3.5" />
+
+                                </svg>
+
+                            </span>
+
+                            <span>
+                                Сгенерировать расписание
+                            </span>
+
+                            <span class="generate-arrow">
+                                →
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </main>
+
+
+            <!-- =========================================================
+                 SUMMARY
+                 ========================================================= -->
+
+            <aside class="generator-sidebar">
+
+                <div class="summary-card">
+
+                    <div class="summary-header">
+
+                        <div>
+
+                            <span class="summary-eyebrow">
+                                СВОДКА
+                            </span>
+
+                            <h2>
+                                Параметры генерации
+                            </h2>
+
+                        </div>
+
+                        <span class="summary-live">
+                            LIVE
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-metrics">
+
+                        <div class="summary-metric">
+
+                            <span class="metric-value"
+                                  id="summaryGroups">
+                                0
+                            </span>
+
+                            <span class="metric-label">
+                                групп
+                            </span>
+
+                        </div>
+
+                        <div class="summary-metric">
+
+                            <span class="metric-value"
+                                  id="summaryDays">
+                                0
+                            </span>
+
+                            <span class="metric-label">
+                                дней
+                            </span>
+
+                        </div>
+
+                        <div class="summary-metric">
+
+                            <span class="metric-value"
+                                  id="summarySlots">
+                                0
+                            </span>
+
+                            <span class="metric-label">
+                                интервалов
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-load">
+
+                        <div class="summary-load-top">
+
+                            <span>
+                                Учебная нагрузка
+                            </span>
+
+                            <span class="summary-auto-badge">
+                                Авто
+                            </span>
+
+                        </div>
+
+                        <strong>
+                            Определяется автоматически
+                        </strong>
+
+                        <span>
+                            На основании нагрузки предметов
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-divider"></div>
+
+
+                    <div class="summary-list">
+
+                        <div class="summary-list-row">
+
+                            <span>
+                                Максимум в день
+                            </span>
+
+                            <strong id="summaryMaxLessons">
+                                @Model.MaxLessonsPerDay
+                            </strong>
+
+                        </div>
+
+                        <div class="summary-list-row">
+
+                            <span>
+                                Подряд
+                            </span>
+
+                            <strong id="summaryMaxConsecutive">
+                                @Model.MaxConsecutiveLessons
+                            </strong>
+
+                        </div>
+
+                        <div class="summary-list-row">
+
+                            <span>
+                                Распределение
+                            </span>
+
+                            <strong id="summaryDistribution">
+                                @(Model.DistributeLessons ? "Вкл." : "Выкл.")
+                            </strong>
+
+                        </div>
+
+                        <div class="summary-list-row">
+
+                            <span>
+                                Аудитории
+                            </span>
+
+                            <strong id="summaryClassrooms">
+                                @(Model.UseClassroomRecommendations
+                                    ? "Авто"
+                                    : "Стандарт")
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-footer">
+
+                        <div class="summary-footer-icon">
+                            i
+                        </div>
+
+                        <span>
+                            После запуска система проверит пересечения
+                            преподавателей, групп и аудиторий.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <a href="/Account/Settings"
+                   class="settings-shortcut">
+
+                    <span class="settings-shortcut-icon">
+
+                        <svg viewBox="0 0 24 24"
+                             aria-hidden="true">
+
+                            <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+
+                            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 1.7-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2.4v-.2a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.7-1.7.06-.06A1.7 1.7 0 0 0 8.46 15a1.7 1.7 0 0 0-1.56-1.03H6.7v-2.4h.2A1.7 1.7 0 0 0 8.46 10a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.7-1.7.06.06A1.7 1.7 0 0 0 13.54 8a1.7 1.7 0 0 0 1.03-1.56V5h2.4v.2a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.7 1.7-.06.06A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.56 1.03h.2v2.4h-.2A1.7 1.7 0 0 0 19.4 15Z" />
+
+                        </svg>
+
+                    </span>
+
+                    <span class="settings-shortcut-copy">
+
+                        <strong>
+                            Настройки программы
+                        </strong>
+
+                        <small>
+                            Нагрузка и другие параметры системы
+                        </small>
+
+                    </span>
+
+                    <span class="settings-shortcut-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form =
+            document.getElementById("generatorForm");
+
+        const groupsGrid =
+            document.getElementById("groupsGrid");
+
+        const selectAllButton =
+            document.getElementById("selectAllGroups");
+
+        const timeSlotsList =
+            document.getElementById("timeSlotsList");
+
+        const addTimeSlotButton =
+            document.getElementById("addTimeSlot");
+
+        const summaryGroups =
+            document.getElementById("summaryGroups");
+
+        const summaryDays =
+            document.getElementById("summaryDays");
+
+        const summarySlots =
+            document.getElementById("summarySlots");
+
+        const summaryMaxLessons =
+            document.getElementById("summaryMaxLessons");
+
+        const summaryMaxConsecutive =
+            document.getElementById("summaryMaxConsecutive");
+
+        const summaryDistribution =
+            document.getElementById("summaryDistribution");
+
+        const summaryClassrooms =
+            document.getElementById("summaryClassrooms");
+
+
+        function getGroupInputs() {
+
+            return document.querySelectorAll(
+                ".group-checkbox-input"
+            );
+
+        }
+
+
+        function getDayInputs() {
+
+            return document.querySelectorAll(
+                ".day-card input[type='checkbox']"
+            );
+
+        }
+
+
+        function updateGroupCards() {
+
+            getGroupInputs().forEach(input => {
+
+                const card =
+                    input.closest(".group-card");
+
+                if (!card) {
+                    return;
+                }
+
+                card.classList.toggle(
+                    "is-selected",
+                    input.checked
+                );
+
+            });
+
+        }
+
+
+        function updateDayCards() {
+
+            getDayInputs().forEach(input => {
+
+                const card =
+                    input.closest(".day-card");
+
+                if (!card) {
+                    return;
+                }
+
+                card.classList.toggle(
+                    "is-selected",
+                    input.checked
+                );
+
+            });
+
+        }
+
+
+        function updateSelectAllButton() {
+
+            if (!selectAllButton) {
+                return;
+            }
+
+            const inputs =
+                Array.from(getGroupInputs());
+
+            if (inputs.length === 0) {
+                return;
+            }
+
+            const selectedCount =
+                inputs.filter(
+                    input => input.checked
+                ).length;
+
+            selectAllButton.textContent =
+                selectedCount === inputs.length
+                    ? "Снять выбор"
+                    : "Выбрать все";
+
+        }
+
+
+        function updateSummary() {
+
+            const groupsCount =
+                Array.from(getGroupInputs())
+                    .filter(input => input.checked)
+                    .length;
+
+            const daysCount =
+                Array.from(getDayInputs())
+                    .filter(input => input.checked)
+                    .length;
+
+            const slotsCount =
+                timeSlotsList
+                    ? timeSlotsList.querySelectorAll(
+                        "[data-slot-row]"
+                    ).length
+                    : 0;
+
+            if (summaryGroups) {
+                summaryGroups.textContent =
+                    groupsCount;
+            }
+
+            if (summaryDays) {
+                summaryDays.textContent =
+                    daysCount;
+            }
+
+            if (summarySlots) {
+                summarySlots.textContent =
+                    slotsCount;
+            }
+
+
+            if (summaryMaxLessons) {
+
+                const input =
+                    document.getElementById(
+                        "MaxLessonsPerDay"
+                    );
+
+                summaryMaxLessons.textContent =
+                    input?.value || "—";
+
+            }
+
+
+            if (summaryMaxConsecutive) {
+
+                const input =
+                    document.getElementById(
+                        "MaxConsecutiveLessons"
+                    );
+
+                summaryMaxConsecutive.textContent =
+                    input?.value || "—";
+
+            }
+
+
+            if (summaryDistribution) {
+
+                const input =
+                    document.querySelector(
+                        "input[name='DistributeLessons']"
+                    );
+
+                summaryDistribution.textContent =
+                    input?.checked
+                        ? "Вкл."
+                        : "Выкл.";
+
+            }
+
+
+            if (summaryClassrooms) {
+
+                const input =
+                    document.querySelector(
+                        "input[name='UseClassroomRecommendations']"
+                    );
+
+                summaryClassrooms.textContent =
+                    input?.checked
+                        ? "Авто"
+                        : "Стандарт";
+
+            }
+
+        }
+
+
+        function updateSlotNumbers() {
+
+            if (!timeSlotsList) {
+                return;
+            }
+
+            const rows =
+                timeSlotsList.querySelectorAll(
+                    "[data-slot-row]"
+                );
+
+            rows.forEach((row, index) => {
+
+                const number =
+                    row.querySelector(
+                        ".slot-number"
+                    );
+
+                if (number) {
+
+                    number.textContent =
+                        String(index + 1)
+                            .padStart(2, "0");
+
+                }
+
+
+                const start =
+                    row.querySelector(
+                        "[data-time-start]"
+                    );
+
+                const end =
+                    row.querySelector(
+                        "[data-time-end]"
+                    );
+
+
+                if (start) {
+
+                    start.name =
+                        `TimeSlots[${index}].StartTime`;
+
+                }
+
+
+                if (end) {
+
+                    end.name =
+                        `TimeSlots[${index}].EndTime`;
+
+                }
+
+
+                const remove =
+                    row.querySelector(
+                        "[data-remove-slot]"
+                    );
+
+                if (remove) {
+
+                    remove.disabled =
+                        rows.length <= 1;
+
+                }
+
+            });
+
+            updateSummary();
+
+        }
+
+
+        function createTimeSlot() {
+
+            if (!timeSlotsList) {
+                return;
+            }
+
+            const index =
+                timeSlotsList.querySelectorAll(
+                    "[data-slot-row]"
+                ).length;
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "time-slot-row";
+
+            row.dataset.slotRow =
+                "";
+
+
+            row.innerHTML = `
+                <span class="slot-number">
+                    ${String(index + 1).padStart(2, "0")}
+                </span>
+
+                <div class="time-input-group">
+
+                    <label>
+                        Начало
+                    </label>
+
+                    <input
+                        type="time"
+                        class="time-input"
+                        data-time-start
+                        name="TimeSlots[${index}].StartTime"
+                        value="08:00"
+                        required />
+
+                </div>
+
+                <span class="time-dash">
+                    —
+                </span>
+
+                <div class="time-input-group">
+
+                    <label>
+                        Окончание
+                    </label>
+
+                    <input
+                        type="time"
+                        class="time-input"
+                        data-time-end
+                        name="TimeSlots[${index}].EndTime"
+                        value="09:30"
+                        required />
+
+                </div>
+
+                <button
+                    type="button"
+                    class="remove-slot-button"
+                    data-remove-slot
+                    aria-label="Удалить интервал">
+
+                    <svg viewBox="0 0 24 24"
+                         aria-hidden="true">
+
+                        <path d="M6 6l12 12" />
+                        <path d="M18 6 6 18" />
+
+                    </svg>
+
+                </button>
+            `;
+
+
+            timeSlotsList.appendChild(row);
+
+            updateSlotNumbers();
+
+        }
+
+
+        /*
+         * Выбор всех групп.
+         */
+
+        if (selectAllButton) {
+
+            selectAllButton.addEventListener(
+                "click",
+                function () {
+
+                    const inputs =
+                        Array.from(
+                            getGroupInputs()
+                        );
+
+                    if (inputs.length === 0) {
+                        return;
+                    }
+
+                    const shouldSelect =
+                        inputs.some(
+                            input => !input.checked
+                        );
+
+                    inputs.forEach(input => {
+
+                        input.checked =
+                            shouldSelect;
+
+                    });
+
+                    updateGroupCards();
+                    updateSelectAllButton();
+                    updateSummary();
+
+                }
+            );
+
+        }
+
+
+        /*
+         * Изменение элементов формы.
+         */
+
+        document.addEventListener(
+            "change",
+            function (event) {
+
+                if (
+                    event.target.matches(
+                        ".group-checkbox-input"
+                    )
+                ) {
+
+                    updateGroupCards();
+                    updateSelectAllButton();
+                    updateSummary();
+
+                }
+
+
+                if (
+                    event.target.matches(
+                        ".day-card input[type='checkbox']"
+                    )
+                ) {
+
+                    updateDayCards();
+                    updateSummary();
+
+                }
+
+
+                if (
+                    event.target.matches(
+                        "#MaxLessonsPerDay"
+                    ) ||
+                    event.target.matches(
+                        "#MaxConsecutiveLessons"
+                    ) ||
+                    event.target.matches(
+                        "input[name='DistributeLessons']"
+                    ) ||
+                    event.target.matches(
+                        "input[name='UseClassroomRecommendations']"
+                    )
+                ) {
+
+                    updateSummary();
+
+                }
+
+            }
+        );
+
+
+        /*
+         * Добавление нового временного интервала.
+         */
+
+        if (addTimeSlotButton) {
+
+            addTimeSlotButton.addEventListener(
+                "click",
+                function () {
+
+                    createTimeSlot();
+
+                }
+            );
+
+        }
+
+
+        /*
+         * Удаление временного интервала.
+         */
+
+        if (timeSlotsList) {
+
+            timeSlotsList.addEventListener(
+                "click",
+                function (event) {
+
+                    const button =
+                        event.target.closest(
+                            "[data-remove-slot]"
+                        );
+
+                    if (!button) {
+                        return;
+                    }
+
+
+                    const rows =
+                        timeSlotsList.querySelectorAll(
+                            "[data-slot-row]"
+                        );
+
+
+                    if (rows.length <= 1) {
+                        return;
+                    }
+
+
+                    const row =
+                        button.closest(
+                            "[data-slot-row]"
+                        );
+
+
+                    if (row) {
+                        row.remove();
+                    }
+
+
+                    updateSlotNumbers();
+
+                }
+            );
+
+        }
+
+
+        /*
+         * Клиентская проверка перед отправкой.
+         *
+         * Серверная проверка всё равно обязательна.
+         */
+
+        if (form) {
+
+            form.addEventListener(
+                "submit",
+                function (event) {
+
+                    const selectedGroups =
+                        Array.from(
+                            getGroupInputs()
+                        ).filter(
+                            input => input.checked
+                        );
+
+
+                    if (selectedGroups.length === 0) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Выберите хотя бы одну группу."
+                        );
+
+                        return;
+                    }
+
+
+                    const selectedDays =
+                        Array.from(
+                            getDayInputs()
+                        ).filter(
+                            input => input.checked
+                        );
+
+
+                    if (selectedDays.length === 0) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Выберите хотя бы один учебный день."
+                        );
+
+                        return;
+                    }
+
+
+                    if (!timeSlotsList) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Не удалось найти список временных интервалов."
+                        );
+
+                        return;
+                    }
+
+
+                    const rows =
+                        Array.from(
+                            timeSlotsList.querySelectorAll(
+                                "[data-slot-row]"
+                            )
+                        );
+
+
+                    if (rows.length === 0) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Добавьте хотя бы один временной интервал."
+                        );
+
+                        return;
+                    }
+
+
+                    for (
+                        let i = 0;
+                        i < rows.length;
+                        i++
+                    ) {
+
+                        const start =
+                            rows[i]
+                                .querySelector(
+                                    "[data-time-start]"
+                                )
+                                ?.value;
+
+                        const end =
+                            rows[i]
+                                .querySelector(
+                                    "[data-time-end]"
+                                )
+                                ?.value;
+
+
+                        if (!start || !end) {
+
+                            event.preventDefault();
+
+                            alert(
+                                `Заполните время в интервале №${i + 1}.`
+                            );
+
+                            return;
+                        }
+
+
+                        if (start >= end) {
+
+                            event.preventDefault();
+
+                            alert(
+                                `В интервале №${i + 1} время окончания должно быть позже времени начала.`
+                            );
+
+                            return;
+                        }
+
+                    }
+
+
+                    const maxLessons =
+                        Number(
+                            document.getElementById(
+                                "MaxLessonsPerDay"
+                            )?.value
+                        );
+
+                    if (
+                        !Number.isInteger(maxLessons) ||
+                        maxLessons < 1 ||
+                        maxLessons > 10
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Максимум занятий в день должен быть от 1 до 10."
+                        );
+
+                        return;
+                    }
+
+
+                    const maxConsecutive =
+                        Number(
+                            document.getElementById(
+                                "MaxConsecutiveLessons"
+                            )?.value
+                        );
+
+                    if (
+                        !Number.isInteger(maxConsecutive) ||
+                        maxConsecutive < 1 ||
+                        maxConsecutive > 10
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Максимум занятий подряд должен быть от 1 до 10."
+                        );
+
+                        return;
+                    }
+
+                }
+            );
+
+        }
+
+
+        /*
+         * Переходы между этапами.
+         */
+
+        document
+            .querySelectorAll("[data-step-link]")
+            .forEach(link => {
+
+                link.addEventListener(
+                    "click",
+                    function (event) {
+
+                        const targetId =
+                            this.dataset.stepLink;
+
+                        const target =
+                            document.getElementById(
+                                targetId
+                            );
+
+                        if (!target) {
+                            return;
+                        }
+
+                        event.preventDefault();
+
+                        target.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+
+                    }
+                );
+
+            });
+
+
+        /*
+         * Определение активного этапа
+         * при прокрутке страницы.
+         */
+
+        const sections =
+            document.querySelectorAll(
+                ".generator-section[data-step]"
+            );
+
+        const stepLinks =
+            document.querySelectorAll(
+                "[data-step-link]"
+            );
+
+
+        if (
+            "IntersectionObserver" in window
+        ) {
+
+            const observer =
+                new IntersectionObserver(
+                    entries => {
+
+                        entries.forEach(
+                            entry => {
+
+                                if (
+                                    !entry.isIntersecting
+                                ) {
+                                    return;
+                                }
+
+
+                                const id =
+                                    entry.target.dataset.step;
+
+
+                                stepLinks.forEach(
+                                    link => {
+
+                                        link.classList.toggle(
+                                            "is-active",
+                                            link.dataset.stepLink === id
+                                        );
+
+                                    }
+                                );
+
+                            }
+                        );
+
+                    },
+                    {
+                        rootMargin:
+                            "-25% 0px -60% 0px",
+
+                        threshold: 0
+                    }
+                );
+
+
+            sections.forEach(
+                section => {
+
+                    observer.observe(
+                        section
+                    );
+
+                }
+            );
+
+        }
+
+
+        /*
+         * Первичная инициализация.
+         */
+
+        updateGroupCards();
+        updateDayCards();
+        updateSelectAllButton();
+        updateSlotNumbers();
+        updateSummary();
+
+    });
+</script>

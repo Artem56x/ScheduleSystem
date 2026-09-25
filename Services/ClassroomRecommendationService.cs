@@ -19,17 +19,30 @@ public class ClassroomRecommendationService
         Subject subject,
         Group group)
     {
+        var requiredCategoryIds = subject
+            .ClassroomCategoryRequirements
+            .Select(x => x.ClassroomCategoryId)
+            .Distinct()
+            .ToList();
+
         var classrooms = await _context.Classrooms
             .AsNoTracking()
             .Include(c => c.ClassroomCategory)
             .Where(c =>
                 c.Id != schedule.ClassroomId &&
-                c.Capacity >= group.StudentCount &&
-                (!subject.RequiresComputers ||
-                 c.HasComputers))
+                c.Capacity >= group.StudentCount)
             .OrderBy(c => c.Capacity)
             .ThenBy(c => c.Name)
             .ToListAsync();
+
+        if (requiredCategoryIds.Count > 0)
+        {
+            classrooms = classrooms
+                .Where(c =>
+                    requiredCategoryIds.Contains(
+                        c.ClassroomCategoryId))
+                .ToList();
+        }
 
         if (classrooms.Count == 0)
         {

@@ -277,3 +277,221 @@
             width: 100%;
         }
     }
+
+    /* =========================================================
+   REQUIREMENTS
+   ========================================================= */
+
+.requirements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.requirement-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    width: 100%;
+    padding: 20px 22px;
+
+    border: 1px solid rgba(120, 150, 190, 0.16);
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 8px 25px rgba(40, 80, 130, 0.06);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.requirement-card:hover {
+    transform: translateY(-1px);
+
+    border-color: rgba(70, 130, 220, 0.25);
+
+    box-shadow:
+        0 12px 30px rgba(40, 80, 130, 0.10);
+}
+
+.requirement-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.requirement-icon {
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background: rgba(80, 140, 220, 0.10);
+
+    font-size: 23px;
+}
+
+.requirement-text {
+    min-width: 0;
+}
+
+.requirement-title {
+    font-size: 16px;
+    font-weight: 650;
+    color: #172033;
+}
+
+.requirement-description {
+    margin-top: 4px;
+
+    font-size: 13px;
+    line-height: 1.45;
+
+    color: #718096;
+}
+
+.switch {
+    position: relative;
+
+    width: 52px;
+    height: 31px;
+
+    flex: 0 0 52px;
+}
+
+.switch input {
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+
+    border-radius: 999px;
+
+    background: #d8dee8;
+
+    transition: 0.25s ease;
+}
+
+.slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 25px;
+    height: 25px;
+
+    left: 3px;
+    top: 3px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.18);
+
+    transition: 0.25s ease;
+}
+
+.switch input:checked + .slider {
+    background: #4d8fe8;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(21px);
+}
+
+.switch input:focus-visible + .slider {
+    outline: 3px solid rgba(77, 143, 232, 0.22);
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   EMPTY REQUIREMENTS
+   ========================================================= */
+
+.empty-requirements {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    margin-top: 20px;
+    padding: 18px 20px;
+
+    border-radius: 18px;
+
+    background: rgba(245, 247, 250, 0.9);
+    border: 1px solid rgba(120, 140, 170, 0.14);
+}
+
+.empty-requirements-icon {
+    font-size: 28px;
+}
+
+.empty-requirements strong {
+    display: block;
+
+    font-size: 15px;
+    color: #172033;
+}
+
+.empty-requirements p {
+    margin: 4px 0 0;
+
+    font-size: 13px;
+    color: #718096;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    .requirement-card {
+        padding: 16px;
+    }
+
+    .requirement-info {
+        gap: 12px;
+    }
+
+    .requirement-icon {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+
+        font-size: 20px;
+    }
+
+    .requirement-title {
+        font-size: 14px;
+    }
+
+    .requirement-description {
+        font-size: 12px;
+    }
+
+}

@@ -27,6 +27,10 @@ namespace ScheduleSystem.Data
         // Расписание
         public DbSet<Schedule> Schedules { get; set; }
 
+        public DbSet<ScheduleTimeSlot> ScheduleTimeSlots { get; set; }
+
+        public DbSet<ScheduleGenerationSettings> ScheduleGenerationSettings { get; set; }
+
         // Категории аудиторий
         public DbSet<ClassroomCategory> ClassroomCategories { get; set; }
 
@@ -36,9 +40,32 @@ namespace ScheduleSystem.Data
         // Журнал
         public DbSet<AuditLog> AuditLogs { get; set; }
 
+        public DbSet<GroupSubject> GroupSubjects { get; set; }
+
+        public DbSet<SubjectClassroomCategory> SubjectClassroomCategories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<SubjectClassroomCategory>()
+                .HasKey(x => new
+                {
+                    x.SubjectId,
+                    x.ClassroomCategoryId
+                });
+
+            modelBuilder.Entity<SubjectClassroomCategory>()
+                .HasOne(x => x.Subject)
+                .WithMany(x => x.ClassroomCategoryRequirements)
+                .HasForeignKey(x => x.SubjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SubjectClassroomCategory>()
+                .HasOne(x => x.ClassroomCategory)
+                .WithMany(x => x.SubjectRequirements)
+                .HasForeignKey(x => x.ClassroomCategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // ==============================
             // Schedule → Teacher

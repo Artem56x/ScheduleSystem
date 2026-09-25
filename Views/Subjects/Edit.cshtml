@@ -2,6 +2,16 @@
 
 @{
     ViewData["Title"] = "Редактировать предмет";
+
+    var classroomCategories =
+        ViewBag.ClassroomCategories
+        as IEnumerable<ScheduleSystem.Models.ClassroomCategory>
+        ?? Enumerable.Empty<ScheduleSystem.Models.ClassroomCategory>();
+
+    var selectedCategoryIds =
+        ViewBag.SelectedClassroomCategoryIds
+        as IEnumerable<int>
+        ?? Enumerable.Empty<int>();
 }
 
 @section Styles {
@@ -17,81 +27,157 @@
         </div>
     </div>
 
-    <div class="glass-form-card">
+    <form asp-action="Edit" method="post" class="subject-form">
 
-        <div class="form-icon">
-            ✏️
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Id" />
+
+        <div asp-validation-summary="ModelOnly" class="validation-summary">
         </div>
 
-        <div class="form-title">
-            <h2>Информация о предмете</h2>
-            <p>Измените необходимые данные.</p>
-        </div>
-
-        <form asp-action="Edit" method="post">
-
-            @Html.AntiForgeryToken()
-
-            <input type="hidden" asp-for="Id" />
-
-            <div asp-validation-summary="ModelOnly" class="glass-validation"></div>
+        <!-- Основная информация -->
+        <div class="form-card">
 
             <div class="form-group">
-                <label asp-for="Name" class="form-label">
-                    Название предмета
-                </label>
 
-                <input asp-for="Name" class="form-control glass-input" placeholder="Например: Информатика" />
+                <label asp-for="Name"></label>
 
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <input asp-for="Name" class="form-control" />
+
+                <span asp-validation-for="Name" class="field-validation">
+                </span>
+
             </div>
 
-            <div class="computer-option">
+            <div class="form-row">
 
-                <div class="computer-info">
-                    <div class="computer-icon">
-                        💻
-                    </div>
+                <div class="form-group">
 
-                    <div>
-                        <div class="computer-title">
-                            Требуются компьютеры
-                        </div>
+                    <label asp-for="Course"></label>
 
-                        <div class="computer-description">
-                            Для проведения этого предмета необходим компьютерный класс
-                        </div>
-                    </div>
+                    <select asp-for="Course" class="form-control">
+
+                        <option value="1">1 курс</option>
+                        <option value="2">2 курс</option>
+                        <option value="3">3 курс</option>
+                        <option value="4">4 курс</option>
+                        <option value="5">5 курс</option>
+
+                    </select>
+
+                    <span asp-validation-for="Course" class="field-validation">
+                    </span>
+
                 </div>
 
-                <label class="switch">
-                    <input asp-for="RequiresComputers" />
-                    <span class="slider"></span>
+                <div class="form-group">
+
+                    <label asp-for="Type"></label>
+
+                    <select asp-for="Type" asp-items="Html.GetEnumSelectList<ScheduleSystem.Models.SubjectType>()"
+                            class="form-control">
+                    </select>
+
+                    <span asp-validation-for="Type" class="field-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Требования к аудитории -->
+        <div class="requirements-list">
+
+            @foreach (var category in classroomCategories)
+            {
+                var isSelected =
+                    selectedCategoryIds.Contains(category.Id);
+
+                <label class="requirement-card">
+
+                    <div class="requirement-info">
+
+                        <div class="requirement-icon">
+                            🏫
+                        </div>
+
+                        <div class="requirement-text">
+
+                            <div class="requirement-title">
+                                Требуется @category.Name
+                            </div>
+
+                            <div class="requirement-description">
+                                Занятие должно проводиться
+                                в помещении категории
+                                «@category.Name».
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <span class="switch">
+
+                        <input type="checkbox" name="selectedClassroomCategoryIds" value="@category.Id"
+                               checked="@isSelected" />
+
+                        <span class="slider"></span>
+
+                    </span>
+
                 </label>
+            }
+
+        </div>
+
+        @if (!classroomCategories.Any())
+        {
+            <div class="empty-requirements">
+
+                <div class="empty-requirements-icon">
+                    🏫
+                </div>
+
+                <div>
+
+                    <strong>
+                        Категории аудиторий пока не созданы
+                    </strong>
+
+                    <p>
+                        Добавьте категории аудиторий,
+                        чтобы использовать их как требования предметов.
+                    </p>
+
+                </div>
 
             </div>
+        }
 
-            <div class="form-actions">
+        <div class="form-actions">
 
-                <button type="submit" class="btn save-btn">
-                    Сохранить изменения
-                </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                Отмена
+            </a>
 
-                <a asp-action="Index" class="btn cancel-btn">
-                    Отмена
-                </a>
+            <button type="submit" class="btn btn-primary">
+                Сохранить изменения
+            </button>
 
-            </div>
+        </div>
 
-        </form>
+    </form>
 
-    </div>
-
-   
 </div>
 
 @section Scripts {
+
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
 }

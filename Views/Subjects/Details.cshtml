@@ -2,6 +2,19 @@
 
 @{
     ViewData["Title"] = "Информация о предмете";
+
+    var requirements =
+        Model.ClassroomCategoryRequirements?
+            .Where(x => x.ClassroomCategory != null)
+            .ToList()
+        ?? new List<ScheduleSystem.Models.SubjectClassroomCategory>();
+
+    var subjectTypeName = Model.Type switch
+    {
+        ScheduleSystem.Models.SubjectType.General => "Общеобразовательный",
+        ScheduleSystem.Models.SubjectType.Special => "Специальный",
+        _ => Model.Type.ToString()
+    };
 }
 
 @section Styles {
@@ -11,32 +24,50 @@
 <div class="subject-details-page">
 
     <div class="page-header">
+
         <div>
             <h1>Информация о предмете</h1>
-            <p>Подробная информация об учебном предмете</p>
+
+            <p>
+                Подробная информация об учебном предмете
+            </p>
         </div>
+
     </div>
 
     <div class="glass-details-card">
 
+        <!-- PROFILE -->
         <div class="subject-profile">
 
             <div class="subject-avatar">
+
                 @(string.IsNullOrWhiteSpace(Model.Name)
                     ? "?"
                     : Model.Name.Substring(0, 1).ToUpper())
+
             </div>
 
             <div>
-                <h2>@Model.Name</h2>
-                <p>Учебный предмет</p>
+
+                <h2>
+                    @Model.Name
+                </h2>
+
+                <p>
+                    Учебный предмет
+                </p>
+
             </div>
 
         </div>
 
+        <!-- DETAILS -->
         <div class="details-list">
 
+            <!-- NAME -->
             <div class="detail-row">
+
                 <div class="detail-label">
                     Название
                 </div>
@@ -44,10 +75,83 @@
                 <div class="detail-value">
                     @Model.Name
                 </div>
+
             </div>
+
+            <!-- COURSE -->
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Курс
+                </div>
+
+                <div class="detail-value">
+                    @Model.Course курс
+                </div>
+
+            </div>
+
+            <!-- TYPE -->
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Тип предмета
+                </div>
+
+                <div class="detail-value">
+                    @subjectTypeName
+                </div>
+
+            </div>
+
+            <!-- CLASSROOM REQUIREMENTS -->
+            @if (requirements.Any())
+            {
+                <div class="detail-row requirements-row">
+
+                    <div class="detail-label">
+                        Требования к аудитории
+                    </div>
+
+                    <div class="detail-value">
+
+                        <div class="requirements-details">
+
+                            @foreach (var requirement in requirements)
+                            {
+                                <span class="requirement-badge">
+                                    🏫 @requirement.ClassroomCategory.Name
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="detail-row requirements-row">
+
+                    <div class="detail-label">
+                        Требования к аудитории
+                    </div>
+
+                    <div class="detail-value">
+
+                        <span class="status-badge">
+                            Без специальных требований
+                        </span>
+
+                    </div>
+
+                </div>
+            }
 
         </div>
 
+        <!-- ACTIONS -->
         <div class="details-actions">
 
             @if (User.IsInRole("Admin"))

@@ -268,9 +268,6 @@ namespace ScheduleSystem.Migrations
                     b.Property<int>("ClassroomCategoryId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("HasComputers")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -331,6 +328,32 @@ namespace ScheduleSystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("ScheduleSystem.Models.GroupSubject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WeeklyLessons")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("GroupSubjects");
                 });
 
             modelBuilder.Entity("ScheduleSystem.Models.Notification", b =>
@@ -417,6 +440,59 @@ namespace ScheduleSystem.Migrations
                     b.ToTable("Schedules");
                 });
 
+            modelBuilder.Entity("ScheduleSystem.Models.ScheduleGenerationSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AllowGaps")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("DefaultWeeklyLessons")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxGapsPerDay")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxLessonsPerDay")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TeachingDaysPerWeek")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScheduleGenerationSettings");
+                });
+
+            modelBuilder.Entity("ScheduleSystem.Models.ScheduleTimeSlot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("interval");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("interval");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScheduleTimeSlots");
+                });
+
             modelBuilder.Entity("ScheduleSystem.Models.Subject", b =>
                 {
                     b.Property<int>("Id")
@@ -425,17 +501,35 @@ namespace ScheduleSystem.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Course")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<bool>("RequiresComputers")
-                        .HasColumnType("boolean");
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.ToTable("Subjects");
+                });
+
+            modelBuilder.Entity("ScheduleSystem.Models.SubjectClassroomCategory", b =>
+                {
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ClassroomCategoryId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("SubjectId", "ClassroomCategoryId");
+
+                    b.HasIndex("ClassroomCategoryId");
+
+                    b.ToTable("SubjectClassroomCategories");
                 });
 
             modelBuilder.Entity("ScheduleSystem.Models.Teacher", b =>
@@ -538,6 +632,25 @@ namespace ScheduleSystem.Migrations
                     b.Navigation("ClassroomCategory");
                 });
 
+            modelBuilder.Entity("ScheduleSystem.Models.GroupSubject", b =>
+                {
+                    b.HasOne("ScheduleSystem.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ScheduleSystem.Models.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("ScheduleSystem.Models.Notification", b =>
                 {
                     b.HasOne("ScheduleSystem.Models.ApplicationUser", "User")
@@ -584,6 +697,25 @@ namespace ScheduleSystem.Migrations
                     b.Navigation("Teacher");
                 });
 
+            modelBuilder.Entity("ScheduleSystem.Models.SubjectClassroomCategory", b =>
+                {
+                    b.HasOne("ScheduleSystem.Models.ClassroomCategory", "ClassroomCategory")
+                        .WithMany("SubjectRequirements")
+                        .HasForeignKey("ClassroomCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ScheduleSystem.Models.Subject", "Subject")
+                        .WithMany("ClassroomCategoryRequirements")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassroomCategory");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("ScheduleSystem.Models.Teacher", b =>
                 {
                     b.HasOne("ScheduleSystem.Models.Subject", "Subject")
@@ -596,6 +728,13 @@ namespace ScheduleSystem.Migrations
             modelBuilder.Entity("ScheduleSystem.Models.ClassroomCategory", b =>
                 {
                     b.Navigation("Classrooms");
+
+                    b.Navigation("SubjectRequirements");
+                });
+
+            modelBuilder.Entity("ScheduleSystem.Models.Subject", b =>
+                {
+                    b.Navigation("ClassroomCategoryRequirements");
                 });
 #pragma warning restore 612, 618
         }

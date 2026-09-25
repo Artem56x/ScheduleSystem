@@ -10,6 +10,7 @@
 
 <div class="classroom-form-page">
 
+
     <div class="page-header">
         <div>
             <h1>Редактировать аудиторию</h1>
@@ -25,7 +26,7 @@
 
         <div class="form-title">
             <h2>Информация об аудитории</h2>
-            <p>Измените номер, категорию, количество мест и оборудование.</p>
+            <p>Измените номер, категорию и количество мест.</p>
         </div>
 
         <form asp-action="Edit" method="post">
@@ -90,43 +91,6 @@
 
             </div>
 
-            <!-- КОМПЬЮТЕРЫ -->
-
-            <div class="equipment-option">
-
-                <div class="equipment-info">
-
-                    <div class="equipment-icon">
-                        💻
-                    </div>
-
-                    <div>
-
-                        <div class="equipment-title">
-                            Есть компьютеры
-                        </div>
-
-                        <div class="equipment-description">
-                            В аудитории установлены компьютеры
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <label class="switch">
-
-                    <input asp-for="HasComputers" />
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-            <span asp-validation-for="HasComputers" class="text-danger">
-            </span>
-
             <!-- КНОПКИ -->
 
             <div class="form-actions">
@@ -145,12 +109,15 @@
 
     </div>
 
+
 </div>
 
 @section Scripts {
 
+
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
 
 }

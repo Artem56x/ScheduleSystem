@@ -65,6 +65,8 @@ public class ScheduleValidationService
 
         var subject = await _context.Subjects
             .AsNoTracking()
+            .Include(s => s.ClassroomCategoryRequirements)
+                .ThenInclude(x => x.ClassroomCategory)
             .FirstOrDefaultAsync(
                 s => s.Id == schedule.SubjectId);
 
@@ -153,19 +155,79 @@ public class ScheduleValidationService
         }
 
         // --------------------------------------------------------
-        // Требование компьютеров
+        // Требования к категории аудитории
+        // --------------------------------------------------------
+        //
+        // Теперь предмет не содержит RequiresComputers.
+        //
+        // Если у предмета есть требования к категориям,
+        // выбранная аудитория должна соответствовать
+        // хотя бы одной из них.
+        //
+        // Например:
+        //
+        // Базы данных
+        // └── Компьютерный класс
+        //
+        // Аудитория 101
+        // └── Компьютерный класс
+        //
+        // => подходит.
+        //
+        // Если у предмета несколько категорий, они считаются
+        // альтернативными вариантами помещений (OR).
+        //
+        // Например:
+        //
+        // Электротехника
+        // ├── Лаборатория
+        // └── Мастерская
+        //
+        // Подойдёт либо лаборатория, либо мастерская.
         // --------------------------------------------------------
 
-        if (subject!.RequiresComputers &&
-            !classroom.HasComputers)
-        {
-            result.AddError(
-                "ClassroomId",
-                $"Предмет «{subject.Name}» требует компьютерную " +
-                $"аудиторию. В аудитории «{classroom.Name}» " +
-                $"компьютеров нет.");
+        var requiredCategoryIds = subject!
+            .ClassroomCategoryRequirements
+            .Where(x => x.ClassroomCategory != null)
+            .Select(x => x.ClassroomCategoryId)
+            .Distinct()
+            .ToList();
 
-            result.ClassroomRecommendationNeeded = true;
+        if (requiredCategoryIds.Count > 0)
+        {
+            var classroomCategoryId =
+                classroom!.ClassroomCategoryId;
+
+            if (!requiredCategoryIds.Contains(
+                    classroomCategoryId))
+            {
+                var requiredCategoryNames = subject
+                    .ClassroomCategoryRequirements
+                    .Where(x =>
+                        x.ClassroomCategory != null)
+                    .Select(x =>
+                        x.ClassroomCategory.Name)
+                    .Where(name =>
+                        !string.IsNullOrWhiteSpace(name))
+                    .Distinct()
+                    .ToList();
+
+                var categoryText =
+                    requiredCategoryNames.Count == 1
+                        ? $"«{requiredCategoryNames[0]}»"
+                        : string.Join(
+                            ", ",
+                            requiredCategoryNames.Select(
+                                name => $"«{name}»"));
+
+                result.AddError(
+                    "ClassroomId",
+                    $"Для предмета «{subject.Name}» требуется " +
+                    $"аудитория категории {categoryText}. " +
+                    $"Выбрана категория «{classroom!.ClassroomCategory?.Name ?? "не указана"}».");
+
+                result.ClassroomRecommendationNeeded = true;
+            }
         }
 
         // --------------------------------------------------------
@@ -176,7 +238,7 @@ public class ScheduleValidationService
         {
             result.AddError(
                 "ClassroomId",
-                $"Аудитория «{classroom.Name}» уже занята " +
+                $"Аудитория «{classroom!.Name}» уже занята " +
                 $"в выбранное время.");
 
             result.ClassroomRecommendationNeeded = true;
@@ -190,7 +252,7 @@ public class ScheduleValidationService
         {
             result.AddError(
                 "GroupId",
-                $"У группы «{group.Name}» уже есть занятие " +
+                $"У группы «{group!.Name}» уже есть занятие " +
                 $"в выбранное время.");
         }
 
@@ -202,7 +264,7 @@ public class ScheduleValidationService
         {
             result.AddError(
                 "TeacherId",
-                $"У преподавателя «{teacher.FullName}» уже есть " +
+                $"У преподавателя «{teacher!.FullName}» уже есть " +
                 $"занятие в выбранное время.");
         }
 

@@ -22,8 +22,10 @@
         @if (User.IsInRole("Admin"))
         {
             <a asp-action="Create" class="add-classroom-btn">
+
                 <span>＋</span>
                 Добавить аудиторию
+
             </a>
         }
 
@@ -33,8 +35,10 @@
     @if (TempData["ErrorMessage"] is string errorMessage)
     {
         <div class="glass-alert">
+
             <span>⚠</span>
             <span>@errorMessage</span>
+
         </div>
     }
 
@@ -51,14 +55,18 @@
             @if (!string.IsNullOrWhiteSpace(search))
             {
                 <a asp-action="Index" class="clear-search" title="Очистить поиск">
+
                     ×
+
                 </a>
             }
 
         </div>
 
         <button type="submit" class="search-btn">
+
             Найти
+
         </button>
 
     </form>
@@ -66,8 +74,10 @@
     @if (Model.Any())
     {
         <div class="classrooms-count">
+
             Найдено аудиторий:
             <strong>@Model.Count()</strong>
+
         </div>
 
         <!-- TABLE -->
@@ -79,7 +89,6 @@
                 <div>Аудитория</div>
                 <div>Категория</div>
                 <div>Места</div>
-                <div>Компьютеры</div>
                 <div>Действия</div>
 
             </div>
@@ -92,9 +101,11 @@
                     <div class="classroom-info">
 
                         <div class="classroom-avatar">
+
                             @(string.IsNullOrWhiteSpace(item.Name)
                                 ? "?"
                                 : item.Name.Substring(0, 1).ToUpper())
+
                         </div>
 
                         <div class="classroom-text">
@@ -117,7 +128,9 @@
                         @if (item.ClassroomCategory != null)
                         {
                             <span class="category-badge">
+
                                 @item.ClassroomCategory.Name
+
                             </span>
                         }
                         else
@@ -142,39 +155,27 @@
 
                     </div>
 
-                    <!-- КОМПЬЮТЕРЫ -->
-                    <div class="equipment-info">
-
-                        @if (item.HasComputers)
-                        {
-                            <span class="equipment-badge available">
-                                ✓ Есть
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="equipment-badge unavailable">
-                                Нет
-                            </span>
-                        }
-
-                    </div>
-
                     <!-- ДЕЙСТВИЯ -->
                     <div class="classroom-actions">
 
                         <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+
                             Подробнее
+
                         </a>
 
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+
                                 Изменить
+
                             </a>
 
                             <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+
                                 Удалить
+
                             </a>
                         }
 
@@ -188,8 +189,10 @@
         @if (!string.IsNullOrWhiteSpace(search))
         {
             <div class="search-result-info">
+
                 По запросу «@search» найдено:
                 <strong>@Model.Count()</strong>
+
             </div>
         }
     }
@@ -207,13 +210,17 @@
                 <h2>Аудитории не найдены</h2>
 
                 <p>
+
                     По запросу
                     <strong>«@search»</strong>
                     ничего не найдено.
+
                 </p>
 
                 <a asp-action="Index" class="clear-btn">
+
                     Сбросить поиск
+
                 </a>
             }
             else
@@ -225,15 +232,19 @@
                 <h2>Аудиторий пока нет</h2>
 
                 <p>
+
                     Добавьте первую аудиторию,
                     чтобы использовать её в расписании.
+
                 </p>
 
                 @if (User.IsInRole("Admin"))
                 {
                     <a asp-action="Create" class="add-classroom-btn">
+
                         <span>＋</span>
                         Добавить аудиторию
+
                     </a>
                 }
             }
@@ -242,4 +253,3 @@
     }
 
 </div>
-
