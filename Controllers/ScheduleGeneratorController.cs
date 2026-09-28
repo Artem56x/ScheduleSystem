@@ -1,7 +1,8 @@
-using System.Text.Json;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
 using ScheduleSystem.Models.Generator;
@@ -14,16 +15,22 @@ public class ScheduleGeneratorController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ScheduleGeneratorService _generatorService;
+    private readonly IMemoryCache _cache;
 
-    private const string PreviewDataKey =
-        "ScheduleGeneratorPreview";
+    private const string PreviewSessionKey =
+        "ScheduleGeneratorPreviewId";
+
+    private static readonly TimeSpan PreviewLifetime =
+        TimeSpan.FromMinutes(20);
 
     public ScheduleGeneratorController(
         ApplicationDbContext context,
-        ScheduleGeneratorService generatorService)
+        ScheduleGeneratorService generatorService,
+        IMemoryCache cache)
     {
         _context = context;
         _generatorService = generatorService;
+        _cache = cache;
     }
 
     // ============================================================
@@ -48,48 +55,47 @@ public class ScheduleGeneratorController : Controller
 
             TimeSlots = new List<GenerationTimeSlot>
             {
+                new()
+                {
+                    StartTime = new TimeSpan(8, 30, 0),
+                    EndTime = new TimeSpan(9, 50, 0)
+                },
 
-new()
-{
-    StartTime = new TimeSpan(8, 30, 0),
-    EndTime = new TimeSpan(9, 50, 0)
-},
+                new()
+                {
+                    StartTime = new TimeSpan(10, 0, 0),
+                    EndTime = new TimeSpan(11, 20, 0)
+                },
 
-new()
-{
-    StartTime = new TimeSpan(10, 0, 0),
-    EndTime = new TimeSpan(11, 20, 0)
-},
+                new()
+                {
+                    StartTime = new TimeSpan(11, 40, 0),
+                    EndTime = new TimeSpan(13, 0, 0)
+                },
 
-new()
-{
-    StartTime = new TimeSpan(11, 40, 0),
-    EndTime = new TimeSpan(13, 0, 0)
-},
+                new()
+                {
+                    StartTime = new TimeSpan(13, 20, 0),
+                    EndTime = new TimeSpan(14, 40, 0)
+                },
 
-new()
-{
-    StartTime = new TimeSpan(13, 20, 0),
-    EndTime = new TimeSpan(14, 40, 0)
-},
+                new()
+                {
+                    StartTime = new TimeSpan(15, 0, 0),
+                    EndTime = new TimeSpan(16, 20, 0)
+                },
 
-new()
-{
-    StartTime = new TimeSpan(15, 0, 0),
-    EndTime = new TimeSpan(16, 20, 0)
-},
+                new()
+                {
+                    StartTime = new TimeSpan(16, 40, 0),
+                    EndTime = new TimeSpan(18, 0, 0)
+                },
 
-new()
-{
-    StartTime = new TimeSpan(16, 40, 0),
-    EndTime = new TimeSpan(18, 0, 0)
-},
-
-new()
-{
-    StartTime = new TimeSpan(18, 20, 0),
-    EndTime = new TimeSpan(19, 0, 0)
-},
+                new()
+                {
+                    StartTime = new TimeSpan(18, 20, 0),
+                    EndTime = new TimeSpan(19, 0, 0)
+                }
             },
 
             MaxLessonsPerDay = 6,
@@ -112,14 +118,23 @@ new()
     {
         await LoadViewDataAsync();
 
-        ValidateGenerationRequest(model);
+        NormalizeRequest(model);
 
-        if (!ModelState.IsValid)
+        var validationErrors =
+            ValidateRequest(model);
+
+        if (validationErrors.Count > 0)
         {
+            foreach (var error in validationErrors)
+            {
+                ModelState.AddModelError("", error);
+            }
+
             return View("Index", model);
         }
 
-        var result = await _generatorService.GenerateAsync(model);
+        var result =
+            await _generatorService.GenerateAsync(model);
 
         if (!result.IsSuccess)
         {
@@ -131,10 +146,50 @@ new()
             return View("Index", model);
         }
 
-        var preview = new ScheduleGenerationPreviewViewModel
-        {
-            Items = result.GeneratedItems
-        };
+        var groupIds = model.SelectedGroupIds
+            .Distinct()
+            .ToList();
+
+        var days = model.Days
+            .Distinct()
+            .ToList();
+
+        var existingCount =
+            await _context.Schedules
+                .AsNoTracking()
+                .CountAsync(s =>
+                    s.DayOfWeek.HasValue &&
+                    days.Contains(s.DayOfWeek.Value) &&
+                    groupIds.Contains(s.GroupId));
+
+        var preview =
+            new ScheduleGenerationPreviewViewModel
+            {
+                Items = result.GeneratedItems,
+
+                SelectedGroupIds = groupIds,
+
+                SelectedDays = days,
+
+                TimeSlots = model.TimeSlots
+                    .OrderBy(x => x.StartTime)
+                    .ToList(),
+
+                MaxLessonsPerDay =
+                    model.MaxLessonsPerDay,
+
+                MaxConsecutiveLessons =
+                    model.MaxConsecutiveLessons,
+
+                DistributeLessons =
+                    model.DistributeLessons,
+
+                UseClassroomRecommendations =
+                    model.UseClassroomRecommendations,
+
+                ExistingSchedulesToReplace =
+                    existingCount
+            };
 
         StorePreview(preview);
 
@@ -145,58 +200,34 @@ new()
     // PREVIEW
     // ============================================================
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Preview(
-        ScheduleGenerationRequest model)
+    [HttpGet]
+    public IActionResult Preview()
     {
-        await LoadViewDataAsync();
+        var preview = GetStoredPreview();
 
-        ValidateGenerationRequest(model);
-
-        if (!ModelState.IsValid)
+        if (preview == null)
         {
-            return View("Index", model);
+            TempData["ErrorMessage"] =
+                "Предпросмотр расписания истёк. " +
+                "Выполните генерацию заново.";
+
+            return RedirectToAction(nameof(Index));
         }
-
-        var result = await _generatorService.GenerateAsync(model);
-
-        if (!result.IsSuccess)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error);
-            }
-
-            return View("Index", model);
-        }
-
-        var preview = new ScheduleGenerationPreviewViewModel
-        {
-            Items = result.GeneratedItems
-        };
-
-        StorePreview(preview);
 
         return View(preview);
     }
 
     // ============================================================
-    // SAVE
+    // CONFIRM AND SAVE
     // ============================================================
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Save()
+    public async Task<IActionResult> ConfirmAndSave()
     {
-        // --------------------------------------------------------
-        // Получаем предпросмотр
-        // --------------------------------------------------------
-
         var preview = GetStoredPreview();
 
         if (preview == null ||
-            preview.Items == null ||
             preview.Items.Count == 0)
         {
             TempData["ErrorMessage"] =
@@ -206,354 +237,144 @@ new()
             return RedirectToAction(nameof(Index));
         }
 
-        // --------------------------------------------------------
-        // Проверяем данные
-        // --------------------------------------------------------
-
-        var items = preview.Items;
-
-        // Удаляем возможные дубликаты внутри самого результата.
-        items = items
-            .GroupBy(x => new
-            {
-                x.GroupId,
-                x.SubjectId,
-                x.TeacherId,
-                x.ClassroomId,
-                x.DayOfWeek,
-                x.StartTime,
-                x.EndTime
-            })
-            .Select(x => x.First())
-            .ToList();
-
-        if (items.Count == 0)
-        {
-            TempData["ErrorMessage"] =
-                "В сгенерированном расписании нет занятий.";
-
-            RemoveStoredPreview();
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // --------------------------------------------------------
-        // Проверяем существование связанных сущностей
-        // --------------------------------------------------------
-
-        var groupIds = items
-            .Select(x => x.GroupId)
-            .Distinct()
-            .ToList();
-
-        var subjectIds = items
-            .Select(x => x.SubjectId)
-            .Distinct()
-            .ToList();
-
-        var teacherIds = items
-            .Select(x => x.TeacherId)
-            .Distinct()
-            .ToList();
-
-        var classroomIds = items
-            .Select(x => x.ClassroomId)
-            .Distinct()
-            .ToList();
-        var existingGroupIds = (
-            await _context.Groups
-                .AsNoTracking()
-                .Where(x => groupIds.Contains(x.Id))
-                .Select(x => x.Id)
-                .ToListAsync()
-        ).ToHashSet();
-
-        var existingSubjectIds = (
-            await _context.Subjects
-                .AsNoTracking()
-                .Where(x => subjectIds.Contains(x.Id))
-                .Select(x => x.Id)
-                .ToListAsync()
-        ).ToHashSet();
-
-        var existingTeacherIds = (
-            await _context.Teachers
-                .AsNoTracking()
-                .Where(x => teacherIds.Contains(x.Id))
-                .Select(x => x.Id)
-                .ToListAsync()
-        ).ToHashSet();
-
-        var existingClassroomIds = (
-            await _context.Classrooms
-                .AsNoTracking()
-                .Where(x => classroomIds.Contains(x.Id))
-                .Select(x => x.Id)
-                .ToListAsync()
-        ).ToHashSet();
-
-
-        foreach (var item in items)
-        {
-            if (!existingGroupIds.Contains(item.GroupId))
-            {
-                TempData["ErrorMessage"] =
-                    $"Группа «{item.GroupName}» больше не существует.";
-
-                RemoveStoredPreview();
-
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (!existingSubjectIds.Contains(item.SubjectId))
-            {
-                TempData["ErrorMessage"] =
-                    $"Предмет «{item.SubjectName}» больше не существует.";
-
-                RemoveStoredPreview();
-
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (!existingTeacherIds.Contains(item.TeacherId))
-            {
-                TempData["ErrorMessage"] =
-                    $"Преподаватель «{item.TeacherName}» больше не существует.";
-
-                RemoveStoredPreview();
-
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (!existingClassroomIds.Contains(item.ClassroomId))
-            {
-                TempData["ErrorMessage"] =
-                    $"Аудитория «{item.ClassroomName}» больше не существует.";
-
-                RemoveStoredPreview();
-
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (item.StartTime >= item.EndTime)
-            {
-                TempData["ErrorMessage"] =
-                    $"Некорректное время занятия «{item.SubjectName}».";
-
-                RemoveStoredPreview();
-
-                return RedirectToAction(nameof(Index));
-            }
-        }
-
-        // --------------------------------------------------------
-        // Проверяем конфликты внутри сгенерированного результата
-        // --------------------------------------------------------
-
-        for (var i = 0; i < items.Count; i++)
-        {
-            for (var j = i + 1; j < items.Count; j++)
-            {
-                var first = items[i];
-                var second = items[j];
-
-                if (first.DayOfWeek != second.DayOfWeek)
-                {
-                    continue;
-                }
-
-                var overlaps =
-                    first.StartTime < second.EndTime &&
-                    first.EndTime > second.StartTime;
-
-                if (!overlaps)
-                {
-                    continue;
-                }
-
-                // Одна группа не может иметь два занятия одновременно.
-                if (first.GroupId == second.GroupId)
-                {
-                    TempData["ErrorMessage"] =
-                        $"Обнаружен конфликт группы «{first.GroupName}»: " +
-                        $"{first.StartTime:hh\\:mm}–{first.EndTime:hh\\:mm}.";
-
-                    RemoveStoredPreview();
-
-                    return RedirectToAction(nameof(Index));
-                }
-
-                // Один преподаватель не может вести два занятия одновременно.
-                if (first.TeacherId == second.TeacherId)
-                {
-                    TempData["ErrorMessage"] =
-                        $"Обнаружен конфликт преподавателя " +
-                        $"«{first.TeacherName}»: " +
-                        $"{first.StartTime:hh\\:mm}–{first.EndTime:hh\\:mm}.";
-
-                    RemoveStoredPreview();
-
-                    return RedirectToAction(nameof(Index));
-                }
-
-                // Одна аудитория не может использоваться двумя группами.
-                if (first.ClassroomId == second.ClassroomId)
-                {
-                    TempData["ErrorMessage"] =
-                        $"Обнаружен конфликт аудитории " +
-                        $"«{first.ClassroomName}»: " +
-                        $"{first.StartTime:hh\\:mm}–{first.EndTime:hh\\:mm}.";
-
-                    RemoveStoredPreview();
-
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-        }
-
-        // --------------------------------------------------------
-        // Получаем существующие записи БД
-        // --------------------------------------------------------
-
-        var days = items
-            .Select(x => x.DayOfWeek)
-            .Distinct()
-            .ToList();
-
-        var existingSchedules = await _context.Schedules
-            .AsNoTracking()
-            .Where(s =>
-                s.DayOfWeek != null &&
-                days.Contains(s.DayOfWeek.Value))
-            .ToListAsync();
-
-        // --------------------------------------------------------
-        // Проверяем конфликты с уже существующим расписанием
-        // --------------------------------------------------------
-
-        foreach (var item in items)
-        {
-            foreach (var existing in existingSchedules)
-            {
-                if (existing.DayOfWeek != item.DayOfWeek)
-                {
-                    continue;
-                }
-
-                if (existing.StartTime == null ||
-                    existing.EndTime == null)
-                {
-                    continue;
-                }
-
-                var overlaps =
-                    existing.StartTime.Value < item.EndTime &&
-                    existing.EndTime.Value > item.StartTime;
-
-                if (!overlaps)
-                {
-                    continue;
-                }
-
-                // ------------------------------------------------
-                // Конфликт группы
-                // ------------------------------------------------
-
-                if (existing.GroupId == item.GroupId)
-                {
-                    TempData["ErrorMessage"] =
-                        $"Невозможно сохранить расписание. " +
-                        $"У группы «{item.GroupName}» уже есть занятие " +
-                        $"в это время.";
-
-                    RemoveStoredPreview();
-
-                    return RedirectToAction(nameof(Index));
-                }
-
-                // ------------------------------------------------
-                // Конфликт преподавателя
-                // ------------------------------------------------
-
-                if (existing.TeacherId == item.TeacherId)
-                {
-                    TempData["ErrorMessage"] =
-                        $"Невозможно сохранить расписание. " +
-                        $"У преподавателя «{item.TeacherName}» уже есть " +
-                        $"занятие в это время.";
-
-                    RemoveStoredPreview();
-
-                    return RedirectToAction(nameof(Index));
-                }
-
-                // ------------------------------------------------
-                // Конфликт аудитории
-                // ------------------------------------------------
-
-                if (existing.ClassroomId == item.ClassroomId)
-                {
-                    TempData["ErrorMessage"] =
-                        $"Невозможно сохранить расписание. " +
-                        $"Аудитория «{item.ClassroomName}» уже занята " +
-                        $"в это время.";
-
-                    RemoveStoredPreview();
-
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-        }
-
-        // --------------------------------------------------------
-        // Сохраняем всё одной транзакцией
-        // --------------------------------------------------------
+        // ========================================================
+        // TRANSACTION
+        // ========================================================
 
         await using var transaction =
-            await _context.Database.BeginTransactionAsync();
+            await _context.Database.BeginTransactionAsync(
+                System.Data.IsolationLevel.Serializable);
 
         try
         {
-            var schedules = items
-                .Select(item => new Schedule
-                {
-                    GroupId = item.GroupId,
-                    SubjectId = item.SubjectId,
-                    TeacherId = item.TeacherId,
-                    ClassroomId = item.ClassroomId,
-                    DayOfWeek = item.DayOfWeek,
-                    StartTime = item.StartTime,
-                    EndTime = item.EndTime
-                })
+            // ----------------------------------------------------
+            // FINAL VALIDATION
+            // ----------------------------------------------------
+
+            var validationErrors =
+                await _generatorService.ValidateBeforeSaveAsync(
+                    preview);
+
+            if (validationErrors.Count > 0)
+            {
+                await transaction.RollbackAsync();
+
+                TempData["ErrorMessage"] =
+                    "Расписание изменилось после генерации. " +
+                    "Предпросмотр больше нельзя безопасно сохранить.";
+
+                TempData["GenerationValidationErrors"] =
+                    string.Join(
+                        "\n",
+                        validationErrors);
+
+                return RedirectToAction(nameof(Preview));
+            }
+
+            var groupIds = preview.SelectedGroupIds
+                .Distinct()
                 .ToList();
 
-            await _context.Schedules.AddRangeAsync(schedules);
+            var days = preview.SelectedDays
+                .Distinct()
+                .ToList();
+
+            // ----------------------------------------------------
+            // DELETE OLD SCHEDULE
+            // ----------------------------------------------------
+
+            var oldSchedules =
+                await _context.Schedules
+                    .Where(s =>
+                        groupIds.Contains(s.GroupId) &&
+                        s.DayOfWeek.HasValue &&
+                        days.Contains(s.DayOfWeek.Value))
+                    .ToListAsync();
+
+            if (oldSchedules.Count > 0)
+            {
+                _context.Schedules.RemoveRange(
+                    oldSchedules);
+
+                await _context.SaveChangesAsync();
+            }
+
+            // ----------------------------------------------------
+            // INSERT NEW SCHEDULE
+            // ----------------------------------------------------
+
+            var newSchedules =
+                preview.Items
+                    .Select(item =>
+                        new Schedule
+                        {
+                            GroupId =
+                                item.GroupId,
+
+                            SubjectId =
+                                item.SubjectId,
+
+                            TeacherId =
+                                item.TeacherId,
+
+                            ClassroomId =
+                                item.ClassroomId,
+
+                            DayOfWeek =
+                                item.DayOfWeek,
+
+                            StartTime =
+                                item.StartTime,
+
+                            EndTime =
+                                item.EndTime
+                        })
+                    .ToList();
+
+            await _context.Schedules
+                .AddRangeAsync(newSchedules);
 
             await _context.SaveChangesAsync();
+
+            // ----------------------------------------------------
+            // COMMIT
+            // ----------------------------------------------------
 
             await transaction.CommitAsync();
 
             RemoveStoredPreview();
 
             TempData["SuccessMessage"] =
-                $"Расписание успешно сохранено. " +
-                $"Добавлено занятий: {schedules.Count}.";
+                $"Расписание успешно заменено. " +
+                $"Добавлено занятий: {newSchedules.Count}.";
 
             return RedirectToAction(
                 "Index",
-                "Schedules"
-            );
+                "Schedules");
         }
-        catch (Exception)
+        catch
         {
             await transaction.RollbackAsync();
 
             TempData["ErrorMessage"] =
                 "При сохранении расписания произошла ошибка. " +
-                "Изменения не были сохранены.";
+                "Старое расписание осталось без изменений.";
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Preview));
         }
+    }
+
+    // ============================================================
+    // CANCEL PREVIEW
+    // ============================================================
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult CancelPreview()
+    {
+        RemoveStoredPreview();
+
+        return RedirectToAction(nameof(Index));
     }
 
     // ============================================================
@@ -561,93 +382,106 @@ new()
     // ============================================================
 
     [HttpGet]
-    public async Task<IActionResult> GetGroupLoad(int groupId)
+    public async Task<IActionResult> GetGroupLoad(
+        int groupId)
     {
-        var groupExists = await _context.Groups
-            .AsNoTracking()
-            .AnyAsync(g => g.Id == groupId);
+        var groupExists =
+            await _context.Groups
+                .AsNoTracking()
+                .AnyAsync(g => g.Id == groupId);
 
         if (!groupExists)
         {
             return NotFound();
         }
 
-        var load = await _context.GroupSubjects
-            .AsNoTracking()
-            .Where(gs => gs.GroupId == groupId)
-            .Include(gs => gs.Subject)
-                .ThenInclude(s =>
-                    s!.ClassroomCategoryRequirements)
-                    .ThenInclude(x => x.ClassroomCategory)
-            .OrderBy(gs => gs.Subject!.Name)
-            .Select(gs => new
-            {
-                subjectId = gs.SubjectId,
+        var load =
+            await _context.GroupSubjects
+                .AsNoTracking()
+                .Where(gs =>
+                    gs.GroupId == groupId)
+                .Include(gs => gs.Subject)
+                    .ThenInclude(s =>
+                        s!.ClassroomCategoryRequirements)
+                    .ThenInclude(x =>
+                        x.ClassroomCategory)
+                .OrderBy(gs =>
+                    gs.Subject!.Name)
+                .Select(gs => new
+                {
+                    subjectId = gs.SubjectId,
 
-                subjectName = gs.Subject != null
-                    ? gs.Subject.Name
-                    : "Предмет не найден",
+                    subjectName =
+                        gs.Subject != null
+                            ? gs.Subject.Name
+                            : "Предмет не найден",
 
-                weeklyLessons = gs.WeeklyLessons,
+                    weeklyLessons =
+                        gs.WeeklyLessons,
 
-                type = gs.Subject != null
-                    ? gs.Subject.Type
-                    : SubjectType.General,
+                    type =
+                        gs.Subject != null
+                            ? gs.Subject.Type
+                            : SubjectType.General,
 
-                classroomCategoryIds =
-                    gs.Subject != null
-                        ? gs.Subject
-                            .ClassroomCategoryRequirements
-                            .Select(x => x.ClassroomCategoryId)
-                            .ToList()
-                        : new List<int>(),
+                    classroomCategoryIds =
+                        gs.Subject != null
+                            ? gs.Subject
+                                .ClassroomCategoryRequirements
+                                .Select(x =>
+                                    x.ClassroomCategoryId)
+                                .ToList()
+                            : new List<int>(),
 
-                classroomCategoryNames =
-                    gs.Subject != null
-                        ? gs.Subject
-                            .ClassroomCategoryRequirements
-                            .Where(x =>
-                                x.ClassroomCategory != null)
-                            .Select(x =>
-                                x.ClassroomCategory!.Name)
-                            .ToList()
-                        : new List<string>()
-            })
-            .ToListAsync();
+                    classroomCategoryNames =
+                        gs.Subject != null
+                            ? gs.Subject
+                                .ClassroomCategoryRequirements
+                                .Where(x =>
+                                    x.ClassroomCategory != null)
+                                .Select(x =>
+                                    x.ClassroomCategory!.Name)
+                                .ToList()
+                            : new List<string>()
+                })
+                .ToListAsync();
 
         return Json(load);
     }
 
     // ============================================================
-    // LOAD VIEW DATA
+    // VIEW DATA
     // ============================================================
 
     private async Task LoadViewDataAsync()
     {
-        ViewBag.Groups = await _context.Groups
-            .AsNoTracking()
-            .OrderBy(g => g.Course)
-            .ThenBy(g => g.Name)
-            .ToListAsync();
+        ViewBag.Groups =
+            await _context.Groups
+                .AsNoTracking()
+                .OrderBy(g => g.Course)
+                .ThenBy(g => g.Name)
+                .ToListAsync();
 
-        ViewBag.Subjects = await _context.Subjects
-            .AsNoTracking()
-            .Include(s =>
-                s.ClassroomCategoryRequirements)
+        ViewBag.Subjects =
+            await _context.Subjects
+                .AsNoTracking()
+                .Include(s =>
+                    s.ClassroomCategoryRequirements)
                 .ThenInclude(x =>
                     x.ClassroomCategory)
-            .OrderBy(s => s.Name)
-            .ToListAsync();
+                .OrderBy(s => s.Name)
+                .ToListAsync();
 
-        ViewBag.GroupSubjects = await _context.GroupSubjects
-            .AsNoTracking()
-            .Include(gs => gs.Group)
-            .Include(gs => gs.Subject)
-                .ThenInclude(s =>
-                    s!.ClassroomCategoryRequirements)
+        ViewBag.GroupSubjects =
+            await _context.GroupSubjects
+                .AsNoTracking()
+                .Include(gs => gs.Group)
+                .Include(gs => gs.Subject)
+                    .ThenInclude(s =>
+                        s!.ClassroomCategoryRequirements)
                     .ThenInclude(x =>
                         x.ClassroomCategory)
-            .ToListAsync();
+                .ToListAsync();
 
         ViewBag.ClassroomCategories =
             await _context.ClassroomCategories
@@ -657,227 +491,171 @@ new()
     }
 
     // ============================================================
-    // VALIDATION
+    // REQUEST NORMALIZATION
     // ============================================================
 
-    private void ValidateGenerationRequest(
+    private static void NormalizeRequest(
         ScheduleGenerationRequest model)
     {
-        // --------------------------------------------------------
-        // GROUPS
-        // --------------------------------------------------------
-
-        if (model.SelectedGroupIds == null ||
-            model.SelectedGroupIds.Count == 0)
-        {
-            ModelState.AddModelError(
-                "",
-                "Выберите хотя бы одну группу."
-            );
-        }
-
-        // --------------------------------------------------------
-        // DAYS
-        // --------------------------------------------------------
-
-        if (model.Days == null ||
-            model.Days.Count == 0)
-        {
-            ModelState.AddModelError(
-                "",
-                "Выберите хотя бы один день недели."
-            );
-        }
-
-        // --------------------------------------------------------
-        // TIME SLOTS
-        // --------------------------------------------------------
-
-        if (model.TimeSlots == null ||
-            model.TimeSlots.Count == 0)
-        {
-            ModelState.AddModelError(
-                "",
-                "Добавьте хотя бы один временной интервал."
-            );
-        }
-        else
-        {
-            ValidateTimeSlots(model.TimeSlots);
-        }
-
-        // --------------------------------------------------------
-        // SELECTED GROUPS
-        // --------------------------------------------------------
-
-        if (model.SelectedGroupIds != null &&
-            model.SelectedGroupIds.Count > 0)
-        {
-            var selectedGroupIds = model.SelectedGroupIds
+        model.SelectedGroupIds =
+            model.SelectedGroupIds
                 .Distinct()
                 .ToList();
 
-            var existingGroupIds = _context.Groups
-                .AsNoTracking()
-                .Where(g =>
-                    selectedGroupIds.Contains(g.Id))
-                .Select(g => g.Id)
-                .ToHashSet();
-
-            var invalidGroups = selectedGroupIds
-                .Where(id =>
-                    !existingGroupIds.Contains(id))
+        model.Days =
+            model.Days
+                .Distinct()
                 .ToList();
 
-            if (invalidGroups.Count > 0)
+        model.TimeSlots =
+            model.TimeSlots
+                .OrderBy(x => x.StartTime)
+                .ToList();
+    }
+
+    // ============================================================
+    // REQUEST VALIDATION
+    // ============================================================
+
+    private List<string> ValidateRequest(
+        ScheduleGenerationRequest model)
+    {
+        var errors = new List<string>();
+
+        if (model.SelectedGroupIds.Count == 0)
+        {
+            errors.Add(
+                "Выберите хотя бы одну группу.");
+        }
+
+        if (model.Days.Count == 0)
+        {
+            errors.Add(
+                "Выберите хотя бы один день недели.");
+        }
+
+        if (model.TimeSlots.Count == 0)
+        {
+            errors.Add(
+                "Добавьте хотя бы один временной интервал.");
+        }
+
+        for (var i = 0;
+             i < model.TimeSlots.Count;
+             i++)
+        {
+            var slot = model.TimeSlots[i];
+
+            if (slot.StartTime >= slot.EndTime)
             {
-                ModelState.AddModelError(
-                    "",
-                    "Некоторые выбранные группы не существуют."
-                );
+                errors.Add(
+                    $"Интервал №{i + 1} имеет некорректное время.");
             }
         }
 
-        // --------------------------------------------------------
-        // LIMITS
-        // --------------------------------------------------------
+        for (var i = 0;
+             i < model.TimeSlots.Count;
+             i++)
+        {
+            for (var j = i + 1;
+                 j < model.TimeSlots.Count;
+                 j++)
+            {
+                var first =
+                    model.TimeSlots[i];
+
+                var second =
+                    model.TimeSlots[j];
+
+                if (first.StartTime < second.EndTime &&
+                    first.EndTime > second.StartTime)
+                {
+                    errors.Add(
+                        $"Интервалы №{i + 1} и №{j + 1} пересекаются.");
+                }
+            }
+        }
 
         if (model.MaxLessonsPerDay < 1 ||
             model.MaxLessonsPerDay > 10)
         {
-            ModelState.AddModelError(
-                "",
-                "Максимальное количество пар в день " +
-                "должно быть от 1 до 10."
-            );
+            errors.Add(
+                "Максимум пар в день должен быть от 1 до 10.");
         }
 
         if (model.MaxConsecutiveLessons < 1 ||
             model.MaxConsecutiveLessons > 10)
         {
-            ModelState.AddModelError(
-                "",
-                "Максимальное количество пар подряд " +
-                "должно быть от 1 до 10."
-            );
+            errors.Add(
+                "Максимум пар подряд должен быть от 1 до 10.");
         }
+
+        return errors;
     }
 
     // ============================================================
-    // TIME SLOT VALIDATION
-    // ============================================================
-
-    private void ValidateTimeSlots(
-        List<GenerationTimeSlot> slots)
-    {
-        // --------------------------------------------------------
-        // INVALID INTERVALS
-        // --------------------------------------------------------
-
-        for (var i = 0; i < slots.Count; i++)
-        {
-            var current = slots[i];
-
-            if (current.StartTime >= current.EndTime)
-            {
-                ModelState.AddModelError(
-                    "",
-                    $"Некорректный интервал №{i + 1}: " +
-                    $"{current.StartTime:hh\\:mm} — " +
-                    $"{current.EndTime:hh\\:mm}."
-                );
-            }
-        }
-
-        // --------------------------------------------------------
-        // OVERLAPPING INTERVALS
-        // --------------------------------------------------------
-
-        for (var i = 0; i < slots.Count; i++)
-        {
-            for (var j = i + 1;
-                 j < slots.Count;
-                 j++)
-            {
-                var first = slots[i];
-                var second = slots[j];
-
-                var overlaps =
-                    first.StartTime < second.EndTime &&
-                    first.EndTime > second.StartTime;
-
-                if (overlaps)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        $"Временные интервалы №{i + 1} " +
-                        $"и №{j + 1} пересекаются."
-                    );
-                }
-            }
-        }
-    }
-
-    // ============================================================
-    // PREVIEW STORAGE
+    // PREVIEW CACHE
     // ============================================================
 
     private void StorePreview(
         ScheduleGenerationPreviewViewModel preview)
     {
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
+        var previewId =
+            Convert.ToHexString(
+                RandomNumberGenerator.GetBytes(32));
 
-        var json = JsonSerializer.Serialize(
+        _cache.Set(
+            GetCacheKey(previewId),
             preview,
-            options
-        );
+            new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow =
+                    PreviewLifetime,
 
-        TempData[PreviewDataKey] = json;
+                SlidingExpiration =
+                    TimeSpan.FromMinutes(10)
+            });
+
+        HttpContext.Session.SetString(
+            PreviewSessionKey,
+            previewId);
     }
-
-    // ============================================================
-    // GET STORED PREVIEW
-    // ============================================================
 
     private ScheduleGenerationPreviewViewModel?
         GetStoredPreview()
     {
-        var json = TempData[PreviewDataKey] as string;
+        var previewId =
+            HttpContext.Session.GetString(
+                PreviewSessionKey);
 
-        if (string.IsNullOrWhiteSpace(json))
+        if (string.IsNullOrWhiteSpace(previewId))
         {
             return null;
         }
 
-        try
-        {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            return JsonSerializer.Deserialize
-                <ScheduleGenerationPreviewViewModel>(
-                    json,
-                    options
-                );
-        }
-        catch
-        {
-            return null;
-        }
+        return _cache.Get<ScheduleGenerationPreviewViewModel>(
+            GetCacheKey(previewId));
     }
-
-    // ============================================================
-    // REMOVE STORED PREVIEW
-    // ============================================================
 
     private void RemoveStoredPreview()
     {
-        TempData.Remove(PreviewDataKey);
+        var previewId =
+            HttpContext.Session.GetString(
+                PreviewSessionKey);
+
+        if (!string.IsNullOrWhiteSpace(previewId))
+        {
+            _cache.Remove(
+                GetCacheKey(previewId));
+        }
+
+        HttpContext.Session.Remove(
+            PreviewSessionKey);
+    }
+
+    private static string GetCacheKey(
+        string previewId)
+    {
+        return $"ScheduleGenerator:Preview:{previewId}";
     }
 }
-

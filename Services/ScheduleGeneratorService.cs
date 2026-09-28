@@ -9,7 +9,7 @@ public class ScheduleGeneratorService
 {
     private readonly ApplicationDbContext _context;
 
-    private const int MaxSearchNodes = 100_000;
+    private const int MaxSearchNodes = 150_000;
 
     public ScheduleGeneratorService(ApplicationDbContext context)
     {
@@ -26,14 +26,14 @@ public class ScheduleGeneratorService
         var result = new ScheduleGenerationResult();
 
         // --------------------------------------------------------
-        // BASIC REQUEST VALIDATION
+        // REQUEST VALIDATION
         // --------------------------------------------------------
 
-        var validationErrors = ValidateRequest(request);
+        var requestErrors = ValidateRequest(request);
 
-        if (validationErrors.Count > 0)
+        if (requestErrors.Count > 0)
         {
-            foreach (var error in validationErrors)
+            foreach (var error in requestErrors)
             {
                 result.AddError(error);
             }
@@ -47,6 +47,7 @@ public class ScheduleGeneratorService
 
         var selectedDays = request.Days
             .Distinct()
+            .OrderBy(x => x)
             .ToList();
 
         var timeSlots = request.TimeSlots
@@ -54,47 +55,13 @@ public class ScheduleGeneratorService
             .ToList();
 
         // --------------------------------------------------------
-        // LOAD DATA ONCE
+        // LOAD GROUPS
         // --------------------------------------------------------
 
         var groups = await _context.Groups
             .AsNoTracking()
             .Where(g => selectedGroupIds.Contains(g.Id))
             .ToListAsync();
-
-        var groupSubjects = await _context.GroupSubjects
-            .AsNoTracking()
-            .Include(gs => gs.Group)
-            .Include(gs => gs.Subject)
-                .ThenInclude(s => s!.ClassroomCategoryRequirements)
-            .Where(gs => selectedGroupIds.Contains(gs.GroupId))
-            .ToListAsync();
-
-        var subjects = await _context.Subjects
-            .AsNoTracking()
-            .Include(s => s.ClassroomCategoryRequirements)
-            .ToListAsync();
-
-        var teachers = await _context.Teachers
-            .AsNoTracking()
-            .ToListAsync();
-
-        var classrooms = await _context.Classrooms
-            .AsNoTracking()
-            .Include(c => c.ClassroomCategory)
-            .ToListAsync();
-
-        var existingSchedules = await _context.Schedules
-            .AsNoTracking()
-            .Where(s =>
-                s.DayOfWeek.HasValue &&
-                s.StartTime.HasValue &&
-                s.EndTime.HasValue)
-            .ToListAsync();
-
-        // --------------------------------------------------------
-        // VALIDATE SELECTED GROUPS
-        // --------------------------------------------------------
 
         var existingGroupIds = groups
             .Select(g => g.Id)
@@ -105,8 +72,7 @@ public class ScheduleGeneratorService
             if (!existingGroupIds.Contains(groupId))
             {
                 result.AddError(
-                    $"Группа с ID {groupId} не найдена."
-                );
+                    $"Группа с ID {groupId} не найдена.");
             }
         }
 
@@ -116,71 +82,70 @@ public class ScheduleGeneratorService
         }
 
         // --------------------------------------------------------
+        // LOAD GROUP SUBJECTS
+        // --------------------------------------------------------
+
+        var groupSubjects = await _context.GroupSubjects
+            .AsNoTracking()
+            .Include(gs => gs.Group)
+            .Include(gs => gs.Subject)
+                .ThenInclude(s => s!.ClassroomCategoryRequirements)
+            .Where(gs => selectedGroupIds.Contains(gs.GroupId))
+            .ToListAsync();
+
+        // --------------------------------------------------------
+        // LOAD TEACHERS
+        // --------------------------------------------------------
+
+        var teachers = await _context.Teachers
+            .AsNoTracking()
+            .ToListAsync();
+
+        // --------------------------------------------------------
+        // LOAD CLASSROOMS
+        // --------------------------------------------------------
+
+        var classrooms = await _context.Classrooms
+            .AsNoTracking()
+            .Include(c => c.ClassroomCategory)
+            .ToListAsync();
+
+        // --------------------------------------------------------
+        // LOAD EXISTING SCHEDULE
+        // --------------------------------------------------------
+        //
+        // ВАЖНО:
+        //
+        // Расписание выбранных групп в выбранные дни НЕ загружаем,
+        // потому что при подтверждении оно будет удалено и заменено.
+        //
+        // Расписание других групп продолжает блокировать:
+        // - преподавателя;
+        // - аудиторию;
+        // - группу, если она не входит в выбранные группы.
+        //
+        // Расписание выбранных групп в другие дни также не влияет,
+        // поскольку генерация идёт только по выбранным дням.
+        // --------------------------------------------------------
+
+        var existingSchedules = await _context.Schedules
+            .AsNoTracking()
+            .Where(s =>
+                s.DayOfWeek.HasValue &&
+                s.StartTime.HasValue &&
+                s.EndTime.HasValue &&
+                selectedDays.Contains(s.DayOfWeek.Value) &&
+                !selectedGroupIds.Contains(s.GroupId))
+            .ToListAsync();
+
+        // --------------------------------------------------------
         // CREATE LESSON TASKS
         // --------------------------------------------------------
 
-        var lessonTasks = new List<LessonTask>();
-
-        foreach (var group in groups)
-        {
-            var groupLoads = groupSubjects
-                .Where(gs => gs.GroupId == group.Id)
-                .ToList();
-
-            if (groupLoads.Count == 0)
-            {
-                result.AddError(
-                    $"Для группы «{group.Name}» не назначены предметы."
-                );
-
-                continue;
-            }
-
-            foreach (var groupSubject in groupLoads)
-            {
-                if (groupSubject.Subject == null)
-                {
-                    result.AddError(
-                        $"У группы «{group.Name}» найден предмет, " +
-                        "который не существует."
-                    );
-
-                    continue;
-                }
-
-                if (groupSubject.WeeklyLessons <= 0)
-                {
-                    result.AddError(
-                        $"Для предмета «{groupSubject.Subject.Name}» " +
-                        $"группы «{group.Name}» указано некорректное " +
-                        "количество занятий в неделю."
-                    );
-
-                    continue;
-                }
-
-                for (var lessonNumber = 1;
-                     lessonNumber <= groupSubject.WeeklyLessons;
-                     lessonNumber++)
-                {
-                    lessonTasks.Add(
-                        new LessonTask
-                        {
-                            GroupId = group.Id,
-                            GroupName = group.Name,
-                            StudentCount = group.StudentCount,
-
-                            SubjectId = groupSubject.Subject.Id,
-                            SubjectName = groupSubject.Subject.Name,
-
-                            Subject = groupSubject.Subject,
-
-                            LessonNumber = lessonNumber
-                        }
-                    );
-                }
-            }
-        }
+        var lessonTasks = BuildLessonTasks(
+            groups,
+            groupSubjects,
+            result);
 
         if (result.HasErrors)
         {
@@ -190,31 +155,29 @@ public class ScheduleGeneratorService
         if (lessonTasks.Count == 0)
         {
             result.AddError(
-                "Не найдено ни одного занятия для генерации."
-            );
+                "Не найдено ни одного занятия для генерации.");
 
             return result;
         }
 
         // --------------------------------------------------------
-        // CHECK TOTAL CAPACITY
+        // CAPACITY CHECK
         // --------------------------------------------------------
 
-        var availableSlotsCount =
+        var availableSlotsPerGroup =
             selectedDays.Count * timeSlots.Count;
 
         foreach (var group in groups)
         {
-            var requiredLessons = lessonTasks
-                .Count(x => x.GroupId == group.Id);
+            var requiredLessons = lessonTasks.Count(
+                x => x.GroupId == group.Id);
 
-            if (requiredLessons > availableSlotsCount)
+            if (requiredLessons > availableSlotsPerGroup)
             {
                 result.AddError(
                     $"Для группы «{group.Name}» требуется " +
                     $"{requiredLessons} занятий, но доступно только " +
-                    $"{availableSlotsCount} временных слотов."
-                );
+                    $"{availableSlotsPerGroup} временных слотов.");
             }
         }
 
@@ -229,16 +192,11 @@ public class ScheduleGeneratorService
 
         foreach (var task in lessonTasks)
         {
-            var candidates = GetTeacherCandidates(
-                task,
-                teachers);
-
-            if (candidates.Count == 0)
+            if (GetTeacherCandidates(task, teachers).Count == 0)
             {
                 result.AddError(
                     $"Для предмета «{task.SubjectName}» " +
-                    $"не найден преподаватель."
-                );
+                    "не найден преподаватель.");
             }
         }
 
@@ -254,20 +212,17 @@ public class ScheduleGeneratorService
         foreach (var task in lessonTasks)
         {
             var group = groups.First(
-                x => x.Id == task.GroupId);
+                g => g.Id == task.GroupId);
 
-            var candidates = GetClassroomCandidates(
-                task,
-                group,
-                classrooms);
-
-            if (candidates.Count == 0)
+            if (GetClassroomCandidates(
+                    task,
+                    group,
+                    classrooms).Count == 0)
             {
                 result.AddError(
                     $"Для занятия «{task.SubjectName}» " +
                     $"группы «{task.GroupName}» " +
-                    "не найдена подходящая аудитория."
-                );
+                    "не найдена подходящая аудитория.");
             }
         }
 
@@ -277,50 +232,33 @@ public class ScheduleGeneratorService
         }
 
         // --------------------------------------------------------
+        // BUILD SLOTS
+        // --------------------------------------------------------
+
+        var slots = BuildSlots(
+            selectedDays,
+            timeSlots);
+
+        // --------------------------------------------------------
         // ORDER LESSONS
         // --------------------------------------------------------
 
         var orderedLessons = OrderLessons(
             lessonTasks,
-            request.DistributeLessons);
+            groups,
+            teachers,
+            classrooms,
+            slots,
+            existingSchedules,
+            request);
 
         // --------------------------------------------------------
-        // CREATE SLOT LIST
-        // --------------------------------------------------------
-
-        var slots = new List<GenerationSlot>();
-
-        foreach (var day in selectedDays)
-        {
-            for (var i = 0; i < timeSlots.Count; i++)
-            {
-                slots.Add(
-                    new GenerationSlot
-                    {
-                        DayOfWeek = day,
-                        StartTime = timeSlots[i].StartTime,
-                        EndTime = timeSlots[i].EndTime,
-                        SlotIndex = i
-                    }
-                );
-            }
-        }
-
-        // --------------------------------------------------------
-        // GENERATION STATE
+        // BACKTRACKING GENERATION
         // --------------------------------------------------------
 
         var generated = new List<GeneratedCandidate>();
 
-        var searchState = new SearchState
-        {
-            NodesVisited = 0,
-            Failed = false
-        };
-
-        // --------------------------------------------------------
-        // BACKTRACKING
-        // --------------------------------------------------------
+        var searchState = new SearchState();
 
         var success = TryGenerate(
             index: 0,
@@ -339,11 +277,33 @@ public class ScheduleGeneratorService
             result.AddError(
                 searchState.NodesVisited >= MaxSearchNodes
                     ? "Не удалось построить расписание в допустимое количество попыток. " +
-                      "Попробуйте уменьшить количество занятий, увеличить число дней " +
-                      "или добавить временные интервалы."
+                      "Попробуйте увеличить количество дней или временных интервалов."
                     : "Не удалось построить расписание без конфликтов. " +
-                      "Попробуйте изменить дни, интервалы или ограничения."
-            );
+                      "Попробуйте изменить нагрузку, дни или ограничения.");
+
+            return result;
+        }
+
+        // --------------------------------------------------------
+        // FINAL VALIDATION
+        // --------------------------------------------------------
+
+        var finalErrors = ValidateGeneratedSchedule(
+            generated,
+            lessonTasks,
+            groups,
+            teachers,
+            classrooms,
+            existingSchedules,
+            request,
+            timeSlots);
+
+        if (finalErrors.Count > 0)
+        {
+            foreach (var error in finalErrors)
+            {
+                result.AddError(error);
+            }
 
             return result;
         }
@@ -355,7 +315,8 @@ public class ScheduleGeneratorService
         foreach (var item in generated
                      .OrderBy(x => x.DayOfWeek)
                      .ThenBy(x => x.StartTime)
-                     .ThenBy(x => x.GroupName))
+                     .ThenBy(x => x.GroupName)
+                     .ThenBy(x => x.SubjectName))
         {
             result.GeneratedItems.Add(
                 new GeneratedScheduleItem
@@ -377,13 +338,467 @@ public class ScheduleGeneratorService
                     EndTime = item.EndTime,
 
                     LessonNumber = item.LessonNumber
-                }
-            );
+                });
         }
 
         result.IsSuccess = true;
 
         return result;
+    }
+
+    // ============================================================
+    // VALIDATE BEFORE SAVE
+    // ============================================================
+
+    public async Task<List<string>> ValidateBeforeSaveAsync(
+        ScheduleGenerationPreviewViewModel preview)
+    {
+        var errors = new List<string>();
+
+        if (preview == null)
+        {
+            errors.Add("Предпросмотр расписания не найден.");
+            return errors;
+        }
+
+        if (preview.Items == null ||
+            preview.Items.Count == 0)
+        {
+            errors.Add(
+                "Предпросмотр не содержит ни одного занятия.");
+
+            return errors;
+        }
+
+        var selectedGroupIds = preview.SelectedGroupIds
+            .Distinct()
+            .ToHashSet();
+
+        var selectedDays = preview.SelectedDays
+            .Distinct()
+            .ToHashSet();
+
+        var timeSlots = preview.TimeSlots
+            .OrderBy(x => x.StartTime)
+            .ToList();
+
+        if (selectedGroupIds.Count == 0)
+        {
+            errors.Add("В предпросмотре не выбрана ни одна группа.");
+        }
+
+        if (selectedDays.Count == 0)
+        {
+            errors.Add("В предпросмотре не выбран ни один день.");
+        }
+
+        if (timeSlots.Count == 0)
+        {
+            errors.Add(
+                "В предпросмотре не найдено ни одного временного интервала.");
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
+        }
+
+        // --------------------------------------------------------
+        // CURRENT GROUPS
+        // --------------------------------------------------------
+
+        var groups = await _context.Groups
+            .AsNoTracking()
+            .Where(g => selectedGroupIds.Contains(g.Id))
+            .ToListAsync();
+
+        var groupById = groups.ToDictionary(g => g.Id);
+
+        foreach (var groupId in selectedGroupIds)
+        {
+            if (!groupById.ContainsKey(groupId))
+            {
+                errors.Add(
+                    $"Группа с ID {groupId} больше не существует.");
+            }
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
+        }
+
+        // --------------------------------------------------------
+        // CURRENT GROUP SUBJECTS
+        // --------------------------------------------------------
+
+        var groupSubjects = await _context.GroupSubjects
+            .AsNoTracking()
+            .Include(gs => gs.Subject)
+                .ThenInclude(s => s!.ClassroomCategoryRequirements)
+            .Where(gs => selectedGroupIds.Contains(gs.GroupId))
+            .ToListAsync();
+
+        var groupSubjectMap = groupSubjects
+            .GroupBy(gs => new
+            {
+                gs.GroupId,
+                gs.SubjectId
+            })
+            .ToDictionary(
+                g => (g.Key.GroupId, g.Key.SubjectId),
+                g => g.First());
+
+        // --------------------------------------------------------
+        // CURRENT TEACHERS
+        // --------------------------------------------------------
+
+        var teachers = await _context.Teachers
+            .AsNoTracking()
+            .ToListAsync();
+
+        var teacherById = teachers.ToDictionary(
+            t => t.Id);
+
+        // --------------------------------------------------------
+        // CURRENT CLASSROOMS
+        // --------------------------------------------------------
+
+        var classrooms = await _context.Classrooms
+            .AsNoTracking()
+            .Include(c => c.ClassroomCategory)
+            .ToListAsync();
+
+        var classroomById = classrooms.ToDictionary(
+            c => c.Id);
+
+        // --------------------------------------------------------
+        // PROTECTED EXISTING SCHEDULES
+        // --------------------------------------------------------
+        //
+        // Выбранные группы в выбранные дни будут заменены,
+        // поэтому они НЕ считаются конфликтующими.
+        //
+        // Остальные записи защищены и должны продолжать
+        // блокировать генерацию.
+        // --------------------------------------------------------
+
+        var protectedSchedules = await _context.Schedules
+            .AsNoTracking()
+            .Where(s =>
+                s.DayOfWeek.HasValue &&
+                s.StartTime.HasValue &&
+                s.EndTime.HasValue &&
+                selectedDays.Contains(s.DayOfWeek.Value) &&
+                !selectedGroupIds.Contains(s.GroupId))
+            .ToListAsync();
+
+        // --------------------------------------------------------
+        // PREVIEW ITEM VALIDATION
+        // --------------------------------------------------------
+
+        foreach (var item in preview.Items)
+        {
+            if (!selectedGroupIds.Contains(item.GroupId))
+            {
+                errors.Add(
+                    $"Предпросмотр содержит занятие группы «{item.GroupName}», " +
+                    "которая не выбрана для генерации.");
+            }
+
+            if (!selectedDays.Contains(item.DayOfWeek))
+            {
+                errors.Add(
+                    $"Занятие «{item.SubjectName}» группы «{item.GroupName}» " +
+                    "находится вне выбранных дней.");
+            }
+
+            if (item.StartTime >= item.EndTime)
+            {
+                errors.Add(
+                    $"Некорректное время занятия «{item.SubjectName}» " +
+                    $"для группы «{item.GroupName}».");
+            }
+
+            if (!groupById.TryGetValue(
+                    item.GroupId,
+                    out var group))
+            {
+                continue;
+            }
+
+            // ----------------------------------------------------
+            // GROUP SUBJECT
+            // ----------------------------------------------------
+
+            if (!groupSubjectMap.TryGetValue(
+                    (item.GroupId, item.SubjectId),
+                    out var groupSubject))
+            {
+                errors.Add(
+                    $"Предмет «{item.SubjectName}» больше не назначен " +
+                    $"группе «{group.Name}».");
+
+                continue;
+            }
+
+            if (groupSubject.Subject == null)
+            {
+                errors.Add(
+                    $"Предмет с ID {item.SubjectId} больше не существует.");
+
+                continue;
+            }
+
+            // ----------------------------------------------------
+            // TEACHER
+            // ----------------------------------------------------
+
+            if (!teacherById.TryGetValue(
+                    item.TeacherId,
+                    out var teacher))
+            {
+                errors.Add(
+                    $"Преподаватель «{item.TeacherName}» больше не существует.");
+            }
+            else if (teacher.SubjectId != item.SubjectId)
+            {
+                errors.Add(
+                    $"Преподаватель «{teacher.FullName}» больше не может " +
+                    $"вести предмет «{item.SubjectName}».");
+            }
+
+            // ----------------------------------------------------
+            // CLASSROOM
+            // ----------------------------------------------------
+
+            if (!classroomById.TryGetValue(
+                    item.ClassroomId,
+                    out var classroom))
+            {
+                errors.Add(
+                    $"Аудитория «{item.ClassroomName}» больше не существует.");
+
+                continue;
+            }
+
+            if (classroom.Capacity < group.StudentCount)
+            {
+                errors.Add(
+                    $"Аудитория «{classroom.Name}» не вмещает " +
+                    $"группу «{group.Name}».");
+            }
+
+            var requiredCategories = groupSubject.Subject
+                .ClassroomCategoryRequirements
+                .Select(x => x.ClassroomCategoryId)
+                .Distinct()
+                .ToHashSet();
+
+            if (requiredCategories.Count > 0 &&
+                !requiredCategories.Contains(
+                    classroom.ClassroomCategoryId))
+            {
+                errors.Add(
+                    $"Аудитория «{classroom.Name}» не соответствует " +
+                    $"требованиям предмета «{item.SubjectName}».");
+            }
+        }
+
+        // --------------------------------------------------------
+        // LOAD COUNTS
+        // --------------------------------------------------------
+
+        foreach (var group in groups)
+        {
+            var currentLoads = groupSubjects
+                .Where(gs => gs.GroupId == group.Id)
+                .ToList();
+
+            foreach (var groupSubject in currentLoads)
+            {
+                var actual = preview.Items.Count(item =>
+                    item.GroupId == group.Id &&
+                    item.SubjectId == groupSubject.SubjectId);
+
+                if (actual != groupSubject.WeeklyLessons)
+                {
+                    var subjectName =
+                        groupSubject.Subject?.Name ??
+                        $"ID {groupSubject.SubjectId}";
+
+                    errors.Add(
+                        $"Нагрузка по предмету «{subjectName}» " +
+                        $"для группы «{group.Name}» изменилась. " +
+                        $"Ожидалось {groupSubject.WeeklyLessons}, " +
+                        $"в предпросмотре {actual}.");
+                }
+            }
+        }
+
+        // --------------------------------------------------------
+        // INTERNAL CONFLICTS
+        // --------------------------------------------------------
+
+        ValidatePreviewInternalConflicts(
+            preview.Items,
+            errors);
+
+        // --------------------------------------------------------
+        // MAX LESSONS PER DAY
+        // --------------------------------------------------------
+
+        foreach (var groupDay in preview.Items
+                     .GroupBy(x => new
+                     {
+                         x.GroupId,
+                         x.DayOfWeek
+                     }))
+        {
+            if (groupDay.Count() >
+                preview.MaxLessonsPerDay)
+            {
+                var item = groupDay.First();
+
+                errors.Add(
+                    $"Для группы «{item.GroupName}» на {GetDayName(item.DayOfWeek)} " +
+                    $"запланировано {groupDay.Count()} занятий, " +
+                    $"что превышает лимит {preview.MaxLessonsPerDay}.");
+            }
+        }
+
+        // --------------------------------------------------------
+        // CONSECUTIVE LESSONS
+        // --------------------------------------------------------
+
+        ValidatePreviewConsecutiveLessons(
+            preview.Items,
+            protectedSchedules,
+            timeSlots,
+            preview.MaxConsecutiveLessons,
+            errors);
+
+        // --------------------------------------------------------
+        // CONFLICTS WITH PROTECTED SCHEDULE
+        // --------------------------------------------------------
+
+        foreach (var item in preview.Items)
+        {
+            foreach (var existing in protectedSchedules)
+            {
+                if (existing.DayOfWeek != item.DayOfWeek ||
+                    !existing.StartTime.HasValue ||
+                    !existing.EndTime.HasValue)
+                {
+                    continue;
+                }
+
+                if (!Overlaps(
+                        existing.StartTime.Value,
+                        existing.EndTime.Value,
+                        item.StartTime,
+                        item.EndTime))
+                {
+                    continue;
+                }
+
+                if (existing.GroupId == item.GroupId)
+                {
+                    errors.Add(
+                        $"Группа «{item.GroupName}» уже занята " +
+                        "в выбранное время.");
+                }
+
+                if (existing.TeacherId == item.TeacherId)
+                {
+                    errors.Add(
+                        $"Преподаватель «{item.TeacherName}» уже занят " +
+                        "в выбранное время.");
+                }
+
+                if (existing.ClassroomId == item.ClassroomId)
+                {
+                    errors.Add(
+                        $"Аудитория «{item.ClassroomName}» уже занята " +
+                        "в выбранное время.");
+                }
+            }
+        }
+
+        return errors
+            .Distinct()
+            .ToList();
+    }
+
+    // ============================================================
+    // LESSON TASKS
+    // ============================================================
+
+    private static List<LessonTask> BuildLessonTasks(
+        List<Group> groups,
+        List<GroupSubject> groupSubjects,
+        ScheduleGenerationResult result)
+    {
+        var tasks = new List<LessonTask>();
+
+        foreach (var group in groups)
+        {
+            var loads = groupSubjects
+                .Where(gs => gs.GroupId == group.Id)
+                .ToList();
+
+            if (loads.Count == 0)
+            {
+                result.AddError(
+                    $"Для группы «{group.Name}» не назначены предметы.");
+
+                continue;
+            }
+
+            foreach (var groupSubject in loads)
+            {
+                if (groupSubject.Subject == null)
+                {
+                    result.AddError(
+                        $"У группы «{group.Name}» найден предмет, " +
+                        "который не существует.");
+
+                    continue;
+                }
+
+                if (groupSubject.WeeklyLessons <= 0)
+                {
+                    result.AddError(
+                        $"Для предмета «{groupSubject.Subject.Name}» " +
+                        $"группы «{group.Name}» указано некорректное " +
+                        "количество занятий в неделю.");
+
+                    continue;
+                }
+
+                for (var number = 1;
+                     number <= groupSubject.WeeklyLessons;
+                     number++)
+                {
+                    tasks.Add(
+                        new LessonTask
+                        {
+                            GroupId = group.Id,
+                            GroupName = group.Name,
+                            StudentCount = group.StudentCount,
+
+                            SubjectId = groupSubject.Subject.Id,
+                            SubjectName = groupSubject.Subject.Name,
+
+                            Subject = groupSubject.Subject,
+
+                            LessonNumber = number
+                        });
+                }
+            }
+        }
+
+        return tasks;
     }
 
     // ============================================================
@@ -394,6 +809,12 @@ public class ScheduleGeneratorService
         ScheduleGenerationRequest request)
     {
         var errors = new List<string>();
+
+        if (request == null)
+        {
+            errors.Add("Запрос генерации не найден.");
+            return errors;
+        }
 
         if (request.SelectedGroupIds == null ||
             request.SelectedGroupIds.Count == 0)
@@ -411,28 +832,22 @@ public class ScheduleGeneratorService
             request.TimeSlots.Count == 0)
         {
             errors.Add(
-                "Добавьте хотя бы один временной интервал."
-            );
+                "Добавьте хотя бы один временной интервал.");
         }
         else
         {
-            for (var i = 0;
-                 i < request.TimeSlots.Count;
-                 i++)
+            for (var i = 0; i < request.TimeSlots.Count; i++)
             {
                 var slot = request.TimeSlots[i];
 
                 if (slot.StartTime >= slot.EndTime)
                 {
                     errors.Add(
-                        $"Временной интервал №{i + 1} некорректен."
-                    );
+                        $"Временной интервал №{i + 1} некорректен.");
                 }
             }
 
-            for (var i = 0;
-                 i < request.TimeSlots.Count;
-                 i++)
+            for (var i = 0; i < request.TimeSlots.Count; i++)
             {
                 for (var j = i + 1;
                      j < request.TimeSlots.Count;
@@ -441,13 +856,15 @@ public class ScheduleGeneratorService
                     var first = request.TimeSlots[i];
                     var second = request.TimeSlots[j];
 
-                    if (first.StartTime < second.EndTime &&
-                        first.EndTime > second.StartTime)
+                    if (Overlaps(
+                            first.StartTime,
+                            first.EndTime,
+                            second.StartTime,
+                            second.EndTime))
                     {
                         errors.Add(
                             $"Временные интервалы №{i + 1} и " +
-                            $"№{j + 1} пересекаются."
-                        );
+                            $"№{j + 1} пересекаются.");
                     }
                 }
             }
@@ -457,58 +874,86 @@ public class ScheduleGeneratorService
             request.MaxLessonsPerDay > 10)
         {
             errors.Add(
-                "Максимальное количество пар в день должно быть от 1 до 10."
-            );
+                "Максимальное количество пар в день должно быть от 1 до 10.");
         }
 
         if (request.MaxConsecutiveLessons < 1 ||
             request.MaxConsecutiveLessons > 10)
         {
             errors.Add(
-                "Максимальное количество пар подряд должно быть от 1 до 10."
-            );
+                "Максимальное количество пар подряд должно быть от 1 до 10.");
         }
 
-        return errors;
+        return errors
+            .Distinct()
+            .ToList();
     }
 
     // ============================================================
-    // ORDER LESSONS
+    // BUILD SLOTS
+    // ============================================================
+
+    private static List<GenerationSlot> BuildSlots(
+        List<DayOfWeek> days,
+        List<GenerationTimeSlot> timeSlots)
+    {
+        var slots = new List<GenerationSlot>();
+
+        foreach (var day in days)
+        {
+            for (var i = 0; i < timeSlots.Count; i++)
+            {
+                slots.Add(
+                    new GenerationSlot
+                    {
+                        DayOfWeek = day,
+                        StartTime = timeSlots[i].StartTime,
+                        EndTime = timeSlots[i].EndTime,
+                        SlotIndex = i
+                    });
+            }
+        }
+
+        return slots;
+    }
+
+    // ============================================================
+    // LESSON ORDER
     // ============================================================
 
     private static List<LessonTask> OrderLessons(
         List<LessonTask> lessons,
-        bool distributeLessons)
+        List<Group> groups,
+        List<Teacher> teachers,
+        List<Classroom> classrooms,
+        List<GenerationSlot> slots,
+        List<Schedule> existingSchedules,
+        ScheduleGenerationRequest request)
     {
-        /*
-         * Сначала ставим более сложные занятия:
-         *
-         * 1. предметы с меньшим количеством преподавателей;
-         * 2. предметы с более строгими требованиями;
-         * 3. большие группы.
-         *
-         * Само количество преподавателей здесь не загружаем
-         * отдельным запросом — предварительная сортировка
-         * выполняется позже непосредственно в поиске.
-         */
-
-        if (!distributeLessons)
-        {
-            return lessons
-                .OrderByDescending(x => x.StudentCount)
-                .ThenBy(x => x.SubjectName)
-                .ThenBy(x => x.GroupName)
-                .ThenBy(x => x.LessonNumber)
-                .ToList();
-        }
-
-        /*
-         * При распределении одинаковые предметы одной группы
-         * стараемся разнести по поиску.
-         */
-
         return lessons
-            .OrderByDescending(x => x.StudentCount)
+            .OrderByDescending(x =>
+                GetTeacherCandidates(x, teachers).Count == 1)
+
+            .ThenByDescending(x =>
+                GetClassroomCandidates(
+                    x,
+                    groups.First(g => g.Id == x.GroupId),
+                    classrooms).Count == 1)
+
+            .ThenByDescending(x =>
+                x.Subject.ClassroomCategoryRequirements.Count > 0)
+
+            .ThenByDescending(x => x.StudentCount)
+
+            .ThenBy(x =>
+                GetTeacherCandidates(x, teachers).Count)
+
+            .ThenBy(x =>
+                GetClassroomCandidates(
+                    x,
+                    groups.First(g => g.Id == x.GroupId),
+                    classrooms).Count)
+
             .ThenBy(x => x.SubjectName)
             .ThenBy(x => x.GroupName)
             .ThenBy(x => x.LessonNumber)
@@ -543,12 +988,12 @@ public class ScheduleGeneratorService
             return false;
         }
 
-        var remainingLessons = lessons
+        var remaining = lessons
             .Skip(index)
             .ToList();
 
         var task = SelectMostConstrainedLesson(
-            remainingLessons,
+            remaining,
             slots,
             groups,
             teachers,
@@ -562,11 +1007,6 @@ public class ScheduleGeneratorService
             return false;
         }
 
-        /*
-         * Меняем task с текущей позицией.
-         * Это позволяет сначала обрабатывать самые сложные занятия.
-         */
-
         var taskIndex = lessons.IndexOf(task);
 
         if (taskIndex != index)
@@ -578,7 +1018,7 @@ public class ScheduleGeneratorService
         }
 
         var group = groups.First(
-            x => x.Id == task.GroupId);
+            g => g.Id == task.GroupId);
 
         var teacherCandidates = GetTeacherCandidates(
             task,
@@ -588,12 +1028,6 @@ public class ScheduleGeneratorService
             task,
             group,
             classrooms);
-
-        if (teacherCandidates.Count == 0 ||
-            classroomCandidates.Count == 0)
-        {
-            return false;
-        }
 
         var slotCandidates = GetSlotCandidates(
             task,
@@ -614,7 +1048,12 @@ public class ScheduleGeneratorService
                 continue;
             }
 
-            foreach (var teacher in teacherCandidates)
+            var orderedTeachers = OrderTeachers(
+                teacherCandidates,
+                slot,
+                generated);
+
+            foreach (var teacher in orderedTeachers)
             {
                 if (!CanPlaceTeacher(
                         teacher.Id,
@@ -642,29 +1081,27 @@ public class ScheduleGeneratorService
                         continue;
                     }
 
-                    var candidate =
-                        new GeneratedCandidate
-                        {
-                            GroupId = group.Id,
-                            GroupName = group.Name,
+                    var candidate = new GeneratedCandidate
+                    {
+                        GroupId = group.Id,
+                        GroupName = group.Name,
 
-                            SubjectId = task.SubjectId,
-                            SubjectName = task.SubjectName,
+                        SubjectId = task.SubjectId,
+                        SubjectName = task.SubjectName,
 
-                            TeacherId = teacher.Id,
-                            TeacherName = teacher.FullName,
+                        TeacherId = teacher.Id,
+                        TeacherName = teacher.FullName,
 
-                            ClassroomId = classroom.Id,
-                            ClassroomName = classroom.Name,
+                        ClassroomId = classroom.Id,
+                        ClassroomName = classroom.Name,
 
-                            DayOfWeek = slot.DayOfWeek,
-                            StartTime = slot.StartTime,
-                            EndTime = slot.EndTime,
+                        DayOfWeek = slot.DayOfWeek,
+                        StartTime = slot.StartTime,
+                        EndTime = slot.EndTime,
 
-                            LessonNumber = task.LessonNumber,
-
-                            SlotIndex = slot.SlotIndex
-                        };
+                        LessonNumber = task.LessonNumber,
+                        SlotIndex = slot.SlotIndex
+                    };
 
                     generated.Add(candidate);
 
@@ -685,7 +1122,7 @@ public class ScheduleGeneratorService
 
                     generated.Remove(candidate);
 
-                    if (state.NodesVisited > MaxSearchNodes)
+                    if (state.NodesVisited >= MaxSearchNodes)
                     {
                         return false;
                     }
@@ -700,7 +1137,7 @@ public class ScheduleGeneratorService
     // MOST CONSTRAINED LESSON
     // ============================================================
 
-    private LessonTask? SelectMostConstrainedLesson(
+    private static LessonTask? SelectMostConstrainedLesson(
         List<LessonTask> lessons,
         List<GenerationSlot> slots,
         List<Group> groups,
@@ -711,12 +1148,13 @@ public class ScheduleGeneratorService
         ScheduleGenerationRequest request)
     {
         LessonTask? selected = null;
-        var smallestCandidateCount = int.MaxValue;
+
+        var smallestScore = long.MaxValue;
 
         foreach (var lesson in lessons)
         {
             var group = groups.First(
-                x => x.Id == lesson.GroupId);
+                g => g.Id == lesson.GroupId);
 
             var teacherCount = GetTeacherCandidates(
                 lesson,
@@ -740,14 +1178,19 @@ public class ScheduleGeneratorService
                 generated,
                 request).Count;
 
-            var total =
-                Math.Max(1, teacherCount) *
-                Math.Max(1, classroomCount) *
-                Math.Max(1, slotCount);
-
-            if (total < smallestCandidateCount)
+            if (slotCount == 0)
             {
-                smallestCandidateCount = total;
+                return lesson;
+            }
+
+            var score =
+                (long)teacherCount *
+                classroomCount *
+                slotCount;
+
+            if (score < smallestScore)
+            {
+                smallestScore = score;
                 selected = lesson;
             }
         }
@@ -769,6 +1212,20 @@ public class ScheduleGeneratorService
             .ToList();
     }
 
+    private static List<Teacher> OrderTeachers(
+        List<Teacher> teachers,
+        GenerationSlot slot,
+        List<GeneratedCandidate> generated)
+    {
+        return teachers
+            .OrderBy(t =>
+                generated.Count(x =>
+                    x.TeacherId == t.Id &&
+                    x.DayOfWeek == slot.DayOfWeek))
+            .ThenBy(t => t.FullName)
+            .ToList();
+    }
+
     // ============================================================
     // CLASSROOMS
     // ============================================================
@@ -787,12 +1244,51 @@ public class ScheduleGeneratorService
         return classrooms
             .Where(c =>
                 c.Capacity >= group.StudentCount)
+
             .Where(c =>
                 requiredCategoryIds.Count == 0 ||
                 requiredCategoryIds.Contains(
                     c.ClassroomCategoryId))
+
             .OrderBy(c => c.Capacity)
             .ThenBy(c => c.Name)
+            .ToList();
+    }
+
+    private static List<Classroom> OrderClassrooms(
+        List<Classroom> classrooms,
+        LessonTask task,
+        Group group,
+        bool useRecommendations)
+    {
+        var requiredCategoryIds = task.Subject
+            .ClassroomCategoryRequirements
+            .Select(x => x.ClassroomCategoryId)
+            .Distinct()
+            .ToHashSet();
+
+        if (!useRecommendations)
+        {
+            return classrooms
+                .OrderBy(c => c.Name)
+                .ToList();
+        }
+
+        return classrooms
+            .OrderByDescending(c =>
+                requiredCategoryIds.Count == 0 ||
+                requiredCategoryIds.Contains(
+                    c.ClassroomCategoryId))
+
+            .ThenBy(c =>
+                Math.Max(
+                    0,
+                    c.Capacity - group.StudentCount))
+
+            .ThenBy(c => c.Capacity)
+
+            .ThenBy(c => c.Name)
+
             .ToList();
     }
 
@@ -807,49 +1303,47 @@ public class ScheduleGeneratorService
         List<GeneratedCandidate> generated,
         ScheduleGenerationRequest request)
     {
-        var candidates = new List<GenerationSlot>();
-
-        foreach (var slot in slots)
-        {
-            if (!CanPlaceGroup(
+        var candidates = slots
+            .Where(slot =>
+                CanPlaceGroup(
                     task,
                     slot,
                     generated,
                     existingSchedules,
                     request))
-            {
-                continue;
-            }
-
-            candidates.Add(slot);
-        }
+            .ToList();
 
         if (request.DistributeLessons)
         {
-            candidates = candidates
+            return candidates
                 .OrderBy(slot =>
                     CountGroupLessonsOnDay(
                         task.GroupId,
                         slot.DayOfWeek,
                         generated))
+
                 .ThenBy(slot =>
-                    CountGroupLessonsInSlotRange(
+                    CountSubjectLessonsOnDay(
+                        task.GroupId,
+                        task.SubjectId,
+                        slot.DayOfWeek,
+                        generated))
+
+                .ThenBy(slot =>
+                    CountGroupLessonsBeforeSlot(
                         task.GroupId,
                         slot,
                         generated))
+
                 .ThenBy(slot => slot.DayOfWeek)
                 .ThenBy(slot => slot.StartTime)
                 .ToList();
         }
-        else
-        {
-            candidates = candidates
-                .OrderBy(slot => slot.DayOfWeek)
-                .ThenBy(slot => slot.StartTime)
-                .ToList();
-        }
 
-        return candidates;
+        return candidates
+            .OrderBy(slot => slot.DayOfWeek)
+            .ThenBy(slot => slot.StartTime)
+            .ToList();
     }
 
     // ============================================================
@@ -863,19 +1357,20 @@ public class ScheduleGeneratorService
         List<Schedule> existingSchedules,
         ScheduleGenerationRequest request)
     {
-        var existingGroupSchedules = existingSchedules
-            .Where(s =>
-                s.GroupId == task.GroupId &&
-                s.DayOfWeek == slot.DayOfWeek &&
-                s.StartTime.HasValue &&
-                s.EndTime.HasValue)
-            .ToList();
-
-        foreach (var existing in existingGroupSchedules)
+        // Protected existing schedules.
+        foreach (var existing in existingSchedules)
         {
+            if (existing.GroupId != task.GroupId ||
+                existing.DayOfWeek != slot.DayOfWeek ||
+                !existing.StartTime.HasValue ||
+                !existing.EndTime.HasValue)
+            {
+                continue;
+            }
+
             if (Overlaps(
-                    existing.StartTime!.Value,
-                    existing.EndTime!.Value,
+                    existing.StartTime.Value,
+                    existing.EndTime.Value,
                     slot.StartTime,
                     slot.EndTime))
             {
@@ -883,6 +1378,7 @@ public class ScheduleGeneratorService
             }
         }
 
+        // Generated schedules.
         foreach (var item in generated)
         {
             if (item.GroupId != task.GroupId ||
@@ -901,28 +1397,19 @@ public class ScheduleGeneratorService
             }
         }
 
-        var lessonsToday = CountGroupLessonsOnDay(
-            task.GroupId,
-            slot.DayOfWeek,
-            generated);
+        var generatedToday =
+            CountGroupLessonsOnDay(
+                task.GroupId,
+                slot.DayOfWeek,
+                generated);
 
-        var existingLessonsToday = existingSchedules
-            .Count(s =>
+        var existingToday =
+            existingSchedules.Count(s =>
                 s.GroupId == task.GroupId &&
                 s.DayOfWeek == slot.DayOfWeek);
 
-        if (lessonsToday + existingLessonsToday >=
+        if (generatedToday + existingToday >=
             request.MaxLessonsPerDay)
-        {
-            return false;
-        }
-
-        if (!CanPlaceConsecutive(
-                task.GroupId,
-                slot,
-                generated,
-                existingSchedules,
-                request.MaxConsecutiveLessons))
         {
             return false;
         }
@@ -1033,110 +1520,6 @@ public class ScheduleGeneratorService
     }
 
     // ============================================================
-    // CONSECUTIVE LESSONS
-    // ============================================================
-
-    private static bool CanPlaceConsecutive(
-        int groupId,
-        GenerationSlot slot,
-        List<GeneratedCandidate> generated,
-        List<Schedule> existingSchedules,
-        int maxConsecutive)
-    {
-        if (maxConsecutive <= 0)
-        {
-            return true;
-        }
-
-        var occupied = new HashSet<int>();
-
-        foreach (var item in generated)
-        {
-            if (item.GroupId == groupId &&
-                item.DayOfWeek == slot.DayOfWeek)
-            {
-                occupied.Add(item.SlotIndex);
-            }
-        }
-
-        /*
-         * Существующие расписания не имеют SlotIndex.
-         * Поэтому здесь проверяем только непосредственное
-         * количество уже сгенерированных соседних слотов.
-         *
-         * Конфликты с существующей БД при этом всё равно
-         * полностью проверяются выше.
-         */
-
-        occupied.Add(slot.SlotIndex);
-
-        var consecutive = 1;
-
-        var left = slot.SlotIndex - 1;
-
-        while (occupied.Contains(left))
-        {
-            consecutive++;
-            left--;
-        }
-
-        var right = slot.SlotIndex + 1;
-
-        while (occupied.Contains(right))
-        {
-            consecutive++;
-            right++;
-        }
-
-        return consecutive <= maxConsecutive;
-    }
-
-    // ============================================================
-    // CLASSROOM ORDER
-    // ============================================================
-
-    private static List<Classroom> OrderClassrooms(
-        List<Classroom> classrooms,
-        LessonTask task,
-        Group group,
-        bool useRecommendations)
-    {
-        var requiredCategoryIds = task.Subject
-            .ClassroomCategoryRequirements
-            .Select(x => x.ClassroomCategoryId)
-            .Distinct()
-            .ToHashSet();
-
-        if (!useRecommendations)
-        {
-            return classrooms
-                .OrderBy(c => c.Name)
-                .ToList();
-        }
-
-        /*
-         * Предпочитаем аудиторию:
-         *
-         * 1. подходящей категории;
-         * 2. с минимальным достаточным количеством мест.
-         *
-         * Таким образом большая аудитория не занимает место,
-         * если есть подходящая небольшая.
-         */
-
-        return classrooms
-            .OrderByDescending(c =>
-                requiredCategoryIds.Count == 0 ||
-                requiredCategoryIds.Contains(
-                    c.ClassroomCategoryId))
-            .ThenBy(c =>
-                Math.Max(0, c.Capacity - group.StudentCount))
-            .ThenBy(c => c.Capacity)
-            .ThenBy(c => c.Name)
-            .ToList();
-    }
-
-    // ============================================================
     // DISTRIBUTION HELPERS
     // ============================================================
 
@@ -1150,7 +1533,19 @@ public class ScheduleGeneratorService
             x.DayOfWeek == day);
     }
 
-    private static int CountGroupLessonsInSlotRange(
+    private static int CountSubjectLessonsOnDay(
+        int groupId,
+        int subjectId,
+        DayOfWeek day,
+        List<GeneratedCandidate> generated)
+    {
+        return generated.Count(x =>
+            x.GroupId == groupId &&
+            x.SubjectId == subjectId &&
+            x.DayOfWeek == day);
+    }
+
+    private static int CountGroupLessonsBeforeSlot(
         int groupId,
         GenerationSlot slot,
         List<GeneratedCandidate> generated)
@@ -1158,10 +1553,645 @@ public class ScheduleGeneratorService
         return generated.Count(x =>
             x.GroupId == groupId &&
             x.DayOfWeek == slot.DayOfWeek &&
-            (
-                x.StartTime == slot.StartTime ||
-                x.EndTime == slot.EndTime
-            ));
+            x.SlotIndex < slot.SlotIndex);
+    }
+
+    // ============================================================
+    // FINAL VALIDATION
+    // ============================================================
+
+    private static List<string> ValidateGeneratedSchedule(
+        List<GeneratedCandidate> generated,
+        List<LessonTask> lessonTasks,
+        List<Group> groups,
+        List<Teacher> teachers,
+        List<Classroom> classrooms,
+        List<Schedule> existingSchedules,
+        ScheduleGenerationRequest request,
+        List<GenerationTimeSlot> timeSlots)
+    {
+        var errors = new List<string>();
+
+        // --------------------------------------------------------
+        // COUNT
+        // --------------------------------------------------------
+
+        if (generated.Count != lessonTasks.Count)
+        {
+            errors.Add(
+                $"Генератор создал {generated.Count} занятий " +
+                $"из {lessonTasks.Count} необходимых.");
+
+            return errors;
+        }
+
+        // --------------------------------------------------------
+        // SUBJECT LOAD
+        // --------------------------------------------------------
+
+        foreach (var group in groups)
+        {
+            var expected = lessonTasks
+                .Where(x => x.GroupId == group.Id)
+                .GroupBy(x => x.SubjectId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Count());
+
+            foreach (var pair in expected)
+            {
+                var actual = generated.Count(x =>
+                    x.GroupId == group.Id &&
+                    x.SubjectId == pair.Key);
+
+                if (actual != pair.Value)
+                {
+                    var subjectName = lessonTasks
+                        .First(x =>
+                            x.GroupId == group.Id &&
+                            x.SubjectId == pair.Key)
+                        .SubjectName;
+
+                    errors.Add(
+                        $"Нагрузка по предмету «{subjectName}» " +
+                        $"для группы «{group.Name}» " +
+                        "сформирована неверно.");
+                }
+            }
+        }
+
+        // --------------------------------------------------------
+        // GROUP CONFLICTS
+        // --------------------------------------------------------
+
+        foreach (var groupDay in generated
+                     .GroupBy(x => new
+                     {
+                         x.GroupId,
+                         x.DayOfWeek
+                     }))
+        {
+            var items = groupDay.ToList();
+
+            if (items.Count > request.MaxLessonsPerDay)
+            {
+                var groupName = items[0].GroupName;
+
+                errors.Add(
+                    $"Для группы «{groupName}» превышено " +
+                    "максимальное количество занятий в день.");
+            }
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                for (var j = i + 1; j < items.Count; j++)
+                {
+                    if (Overlaps(
+                            items[i].StartTime,
+                            items[i].EndTime,
+                            items[j].StartTime,
+                            items[j].EndTime))
+                    {
+                        errors.Add(
+                            $"Обнаружен конфликт расписания " +
+                            $"для группы «{items[i].GroupName}».");
+                    }
+                }
+            }
+        }
+
+        // --------------------------------------------------------
+        // TEACHER CONFLICTS
+        // --------------------------------------------------------
+
+        foreach (var teacherDay in generated
+                     .GroupBy(x => new
+                     {
+                         x.TeacherId,
+                         x.DayOfWeek
+                     }))
+        {
+            var items = teacherDay.ToList();
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                for (var j = i + 1; j < items.Count; j++)
+                {
+                    if (Overlaps(
+                            items[i].StartTime,
+                            items[i].EndTime,
+                            items[j].StartTime,
+                            items[j].EndTime))
+                    {
+                        errors.Add(
+                            $"Обнаружен конфликт расписания " +
+                            $"для преподавателя «{items[i].TeacherName}».");
+                    }
+                }
+            }
+        }
+
+        // --------------------------------------------------------
+        // CLASSROOM CONFLICTS
+        // --------------------------------------------------------
+
+        foreach (var classroomDay in generated
+                     .GroupBy(x => new
+                     {
+                         x.ClassroomId,
+                         x.DayOfWeek
+                     }))
+        {
+            var items = classroomDay.ToList();
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                for (var j = i + 1; j < items.Count; j++)
+                {
+                    if (Overlaps(
+                            items[i].StartTime,
+                            items[i].EndTime,
+                            items[j].StartTime,
+                            items[j].EndTime))
+                    {
+                        errors.Add(
+                            $"Обнаружен конфликт аудитории " +
+                            $"«{items[i].ClassroomName}».");
+                    }
+                }
+            }
+        }
+
+        // --------------------------------------------------------
+        // EXISTING SCHEDULE CONFLICTS
+        // --------------------------------------------------------
+
+        foreach (var item in generated)
+        {
+            foreach (var existing in existingSchedules)
+            {
+                if (existing.DayOfWeek != item.DayOfWeek ||
+                    !existing.StartTime.HasValue ||
+                    !existing.EndTime.HasValue)
+                {
+                    continue;
+                }
+
+                if (!Overlaps(
+                        existing.StartTime.Value,
+                        existing.EndTime.Value,
+                        item.StartTime,
+                        item.EndTime))
+                {
+                    continue;
+                }
+
+                if (existing.GroupId == item.GroupId)
+                {
+                    errors.Add(
+                        $"Группа «{item.GroupName}» уже имеет " +
+                        "занятие в выбранное время.");
+                }
+
+                if (existing.TeacherId == item.TeacherId)
+                {
+                    errors.Add(
+                        $"Преподаватель «{item.TeacherName}» " +
+                        "уже занят в выбранное время.");
+                }
+
+                if (existing.ClassroomId == item.ClassroomId)
+                {
+                    errors.Add(
+                        $"Аудитория «{item.ClassroomName}» " +
+                        "уже занята в выбранное время.");
+                }
+            }
+        }
+
+        // --------------------------------------------------------
+        // TEACHER VALIDITY
+        // --------------------------------------------------------
+
+        var teacherIdsBySubject = teachers
+            .Where(t => t.SubjectId.HasValue)
+            .GroupBy(t => t.SubjectId!.Value)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(t => t.Id).ToHashSet());
+
+        foreach (var item in generated)
+        {
+            if (!teacherIdsBySubject.TryGetValue(
+                    item.SubjectId,
+                    out var teacherIds) ||
+                !teacherIds.Contains(item.TeacherId))
+            {
+                errors.Add(
+                    $"Преподаватель «{item.TeacherName}» " +
+                    $"не может вести предмет «{item.SubjectName}».");
+            }
+        }
+
+        // --------------------------------------------------------
+        // CLASSROOM VALIDITY
+        // --------------------------------------------------------
+
+        var classroomById = classrooms
+            .ToDictionary(c => c.Id);
+
+        foreach (var item in generated)
+        {
+            if (!classroomById.TryGetValue(
+                    item.ClassroomId,
+                    out var classroom))
+            {
+                errors.Add(
+                    $"Аудитория «{item.ClassroomName}» не найдена.");
+
+                continue;
+            }
+
+            var group = groups.First(
+                g => g.Id == item.GroupId);
+
+            if (classroom.Capacity < group.StudentCount)
+            {
+                errors.Add(
+                    $"Аудитория «{classroom.Name}» " +
+                    $"не вмещает группу «{group.Name}».");
+            }
+
+            var task = lessonTasks.First(
+                x =>
+                    x.GroupId == item.GroupId &&
+                    x.SubjectId == item.SubjectId);
+
+            var requiredCategories = task.Subject
+                .ClassroomCategoryRequirements
+                .Select(x => x.ClassroomCategoryId)
+                .Distinct()
+                .ToHashSet();
+
+            if (requiredCategories.Count > 0 &&
+                !requiredCategories.Contains(
+                    classroom.ClassroomCategoryId))
+            {
+                errors.Add(
+                    $"Аудитория «{classroom.Name}» " +
+                    "не соответствует требованиям " +
+                    $"предмета «{item.SubjectName}».");
+            }
+        }
+
+        // --------------------------------------------------------
+        // CONSECUTIVE LESSONS
+        // --------------------------------------------------------
+
+        ValidateGeneratedConsecutiveLessons(
+            generated,
+            existingSchedules,
+            timeSlots,
+            request.MaxConsecutiveLessons,
+            errors);
+
+        return errors
+            .Distinct()
+            .ToList();
+    }
+
+    // ============================================================
+    // PREVIEW INTERNAL CONFLICTS
+    // ============================================================
+
+    private static void ValidatePreviewInternalConflicts(
+        List<GeneratedScheduleItem> items,
+        List<string> errors)
+    {
+        ValidatePreviewEntityConflicts(
+            items,
+            x => x.GroupId,
+            x => x.GroupName,
+            "группы",
+            "группе",
+            errors);
+
+        ValidatePreviewEntityConflicts(
+            items,
+            x => x.TeacherId,
+            x => x.TeacherName,
+            "преподавателя",
+            "преподавателю",
+            errors);
+
+        ValidatePreviewEntityConflicts(
+            items,
+            x => x.ClassroomId,
+            x => x.ClassroomName,
+            "аудитории",
+            "аудитории",
+            errors);
+    }
+
+    private static void ValidatePreviewEntityConflicts<TKey>(
+        List<GeneratedScheduleItem> items,
+        Func<GeneratedScheduleItem, TKey> keySelector,
+        Func<GeneratedScheduleItem, string> nameSelector,
+        string entityName,
+        string entityNameDative,
+        List<string> errors)
+    {
+        foreach (var group in items.GroupBy(x => new
+        {
+            Key = keySelector(x),
+            x.DayOfWeek
+        }))
+        {
+            var dayItems = group.ToList();
+
+            for (var i = 0; i < dayItems.Count; i++)
+            {
+                for (var j = i + 1; j < dayItems.Count; j++)
+                {
+                    if (!Overlaps(
+                            dayItems[i].StartTime,
+                            dayItems[i].EndTime,
+                            dayItems[j].StartTime,
+                            dayItems[j].EndTime))
+                    {
+                        continue;
+                    }
+
+                    errors.Add(
+                        $"Обнаружен конфликт для {entityNameDative} " +
+                        $"«{nameSelector(dayItems[i])}» " +
+                        $"на {GetDayName(dayItems[i].DayOfWeek)}.");
+
+                    break;
+                }
+            }
+        }
+    }
+
+    // ============================================================
+    // PREVIEW CONSECUTIVE LESSONS
+    // ============================================================
+
+    private static void ValidatePreviewConsecutiveLessons(
+        List<GeneratedScheduleItem> previewItems,
+        List<Schedule> protectedSchedules,
+        List<GenerationTimeSlot> timeSlots,
+        int maxConsecutiveLessons,
+        List<string> errors)
+    {
+        if (maxConsecutiveLessons <= 0 ||
+            timeSlots.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var groupDay in previewItems
+                     .GroupBy(x => new
+                     {
+                         x.GroupId,
+                         x.DayOfWeek
+                     }))
+        {
+            var groupItems = groupDay.ToList();
+
+            for (var slotIndex = 0;
+                 slotIndex < timeSlots.Count;
+                 slotIndex++)
+            {
+                var slot = timeSlots[slotIndex];
+
+                if (!groupItems.Any(item =>
+                        Overlaps(
+                            item.StartTime,
+                            item.EndTime,
+                            slot.StartTime,
+                            slot.EndTime)))
+                {
+                    continue;
+                }
+
+                var consecutive = CountConsecutivePreviewSlots(
+                    groupDay.Key.GroupId,
+                    groupDay.Key.DayOfWeek,
+                    slotIndex,
+                    groupItems,
+                    protectedSchedules,
+                    timeSlots);
+
+                if (consecutive > maxConsecutiveLessons)
+                {
+                    var groupName = groupItems[0].GroupName;
+
+                    errors.Add(
+                        $"Для группы «{groupName}» на " +
+                        $"{GetDayName(groupDay.Key.DayOfWeek)} " +
+                        $"получилось {consecutive} занятий подряд. " +
+                        $"Допустимо максимум {maxConsecutiveLessons}.");
+
+                    break;
+                }
+            }
+        }
+    }
+
+    private static int CountConsecutivePreviewSlots(
+        int groupId,
+        DayOfWeek day,
+        int targetSlotIndex,
+        List<GeneratedScheduleItem> previewItems,
+        List<Schedule> protectedSchedules,
+        List<GenerationTimeSlot> timeSlots)
+    {
+        var occupied = new HashSet<int>();
+
+        for (var i = 0; i < timeSlots.Count; i++)
+        {
+            var slot = timeSlots[i];
+
+            var occupiedByPreview = previewItems.Any(item =>
+                Overlaps(
+                    item.StartTime,
+                    item.EndTime,
+                    slot.StartTime,
+                    slot.EndTime));
+
+            var occupiedByExisting = protectedSchedules.Any(existing =>
+                existing.GroupId == groupId &&
+                existing.DayOfWeek == day &&
+                existing.StartTime.HasValue &&
+                existing.EndTime.HasValue &&
+                Overlaps(
+                    existing.StartTime.Value,
+                    existing.EndTime.Value,
+                    slot.StartTime,
+                    slot.EndTime));
+
+            if (occupiedByPreview || occupiedByExisting)
+            {
+                occupied.Add(i);
+            }
+        }
+
+        if (!occupied.Contains(targetSlotIndex))
+        {
+            return 0;
+        }
+
+        var count = 1;
+
+        var left = targetSlotIndex - 1;
+
+        while (occupied.Contains(left))
+        {
+            count++;
+            left--;
+        }
+
+        var right = targetSlotIndex + 1;
+
+        while (occupied.Contains(right))
+        {
+            count++;
+            right++;
+        }
+
+        return count;
+    }
+
+    // ============================================================
+    // GENERATED CONSECUTIVE LESSONS
+    // ============================================================
+
+    private static void ValidateGeneratedConsecutiveLessons(
+        List<GeneratedCandidate> generated,
+        List<Schedule> existingSchedules,
+        List<GenerationTimeSlot> timeSlots,
+        int maxConsecutiveLessons,
+        List<string> errors)
+    {
+        if (maxConsecutiveLessons <= 0 ||
+            timeSlots.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var groupDay in generated
+                     .GroupBy(x => new
+                     {
+                         x.GroupId,
+                         x.DayOfWeek
+                     }))
+        {
+            var generatedItems = groupDay.ToList();
+
+            for (var slotIndex = 0;
+                 slotIndex < timeSlots.Count;
+                 slotIndex++)
+            {
+                var slot = timeSlots[slotIndex];
+
+                if (!generatedItems.Any(item =>
+                        Overlaps(
+                            item.StartTime,
+                            item.EndTime,
+                            slot.StartTime,
+                            slot.EndTime)))
+                {
+                    continue;
+                }
+
+                var occupied = new HashSet<int>();
+
+                for (var i = 0; i < timeSlots.Count; i++)
+                {
+                    var currentSlot = timeSlots[i];
+
+                    var generatedOccupied =
+                        generatedItems.Any(item =>
+                            Overlaps(
+                                item.StartTime,
+                                item.EndTime,
+                                currentSlot.StartTime,
+                                currentSlot.EndTime));
+
+                    var existingOccupied =
+                        existingSchedules.Any(existing =>
+                            existing.GroupId == groupDay.Key.GroupId &&
+                            existing.DayOfWeek == groupDay.Key.DayOfWeek &&
+                            existing.StartTime.HasValue &&
+                            existing.EndTime.HasValue &&
+                            Overlaps(
+                                existing.StartTime.Value,
+                                existing.EndTime.Value,
+                                currentSlot.StartTime,
+                                currentSlot.EndTime));
+
+                    if (generatedOccupied || existingOccupied)
+                    {
+                        occupied.Add(i);
+                    }
+                }
+
+                if (!occupied.Contains(slotIndex))
+                {
+                    continue;
+                }
+
+                var consecutive = 1;
+
+                var left = slotIndex - 1;
+
+                while (occupied.Contains(left))
+                {
+                    consecutive++;
+                    left--;
+                }
+
+                var right = slotIndex + 1;
+
+                while (occupied.Contains(right))
+                {
+                    consecutive++;
+                    right++;
+                }
+
+                if (consecutive > maxConsecutiveLessons)
+                {
+                    errors.Add(
+                        $"Для группы «{generatedItems[0].GroupName}» " +
+                        $"на {GetDayName(groupDay.Key.DayOfWeek)} " +
+                        $"получилось {consecutive} занятий подряд. " +
+                        $"Допустимо максимум {maxConsecutiveLessons}.");
+
+                    break;
+                }
+            }
+        }
+    }
+
+    // ============================================================
+    // DAY NAME
+    // ============================================================
+
+    private static string GetDayName(
+        DayOfWeek day)
+    {
+        return day switch
+        {
+            DayOfWeek.Monday => "понедельник",
+            DayOfWeek.Tuesday => "вторник",
+            DayOfWeek.Wednesday => "среду",
+            DayOfWeek.Thursday => "четверг",
+            DayOfWeek.Friday => "пятницу",
+            DayOfWeek.Saturday => "субботу",
+            DayOfWeek.Sunday => "воскресенье",
+            _ => day.ToString()
+        };
     }
 
     // ============================================================
@@ -1242,7 +2272,5 @@ public class ScheduleGeneratorService
     private sealed class SearchState
     {
         public int NodesVisited { get; set; }
-
-        public bool Failed { get; set; }
     }
 }

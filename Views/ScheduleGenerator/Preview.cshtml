@@ -22,204 +22,472 @@
             </h1>
 
             <p>
-                Проверьте результат генерации перед сохранением
-                в базу данных.
+                Проверьте автоматически созданное расписание
+                перед сохранением.
             </p>
         </div>
 
-        <div class="preview-warning">
-            <span>⚠</span>
+        <div class="preview-header-actions">
 
-            <div>
-                <strong>Расписание ещё не сохранено</strong>
-
-                <small>
-                    Изменения появятся в основном расписании
-                    только после подтверждения.
-                </small>
-            </div>
-        </div>
-
-    </div>
-
-
-    <!-- ===================================================== -->
-    <!-- STATISTICS -->
-    <!-- ===================================================== -->
-
-    <div class="preview-statistics">
-
-        <div class="stat-card">
-            <span>Занятий</span>
-            <strong>@Model.TotalLessons</strong>
-        </div>
-
-        <div class="stat-card">
-            <span>Групп</span>
-            <strong>@Model.TotalGroups</strong>
-        </div>
-
-        <div class="stat-card">
-            <span>Преподавателей</span>
-            <strong>@Model.TotalTeachers</strong>
-        </div>
-
-        <div class="stat-card">
-            <span>Аудиторий</span>
-            <strong>@Model.TotalClassrooms</strong>
-        </div>
-
-        <div class="stat-card">
-            <span>Дней</span>
-            <strong>@Model.TotalDays</strong>
-        </div>
-
-    </div>
-
-
-    <!-- ===================================================== -->
-    <!-- TABLE -->
-    <!-- ===================================================== -->
-
-    <div class="preview-card">
-
-        <div class="preview-card-header">
-
-            <div>
-                <h2>Сгенерированное расписание</h2>
-
-                <p>
-                    Все найденные занятия без конфликтов.
-                </p>
-            </div>
-
-            <div class="lesson-count">
-                @Model.TotalLessons занятий
-            </div>
-
-        </div>
-
-
-        @if (Model.Items.Count == 0)
-        {
-            <div class="empty-preview">
-                <div class="empty-icon">○</div>
-
-                <h3>Расписание пустое</h3>
-
-                <p>
-                    Генератор не создал ни одного занятия.
-                </p>
-            </div>
-        }
-        else
-        {
-            <div class="schedule-table-wrapper">
-
-                <table class="schedule-table">
-
-                    <thead>
-                        <tr>
-                            <th>День</th>
-                            <th>Время</th>
-                            <th>Группа</th>
-                            <th>Предмет</th>
-                            <th>Преподаватель</th>
-                            <th>Аудитория</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @foreach (var item in Model.Items
-                            .OrderBy(x => x.DayOfWeek)
-                            .ThenBy(x => x.StartTime)
-                            .ThenBy(x => x.GroupName))
-                        {
-                            <tr>
-
-                                <td>
-                                    <span class="day-badge">
-                                        @GetDayName(item.DayOfWeek)
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <span class="time-value">
-                                        @item.StartTime.ToString(@"hh\:mm")
-                                        –
-                                        @item.EndTime.ToString(@"hh\:mm")
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <strong>
-                                        @item.GroupName
-                                    </strong>
-                                </td>
-
-                                <td>
-                                    @item.SubjectName
-                                </td>
-
-                                <td>
-                                    @item.TeacherName
-                                </td>
-
-                                <td>
-                                    <span class="classroom-badge">
-                                        @item.ClassroomName
-                                    </span>
-                                </td>
-
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-        }
-
-    </div>
-
-
-    <!-- ===================================================== -->
-    <!-- ACTIONS -->
-    <!-- ===================================================== -->
-
-    <div class="preview-actions">
-
-        <a asp-action="Index" class="secondary-button">
-            ← Изменить настройки
-        </a>
-
-        @if (Model.Items.Count > 0)
-        {
-            <form asp-action="Save" method="post">
+            <form asp-action="CancelPreview" method="post">
 
                 @Html.AntiForgeryToken()
 
-                <button type="submit" class="primary-button">
-
-                    <span>✓</span>
-
-                    Подтвердить и сохранить
-
+                <button type="submit" class="glass-button secondary">
+                    ← Вернуться к настройкам
                 </button>
 
             </form>
+
+        </div>
+
+    </div>
+
+
+    @if (TempData["GenerationValidationErrors"] is string validationErrors)
+    {
+        <div class="preview-alert error">
+            <strong>
+                Расписание больше нельзя сохранить.
+            </strong>
+
+            <div>
+                @foreach (var error in validationErrors.Split('\n'))
+                {
+                    <div>@error</div>
+                }
+            </div>
+        </div>
+    }
+
+
+    <div class="preview-stats">
+
+        <div class="stat-card">
+            <span class="stat-value">
+                @Model.TotalLessons
+            </span>
+
+            <span class="stat-label">
+                занятий
+            </span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-value">
+                @Model.TotalGroups
+            </span>
+
+            <span class="stat-label">
+                групп
+            </span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-value">
+                @Model.TotalTeachers
+            </span>
+
+            <span class="stat-label">
+                преподавателей
+            </span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-value">
+                @Model.TotalClassrooms
+            </span>
+
+            <span class="stat-label">
+                аудиторий
+            </span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-value">
+                @Model.TotalDays
+            </span>
+
+            <span class="stat-label">
+                дней
+            </span>
+        </div>
+
+    </div>
+
+
+    <div class="replacement-card">
+
+        <div class="replacement-icon">
+            ⚠️
+        </div>
+
+        <div class="replacement-content">
+
+            <h2>
+                Расписание будет заменено
+            </h2>
+
+            <p>
+                Существующее расписание выбранных групп
+                за выбранные дни будет удалено и заменено
+                новым автоматически сгенерированным расписанием.
+            </p>
+
+            <div class="replacement-details">
+
+                <div>
+                    <span>Будет удалено</span>
+                    <strong>
+                        @Model.ExistingSchedulesToReplace
+                    </strong>
+                    <small>занятий</small>
+                </div>
+
+                <div>
+                    <span>Будет записано</span>
+                    <strong>
+                        @Model.TotalLessons
+                    </strong>
+                    <small>занятий</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="scope-card">
+
+        <div class="scope-section">
+
+            <h3>
+                Группы
+            </h3>
+
+            <div class="scope-list">
+
+                @foreach (var groupId in Model.SelectedGroupIds)
+                {
+                    var item = Model.Items
+                        .FirstOrDefault(x => x.GroupId == groupId);
+
+                    if (item != null)
+                    {
+                        <span class="scope-chip">
+                            @item.GroupName
+                        </span>
+                    }
+                }
+
+            </div>
+
+        </div>
+
+
+        <div class="scope-section">
+
+            <h3>
+                Дни
+            </h3>
+
+            <div class="scope-list">
+
+                @foreach (var day in Model.SelectedDays.OrderBy(GetDayOrder))
+                {
+                    <span class="scope-chip">
+                        @GetDayName(day)
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="schedule-card">
+
+        <div class="schedule-card-header">
+
+            <div>
+                <h2>
+                    Новое расписание
+                </h2>
+
+                <p>
+                    @Model.TotalLessons занятий
+                </p>
+            </div>
+
+        </div>
+
+
+        @foreach (var dayGroup in Model.Items
+            .GroupBy(x => x.DayOfWeek)
+            .OrderBy(x => GetDayOrder(x.Key)))
+        {
+            <section class="day-section">
+
+                <div class="day-title">
+                    <span class="day-dot"></span>
+
+                    <h3>
+                        @GetDayName(dayGroup.Key)
+                    </h3>
+
+                    <span class="day-count">
+                        @dayGroup.Count()
+                    </span>
+                </div>
+
+
+                <div class="lesson-list">
+
+                    @foreach (var lesson in dayGroup
+                        .OrderBy(x => x.StartTime)
+                        .ThenBy(x => x.GroupName))
+                    {
+                        <div class="lesson-row">
+
+                            <div class="lesson-time">
+                                <strong>
+                                    @lesson.StartTime.ToString(@"hh\:mm")
+                                </strong>
+
+                                <span>
+                                    @lesson.EndTime.ToString(@"hh\:mm")
+                                </span>
+                            </div>
+
+
+                            <div class="lesson-main">
+
+                                <div class="lesson-subject">
+                                    @lesson.SubjectName
+                                </div>
+
+                                <div class="lesson-meta">
+
+                                    <span>
+                                        👥 @lesson.GroupName
+                                    </span>
+
+                                    <span>
+                                        👨‍🏫 @lesson.TeacherName
+                                    </span>
+
+                                    <span>
+                                        🏫 @lesson.ClassroomName
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="lesson-number">
+                                №@lesson.LessonNumber
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </section>
         }
+
+    </div>
+
+
+    <div class="preview-actions">
+
+        <form asp-action="CancelPreview" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <button type="submit" class="glass-button secondary large">
+                Отменить
+            </button>
+
+        </form>
+
+
+        <button type="button" class="glass-button primary large" id="openSaveModal">
+
+            Подтвердить и сохранить
+
+        </button>
 
     </div>
 
 </div>
 
 
+<div class="confirm-modal" id="saveModal" aria-hidden="true">
+
+    <div class="confirm-overlay" id="closeSaveModal"></div>
+
+    <div class="confirm-dialog">
+
+        <div class="confirm-icon">
+            ⚠️
+        </div>
+
+        <h2>
+            Расписание будет заменено
+        </h2>
+
+        <p>
+            Существующее расписание выбранных групп
+            за выбранные дни будет удалено и заменено
+            новым автоматически сгенерированным расписанием.
+        </p>
+
+        <div class="confirm-summary">
+
+            <div>
+                <span>Будет удалено</span>
+                <strong>
+                    @Model.ExistingSchedulesToReplace
+                </strong>
+            </div>
+
+            <div>
+                <span>Будет записано</span>
+                <strong>
+                    @Model.TotalLessons
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="confirm-actions">
+
+            <button type="button" class="glass-button secondary" id="cancelSaveModal">
+                Отменить
+            </button>
+
+
+            <form asp-action="ConfirmAndSave" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="glass-button danger">
+                    Удалить и записать новое
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        const modal =
+            document.getElementById("saveModal");
+
+        const openButton =
+            document.getElementById("openSaveModal");
+
+        const closeButton =
+            document.getElementById("closeSaveModal");
+
+        const cancelButton =
+            document.getElementById("cancelSaveModal");
+
+
+        function openModal() {
+
+            modal.classList.add("is-open");
+
+            modal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            document.body.classList.add(
+                "modal-open"
+            );
+        }
+
+
+        function closeModal() {
+
+            modal.classList.remove("is-open");
+
+            modal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.classList.remove(
+                "modal-open"
+            );
+        }
+
+
+        openButton?.addEventListener(
+            "click",
+            openModal
+        );
+
+        closeButton?.addEventListener(
+            "click",
+            closeModal
+        );
+
+        cancelButton?.addEventListener(
+            "click",
+            closeModal
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Escape") {
+                    closeModal();
+                }
+
+            }
+        );
+
+    </script>
+
+}
+
 @functions {
 
-    private static string GetDayName(DayOfWeek day)
+    private static int GetDayOrder(
+        DayOfWeek day)
+    {
+        return day switch
+        {
+            DayOfWeek.Monday => 1,
+            DayOfWeek.Tuesday => 2,
+            DayOfWeek.Wednesday => 3,
+            DayOfWeek.Thursday => 4,
+            DayOfWeek.Friday => 5,
+            DayOfWeek.Saturday => 6,
+            DayOfWeek.Sunday => 7,
+            _ => 8
+        };
+    }
+
+    private static string GetDayName(
+        DayOfWeek day)
     {
         return day switch
         {
@@ -233,4 +501,5 @@
             _ => day.ToString()
         };
     }
+
 }
