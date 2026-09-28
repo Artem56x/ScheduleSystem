@@ -551,6 +551,21 @@ public class ScheduleGeneratorService
             }
 
             // ----------------------------------------------------
+            // КУРС ГРУППЫ / КУРС ПРЕДМЕТА
+            // ----------------------------------------------------
+
+            if (group.Course != groupSubject.Subject.Course)
+            {
+                errors.Add(
+                    $"Предмет «{groupSubject.Subject.Name}» относится " +
+                    $"к {groupSubject.Subject.Course} курсу, " +
+                    $"а группа «{group.Name}» относится к {group.Course} курсу. " +
+                    "Предпросмотр расписания больше не соответствует учебной нагрузке.");
+
+                continue;
+            }
+
+            // ----------------------------------------------------
             // TEACHER
             // ----------------------------------------------------
 
@@ -765,6 +780,25 @@ public class ScheduleGeneratorService
 
                     continue;
                 }
+
+                // ----------------------------------------------------
+                // КУРС ГРУППЫ / КУРС ПРЕДМЕТА
+                // ----------------------------------------------------
+
+                if (group.Course != groupSubject.Subject.Course)
+                {
+                    result.AddError(
+                        $"Предмет «{groupSubject.Subject.Name}» относится " +
+                        $"к {groupSubject.Subject.Course} курсу, " +
+                        $"но группа «{group.Name}» относится к {group.Course} курсу. " +
+                        "Предмет не может быть использован для этой группы.");
+
+                    continue;
+                }
+
+                // ----------------------------------------------------
+                // WEEKLY LOAD
+                // ----------------------------------------------------
 
                 if (groupSubject.WeeklyLessons <= 0)
                 {
@@ -1583,6 +1617,51 @@ public class ScheduleGeneratorService
                 $"из {lessonTasks.Count} необходимых.");
 
             return errors;
+        }
+
+        // --------------------------------------------------------
+        // GROUP COURSE / SUBJECT COURSE
+        // --------------------------------------------------------
+
+        var groupById = groups.ToDictionary(
+            g => g.Id);
+
+        var subjectById = lessonTasks
+            .Select(x => x.Subject)
+            .GroupBy(x => x.Id)
+            .ToDictionary(
+                g => g.Key,
+                g => g.First());
+
+        foreach (var item in generated)
+        {
+            if (!groupById.TryGetValue(
+                    item.GroupId,
+                    out var group))
+            {
+                errors.Add(
+                    $"Группа для занятия «{item.SubjectName}» не найдена.");
+
+                continue;
+            }
+
+            if (!subjectById.TryGetValue(
+                    item.SubjectId,
+                    out var subject))
+            {
+                errors.Add(
+                    $"Предмет «{item.SubjectName}» не найден.");
+
+                continue;
+            }
+
+            if (group.Course != subject.Course)
+            {
+                errors.Add(
+                    $"Нарушено соответствие курса: " +
+                    $"группа «{group.Name}» — {group.Course} курс, " +
+                    $"предмет «{subject.Name}» — {subject.Course} курс.");
+            }
         }
 
         // --------------------------------------------------------
