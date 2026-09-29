@@ -1,151 +1,407 @@
 @using ScheduleSystem.Models
 
 @{
-    ViewData["Title"] = "Настройки";
+ViewData["Title"] = "Настройки";
 
-    var email = ViewBag.Email as string ?? "";
-    var userName = ViewBag.UserName as string ?? "";
-    var displayName = ViewBag.DisplayName as string ?? userName;
 
-    var firstLetter = string.IsNullOrWhiteSpace(displayName)
-        ? "?"
-        : displayName.Substring(0, 1).ToUpper();
+var email = ViewBag.Email as string ?? "";
+var userName = ViewBag.UserName as string ?? "";
+var displayName = ViewBag.DisplayName as string ?? userName;
 
-    var isAdmin = User.IsInRole("Admin");
+var firstLetter = string.IsNullOrWhiteSpace(displayName)
+    ? "?"
+    : displayName.Substring(0, 1).ToUpper();
 
-    var teacherCount = ViewBag.TeacherCount ?? 0;
-    var groupCount = ViewBag.GroupCount ?? 0;
-    var subjectCount = ViewBag.SubjectCount ?? 0;
-    var classroomCount = ViewBag.ClassroomCount ?? 0;
+var isAdmin = User.IsInRole("Admin");
 
-    var groups =
-        ViewBag.Groups as IEnumerable<Group>
-        ?? Enumerable.Empty<Group>();
+var groups =
+    ViewBag.Groups as IEnumerable<Group>
+    ?? Enumerable.Empty<Group>();
 
-    var subjects =
-        ViewBag.Subjects as IEnumerable<Subject>
-        ?? Enumerable.Empty<Subject>();
+var subjects =
+    ViewBag.Subjects as IEnumerable<Subject>
+    ?? Enumerable.Empty<Subject>();
 
-    var groupSubjects =
-        ViewBag.GroupSubjects as IEnumerable<GroupSubject>
-        ?? Enumerable.Empty<GroupSubject>();
+var groupSubjects =
+    ViewBag.GroupSubjects as IEnumerable<GroupSubject>
+    ?? Enumerable.Empty<GroupSubject>();
+
+
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/Account/Settings.css" asp-append-version="true" />
+@section Styles { <link rel="stylesheet"
+       href="~/css/Account/Settings.css"
+       asp-append-version="true" />
 }
 
 <div class="settings-page">
 
-    <!-- =========================================================
-         HEADER
-         ========================================================= -->
 
-    <header class="settings-header">
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
 
-        <div class="settings-header-left">
+<header class="settings-header">
 
-            <a asp-controller="Account" asp-action="Profile" class="settings-back-button" aria-label="Назад">
+    <div class="settings-header-left">
 
-                <span>‹</span>
+        <a asp-controller="Account"
+           asp-action="Profile"
+           class="settings-back-button"
+           aria-label="Назад">
 
-            </a>
+            <span>‹</span>
 
-            <div class="settings-header-title">
+        </a>
 
-                <h1>Настройки</h1>
+        <div class="settings-header-title">
+
+            <h1>Настройки</h1>
+
+            <p>
+                Управление профилем и параметрами ScheduleSystem
+            </p>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     MESSAGES
+     ========================================================= -->
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="settings-message settings-message-success">
+
+        <span class="settings-message-icon">
+            ✓
+        </span>
+
+        <span>
+            @TempData["SuccessMessage"]
+        </span>
+
+    </div>
+}
+
+@if (TempData["ProgramMessage"] != null)
+{
+    <div class="settings-message settings-message-success">
+
+        <span class="settings-message-icon">
+            ✓
+        </span>
+
+        <span>
+            @TempData["ProgramMessage"]
+        </span>
+
+    </div>
+}
+
+
+<!-- =========================================================
+     TABS
+     ========================================================= -->
+
+<nav class="settings-tabs"
+     aria-label="Разделы настроек">
+
+    <button type="button"
+            class="settings-tab active"
+            data-tab="profile"
+            aria-selected="true">
+
+        <span class="settings-tab-icon">
+            👤
+        </span>
+
+        <span>
+            Профиль
+        </span>
+
+    </button>
+
+
+    @if (isAdmin)
+    {
+        <button type="button"
+                class="settings-tab"
+                data-tab="program"
+                aria-selected="false">
+
+            <span class="settings-tab-icon">
+                ⚙️
+            </span>
+
+            <span>
+                Программа
+            </span>
+
+        </button>
+    }
+
+
+    <button type="button"
+            class="settings-tab"
+            data-tab="about"
+            aria-selected="false">
+
+        <span class="settings-tab-icon">
+            ⓘ
+        </span>
+
+        <span>
+            О программе
+        </span>
+
+    </button>
+
+</nav>
+
+
+<!-- =========================================================
+     PROFILE TAB
+     ========================================================= -->
+
+<section class="settings-tab-content active"
+         data-tab-content="profile">
+
+    <!-- =====================================================
+         PROFILE
+         ===================================================== -->
+
+    <div class="settings-section">
+
+        <div class="settings-section-header">
+
+            <div>
+
+                <h2>
+                    Профиль
+                </h2>
 
                 <p>
-                    Управление профилем и параметрами ScheduleSystem
+                    Основная информация вашей учётной записи
                 </p>
 
             </div>
 
         </div>
 
-    </header>
+
+        <div class="settings-card">
+
+            <div class="settings-profile-preview">
+
+                <div class="settings-avatar">
+                    @firstLetter
+                </div>
+
+                <div class="settings-profile-info">
+
+                    <strong>
+                        @displayName
+                    </strong>
+
+                    <span>
+                        @email
+                    </span>
+
+                    <span class="settings-role">
+                        @(isAdmin
+                            ? "Администратор"
+                            : "Пользователь")
+                    </span>
+
+                </div>
+
+            </div>
 
 
-    <!-- =========================================================
-         MESSAGES
-         ========================================================= -->
+            <form asp-controller="Account"
+                  asp-action="UpdateProfile"
+                  method="post"
+                  class="settings-form">
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="settings-message settings-message-success">
+                @Html.AntiForgeryToken()
 
-            <span class="settings-message-icon">
-                ✓
-            </span>
+                <div class="settings-form-grid">
 
-            <span>
-                @TempData["SuccessMessage"]
+                    <div class="settings-field">
+
+                        <label for="displayName">
+                            Имя
+                        </label>
+
+                        <input type="text"
+                               id="displayName"
+                               name="displayName"
+                               class="settings-input"
+                               value="@displayName"
+                               maxlength="100" />
+
+                    </div>
+
+
+                    <div class="settings-field">
+
+                        <label for="email">
+                            Электронная почта
+                        </label>
+
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               class="settings-input"
+                               value="@email"
+                               maxlength="254" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-form-actions">
+
+                    <button type="submit"
+                            class="settings-save-button">
+
+                        Сохранить изменения
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SECURITY
+         ===================================================== -->
+
+    <div class="settings-section">
+
+        <div class="settings-section-header">
+
+            <div>
+
+                <h2>
+                    Безопасность
+                </h2>
+
+                <p>
+                    Управление паролем учётной записи
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="settings-card settings-action-card">
+
+            <div class="settings-action-icon">
+                🔐
+            </div>
+
+            <div class="settings-action-content">
+
+                <strong>
+                    Изменить пароль
+                </strong>
+
+                <span>
+                    Обновите пароль вашей учётной записи
+                </span>
+
+            </div>
+
+            <a asp-controller="Account"
+               asp-action="ChangePassword"
+               class="settings-secondary-button">
+
+                Изменить
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         APPEARANCE
+         ===================================================== -->
+
+    <div class="settings-section">
+
+        <div class="settings-section-header">
+
+            <div>
+
+                <h2>
+                    Внешний вид
+                </h2>
+
+                <p>
+                    Настройка интерфейса приложения
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="settings-card settings-action-card">
+
+            <div class="settings-action-icon">
+                ✨
+            </div>
+
+            <div class="settings-action-content">
+
+                <strong>
+                    Интерфейс
+                </strong>
+
+                <span>
+                    Дополнительные настройки внешнего вида
+                </span>
+
+            </div>
+
+            <span class="settings-soon">
+                Скоро
             </span>
 
         </div>
-    }
 
-    @if (TempData["ProgramMessage"] != null)
-    {
-        <div class="settings-message settings-message-success">
+    </div>
 
-            <span class="settings-message-icon">
-                ✓
-            </span>
-
-            <span>
-                @TempData["ProgramMessage"]
-            </span>
-
-        </div>
-    }
+</section>
 
 
-    <!-- =========================================================
-         MAIN TABS
-         ========================================================= -->
+<!-- =========================================================
+     PROGRAM TAB
+     ========================================================= -->
 
-    <nav class="settings-tabs" aria-label="Разделы настроек">
+@if (isAdmin)
+{
+    <section class="settings-tab-content"
+             data-tab-content="program">
 
-        <button type="button" class="settings-tab active" data-tab="profile">
-
-            <span class="settings-tab-icon">👤</span>
-
-            <span>Профиль</span>
-
-        </button>
-
-        @if (isAdmin)
-        {
-            <button type="button" class="settings-tab" data-tab="program">
-
-                <span class="settings-tab-icon">⚙️</span>
-
-                <span>Программа</span>
-
-            </button>
-        }
-
-        <button type="button" class="settings-tab" data-tab="about">
-
-            <span class="settings-tab-icon">ⓘ</span>
-
-            <span>О программе</span>
-
-        </button>
-
-    </nav>
-
-
-    <!-- =========================================================
-         PROFILE
-         ========================================================= -->
-
-    <section class="settings-tab-content active" data-tab-content="profile">
-
-        <!-- =====================================================
-             PROFILE
-             ===================================================== -->
+        <!-- =================================================
+             STUDY LOAD
+             ================================================= -->
 
         <div class="settings-section">
 
@@ -153,10 +409,13 @@
 
                 <div>
 
-                    <h2>Профиль</h2>
+                    <h2>
+                        Учебная нагрузка
+                    </h2>
 
                     <p>
-                        Основная информация вашей учётной записи
+                        Добавляйте и изменяйте учебную нагрузку
+                        для учебных групп.
                     </p>
 
                 </div>
@@ -164,30 +423,81 @@
             </div>
 
 
-            <div class="settings-card">
+            <div class="settings-card study-load-card">
 
-                <div class="settings-profile-preview">
+                <!-- =========================================
+                     GROUP SELECT
+                     ========================================= -->
 
-                    <div class="settings-avatar">
-                        @firstLetter
-                    </div>
+                <div class="study-load-toolbar">
 
-                    <div class="settings-profile-info">
+                    <div class="study-load-toolbar-text">
 
                         <strong>
-                            @displayName
+                            Выберите группу
                         </strong>
 
                         <span>
-                            @email
+                            После выбора появится её учебная нагрузка.
                         </span>
 
-                        <span class="settings-role">
+                    </div>
 
-                            @(isAdmin
-                                ? "Администратор"
-                                : "Пользователь")
 
+                    <div class="study-load-group-field">
+
+                        <select id="loadGroupSelect"
+                                class="settings-input study-load-select">
+
+                            <option value="">
+                                Выберите группу
+                            </option>
+
+                            @foreach (var group in groups
+                                .OrderBy(g => g.Course)
+                                .ThenBy(g => g.Name))
+                            {
+                                <option value="@group.Id">
+
+                                    @group.Name
+
+                                    @if (group.Course > 0)
+                                    {
+                                        <text>
+                                            · @group.Course курс
+                                        </text>
+                                    }
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     LOAD CONTAINER
+                     ========================================= -->
+
+                <div id="studyLoadContainer"
+                     class="study-load-container">
+
+                    <div class="study-load-placeholder">
+
+                        <div class="study-load-placeholder-icon">
+                            👥
+                        </div>
+
+                        <strong>
+                            Выберите группу
+                        </strong>
+
+                        <span>
+                            Здесь появятся предметы и количество
+                            занятий в неделю.
                         </span>
 
                     </div>
@@ -195,41 +505,174 @@
                 </div>
 
 
-                <form asp-controller="Account" asp-action="UpdateProfile" method="post" class="settings-form">
+                <!-- =========================================
+                     ADD SUBJECT BUTTON
+                     ========================================= -->
 
-                    @Html.AntiForgeryToken()
+                <div id="addSubjectArea"
+                     class="study-load-add-area"
+                     style="display:none;">
 
-                    <div class="settings-form-grid">
+                    <button type="button"
+                            id="addSubjectButton"
+                            class="settings-secondary-button study-load-add-button">
 
-                        <div class="settings-field">
+                        <span>
+                            ＋
+                        </span>
 
-                            <label for="displayName">
-                                Имя
-                            </label>
+                        Добавить предмет
 
-                            <input type="text" id="displayName" name="displayName" class="settings-input"
-                                   value="@displayName" maxlength="100" />
+                    </button>
+
+                </div>
+
+
+                <!-- =========================================
+                     ADD SUBJECT FORM
+                     ========================================= -->
+
+                <div id="addSubjectForm"
+                     class="study-load-add-form"
+                     style="display:none;">
+
+                    <div class="study-load-add-form-header">
+
+                        <div>
+
+                            <strong>
+                                Добавить предмет
+                            </strong>
+
+                            <span>
+                                Выберите предмет и укажите количество
+                                занятий в неделю.
+                            </span>
 
                         </div>
 
 
-                        <div class="settings-field">
+                        <button type="button"
+                                id="cancelAddSubject"
+                                class="study-load-close-button"
+                                aria-label="Закрыть">
 
-                            <label for="email">
-                                Электронная почта
-                            </label>
+                            ×
 
-                            <input type="email" id="email" name="email" class="settings-input" value="@email"
-                                   maxlength="254" />
+                        </button>
+
+                    </div>
+
+
+                    <div class="settings-form">
+
+                        <div class="settings-form-grid">
+
+                            <div class="settings-field">
+
+                                <label for="addSubjectId">
+                                    Предмет
+                                </label>
+
+                                <select id="addSubjectId"
+                                        class="settings-input">
+
+                                    <option value="">
+                                        Выберите предмет
+                                    </option>
+
+                                    @foreach (var subject in subjects
+                                        .OrderBy(s => s.Name))
+                                    {
+                                        <option value="@subject.Id">
+
+                                            @subject.Name
+
+                                        </option>
+                                    }
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="settings-field">
+
+                                <label for="addWeeklyLessons">
+                                    Занятий в неделю
+                                </label>
+
+                                <input type="number"
+                                       id="addWeeklyLessons"
+                                       class="settings-input"
+                                       value="2"
+                                       min="1"
+                                       max="30" />
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="settings-form-actions">
+
+                            <button type="button"
+                                    id="confirmAddSubject"
+                                    class="settings-save-button">
+
+                                Добавить в список
+
+                            </button>
+
+
+                            <button type="button"
+                                    id="cancelAddSubjectSecondary"
+                                    class="settings-secondary-button">
+
+                                Отмена
+
+                            </button>
 
                         </div>
 
                     </div>
 
+                </div>
 
-                    <div class="settings-form-actions">
 
-                        <button type="submit" class="settings-save-button">
+                <!-- =========================================
+                     SAVE
+                     ========================================= -->
+
+                <form id="saveStudyLoadForm"
+                      asp-controller="Account"
+                      asp-action="SaveGroupSubjects"
+                      method="post"
+                      class="study-load-save-form">
+
+                    @Html.AntiForgeryToken()
+
+                    <div id="studyLoadHiddenInputs"></div>
+
+
+                    <div class="study-load-save-area">
+
+                        <div class="study-load-unsaved-status"
+                             id="studyLoadUnsavedStatus">
+
+                            <span class="study-load-status-dot"></span>
+
+                            <span id="studyLoadStatusText">
+                                Нет несохранённых изменений
+                            </span>
+
+                        </div>
+
+
+                        <button type="submit"
+                                id="saveStudyLoadButton"
+                                class="settings-save-button"
+                                disabled>
 
                             Сохранить изменения
 
@@ -244,9 +687,9 @@
         </div>
 
 
-        <!-- =====================================================
-             SECURITY
-             ===================================================== -->
+        <!-- =================================================
+             HISTORY
+             ================================================= -->
 
         <div class="settings-section">
 
@@ -254,10 +697,12 @@
 
                 <div>
 
-                    <h2>Безопасность</h2>
+                    <h2>
+                        История изменений
+                    </h2>
 
                     <p>
-                        Управление паролем учётной записи
+                        Просмотр действий пользователей системы.
                     </p>
 
                 </div>
@@ -268,24 +713,28 @@
             <div class="settings-card settings-action-card">
 
                 <div class="settings-action-icon">
-                    🔐
+                    🕘
                 </div>
 
                 <div class="settings-action-content">
 
                     <strong>
-                        Изменить пароль
+                        Журнал действий
                     </strong>
 
                     <span>
-                        Обновите пароль вашей учётной записи
+                        Просмотр истории изменений расписания
+                        и данных системы.
                     </span>
 
                 </div>
 
-                <a asp-controller="Account" asp-action="ChangePassword" class="settings-secondary-button">
 
-                    Изменить
+                <a asp-controller="AuditLogs"
+                   asp-action="Index"
+                   class="settings-secondary-button">
+
+                    Открыть
 
                 </a>
 
@@ -294,9 +743,9 @@
         </div>
 
 
-        <!-- =====================================================
-             APPEARANCE
-             ===================================================== -->
+        <!-- =================================================
+             MAINTENANCE
+             ================================================= -->
 
         <div class="settings-section">
 
@@ -304,10 +753,12 @@
 
                 <div>
 
-                    <h2>Внешний вид</h2>
+                    <h2>
+                        Обслуживание
+                    </h2>
 
                     <p>
-                        Настройка интерфейса приложения
+                        Управление и очистка данных программы.
                     </p>
 
                 </div>
@@ -315,663 +766,300 @@
             </div>
 
 
-            <div class="settings-card settings-action-card">
+            <div class="settings-card settings-maintenance-card">
 
-                <div class="settings-action-icon">
-                    ✨
+                <!-- CLEAR SCHEDULE -->
+
+                <div class="settings-action-card">
+
+                    <div class="settings-action-icon">
+                        🗑️
+                    </div>
+
+                    <div class="settings-action-content">
+
+                        <strong>
+                            Очистить расписание
+                        </strong>
+
+                        <span>
+                            Удалить все созданные занятия,
+                            сохранив группы, преподавателей,
+                            предметы и аудитории.
+                        </span>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="settings-danger-button"
+                            data-modal-open="clearScheduleModal">
+
+                        Очистить
+
+                    </button>
+
                 </div>
 
-                <div class="settings-action-content">
 
-                    <strong>
-                        Интерфейс
-                    </strong>
+                <!-- CLEAR ALL DATA -->
 
-                    <span>
-                        Дополнительные настройки внешнего вида
-                    </span>
+                <div class="settings-action-card">
+
+                    <div class="settings-action-icon">
+                        ⚠️
+                    </div>
+
+                    <div class="settings-action-content">
+
+                        <strong>
+                            Очистить все данные
+                        </strong>
+
+                        <span>
+                            Полностью удалить данные программы.
+                            Это действие нельзя отменить.
+                        </span>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="settings-danger-button"
+                            data-modal-open="clearAllDataModal">
+
+                        Очистить всё
+
+                    </button>
 
                 </div>
-
-                <span class="settings-soon">
-                    Скоро
-                </span>
 
             </div>
 
         </div>
 
     </section>
+}
 
 
-    <!-- =========================================================
-         PROGRAM
-         ========================================================= -->
+<!-- =========================================================
+     ABOUT TAB
+     ========================================================= -->
 
-    @if (isAdmin)
-    {
-        <section class="settings-tab-content" data-tab-content="program">
+<section class="settings-tab-content"
+         data-tab-content="about">
 
+    <div class="settings-section">
 
-            <!-- =================================================
-                 STUDY LOAD
-                 ================================================= -->
+        <div class="settings-section-header">
 
-            <div class="settings-section">
+            <div>
 
-                <div class="settings-section-header">
+                <h2>
+                    О программе
+                </h2>
 
-                    <div>
-
-                        <h2>Учебная нагрузка</h2>
-
-                        <p>
-                            Добавляйте и изменяйте учебную нагрузку.
-                            Все изменения сохраняются одновременно
-                            после нажатия кнопки «Сохранить изменения».
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="settings-card study-load-card">
-
-
-                    <!-- =============================================
-                         GROUP SELECT
-                         ============================================= -->
-
-                    <div class="study-load-toolbar">
-
-                        <div class="study-load-toolbar-text">
-
-                            <strong>
-                                Выберите группу
-                            </strong>
-
-                            <span>
-                                После выбора появится вся её учебная нагрузка.
-                            </span>
-
-                        </div>
-
-
-                        <div class="study-load-group-field">
-
-                            <select id="loadGroupSelect" class="settings-input study-load-select">
-
-                                <option value="">
-                                    Выберите группу
-                                </option>
-
-                                @foreach (var group in groups
-                                    .OrderBy(g => g.Course)
-                                    .ThenBy(g => g.Name))
-                                {
-                                    <option value="@group.Id">
-
-                                        @group.Name
-
-                                        @if (group.Course > 0)
-                                        {
-                                            <text>
-                                                · @group.Course курс
-                                            </text>
-                                        }
-
-                                    </option>
-                                }
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =============================================
-                         LOAD CONTENT
-                         ============================================= -->
-
-                    <div id="studyLoadContainer" class="study-load-container">
-
-                        <div class="study-load-placeholder">
-
-                            <div class="study-load-placeholder-icon">
-                                👥
-                            </div>
-
-                            <strong>
-                                Выберите группу
-                            </strong>
-
-                            <span>
-                                Здесь появятся предметы и количество
-                                занятий в неделю.
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =============================================
-                         ADD BUTTON
-                         ============================================= -->
-
-                    <div id="addSubjectArea" class="study-load-add-area" style="display:none;">
-
-                        <button type="button" id="addSubjectButton" class="settings-secondary-button study-load-add-button">
-
-                            <span>＋</span>
-
-                            Добавить предмет
-
-                        </button>
-
-                    </div>
-
-
-                    <!-- =============================================
-                         ADD FORM
-                         ============================================= -->
-
-                    <div id="addSubjectForm" class="study-load-add-form" style="display:none;">
-
-                        <div class="study-load-add-form-header">
-
-                            <div>
-
-                                <strong>
-                                    Добавить предмет
-                                </strong>
-
-                                <span>
-                                    Предмет будет добавлен в список.
-                                    В базу данных он попадёт только
-                                    после нажатия «Сохранить изменения».
-                                </span>
-
-                            </div>
-
-                            <button type="button" id="cancelAddSubject" class="study-load-close-button"
-                                    aria-label="Закрыть">
-
-                                ×
-
-                            </button>
-
-                        </div>
-
-
-                        <div class="settings-form">
-
-                            <div class="settings-form-grid">
-
-                                <div class="settings-field">
-
-                                    <label for="addSubjectId">
-                                        Предмет
-                                    </label>
-
-                                    <select id="addSubjectId" class="settings-input">
-
-                                        <option value="">
-                                            Выберите предмет
-                                        </option>
-
-                                        @foreach (var subject in subjects
-                                            .OrderBy(s => s.Name))
-                                        {
-                                            <option value="@subject.Id">
-                                                @subject.Name
-                                            </option>
-                                        }
-
-                                    </select>
-
-                                </div>
-
-
-                                <div class="settings-field">
-
-                                    <label for="addWeeklyLessons">
-                                        Пар в неделю
-                                    </label>
-
-                                    <input type="number" id="addWeeklyLessons" class="settings-input" value="2" min="1"
-                                           max="20" required />
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="settings-form-actions">
-
-                                <button type="button" id="confirmAddSubject" class="settings-save-button">
-
-                                    Добавить в список
-
-                                </button>
-
-                                <button type="button" id="cancelAddSubjectSecondary" class="settings-secondary-button">
-
-                                    Отмена
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =============================================
-                         SAVE FORM
-                         ============================================= -->
-
-                    <form id="saveStudyLoadForm" asp-controller="Account" asp-action="SaveGroupSubjects" method="post"
-                          class="study-load-save-form">
-
-                        @Html.AntiForgeryToken()
-
-                        <div id="studyLoadHiddenInputs"></div>
-
-                        <div class="study-load-save-area">
-
-                            <div class="study-load-unsaved-status" id="studyLoadUnsavedStatus">
-
-                                <span class="study-load-status-dot"></span>
-
-                                <span id="studyLoadStatusText">
-                                    Нет несохранённых изменений
-                                </span>
-
-                            </div>
-
-
-                            <button type="submit" id="saveStudyLoadButton" class="settings-save-button" disabled>
-
-                                Сохранить изменения
-
-                            </button>
-
-                        </div>
-
-                    </form>
-
-                </div>
+                <p>
+                    Информация о системе ScheduleSystem
+                </p>
 
             </div>
 
+        </div>
 
-            <!-- =================================================
-                 HISTORY
-                 ================================================= -->
 
-            <div class="settings-section">
+        <div class="settings-about-card settings-card">
 
-                <div class="settings-section-header">
+            <!-- HERO -->
 
-                    <div>
+            <div class="settings-about-hero">
 
-                        <h2>История изменений</h2>
-
-                        <p>
-                            Просмотр действий пользователей системы.
-                        </p>
-
-                    </div>
-
+                <div class="settings-about-logo">
+                    📅
                 </div>
-
-
-                <div class="settings-card settings-action-card">
-
-                    <div class="settings-action-icon">
-                        🕘
-                    </div>
-
-                    <div class="settings-action-content">
-
-                        <strong>
-                            Журнал действий
-                        </strong>
-
-                        <span>
-                            Просмотр истории изменений расписания
-                            и данных системы.
-                        </span>
-
-                    </div>
-
-                    <a asp-controller="AuditLogs" asp-action="Index" class="settings-secondary-button">
-
-                        Открыть
-
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 MAINTENANCE
-                 ================================================= -->
-
-            <div class="settings-section">
-
-                <div class="settings-section-header">
-
-                    <div>
-
-                        <h2>Обслуживание</h2>
-
-                        <p>
-                            Управление и очистка данных программы.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="settings-card settings-maintenance-card">
-
-
-                    <!-- CLEAR SCHEDULE -->
-
-                    <div class="settings-action-card">
-
-                        <div class="settings-action-icon">
-                            🗑️
-                        </div>
-
-                        <div class="settings-action-content">
-
-                            <strong>
-                                Очистить расписание
-                            </strong>
-
-                            <span>
-                                Удалить все созданные занятия,
-                                сохранив группы, преподавателей,
-                                предметы и аудитории.
-                            </span>
-
-                        </div>
-
-                        <button type="button" class="settings-danger-button" data-modal-open="clearScheduleModal">
-
-                            Очистить
-
-                        </button>
-
-                    </div>
-
-
-                    <!-- CLEAR ALL DATA -->
-
-                    <div class="settings-action-card">
-
-                        <div class="settings-action-icon">
-                            ⚠️
-                        </div>
-
-                        <div class="settings-action-content">
-
-                            <strong>
-                                Очистить все данные
-                            </strong>
-
-                            <span>
-                                Полностью удалить данные программы.
-                                Это действие нельзя отменить.
-                            </span>
-
-                        </div>
-
-                        <button type="button" class="settings-danger-button" data-modal-open="clearAllDataModal">
-
-                            Очистить всё
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-    }
-
-
-    <!-- =========================================================
-         ABOUT PROGRAM
-         ========================================================= -->
-
-    <section class="settings-tab-content" data-tab-content="about">
-
-        <div class="settings-section">
-
-            <div class="settings-section-header">
 
                 <div>
 
-                    <h2>О программе</h2>
+                    <h2>
+                        ScheduleSystem
+                    </h2>
 
                     <p>
-                        Информация о системе ScheduleSystem
+                        Система управления учебным расписанием
+                        образовательного учреждения.
                     </p>
+
+                    <div class="settings-about-version">
+                        Версия 1.0
+                    </div>
 
                 </div>
 
             </div>
 
 
-            <div class="settings-about-card settings-card">
+            <!-- DESCRIPTION -->
+
+            <div class="settings-about-description">
+
+                <h3>
+                    О системе
+                </h3>
+
+                <p>
+                    ScheduleSystem предназначена для создания,
+                    управления и просмотра учебного расписания.
+                    Система объединяет данные о группах,
+                    преподавателях, предметах и аудиториях
+                    в едином интерфейсе.
+                </p>
+
+                <p>
+                    Программа позволяет создавать расписание
+                    вручную, проверять конфликты, учитывать
+                    ограничения аудиторий, преподавателей и
+                    учебных групп.
+                </p>
+
+            </div>
 
 
-                <!-- HERO -->
+            <!-- FEATURES -->
 
-                <div class="settings-about-hero">
+            <div class="settings-about-features">
 
-                    <div class="settings-about-logo">
-                        📅
+                <h3>
+                    Основные возможности
+                </h3>
+
+
+                <div class="settings-about-feature-grid">
+
+                    <div class="settings-about-feature">
+
+                        <span>
+                            📅
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Расписание
+                            </strong>
+
+                            <p>
+                                Создание, просмотр и управление
+                                учебными занятиями.
+                            </p>
+
+                        </div>
+
                     </div>
 
-                    <div>
 
-                        <h2>
-                            ScheduleSystem
-                        </h2>
+                    <div class="settings-about-feature">
 
-                        <p>
-                            Система управления учебным расписанием
-                            образовательного учреждения.
-                        </p>
+                        <span>
+                            👥
+                        </span>
 
-                        <div class="settings-about-version">
-                            Версия 1.0
+                        <div>
+
+                            <strong>
+                                Группы
+                            </strong>
+
+                            <p>
+                                Управление учебными группами
+                                и их учебной нагрузкой.
+                            </p>
+
                         </div>
 
                     </div>
 
-                </div>
 
+                    <div class="settings-about-feature">
 
-                <!-- DESCRIPTION -->
+                        <span>
+                            👨‍🏫
+                        </span>
 
-                <div class="settings-about-description">
+                        <div>
 
-                    <h3>
-                        О системе
-                    </h3>
+                            <strong>
+                                Преподаватели
+                            </strong>
 
-                    <p>
-                        ScheduleSystem предназначена для создания,
-                        управления и просмотра учебного расписания.
-                        Система объединяет данные о группах,
-                        преподавателях, предметах и аудиториях
-                        в едином интерфейсе.
-                    </p>
-
-                    <p>
-                        Программа позволяет создавать расписание
-                        вручную, проверять конфликты, учитывать
-                        ограничения аудиторий, преподавателей и
-                        учебных групп.
-                    </p>
-
-                </div>
-
-
-                <!-- FEATURES -->
-
-                <div class="settings-about-features">
-
-                    <h3>
-                        Основные возможности
-                    </h3>
-
-
-                    <div class="settings-about-feature-grid">
-
-
-                        <!-- SCHEDULE -->
-
-                        <div class="settings-about-feature">
-
-                            <span>📅</span>
-
-                            <div>
-
-                                <strong>
-                                    Расписание
-                                </strong>
-
-                                <p>
-                                    Создание, просмотр и управление
-                                    учебными занятиями.
-                                </p>
-
-                            </div>
+                            <p>
+                                Хранение информации о преподавателях
+                                и их предметах.
+                            </p>
 
                         </div>
 
-
-                        <!-- GROUPS -->
-
-                        <div class="settings-about-feature">
-
-                            <span>👥</span>
-
-                            <div>
-
-                                <strong>
-                                    Группы
-                                </strong>
-
-                                <p>
-                                    Управление учебными группами
-                                    и их учебной нагрузкой.
-                                </p>
-
-                            </div>
-
-                        </div>
+                    </div>
 
 
-                        <!-- TEACHERS -->
+                    <div class="settings-about-feature">
 
-                        <div class="settings-about-feature">
+                        <span>
+                            🏫
+                        </span>
 
-                            <span>👨‍🏫</span>
+                        <div>
 
-                            <div>
+                            <strong>
+                                Аудитории
+                            </strong>
 
-                                <strong>
-                                    Преподаватели
-                                </strong>
-
-                                <p>
-                                    Хранение информации о преподавателях
-                                    и их предметах.
-                                </p>
-
-                            </div>
+                            <p>
+                                Учёт помещений и их вместимости.
+                            </p>
 
                         </div>
 
-
-                        <!-- CLASSROOMS -->
-
-                        <div class="settings-about-feature">
-
-                            <span>🏫</span>
-
-                            <div>
-
-                                <strong>
-                                    Аудитории
-                                </strong>
-
-                                <p>
-                                    Учёт помещений, вместимости
-                                    и оборудования.
-                                </p>
-
-                            </div>
-
-                        </div>
+                    </div>
 
 
-                        <!-- VALIDATION -->
+                    <div class="settings-about-feature">
 
-                        <div class="settings-about-feature">
+                        <span>
+                            🛡️
+                        </span>
 
-                            <span>🛡️</span>
+                        <div>
 
-                            <div>
+                            <strong>
+                                Проверка конфликтов
+                            </strong>
 
-                                <strong>
-                                    Проверка конфликтов
-                                </strong>
-
-                                <p>
-                                    Контроль пересечений занятий,
-                                    вместимости и требований аудиторий.
-                                </p>
-
-                            </div>
+                            <p>
+                                Контроль пересечений занятий,
+                                вместимости и требований аудиторий.
+                            </p>
 
                         </div>
 
+                    </div>
 
-                        <!-- EXPORT -->
 
-                        <div class="settings-about-feature">
+                    <div class="settings-about-feature">
 
-                            <span>📊</span>
+                        <span>
+                            📊
+                        </span>
 
-                            <div>
+                        <div>
 
-                                <strong>
-                                    Экспорт
-                                </strong>
+                            <strong>
+                                Экспорт
+                            </strong>
 
-                                <p>
-                                    Подготовка расписания
-                                    в различных форматах.
-                                </p>
-
-                            </div>
+                            <p>
+                                Подготовка расписания
+                                в различных форматах.
+                            </p>
 
                         </div>
 
@@ -979,1477 +1067,258 @@
 
                 </div>
 
+            </div>
 
-                <!-- TECHNOLOGIES -->
 
-                <div class="settings-about-tech">
+            <!-- TECHNOLOGIES -->
 
-                    <h3>
-                        Технологии
-                    </h3>
+            <div class="settings-about-tech">
 
-                    <div class="settings-tech-list">
+                <h3>
+                    Технологии
+                </h3>
 
-                        <span>ASP.NET Core</span>
-                        <span>C#</span>
-                        <span>Entity Framework Core</span>
-                        <span>PostgreSQL</span>
-                        <span>HTML / CSS / JavaScript</span>
+                <div class="settings-tech-list">
 
-                    </div>
+                    <span>
+                        ASP.NET Core
+                    </span>
+
+                    <span>
+                        C#
+                    </span>
+
+                    <span>
+                        Entity Framework Core
+                    </span>
+
+                    <span>
+                        PostgreSQL
+                    </span>
+
+                    <span>
+                        HTML / CSS / JavaScript
+                    </span>
 
                 </div>
 
+            </div>
 
-                <!-- =============================================================
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
      CLEAR SCHEDULE MODAL
-     ============================================================= -->
+     ========================================================= -->
 
-                @if (isAdmin)
-                {
-                    <div id="clearScheduleModal" class="settings-modal">
+@if (isAdmin)
+{
+    <div id="clearScheduleModal"
+         class="settings-modal"
+         hidden>
 
-                        <div class="settings-modal-backdrop" data-modal-close></div>
-
-
-                        <div class="settings-modal-content">
-
-                            <button type="button" class="settings-modal-close" data-modal-close>
-
-                                ×
-
-                            </button>
+        <div class="settings-modal-backdrop"
+             data-modal-close>
+        </div>
 
 
-                            <div class="settings-modal-icon">
-                                ⚠️
-                            </div>
+        <div class="settings-modal-content"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="clearScheduleTitle">
+
+            <button type="button"
+                    class="settings-modal-close"
+                    data-modal-close
+                    aria-label="Закрыть">
+
+                ×
+
+            </button>
 
 
-                            <h2>
-                                Очистить расписание?
-                            </h2>
+            <div class="settings-modal-icon">
+                ⚠️
+            </div>
 
 
-                            <p>
-                                Все созданные занятия будут удалены.
-                                Группы, преподаватели, предметы и аудитории
-                                останутся в системе.
-                            </p>
+            <h2 id="clearScheduleTitle">
+                Очистить расписание?
+            </h2>
 
 
-                            <form asp-controller="Account" asp-action="ClearSchedule" method="post">
-
-                                @Html.AntiForgeryToken()
-
-                                <div class="settings-modal-actions">
-
-                                    <button type="button" class="settings-secondary-button" data-modal-close>
-
-                                        Отмена
-
-                                    </button>
-
-                                    <button type="submit" class="settings-danger-button">
-
-                                        Очистить расписание
-
-                                    </button>
-
-                                </div>
-
-                            </form>
-
-                        </div>
-
-                    </div>
+            <p>
+                Все созданные занятия будут удалены.
+                Группы, преподаватели, предметы и аудитории
+                останутся в системе.
+            </p>
 
 
-                    <!-- =========================================================
+            <form asp-controller="Account"
+                  asp-action="ClearSchedule"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="settings-modal-actions">
+
+                    <button type="button"
+                            class="settings-secondary-button"
+                            data-modal-close>
+
+                        Отмена
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="settings-danger-button">
+
+                        Очистить расписание
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
          CLEAR ALL DATA MODAL
-         ========================================================= -->
+         ===================================================== -->
 
-                    <div id="clearAllDataModal" class="settings-modal">
+    <div id="clearAllDataModal"
+         class="settings-modal"
+         hidden>
 
-                        <div class="settings-modal-backdrop" data-modal-close></div>
-
-
-                        <div class="settings-modal-content">
-
-                            <button type="button" class="settings-modal-close" data-modal-close>
-
-                                ×
-
-                            </button>
+        <div class="settings-modal-backdrop"
+             data-modal-close>
+        </div>
 
 
-                            <div class="settings-modal-icon">
-                                🛑
-                            </div>
+        <div class="settings-modal-content"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="clearAllDataTitle">
+
+            <button type="button"
+                    class="settings-modal-close"
+                    data-modal-close
+                    aria-label="Закрыть">
+
+                ×
+
+            </button>
 
 
-                            <h2>
-                                Удалить все данные?
-                            </h2>
+            <div class="settings-modal-icon">
+                🛑
+            </div>
 
 
-                            <p>
-                                Будут удалены расписание, группы, преподаватели,
-                                предметы и аудитории.
-                                Это действие нельзя отменить.
-                            </p>
+            <h2 id="clearAllDataTitle">
+                Удалить все данные?
+            </h2>
 
 
-                            <form asp-controller="Account" asp-action="ClearAllData" method="post">
-
-                                @Html.AntiForgeryToken()
-
-                                <div class="settings-modal-actions">
-
-                                    <button type="button" class="settings-secondary-button" data-modal-close>
-
-                                        Отмена
-
-                                    </button>
-
-                                    <button type="submit" class="settings-danger-button">
-
-                                        Удалить всё
-
-                                    </button>
-
-                                </div>
-
-                            </form>
-
-                        </div>
-
-                    </div>
-                }
+            <p>
+                Будут удалены расписание, группы, преподаватели,
+                предметы и аудитории.
+                Это действие нельзя отменить.
+            </p>
 
 
-                <!-- =============================================================
-     JAVASCRIPT
+            <form asp-controller="Account"
+                  asp-action="ClearAllData"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="settings-modal-actions">
+
+                    <button type="button"
+                            class="settings-secondary-button"
+                            data-modal-close>
+
+                        Отмена
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="settings-danger-button">
+
+                        Удалить всё
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+}
+
+
+</div>
+
+<!-- =============================================================
+     JAVASCRIPT DATA
      ============================================================= -->
 
-                <script>
-
-                                    document.addEventListener("DOMContentLoaded", function () {
-
-                                        /* ============================================================
-                                           DATA
-                                           ============================================================ */
-
-                                        const groups = @Html.Raw(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                System.Text.Json.JsonSerializer.Serialize(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                groups.Select(g => new
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                id = g.Id,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            name = g.Name,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            course = g.Course
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })
-                                                                        )
-                                                                        );
-
-
-                                        const subjects = @Html.Raw(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                System.Text.Json.JsonSerializer.Serialize(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                subjects.Select(s => new
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                id = s.Id,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            name = s.Name
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })
-                                                                        )
-                                                                        );
-
-
-                                        const groupSubjects = @Html.Raw(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                System.Text.Json.JsonSerializer.Serialize(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                groupSubjects.Select(gs => new
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                id = gs.Id,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            groupId = gs.GroupId,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            subjectId = gs.SubjectId,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            weeklyLessons = gs.WeeklyLessons,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            subjectName = gs.Subject != null
-                                                                        ? gs.Subject.Name
-                                                                        : ""
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            })
-                                                                        )
-                                                                        );
-
-
-                                        /* ============================================================
-                                           STUDY LOAD ELEMENTS
-                                           ============================================================ */
-
-                                        const groupSelect =
-                                            document.getElementById("loadGroupSelect");
-
-                                        const container =
-                                            document.getElementById("studyLoadContainer");
-
-                                        const addSubjectArea =
-                                            document.getElementById("addSubjectArea");
-
-                                        const addSubjectForm =
-                                            document.getElementById("addSubjectForm");
-
-                                        const addSubjectButton =
-                                            document.getElementById("addSubjectButton");
-
-                                        const confirmAddSubject =
-                                            document.getElementById("confirmAddSubject");
-
-                                        const cancelAddSubject =
-                                            document.getElementById("cancelAddSubject");
-
-                                        const cancelAddSubjectSecondary =
-                                            document.getElementById("cancelAddSubjectSecondary");
-
-                                        const addSubjectSelect =
-                                            document.getElementById("addSubjectId");
-
-                                        const addWeeklyLessons =
-                                            document.getElementById("addWeeklyLessons");
-
-                                        const saveStudyLoadForm =
-                                            document.getElementById("saveStudyLoadForm");
-
-                                        const hiddenInputs =
-                                            document.getElementById("studyLoadHiddenInputs");
-
-                                        const saveStudyLoadButton =
-                                            document.getElementById("saveStudyLoadButton");
-
-                                        const unsavedStatus =
-                                            document.getElementById("studyLoadUnsavedStatus");
-
-                                        const statusText =
-                                            document.getElementById("studyLoadStatusText");
-
-
-                                        /* ============================================================
-                                           WORKING COPY
-                                           ============================================================ */
-
-                                        let workingLoad = [];
-
-                                        let selectedGroupId = null;
-
-                                        let hasUnsavedChanges = false;
-
-                                        /*
-                                         * ID уже сохранённых записей GroupSubject,
-                                         * которые пользователь удалил.
-                                         *
-                                         * Они отправятся на сервер только после
-                                         * нажатия "Сохранить изменения".
-                                         */
-                                        let deletedGroupSubjectIds = [];
-
-
-                                        /* ============================================================
-                                           HELPERS
-                                           ============================================================ */
-
-                                        function getLessonWord(number) {
-
-                                            const n =
-                                                Math.abs(number) % 100;
-
-                                            const n1 =
-                                                n % 10;
-
-                                            if (n >= 11 && n <= 19) {
-                                                return "пар";
-                                            }
-
-                                            if (n1 === 1) {
-                                                return "пара";
-                                            }
-
-                                            if (n1 >= 2 && n1 <= 4) {
-                                                return "пары";
-                                            }
-
-                                            return "пар";
-                                        }
-
-
-                                        function getSubjectIcon(name) {
-
-                                            const value =
-                                                (name || "").toLowerCase();
-
-
-                                            if (
-                                                value.includes("программ") ||
-                                                value.includes("python") ||
-                                                value.includes("c#") ||
-                                                value.includes("javascript") ||
-                                                value.includes("web")
-                                            ) {
-                                                return "💻";
-                                            }
-
-
-                                            if (
-                                                value.includes("математ") ||
-                                                value.includes("алгебр") ||
-                                                value.includes("геометр")
-                                            ) {
-                                                return "📐";
-                                            }
-
-
-                                            if (
-                                                value.includes("англий") ||
-                                                value.includes("русск") ||
-                                                value.includes("язык")
-                                            ) {
-                                                return "🌐";
-                                            }
-
-
-                                            if (
-                                                value.includes("физик") ||
-                                                value.includes("хим")
-                                            ) {
-                                                return "🔬";
-                                            }
-
-
-                                            if (
-                                                value.includes("истор") ||
-                                                value.includes("обществ")
-                                            ) {
-                                                return "📚";
-                                            }
-
-
-                                            return "📖";
-                                        }
-
-
-                                        function escapeHtml(value) {
-
-                                            const div =
-                                                document.createElement("div");
-
-                                            div.textContent =
-                                                value ?? "";
-
-                                            return div.innerHTML;
-                                        }
-
-
-                                        function setUnsavedChanges(value) {
-
-                                            hasUnsavedChanges =
-                                                value;
-
-
-                                            if (
-                                                !unsavedStatus ||
-                                                !saveStudyLoadButton
-                                            ) {
-                                                return;
-                                            }
-
-
-                                            if (value) {
-
-                                                unsavedStatus.classList.add(
-                                                    "has-changes"
-                                                );
-
-                                                saveStudyLoadButton.disabled =
-                                                    false;
-
-                                                if (statusText) {
-
-                                                    statusText.textContent =
-                                                        "Есть несохранённые изменения";
-
-                                                }
-
-                                            }
-                                            else {
-
-                                                unsavedStatus.classList.remove(
-                                                    "has-changes"
-                                                );
-
-                                                saveStudyLoadButton.disabled =
-                                                    true;
-
-                                                if (statusText) {
-
-                                                    statusText.textContent =
-                                                        "Нет несохранённых изменений";
-
-                                                }
-
-                                            }
-
-                                        }
-
-
-                                        function getSelectedGroup() {
-
-                                            return groups.find(
-                                                group =>
-                                                    Number(group.id) ===
-                                                    Number(selectedGroupId)
-                                            );
-
-                                        }
-
-
-                                        /* ============================================================
-                                           LOAD GROUP
-                                           ============================================================ */
-
-                                        function loadWorkingGroup(groupId) {
-
-                                            selectedGroupId =
-                                                Number(groupId);
-
-                                            deletedGroupSubjectIds = [];
-
-                                            workingLoad =
-                                                groupSubjects
-                                                    .filter(item =>
-                                                        Number(item.groupId) ===
-                                                        Number(groupId)
-                                                    )
-                                                    .map(item => ({
-                                                        id: Number(item.id),
-                                                        groupId: Number(item.groupId),
-                                                        subjectId: Number(item.subjectId),
-                                                        weeklyLessons:
-                                                            Number(item.weeklyLessons),
-                                                        subjectName:
-                                                            item.subjectName || ""
-                                                    }));
-
-
-                                            setUnsavedChanges(false);
-
-                                            renderGroupLoad();
-
-                                            updateAvailableSubjects();
-
-                                        }
-
-
-                                        /* ============================================================
-                                           RENDER GROUP LOAD
-                                           ============================================================ */
-
-                                        function renderGroupLoad() {
-
-                                            if (!selectedGroupId) {
-
-                                                container.innerHTML = `
-                                                                                                    <div class="study-load-placeholder">
-
-                                                                                                        <div class="study-load-placeholder-icon">
-                                                                                                            👥
-                                                                                                        </div>
-
-                                                                                                        <strong>
-                                                                                                            Выберите группу
-                                                                                                        </strong>
-
-                                                                                                        <span>
-                                                                                                            Здесь появятся предметы и количество
-                                                                                                            занятий в неделю.
-                                                                                                        </span>
-
-                                                                                                    </div>
-                                                                                                `;
-
-                                                addSubjectArea.style.display =
-                                                    "none";
-
-                                                addSubjectForm.style.display =
-                                                    "none";
-
-                                                return;
-                                            }
-
-
-                                            const selectedGroup =
-                                                getSelectedGroup();
-
-
-                                            const groupName =
-                                                selectedGroup?.name ||
-                                                "Группа";
-
-
-                                            const totalLessons =
-                                                workingLoad.reduce(
-                                                    (sum, item) =>
-                                                        sum +
-                                                        Number(item.weeklyLessons || 0),
-                                                    0
-                                                );
-
-
-                                            container.innerHTML = `
-
-                                                                                                <div class="study-load-selected-header">
-
-                                                                                                    <div>
-
-                                                                                                        <span class="study-load-label">
-                                                                                                            Учебная нагрузка группы
-                                                                                                        </span>
-
-                                                                                                        <strong>
-                                                                                                            ${escapeHtml(groupName)}
-                                                                                                        </strong>
-
-                                                                                                    </div>
-
-                                                                                                    <div class="study-load-total">
-
-                                                                                                        <strong>
-                                                                                                            ${totalLessons}
-                                                                                                        </strong>
-
-                                                                                                        <span>
-                                                                                                            ${getLessonWord(totalLessons)}
-                                                                                                            в неделю
-                                                                                                        </span>
-
-                                                                                                    </div>
-
-                                                                                                </div>
-
-                                                                                            `;
-
-
-                                            if (workingLoad.length === 0) {
-
-                                                container.innerHTML += `
-
-                                                                                                    <div class="study-load-empty">
-
-                                                                                                        <div class="study-load-empty-icon">
-                                                                                                            📚
-                                                                                                        </div>
-
-                                                                                                        <strong>
-                                                                                                            Учебная нагрузка не настроена
-                                                                                                        </strong>
-
-                                                                                                        <span>
-                                                                                                            Добавьте предметы ниже.
-                                                                                                        </span>
-
-                                                                                                    </div>
-
-                                                                                                `;
-
-                                            }
-                                            else {
-
-                                                const list =
-                                                    document.createElement("div");
-
-                                                list.className =
-                                                    "study-load-list";
-
-
-                                                workingLoad.forEach(item => {
-
-                                                    const itemElement =
-                                                        document.createElement("div");
-
-                                                    itemElement.className =
-                                                        "study-load-item";
-
-
-                                                    itemElement.dataset.id =
-                                                        item.id || "";
-
-
-                                                    itemElement.innerHTML = `
-
-                                                                                                        <div class="study-load-item-icon">
-                                                                                                            ${getSubjectIcon(item.subjectName)}
-                                                                                                        </div>
-
-                                                                                                        <div class="study-load-item-content">
-
-                                                                                                            <strong>
-                                                                                                                ${escapeHtml(item.subjectName)}
-                                                                                                            </strong>
-
-                                                                                                            <span>
-                                                                                                                Учебная нагрузка
-                                                                                                            </span>
-
-                                                                                                        </div>
-
-                                                                                                        <div class="study-load-item-value">
-
-                                                                                                            <strong>
-                                                                                                                ${item.weeklyLessons}
-                                                                                                            </strong>
-
-                                                                                                            <span>
-                                                                                                                ${getLessonWord(item.weeklyLessons)}
-                                                                                                                в неделю
-                                                                                                            </span>
-
-                                                                                                        </div>
-
-                                <div class="study-load-item-edit">
-
-                                    <input
-                                        type="number"
-                                        class="settings-input study-load-lessons-input"
-                                        value="${item.weeklyLessons}"
-                                        min="1"
-                                        max="20"
-                                        data-subject-id="${item.subjectId}"
-                                    />
-
-                                </div>
-
-                                <button
-                                    type="button"
-                                    class="study-load-delete-button"
-                                    title="Удалить предмет"
-                                    aria-label="Удалить ${escapeHtml(item.subjectName)}">
-
-                                    🗑️
-
-                                </button>
-
-                                                                                                    `;
-
-
-                                                    const input =
-                                                        itemElement.querySelector(
-                                                            ".study-load-lessons-input"
-                                                        );
-
-                                                    const deleteButton =
-                                                        itemElement.querySelector(
-                                                            ".study-load-delete-button"
-                                                        );
-
-                                                    deleteButton?.addEventListener(
-                                                        "click",
-                                                        function () {
-
-                                                            const index =
-                                                                workingLoad.findIndex(
-                                                                    loadItem =>
-                                                                        loadItem === item
-                                                                );
-
-                                                            if (index === -1) {
-                                                                return;
-                                                            }
-
-                                                            /*
-                                                             * Если запись уже существует в БД,
-                                                             * запоминаем её ID для удаления
-                                                             * после нажатия "Сохранить изменения".
-                                                             */
-                                                            if (
-                                                                item.id &&
-                                                                Number(item.id) > 0
-                                                            ) {
-
-                                                                const id =
-                                                                    Number(item.id);
-
-                                                                if (
-                                                                    !deletedGroupSubjectIds.includes(id)
-                                                                ) {
-
-                                                                    deletedGroupSubjectIds.push(id);
-
-                                                                }
-                                                            }
-
-                                                            /*
-                                                             * Удаляем предмет из локального списка.
-                                                             */
-                                                            workingLoad.splice(index, 1);
-
-                                                            setUnsavedChanges(true);
-
-                                                            renderGroupLoad();
-
-                                                            updateAvailableSubjects();
-                                                        }
-                                                    );
-
-                                                    input.addEventListener(
-                                                        "input",
-                                                        function () {
-
-                                                            let value =
-                                                                parseInt(
-                                                                    this.value,
-                                                                    10
-                                                                );
-
-
-                                                            if (
-                                                                Number.isNaN(value)
-                                                            ) {
-                                                                return;
-                                                            }
-
-
-                                                            if (value < 1) {
-                                                                value = 1;
-                                                            }
-
-                                                            if (value > 20) {
-                                                                value = 20;
-                                                            }
-
-
-                                                            item.weeklyLessons =
-                                                                value;
-
-
-                                                            setUnsavedChanges(true);
-
-                                                            updateStudyLoadTotal();
-
-                                                        }
-                                                    );
-
-
-                                                    input.addEventListener(
-                                                        "change",
-                                                        function () {
-
-                                                            let value =
-                                                                parseInt(
-                                                                    this.value,
-                                                                    10
-                                                                );
-
-
-                                                            if (
-                                                                Number.isNaN(value) ||
-                                                                value < 1
-                                                            ) {
-                                                                value = 1;
-                                                            }
-
-
-                                                            if (value > 20) {
-                                                                value = 20;
-                                                            }
-
-
-                                                            this.value =
-                                                                value;
-
-                                                            item.weeklyLessons =
-                                                                value;
-
-
-                                                            setUnsavedChanges(true);
-
-                                                            updateStudyLoadTotal();
-
-                                                        }
-                                                    );
-
-
-                                                    list.appendChild(
-                                                        itemElement
-                                                    );
-
-                                                });
-
-
-                                                container.appendChild(
-                                                    list
-                                                );
-
-                                            }
-
-
-                                            addSubjectArea.style.display =
-                                                "flex";
-
-
-                                            updateAvailableSubjects();
-
-                                        }
-
-
-                                        /* ============================================================
-                                           UPDATE TOTAL
-                                           ============================================================ */
-
-                                        function updateStudyLoadTotal() {
-
-                                            const total =
-                                                workingLoad.reduce(
-                                                    (sum, item) =>
-                                                        sum +
-                                                        Number(item.weeklyLessons || 0),
-                                                    0
-                                                );
-
-
-                                            const totalElement =
-                                                container.querySelector(
-                                                    ".study-load-total strong"
-                                                );
-
-
-                                            const totalWordElement =
-                                                container.querySelector(
-                                                    ".study-load-total span"
-                                                );
-
-
-                                            if (totalElement) {
-
-                                                totalElement.textContent =
-                                                    total;
-
-                                            }
-
-
-                                            if (totalWordElement) {
-
-                                                totalWordElement.textContent =
-                                                    `${getLessonWord(total)} в неделю`;
-
-                                            }
-
-                                        }
-
-
-                                        /* ============================================================
-                                           AVAILABLE SUBJECTS
-                                           ============================================================ */
-
-                                        function updateAvailableSubjects() {
-
-                                            if (!addSubjectSelect) {
-                                                return;
-                                            }
-
-
-                                            const existingSubjectIds =
-                                                workingLoad.map(
-                                                    item =>
-                                                        Number(item.subjectId)
-                                                );
-
-
-                                            const availableSubjects =
-                                                subjects.filter(
-                                                    subject =>
-                                                        !existingSubjectIds.includes(
-                                                            Number(subject.id)
-                                                        )
-                                                );
-
-
-                                            addSubjectSelect.innerHTML = `
-
-                                                                                                <option value="">
-                                                                                                    Выберите предмет
-                                                                                                </option>
-
-                                                                                            `;
-
-
-                                            availableSubjects.forEach(subject => {
-
-                                                const option =
-                                                    document.createElement("option");
-
-                                                option.value =
-                                                    subject.id;
-
-                                                option.textContent =
-                                                    subject.name;
-
-                                                addSubjectSelect.appendChild(
-                                                    option
-                                                );
-
-                                            });
-
-
-                                            if (availableSubjects.length === 0) {
-
-                                                addSubjectButton.disabled =
-                                                    true;
-
-                                                addSubjectButton.title =
-                                                    "Все предметы уже добавлены для этой группы";
-
-                                            }
-                                            else {
-
-                                                addSubjectButton.disabled =
-                                                    false;
-
-                                                addSubjectButton.removeAttribute(
-                                                    "title"
-                                                );
-
-                                            }
-
-                                        }
-
-
-                                        /* ============================================================
-                                           GROUP CHANGE
-                                           ============================================================ */
-
-                                        groupSelect?.addEventListener(
-                                            "change",
-                                            function () {
-
-                                                closeAddForm();
-
-
-                                                if (!this.value) {
-
-                                                    selectedGroupId =
-                                                        null;
-
-                                                    workingLoad = [];
-
-                                                    setUnsavedChanges(false);
-
-                                                    renderGroupLoad();
-
-                                                    return;
-
-                                                }
-
-
-                                                loadWorkingGroup(
-                                                    this.value
-                                                );
-
-                                            }
-                                        );
-
-
-                                        /* ============================================================
-                                           OPEN ADD SUBJECT
-                                           ============================================================ */
-
-                                        addSubjectButton?.addEventListener(
-                                            "click",
-                                            function () {
-
-                                                if (!selectedGroupId) {
-                                                    return;
-                                                }
-
-
-                                                addSubjectForm.style.display =
-                                                    "block";
-
-                                                addSubjectArea.style.display =
-                                                    "none";
-
-
-                                                addWeeklyLessons.value =
-                                                    2;
-
-
-                                                updateAvailableSubjects();
-
-                                            }
-                                        );
-
-
-                                        /* ============================================================
-                                           ADD SUBJECT
-                                           ============================================================ */
-
-                                        confirmAddSubject?.addEventListener(
-                                            "click",
-                                            function () {
-
-                                                const subjectId =
-                                                    Number(
-                                                        addSubjectSelect.value
-                                                    );
-
-
-                                                let lessons =
-                                                    parseInt(
-                                                        addWeeklyLessons.value,
-                                                        10
-                                                    );
-
-
-                                                if (!subjectId) {
-
-                                                    alert(
-                                                        "Выберите предмет."
-                                                    );
-
-                                                    return;
-
-                                                }
-
-
-                                                if (
-                                                    Number.isNaN(lessons) ||
-                                                    lessons < 1 ||
-                                                    lessons > 20
-                                                ) {
-
-                                                    alert(
-                                                        "Количество пар должно быть от 1 до 20."
-                                                    );
-
-                                                    return;
-
-                                                }
-
-
-                                                const subject =
-                                                    subjects.find(
-                                                        item =>
-                                                            Number(item.id) ===
-                                                            subjectId
-                                                    );
-
-
-                                                if (!subject) {
-
-                                                    alert(
-                                                        "Выбранный предмет не найден."
-                                                    );
-
-                                                    return;
-
-                                                }
-
-
-                                                const alreadyExists =
-                                                    workingLoad.some(
-                                                        item =>
-                                                            Number(item.subjectId) ===
-                                                            subjectId
-                                                    );
-
-
-                                                if (alreadyExists) {
-
-                                                    alert(
-                                                        "Этот предмет уже добавлен для группы."
-                                                    );
-
-                                                    return;
-
-                                                }
-
-
-                                                workingLoad.push({
-
-                                                    id: 0,
-
-                                                    groupId:
-                                                        Number(selectedGroupId),
-
-                                                    subjectId:
-                                                        subjectId,
-
-                                                    weeklyLessons:
-                                                        lessons,
-
-                                                    subjectName:
-                                                        subject.name
-
-                                                });
-
-
-                                                setUnsavedChanges(true);
-
-                                                closeAddForm();
-
-                                                renderGroupLoad();
-
-                                                updateAvailableSubjects();
-
-                                            }
-                                        );
-
-
-                                        /* ============================================================
-                                           CLOSE ADD FORM
-                                           ============================================================ */
-
-                                        function closeAddForm() {
-
-                                            if (!addSubjectForm) {
-                                                return;
-                                            }
-
-
-                                            addSubjectForm.style.display =
-                                                "none";
-
-
-                                            if (addSubjectArea) {
-
-                                                addSubjectArea.style.display =
-                                                    selectedGroupId
-                                                        ? "flex"
-                                                        : "none";
-
-                                            }
-
-
-                                            if (addSubjectSelect) {
-
-                                                addSubjectSelect.value =
-                                                    "";
-
-                                            }
-
-
-                                            if (addWeeklyLessons) {
-
-                                                addWeeklyLessons.value =
-                                                    2;
-
-                                            }
-
-                                        }
-
-
-                                        cancelAddSubject?.addEventListener(
-                                            "click",
-                                            closeAddForm
-                                        );
-
-
-                                        cancelAddSubjectSecondary?.addEventListener(
-                                            "click",
-                                            closeAddForm
-                                        );
-
-
-                                        /* ============================================================
-                                           PREPARE SAVE DATA
-                                           ============================================================ */
-
-                                        saveStudyLoadForm?.addEventListener(
-                                            "submit",
-                                            function (event) {
-
-                                                if (!hasUnsavedChanges) {
-
-                                                    event.preventDefault();
-
-                                                    return;
-
-                                                }
-
-
-                                                if (!selectedGroupId) {
-
-                                                    event.preventDefault();
-
-                                                    alert(
-                                                        "Сначала выберите группу."
-                                                    );
-
-                                                    return;
-
-                                                }
-
-
-                                                hiddenInputs.innerHTML =
-                                                    "";
-
-/*
- * Передаём серверу ID существующих записей,
- * которые пользователь удалил.
- */
-deletedGroupSubjectIds.forEach(id => {
-
-    const deletedInput =
-        document.createElement("input");
-
-    deletedInput.type =
-        "hidden";
-
-    deletedInput.name =
-        "deletedGroupSubjectId";
-
-    deletedInput.value =
-        id;
-
-    hiddenInputs.appendChild(
-        deletedInput
-    );
-
-});
-
-                                                workingLoad.forEach(item => {
-
-                                                    const groupInput =
-                                                        document.createElement("input");
-
-                                                    groupInput.type =
-                                                        "hidden";
-
-                                                    groupInput.name =
-                                                        "groupId";
-
-                                                    groupInput.value =
-                                                        item.groupId;
-
-
-                                                    const subjectInput =
-                                                        document.createElement("input");
-
-                                                    subjectInput.type =
-                                                        "hidden";
-
-                                                    subjectInput.name =
-                                                        "subjectId";
-
-                                                    subjectInput.value =
-                                                        item.subjectId;
-
-
-                                                    const lessonsInput =
-                                                        document.createElement("input");
-
-                                                    lessonsInput.type =
-                                                        "hidden";
-
-                                                    lessonsInput.name =
-                                                        "weeklyLessons";
-
-                                                    lessonsInput.value =
-                                                        item.weeklyLessons;
-
-
-                                                    hiddenInputs.appendChild(
-                                                        groupInput
-                                                    );
-
-                                                    hiddenInputs.appendChild(
-                                                        subjectInput
-                                                    );
-
-                                                    hiddenInputs.appendChild(
-                                                        lessonsInput
-                                                    );
-
-                                                });
-
-
-                                                saveStudyLoadButton.disabled =
-                                                    true;
-
-                                            }
-                                        );
-
-
-                                        /* ============================================================
-                                           TABS
-                                           ============================================================ */
-
-                                        const tabs =
-                                            document.querySelectorAll(
-                                                ".settings-tab"
-                                            );
-
-
-                                        const tabContents =
-                                            document.querySelectorAll(
-                                                ".settings-tab-content"
-                                            );
-
-
-                                        tabs.forEach(tab => {
-
-                                            tab.addEventListener(
-                                                "click",
-                                                function () {
-
-                                                    const target =
-                                                        this.dataset.tab;
-
-
-                                                    tabs.forEach(item =>
-                                                        item.classList.remove(
-                                                            "active"
-                                                        )
-                                                    );
-
-
-                                                    tabContents.forEach(content =>
-                                                        content.classList.remove(
-                                                            "active"
-                                                        )
-                                                    );
-
-
-                                                    this.classList.add(
-                                                        "active"
-                                                    );
-
-
-                                                    const content =
-                                                        document.querySelector(
-                                                            `[data-tab-content="${target}"]`
-                                                        );
-
-
-                                                    content?.classList.add(
-                                                        "active"
-                                                    );
-
-
-                                                    window.scrollTo({
-
-                                                        top: 0,
-
-                                                        behavior: "smooth"
-
-                                                    });
-
-                                                }
-                                            );
-
-                                        });
-
-
-                                        /* ============================================================
-                                           MODALS
-                                           ============================================================ */
-
-                                        const modalOpenButtons =
-                                            document.querySelectorAll(
-                                                "[data-modal-open]"
-                                            );
-
-
-                                        const modalCloseButtons =
-                                            document.querySelectorAll(
-                                                "[data-modal-close]"
-                                            );
-
-
-                                        modalOpenButtons.forEach(button => {
-
-                                            button.addEventListener(
-                                                "click",
-                                                function () {
-
-                                                    const modalId =
-                                                        this.dataset.modalOpen;
-
-
-                                                    const modal =
-                                                        document.getElementById(
-                                                            modalId
-                                                        );
-
-
-                                                    modal?.classList.add(
-                                                        "active"
-                                                    );
-
-
-                                                    document.body.classList.add(
-                                                        "modal-open"
-                                                    );
-
-                                                }
-                                            );
-
-                                        });
-
-
-                                        modalCloseButtons.forEach(button => {
-
-                                            button.addEventListener(
-                                                "click",
-                                                function () {
-
-                                                    const modal =
-                                                        this.closest(
-                                                            ".settings-modal"
-                                                        );
-
-
-                                                    modal?.classList.remove(
-                                                        "active"
-                                                    );
-
-
-                                                    document.body.classList.remove(
-                                                        "modal-open"
-                                                    );
-
-                                                }
-                                            );
-
-                                        });
-
-
-                                        /* ============================================================
-                                           ESCAPE
-                                           ============================================================ */
-
-                                        document.addEventListener(
-                                            "keydown",
-                                            function (event) {
-
-                                                if (event.key !== "Escape") {
-                                                    return;
-                                                }
-
-
-                                                document
-                                                    .querySelectorAll(
-                                                        ".settings-modal.active"
-                                                    )
-                                                    .forEach(modal => {
-
-                                                        modal.classList.remove(
-                                                            "active"
-                                                        );
-
-                                                    });
-
-
-                                                document.body.classList.remove(
-                                                    "modal-open"
-                                                );
-
-                                            }
-                                        );
-
-                                    });
-
-                </script>
+<script>
+
+    window.scheduleSettingsData = {
+
+        groups: @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                groups.Select(g => new
+                {
+                    id = g.Id,
+                    name = g.Name,
+                    course = g.Course,
+                    specialty = g.Specialty,
+                    studentCount = g.StudentCount
+                })
+            )
+        ),
+
+        subjects: @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                subjects.Select(s => new
+                {
+                    id = s.Id,
+                    name = s.Name,
+                    course = s.Course
+                })
+            )
+        ),
+
+        groupSubjects: @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                groupSubjects.Select(gs => new
+                {
+                    id = gs.Id,
+                    groupId = gs.GroupId,
+                    subjectId = gs.SubjectId,
+                    weeklyLessons = gs.WeeklyLessons
+                })
+            )
+        )
+
+    };
+
+</script>
+
+<script src="~/js/Account/Settings.js"
+        asp-append-version="true"></script>
