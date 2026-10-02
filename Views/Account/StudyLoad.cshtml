@@ -1,0 +1,365 @@
+@using System.Text.Json
+@using ScheduleSystem.Models
+
+@{
+    ViewData["Title"] = "Учебная нагрузка";
+
+    var groups = ViewBag.Groups as IEnumerable<Group>
+                 ?? Enumerable.Empty<Group>();
+
+    var subjects = ViewBag.Subjects as IEnumerable<Subject>
+                   ?? Enumerable.Empty<Subject>();
+
+    var groupSubjects = ViewBag.GroupSubjects as IEnumerable<GroupSubject>
+                        ?? Enumerable.Empty<GroupSubject>();
+
+    var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+
+<link rel="stylesheet"
+      href="~/css/Account/StudyLoad.css"
+      asp-append-version="true" />
+
+<div class="study-load-page">
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <header class="study-load-header">
+
+        <div class="study-load-header-top">
+
+            <a asp-controller="Account"
+               asp-action="Settings"
+               class="study-load-back">
+                <span class="study-load-back-icon">←</span>
+                <span>Настройки</span>
+            </a>
+
+        </div>
+
+        <div class="study-load-title-block">
+
+            <div class="study-load-title-icon">
+                📚
+            </div>
+
+            <div>
+                <h1>Учебная нагрузка</h1>
+
+                <p>
+                    Настройте предметы и количество занятий
+                    в неделю для каждой учебной группы.
+                </p>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         NOTIFICATIONS
+         ========================================================= -->
+
+    @if (!string.IsNullOrWhiteSpace(successMessage))
+    {
+        <div class="study-load-alert study-load-alert-success">
+            <span class="study-load-alert-icon">✓</span>
+            <span>@successMessage</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="study-load-alert study-load-alert-error">
+            <span class="study-load-alert-icon">!</span>
+            <span>@errorMessage</span>
+        </div>
+    }
+
+
+    <!-- =========================================================
+         MAIN CARD
+         ========================================================= -->
+
+    <main class="study-load-card">
+
+        <!-- GROUP SELECT -->
+
+        <section class="study-load-section">
+
+            <div class="study-load-section-header">
+
+                <div>
+                    <span class="study-load-section-kicker">
+                        ШАГ 1
+                    </span>
+
+                    <h2>Выберите группу</h2>
+
+                    <p>
+                        После выбора группы появится её текущая
+                        учебная нагрузка.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="study-load-group-selector">
+
+                <label for="loadGroupSelect">
+                    Учебная группа
+                </label>
+
+                <select id="loadGroupSelect"
+                        class="study-load-select">
+
+                    <option value="">
+                        Выберите группу...
+                    </option>
+
+                    @foreach (var group in groups)
+                    {
+                        <option value="@group.Id">
+                            @group.Name
+                            — @group.Course курс
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             WORKSPACE
+             ===================================================== -->
+
+        <section id="studyLoadContainer"
+                 class="study-load-workspace-container">
+
+            <div class="study-load-placeholder">
+
+                <div class="study-load-placeholder-icon">
+                    📋
+                </div>
+
+                <h3>Группа не выбрана</h3>
+
+                <p>
+                    Выберите учебную группу выше,
+                    чтобы настроить её учебную нагрузку.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ADD SUBJECT
+             ===================================================== -->
+
+        <section id="addSubjectArea"
+                 class="study-load-add-section"
+                 hidden>
+
+            <button type="button"
+                    id="addSubjectButton"
+                    class="study-load-add-button">
+
+                <span class="study-load-add-button-icon">＋</span>
+
+                <span>
+                    Добавить предмет
+                </span>
+
+            </button>
+
+
+            <div id="addSubjectForm"
+                 class="study-load-add-form"
+                 hidden>
+
+                <div class="study-load-add-form-header">
+
+                    <div>
+                        <span class="study-load-section-kicker">
+                            НОВЫЙ ПРЕДМЕТ
+                        </span>
+
+                        <h3>Добавить предмет</h3>
+                    </div>
+
+                    <button type="button"
+                            id="cancelAddSubject"
+                            class="study-load-modal-close">
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="study-load-add-fields">
+
+                    <div class="study-load-field">
+
+                        <label for="addSubjectId">
+                            Предмет
+                        </label>
+
+                        <select id="addSubjectId"
+                                class="study-load-select">
+
+                            <option value="">
+                                Выберите предмет...
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="study-load-field">
+
+                        <label for="addWeeklyLessons">
+                            Занятий в неделю
+                        </label>
+
+                        <input id="addWeeklyLessons"
+                               class="study-load-number-input"
+                               type="number"
+                               min="1"
+                               max="20"
+                               value="2" />
+
+                    </div>
+
+                </div>
+
+
+                <div class="study-load-add-actions">
+
+                    <button type="button"
+                            id="cancelAddSubjectSecondary"
+                            class="study-load-secondary-button">
+                        Отмена
+                    </button>
+
+                    <button type="button"
+                            id="confirmAddSubject"
+                            class="study-load-primary-button">
+                        Добавить предмет
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SAVE FORM
+             ===================================================== -->
+
+        <form id="saveStudyLoadForm"
+              asp-controller="Account"
+              asp-action="SaveGroupSubjects"
+              method="post"
+              class="study-load-save-form">
+
+            @Html.AntiForgeryToken()
+
+            <div id="studyLoadHiddenInputs"></div>
+
+            <div class="study-load-save-bar">
+
+                <div class="study-load-save-status">
+
+                    <span id="studyLoadUnsavedStatus"
+                          class="study-load-status-dot">
+                    </span>
+
+                    <span id="studyLoadStatusText">
+                        Изменения не внесены
+                    </span>
+
+                </div>
+
+
+                <button type="submit"
+                        id="saveStudyLoadButton"
+                        class="study-load-save-button"
+                        disabled>
+
+                    <span class="study-load-save-icon">✓</span>
+
+                    <span>
+                        Сохранить изменения
+                    </span>
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </main>
+
+</div>
+
+
+<!-- =============================================================
+     DATA FOR JAVASCRIPT
+     ============================================================= -->
+
+<script>
+    window.scheduleStudyLoadData = {
+        groups: @Html.Raw(
+            JsonSerializer.Serialize(
+                groups.Select(g => new
+                {
+                    id = g.Id,
+                    name = g.Name,
+                    course = g.Course,
+                    specialty = g.Specialty,
+                    studentCount = g.StudentCount
+                })
+            )
+        ),
+
+        subjects: @Html.Raw(
+            JsonSerializer.Serialize(
+                subjects.Select(s => new
+                {
+                    id = s.Id,
+                    name = s.Name,
+                    course = s.Course
+                })
+            )
+        ),
+
+        groupSubjects: @Html.Raw(
+            JsonSerializer.Serialize(
+                groupSubjects.Select(gs => new
+                {
+                    id = gs.Id,
+                    groupId = gs.GroupId,
+                    subjectId = gs.SubjectId,
+                    weeklyLessons = gs.WeeklyLessons
+                })
+            )
+        )
+    };
+</script>
+
+<script src="~/js/Account/StudyLoad.js"
+        asp-append-version="true"></script>
+

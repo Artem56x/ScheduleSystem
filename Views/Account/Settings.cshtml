@@ -1,407 +1,166 @@
-@using ScheduleSystem.Models
-
 @{
-ViewData["Title"] = "Настройки";
+    ViewData["Title"] = "Настройки";
 
+    var email = ViewBag.Email as string ?? "";
+    var userName = ViewBag.UserName as string ?? "";
+    var displayName = ViewBag.DisplayName as string ?? userName;
 
-var email = ViewBag.Email as string ?? "";
-var userName = ViewBag.UserName as string ?? "";
-var displayName = ViewBag.DisplayName as string ?? userName;
+    var firstLetter = string.IsNullOrWhiteSpace(displayName)
+        ? "?"
+        : displayName.Substring(0, 1).ToUpper();
 
-var firstLetter = string.IsNullOrWhiteSpace(displayName)
-    ? "?"
-    : displayName.Substring(0, 1).ToUpper();
-
-var isAdmin = User.IsInRole("Admin");
-
-var groups =
-    ViewBag.Groups as IEnumerable<Group>
-    ?? Enumerable.Empty<Group>();
-
-var subjects =
-    ViewBag.Subjects as IEnumerable<Subject>
-    ?? Enumerable.Empty<Subject>();
-
-var groupSubjects =
-    ViewBag.GroupSubjects as IEnumerable<GroupSubject>
-    ?? Enumerable.Empty<GroupSubject>();
-
-
+    var isAdmin = User.IsInRole("Admin");
 }
 
-@section Styles { <link rel="stylesheet"
-       href="~/css/Account/Settings.css"
-       asp-append-version="true" />
+@section Styles
+{
+    <link rel="stylesheet"
+          href="~/css/Account/Settings.css"
+          asp-append-version="true" />
 }
 
 <div class="settings-page">
 
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
 
-<!-- =========================================================
-     HEADER
-     ========================================================= -->
+    <header class="settings-header">
 
-<header class="settings-header">
-
-    <div class="settings-header-left">
-
-        <a asp-controller="Account"
-           asp-action="Profile"
-           class="settings-back-button"
-           aria-label="Назад">
-
-            <span>‹</span>
-
-        </a>
-
-        <div class="settings-header-title">
-
-            <h1>Настройки</h1>
-
-            <p>
-                Управление профилем и параметрами ScheduleSystem
-            </p>
-
-        </div>
-
-    </div>
-
-</header>
-
-
-<!-- =========================================================
-     MESSAGES
-     ========================================================= -->
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="settings-message settings-message-success">
-
-        <span class="settings-message-icon">
-            ✓
-        </span>
-
-        <span>
-            @TempData["SuccessMessage"]
-        </span>
-
-    </div>
-}
-
-@if (TempData["ProgramMessage"] != null)
-{
-    <div class="settings-message settings-message-success">
-
-        <span class="settings-message-icon">
-            ✓
-        </span>
-
-        <span>
-            @TempData["ProgramMessage"]
-        </span>
-
-    </div>
-}
-
-
-<!-- =========================================================
-     TABS
-     ========================================================= -->
-
-<nav class="settings-tabs"
-     aria-label="Разделы настроек">
-
-    <button type="button"
-            class="settings-tab active"
-            data-tab="profile"
-            aria-selected="true">
-
-        <span class="settings-tab-icon">
-            👤
-        </span>
-
-        <span>
-            Профиль
-        </span>
-
-    </button>
-
-
-    @if (isAdmin)
-    {
-        <button type="button"
-                class="settings-tab"
-                data-tab="program"
-                aria-selected="false">
-
-            <span class="settings-tab-icon">
-                ⚙️
-            </span>
-
-            <span>
-                Программа
-            </span>
-
-        </button>
-    }
-
-
-    <button type="button"
-            class="settings-tab"
-            data-tab="about"
-            aria-selected="false">
-
-        <span class="settings-tab-icon">
-            ⓘ
-        </span>
-
-        <span>
-            О программе
-        </span>
-
-    </button>
-
-</nav>
-
-
-<!-- =========================================================
-     PROFILE TAB
-     ========================================================= -->
-
-<section class="settings-tab-content active"
-         data-tab-content="profile">
-
-    <!-- =====================================================
-         PROFILE
-         ===================================================== -->
-
-    <div class="settings-section">
-
-        <div class="settings-section-header">
-
-            <div>
-
-                <h2>
-                    Профиль
-                </h2>
-
-                <p>
-                    Основная информация вашей учётной записи
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="settings-card">
-
-            <div class="settings-profile-preview">
-
-                <div class="settings-avatar">
-                    @firstLetter
-                </div>
-
-                <div class="settings-profile-info">
-
-                    <strong>
-                        @displayName
-                    </strong>
-
-                    <span>
-                        @email
-                    </span>
-
-                    <span class="settings-role">
-                        @(isAdmin
-                            ? "Администратор"
-                            : "Пользователь")
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <form asp-controller="Account"
-                  asp-action="UpdateProfile"
-                  method="post"
-                  class="settings-form">
-
-                @Html.AntiForgeryToken()
-
-                <div class="settings-form-grid">
-
-                    <div class="settings-field">
-
-                        <label for="displayName">
-                            Имя
-                        </label>
-
-                        <input type="text"
-                               id="displayName"
-                               name="displayName"
-                               class="settings-input"
-                               value="@displayName"
-                               maxlength="100" />
-
-                    </div>
-
-
-                    <div class="settings-field">
-
-                        <label for="email">
-                            Электронная почта
-                        </label>
-
-                        <input type="email"
-                               id="email"
-                               name="email"
-                               class="settings-input"
-                               value="@email"
-                               maxlength="254" />
-
-                    </div>
-
-                </div>
-
-
-                <div class="settings-form-actions">
-
-                    <button type="submit"
-                            class="settings-save-button">
-
-                        Сохранить изменения
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         SECURITY
-         ===================================================== -->
-
-    <div class="settings-section">
-
-        <div class="settings-section-header">
-
-            <div>
-
-                <h2>
-                    Безопасность
-                </h2>
-
-                <p>
-                    Управление паролем учётной записи
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="settings-card settings-action-card">
-
-            <div class="settings-action-icon">
-                🔐
-            </div>
-
-            <div class="settings-action-content">
-
-                <strong>
-                    Изменить пароль
-                </strong>
-
-                <span>
-                    Обновите пароль вашей учётной записи
-                </span>
-
-            </div>
+        <div class="settings-header-left">
 
             <a asp-controller="Account"
-               asp-action="ChangePassword"
-               class="settings-secondary-button">
+               asp-action="Profile"
+               class="settings-back-button"
+               aria-label="Назад">
 
-                Изменить
+                <span>‹</span>
 
             </a>
 
-        </div>
+            <div class="settings-header-title">
 
-    </div>
-
-
-    <!-- =====================================================
-         APPEARANCE
-         ===================================================== -->
-
-    <div class="settings-section">
-
-        <div class="settings-section-header">
-
-            <div>
-
-                <h2>
-                    Внешний вид
-                </h2>
+                <h1>
+                    Настройки
+                </h1>
 
                 <p>
-                    Настройка интерфейса приложения
+                    Управление профилем и параметрами ScheduleSystem
                 </p>
 
             </div>
 
         </div>
 
+    </header>
 
-        <div class="settings-card settings-action-card">
 
-            <div class="settings-action-icon">
-                ✨
-            </div>
+    <!-- =========================================================
+         MESSAGES
+         ========================================================= -->
 
-            <div class="settings-action-content">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="settings-message settings-message-success">
 
-                <strong>
-                    Интерфейс
-                </strong>
+            <span class="settings-message-icon">
+                ✓
+            </span>
 
-                <span>
-                    Дополнительные настройки внешнего вида
-                </span>
-
-            </div>
-
-            <span class="settings-soon">
-                Скоро
+            <span>
+                @TempData["SuccessMessage"]
             </span>
 
         </div>
-
-    </div>
-
-</section>
+    }
 
 
-<!-- =========================================================
-     PROGRAM TAB
-     ========================================================= -->
+    @if (TempData["ProgramMessage"] != null)
+    {
+        <div class="settings-message settings-message-success">
 
-@if (isAdmin)
-{
-    <section class="settings-tab-content"
-             data-tab-content="program">
+            <span class="settings-message-icon">
+                ✓
+            </span>
 
-        <!-- =================================================
-             STUDY LOAD
-             ================================================= -->
+            <span>
+                @TempData["ProgramMessage"]
+            </span>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         TABS
+         ========================================================= -->
+
+    <nav class="settings-tabs"
+         aria-label="Разделы настроек">
+
+        <button type="button"
+                class="settings-tab active"
+                data-tab="profile"
+                aria-selected="true">
+
+            <span class="settings-tab-icon">
+                👤
+            </span>
+
+            <span>
+                Профиль
+            </span>
+
+        </button>
+
+
+        @if (isAdmin)
+        {
+            <button type="button"
+                    class="settings-tab"
+                    data-tab="program"
+                    aria-selected="false">
+
+                <span class="settings-tab-icon">
+                    ⚙️
+                </span>
+
+                <span>
+                    Программа
+                </span>
+
+            </button>
+        }
+
+
+        <button type="button"
+                class="settings-tab"
+                data-tab="about"
+                aria-selected="false">
+
+            <span class="settings-tab-icon">
+                ⓘ
+            </span>
+
+            <span>
+                О программе
+            </span>
+
+        </button>
+
+    </nav>
+
+
+    <!-- =========================================================
+         PROFILE TAB
+         ========================================================= -->
+
+    <section class="settings-tab-content active"
+             data-tab-content="profile">
+
+        <!-- =====================================================
+             PROFILE
+             ===================================================== -->
 
         <div class="settings-section">
 
@@ -410,12 +169,11 @@ var groupSubjects =
                 <div>
 
                     <h2>
-                        Учебная нагрузка
+                        Профиль
                     </h2>
 
                     <p>
-                        Добавляйте и изменяйте учебную нагрузку
-                        для учебных групп.
+                        Основная информация вашей учётной записи
                     </p>
 
                 </div>
@@ -423,81 +181,28 @@ var groupSubjects =
             </div>
 
 
-            <div class="settings-card study-load-card">
+            <div class="settings-card">
 
-                <!-- =========================================
-                     GROUP SELECT
-                     ========================================= -->
+                <div class="settings-profile-preview">
 
-                <div class="study-load-toolbar">
+                    <div class="settings-avatar">
+                        @firstLetter
+                    </div>
 
-                    <div class="study-load-toolbar-text">
+                    <div class="settings-profile-info">
 
                         <strong>
-                            Выберите группу
+                            @displayName
                         </strong>
 
                         <span>
-                            После выбора появится её учебная нагрузка.
+                            @email
                         </span>
 
-                    </div>
-
-
-                    <div class="study-load-group-field">
-
-                        <select id="loadGroupSelect"
-                                class="settings-input study-load-select">
-
-                            <option value="">
-                                Выберите группу
-                            </option>
-
-                            @foreach (var group in groups
-                                .OrderBy(g => g.Course)
-                                .ThenBy(g => g.Name))
-                            {
-                                <option value="@group.Id">
-
-                                    @group.Name
-
-                                    @if (group.Course > 0)
-                                    {
-                                        <text>
-                                            · @group.Course курс
-                                        </text>
-                                    }
-
-                                </option>
-                            }
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =========================================
-                     LOAD CONTAINER
-                     ========================================= -->
-
-                <div id="studyLoadContainer"
-                     class="study-load-container">
-
-                    <div class="study-load-placeholder">
-
-                        <div class="study-load-placeholder-icon">
-                            👥
-                        </div>
-
-                        <strong>
-                            Выберите группу
-                        </strong>
-
-                        <span>
-                            Здесь появятся предметы и количество
-                            занятий в неделю.
+                        <span class="settings-role">
+                            @(isAdmin
+                                ? "Администратор"
+                                : "Пользователь")
                         </span>
 
                     </div>
@@ -505,174 +210,53 @@ var groupSubjects =
                 </div>
 
 
-                <!-- =========================================
-                     ADD SUBJECT BUTTON
-                     ========================================= -->
-
-                <div id="addSubjectArea"
-                     class="study-load-add-area"
-                     style="display:none;">
-
-                    <button type="button"
-                            id="addSubjectButton"
-                            class="settings-secondary-button study-load-add-button">
-
-                        <span>
-                            ＋
-                        </span>
-
-                        Добавить предмет
-
-                    </button>
-
-                </div>
-
-
-                <!-- =========================================
-                     ADD SUBJECT FORM
-                     ========================================= -->
-
-                <div id="addSubjectForm"
-                     class="study-load-add-form"
-                     style="display:none;">
-
-                    <div class="study-load-add-form-header">
-
-                        <div>
-
-                            <strong>
-                                Добавить предмет
-                            </strong>
-
-                            <span>
-                                Выберите предмет и укажите количество
-                                занятий в неделю.
-                            </span>
-
-                        </div>
-
-
-                        <button type="button"
-                                id="cancelAddSubject"
-                                class="study-load-close-button"
-                                aria-label="Закрыть">
-
-                            ×
-
-                        </button>
-
-                    </div>
-
-
-                    <div class="settings-form">
-
-                        <div class="settings-form-grid">
-
-                            <div class="settings-field">
-
-                                <label for="addSubjectId">
-                                    Предмет
-                                </label>
-
-                                <select id="addSubjectId"
-                                        class="settings-input">
-
-                                    <option value="">
-                                        Выберите предмет
-                                    </option>
-
-                                    @foreach (var subject in subjects
-                                        .OrderBy(s => s.Name))
-                                    {
-                                        <option value="@subject.Id">
-
-                                            @subject.Name
-
-                                        </option>
-                                    }
-
-                                </select>
-
-                            </div>
-
-
-                            <div class="settings-field">
-
-                                <label for="addWeeklyLessons">
-                                    Занятий в неделю
-                                </label>
-
-                                <input type="number"
-                                       id="addWeeklyLessons"
-                                       class="settings-input"
-                                       value="2"
-                                       min="1"
-                                       max="30" />
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="settings-form-actions">
-
-                            <button type="button"
-                                    id="confirmAddSubject"
-                                    class="settings-save-button">
-
-                                Добавить в список
-
-                            </button>
-
-
-                            <button type="button"
-                                    id="cancelAddSubjectSecondary"
-                                    class="settings-secondary-button">
-
-                                Отмена
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =========================================
-                     SAVE
-                     ========================================= -->
-
-                <form id="saveStudyLoadForm"
-                      asp-controller="Account"
-                      asp-action="SaveGroupSubjects"
+                <form asp-controller="Account"
+                      asp-action="UpdateProfile"
                       method="post"
-                      class="study-load-save-form">
+                      class="settings-form">
 
                     @Html.AntiForgeryToken()
 
-                    <div id="studyLoadHiddenInputs"></div>
+                    <div class="settings-form-grid">
 
+                        <div class="settings-field">
 
-                    <div class="study-load-save-area">
+                            <label for="displayName">
+                                Имя
+                            </label>
 
-                        <div class="study-load-unsaved-status"
-                             id="studyLoadUnsavedStatus">
-
-                            <span class="study-load-status-dot"></span>
-
-                            <span id="studyLoadStatusText">
-                                Нет несохранённых изменений
-                            </span>
+                            <input type="text"
+                                   id="displayName"
+                                   name="displayName"
+                                   class="settings-input"
+                                   value="@displayName"
+                                   maxlength="100" />
 
                         </div>
 
 
+                        <div class="settings-field">
+
+                            <label for="email">
+                                Электронная почта
+                            </label>
+
+                            <input type="email"
+                                   id="email"
+                                   name="email"
+                                   class="settings-input"
+                                   value="@email"
+                                   maxlength="254" />
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="settings-form-actions">
+
                         <button type="submit"
-                                id="saveStudyLoadButton"
-                                class="settings-save-button"
-                                disabled>
+                                class="settings-save-button">
 
                             Сохранить изменения
 
@@ -687,9 +271,9 @@ var groupSubjects =
         </div>
 
 
-        <!-- =================================================
-             HISTORY
-             ================================================= -->
+        <!-- =====================================================
+             SECURITY
+             ===================================================== -->
 
         <div class="settings-section">
 
@@ -698,11 +282,11 @@ var groupSubjects =
                 <div>
 
                     <h2>
-                        История изменений
+                        Безопасность
                     </h2>
 
                     <p>
-                        Просмотр действий пользователей системы.
+                        Управление паролем учётной записи
                     </p>
 
                 </div>
@@ -713,28 +297,26 @@ var groupSubjects =
             <div class="settings-card settings-action-card">
 
                 <div class="settings-action-icon">
-                    🕘
+                    🔐
                 </div>
 
                 <div class="settings-action-content">
 
                     <strong>
-                        Журнал действий
+                        Изменить пароль
                     </strong>
 
                     <span>
-                        Просмотр истории изменений расписания
-                        и данных системы.
+                        Обновите пароль вашей учётной записи
                     </span>
 
                 </div>
 
-
-                <a asp-controller="AuditLogs"
-                   asp-action="Index"
+                <a asp-controller="Account"
+                   asp-action="ChangePassword"
                    class="settings-secondary-button">
 
-                    Открыть
+                    Изменить
 
                 </a>
 
@@ -743,9 +325,9 @@ var groupSubjects =
         </div>
 
 
-        <!-- =================================================
-             MAINTENANCE
-             ================================================= -->
+        <!-- =====================================================
+             APPEARANCE
+             ===================================================== -->
 
         <div class="settings-section">
 
@@ -754,11 +336,11 @@ var groupSubjects =
                 <div>
 
                     <h2>
-                        Обслуживание
+                        Внешний вид
                     </h2>
 
                     <p>
-                        Управление и очистка данных программы.
+                        Настройка интерфейса приложения
                     </p>
 
                 </div>
@@ -766,71 +348,516 @@ var groupSubjects =
             </div>
 
 
-            <div class="settings-card settings-maintenance-card">
+            <div class="settings-card settings-action-card">
 
-                <!-- CLEAR SCHEDULE -->
+                <div class="settings-action-icon">
+                    ✨
+                </div>
 
-                <div class="settings-action-card">
+                <div class="settings-action-content">
 
-                    <div class="settings-action-icon">
-                        🗑️
+                    <strong>
+                        Интерфейс
+                    </strong>
+
+                    <span>
+                        Дополнительные настройки внешнего вида
+                    </span>
+
+                </div>
+
+                <span class="settings-soon">
+                    Скоро
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         PROGRAM TAB
+         ========================================================= -->
+
+    @if (isAdmin)
+    {
+        <section class="settings-tab-content"
+                 data-tab-content="program">
+
+            <!-- =================================================
+                 STUDY LOAD
+                 ================================================= -->
+
+            <div class="settings-section">
+
+                <div class="settings-section-header">
+
+                    <div>
+
+                        <h2>
+                            Учебная нагрузка
+                        </h2>
+
+                        <p>
+                            Настройка предметов и количества занятий
+                            для каждой учебной группы.
+                        </p>
+
                     </div>
-
-                    <div class="settings-action-content">
-
-                        <strong>
-                            Очистить расписание
-                        </strong>
-
-                        <span>
-                            Удалить все созданные занятия,
-                            сохранив группы, преподавателей,
-                            предметы и аудитории.
-                        </span>
-
-                    </div>
-
-
-                    <button type="button"
-                            class="settings-danger-button"
-                            data-modal-open="clearScheduleModal">
-
-                        Очистить
-
-                    </button>
 
                 </div>
 
 
-                <!-- CLEAR ALL DATA -->
-
-                <div class="settings-action-card">
+                <div class="settings-card settings-action-card">
 
                     <div class="settings-action-icon">
-                        ⚠️
+                        📚
                     </div>
+
 
                     <div class="settings-action-content">
 
                         <strong>
-                            Очистить все данные
+                            Управление учебной нагрузкой
                         </strong>
 
                         <span>
-                            Полностью удалить данные программы.
-                            Это действие нельзя отменить.
+                            Выберите группу, добавьте предметы
+                            и укажите количество занятий в неделю.
                         </span>
 
                     </div>
 
 
-                    <button type="button"
-                            class="settings-danger-button"
-                            data-modal-open="clearAllDataModal">
+                    <a asp-controller="Account"
+                       asp-action="StudyLoad"
+                       class="settings-secondary-button">
 
-                        Очистить всё
+                        Настроить
 
-                    </button>
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 HISTORY
+                 ================================================= -->
+
+            <div class="settings-section">
+
+                <div class="settings-section-header">
+
+                    <div>
+
+                        <h2>
+                            История изменений
+                        </h2>
+
+                        <p>
+                            Просмотр действий пользователей системы.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-card settings-action-card">
+
+                    <div class="settings-action-icon">
+                        🕘
+                    </div>
+
+                    <div class="settings-action-content">
+
+                        <strong>
+                            Журнал действий
+                        </strong>
+
+                        <span>
+                            Просмотр истории изменений расписания
+                            и данных системы.
+                        </span>
+
+                    </div>
+
+
+                    <a asp-controller="AuditLogs"
+                       asp-action="Index"
+                       class="settings-secondary-button">
+
+                        Открыть
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 MAINTENANCE
+                 ================================================= -->
+
+            <div class="settings-section">
+
+                <div class="settings-section-header">
+
+                    <div>
+
+                        <h2>
+                            Обслуживание
+                        </h2>
+
+                        <p>
+                            Управление и очистка данных программы.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-card settings-maintenance-card">
+
+                    <!-- CLEAR SCHEDULE -->
+
+                    <div class="settings-action-card">
+
+                        <div class="settings-action-icon">
+                            🗑️
+                        </div>
+
+                        <div class="settings-action-content">
+
+                            <strong>
+                                Очистить расписание
+                            </strong>
+
+                            <span>
+                                Удалить все созданные занятия,
+                                сохранив группы, преподавателей,
+                                предметы и аудитории.
+                            </span>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="settings-danger-button"
+                                data-modal-open="clearScheduleModal">
+
+                            Очистить
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- CLEAR ALL DATA -->
+
+                    <div class="settings-action-card">
+
+                        <div class="settings-action-icon">
+                            ⚠️
+                        </div>
+
+                        <div class="settings-action-content">
+
+                            <strong>
+                                Очистить все данные
+                            </strong>
+
+                            <span>
+                                Полностью удалить данные программы.
+                                Это действие нельзя отменить.
+                            </span>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="settings-danger-button"
+                                data-modal-open="clearAllDataModal">
+
+                            Очистить всё
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+    }
+
+
+    <!-- =========================================================
+         ABOUT TAB
+         ========================================================= -->
+
+    <section class="settings-tab-content"
+             data-tab-content="about">
+
+        <div class="settings-section">
+
+            <div class="settings-section-header">
+
+                <div>
+
+                    <h2>
+                        О программе
+                    </h2>
+
+                    <p>
+                        Информация о системе ScheduleSystem
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-about-card settings-card">
+
+                <!-- HERO -->
+
+                <div class="settings-about-hero">
+
+                    <div class="settings-about-logo">
+                        📅
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            ScheduleSystem
+                        </h2>
+
+                        <p>
+                            Система управления учебным расписанием
+                            образовательного учреждения.
+                        </p>
+
+                        <div class="settings-about-version">
+                            Версия 1.0
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="settings-about-description">
+
+                    <h3>
+                        О системе
+                    </h3>
+
+                    <p>
+                        ScheduleSystem предназначена для создания,
+                        управления и просмотра учебного расписания.
+                        Система объединяет данные о группах,
+                        преподавателях, предметах и аудиториях
+                        в едином интерфейсе.
+                    </p>
+
+                    <p>
+                        Программа позволяет создавать расписание
+                        вручную, проверять конфликты, учитывать
+                        ограничения аудиторий, преподавателей и
+                        учебных групп.
+                    </p>
+
+                </div>
+
+
+                <!-- FEATURES -->
+
+                <div class="settings-about-features">
+
+                    <h3>
+                        Основные возможности
+                    </h3>
+
+
+                    <div class="settings-about-feature-grid">
+
+                        <div class="settings-about-feature">
+
+                            <span>
+                                📅
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Расписание
+                                </strong>
+
+                                <p>
+                                    Создание, просмотр и управление
+                                    учебными занятиями.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="settings-about-feature">
+
+                            <span>
+                                👥
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Группы
+                                </strong>
+
+                                <p>
+                                    Управление учебными группами
+                                    и их учебной нагрузкой.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="settings-about-feature">
+
+                            <span>
+                                👨‍🏫
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Преподаватели
+                                </strong>
+
+                                <p>
+                                    Хранение информации о преподавателях
+                                    и их предметах.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="settings-about-feature">
+
+                            <span>
+                                🏫
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Аудитории
+                                </strong>
+
+                                <p>
+                                    Учёт помещений и их вместимости.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="settings-about-feature">
+
+                            <span>
+                                🛡️
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Проверка конфликтов
+                                </strong>
+
+                                <p>
+                                    Контроль пересечений занятий,
+                                    вместимости и требований аудиторий.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="settings-about-feature">
+
+                            <span>
+                                📊
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Экспорт
+                                </strong>
+
+                                <p>
+                                    Подготовка расписания
+                                    в различных форматах.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TECHNOLOGIES -->
+
+                <div class="settings-about-tech">
+
+                    <h3>
+                        Технологии
+                    </h3>
+
+                    <div class="settings-tech-list">
+
+                        <span>
+                            ASP.NET Core
+                        </span>
+
+                        <span>
+                            C#
+                        </span>
+
+                        <span>
+                            Entity Framework Core
+                        </span>
+
+                        <span>
+                            PostgreSQL
+                        </span>
+
+                        <span>
+                            HTML / CSS / JavaScript
+                        </span>
+
+                    </div>
 
                 </div>
 
@@ -839,486 +866,173 @@ var groupSubjects =
         </div>
 
     </section>
-}
 
 
-<!-- =========================================================
-     ABOUT TAB
-     ========================================================= -->
+    <!-- =========================================================
+         CLEAR SCHEDULE MODAL
+         ========================================================= -->
 
-<section class="settings-tab-content"
-         data-tab-content="about">
+    @if (isAdmin)
+    {
+        <div id="clearScheduleModal"
+             class="settings-modal"
+             hidden>
 
-    <div class="settings-section">
+            <div class="settings-modal-backdrop"
+                 data-modal-close>
+            </div>
 
-        <div class="settings-section-header">
 
-            <div>
+            <div class="settings-modal-content"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="clearScheduleTitle">
 
-                <h2>
-                    О программе
+                <button type="button"
+                        class="settings-modal-close"
+                        data-modal-close
+                        aria-label="Закрыть">
+
+                    ×
+
+                </button>
+
+
+                <div class="settings-modal-icon">
+                    ⚠️
+                </div>
+
+
+                <h2 id="clearScheduleTitle">
+                    Очистить расписание?
                 </h2>
 
-                <p>
-                    Информация о системе ScheduleSystem
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="settings-about-card settings-card">
-
-            <!-- HERO -->
-
-            <div class="settings-about-hero">
-
-                <div class="settings-about-logo">
-                    📅
-                </div>
-
-                <div>
-
-                    <h2>
-                        ScheduleSystem
-                    </h2>
-
-                    <p>
-                        Система управления учебным расписанием
-                        образовательного учреждения.
-                    </p>
-
-                    <div class="settings-about-version">
-                        Версия 1.0
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- DESCRIPTION -->
-
-            <div class="settings-about-description">
-
-                <h3>
-                    О системе
-                </h3>
 
                 <p>
-                    ScheduleSystem предназначена для создания,
-                    управления и просмотра учебного расписания.
-                    Система объединяет данные о группах,
-                    преподавателях, предметах и аудиториях
-                    в едином интерфейсе.
+                    Все созданные занятия будут удалены.
+                    Группы, преподаватели, предметы и аудитории
+                    останутся в системе.
                 </p>
+
+
+                <form asp-controller="Account"
+                      asp-action="ClearSchedule"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="settings-modal-actions">
+
+                        <button type="button"
+                                class="settings-secondary-button"
+                                data-modal-close>
+
+                            Отмена
+
+                        </button>
+
+
+                        <button type="submit"
+                                class="settings-danger-button">
+
+                            Очистить расписание
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             CLEAR ALL DATA MODAL
+             ===================================================== -->
+
+        <div id="clearAllDataModal"
+             class="settings-modal"
+             hidden>
+
+            <div class="settings-modal-backdrop"
+                 data-modal-close>
+            </div>
+
+
+            <div class="settings-modal-content"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="clearAllDataTitle">
+
+                <button type="button"
+                        class="settings-modal-close"
+                        data-modal-close
+                        aria-label="Закрыть">
+
+                    ×
+
+                </button>
+
+
+                <div class="settings-modal-icon">
+                    🛑
+                </div>
+
+
+                <h2 id="clearAllDataTitle">
+                    Удалить все данные?
+                </h2>
+
 
                 <p>
-                    Программа позволяет создавать расписание
-                    вручную, проверять конфликты, учитывать
-                    ограничения аудиторий, преподавателей и
-                    учебных групп.
+                    Будут удалены расписание, группы, преподаватели,
+                    предметы и аудитории.
+                    Это действие нельзя отменить.
                 </p>
 
-            </div>
+
+                <form asp-controller="Account"
+                      asp-action="ClearAllData"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="settings-modal-actions">
+
+                        <button type="button"
+                                class="settings-secondary-button"
+                                data-modal-close>
+
+                            Отмена
+
+                        </button>
 
 
-            <!-- FEATURES -->
+                        <button type="submit"
+                                class="settings-danger-button">
 
-            <div class="settings-about-features">
+                            Удалить всё
 
-                <h3>
-                    Основные возможности
-                </h3>
-
-
-                <div class="settings-about-feature-grid">
-
-                    <div class="settings-about-feature">
-
-                        <span>
-                            📅
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Расписание
-                            </strong>
-
-                            <p>
-                                Создание, просмотр и управление
-                                учебными занятиями.
-                            </p>
-
-                        </div>
+                        </button>
 
                     </div>
 
-
-                    <div class="settings-about-feature">
-
-                        <span>
-                            👥
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Группы
-                            </strong>
-
-                            <p>
-                                Управление учебными группами
-                                и их учебной нагрузкой.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="settings-about-feature">
-
-                        <span>
-                            👨‍🏫
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Преподаватели
-                            </strong>
-
-                            <p>
-                                Хранение информации о преподавателях
-                                и их предметах.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="settings-about-feature">
-
-                        <span>
-                            🏫
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Аудитории
-                            </strong>
-
-                            <p>
-                                Учёт помещений и их вместимости.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="settings-about-feature">
-
-                        <span>
-                            🛡️
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Проверка конфликтов
-                            </strong>
-
-                            <p>
-                                Контроль пересечений занятий,
-                                вместимости и требований аудиторий.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="settings-about-feature">
-
-                        <span>
-                            📊
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Экспорт
-                            </strong>
-
-                            <p>
-                                Подготовка расписания
-                                в различных форматах.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- TECHNOLOGIES -->
-
-            <div class="settings-about-tech">
-
-                <h3>
-                    Технологии
-                </h3>
-
-                <div class="settings-tech-list">
-
-                    <span>
-                        ASP.NET Core
-                    </span>
-
-                    <span>
-                        C#
-                    </span>
-
-                    <span>
-                        Entity Framework Core
-                    </span>
-
-                    <span>
-                        PostgreSQL
-                    </span>
-
-                    <span>
-                        HTML / CSS / JavaScript
-                    </span>
-
-                </div>
+                </form>
 
             </div>
 
         </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     CLEAR SCHEDULE MODAL
-     ========================================================= -->
-
-@if (isAdmin)
-{
-    <div id="clearScheduleModal"
-         class="settings-modal"
-         hidden>
-
-        <div class="settings-modal-backdrop"
-             data-modal-close>
-        </div>
-
-
-        <div class="settings-modal-content"
-             role="dialog"
-             aria-modal="true"
-             aria-labelledby="clearScheduleTitle">
-
-            <button type="button"
-                    class="settings-modal-close"
-                    data-modal-close
-                    aria-label="Закрыть">
-
-                ×
-
-            </button>
-
-
-            <div class="settings-modal-icon">
-                ⚠️
-            </div>
-
-
-            <h2 id="clearScheduleTitle">
-                Очистить расписание?
-            </h2>
-
-
-            <p>
-                Все созданные занятия будут удалены.
-                Группы, преподаватели, предметы и аудитории
-                останутся в системе.
-            </p>
-
-
-            <form asp-controller="Account"
-                  asp-action="ClearSchedule"
-                  method="post">
-
-                @Html.AntiForgeryToken()
-
-                <div class="settings-modal-actions">
-
-                    <button type="button"
-                            class="settings-secondary-button"
-                            data-modal-close>
-
-                        Отмена
-
-                    </button>
-
-
-                    <button type="submit"
-                            class="settings-danger-button">
-
-                        Очистить расписание
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         CLEAR ALL DATA MODAL
-         ===================================================== -->
-
-    <div id="clearAllDataModal"
-         class="settings-modal"
-         hidden>
-
-        <div class="settings-modal-backdrop"
-             data-modal-close>
-        </div>
-
-
-        <div class="settings-modal-content"
-             role="dialog"
-             aria-modal="true"
-             aria-labelledby="clearAllDataTitle">
-
-            <button type="button"
-                    class="settings-modal-close"
-                    data-modal-close
-                    aria-label="Закрыть">
-
-                ×
-
-            </button>
-
-
-            <div class="settings-modal-icon">
-                🛑
-            </div>
-
-
-            <h2 id="clearAllDataTitle">
-                Удалить все данные?
-            </h2>
-
-
-            <p>
-                Будут удалены расписание, группы, преподаватели,
-                предметы и аудитории.
-                Это действие нельзя отменить.
-            </p>
-
-
-            <form asp-controller="Account"
-                  asp-action="ClearAllData"
-                  method="post">
-
-                @Html.AntiForgeryToken()
-
-                <div class="settings-modal-actions">
-
-                    <button type="button"
-                            class="settings-secondary-button"
-                            data-modal-close>
-
-                        Отмена
-
-                    </button>
-
-
-                    <button type="submit"
-                            class="settings-danger-button">
-
-                        Удалить всё
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-}
-
+    }
 
 </div>
 
+
 <!-- =============================================================
-     JAVASCRIPT DATA
+     SETTINGS JAVASCRIPT
      ============================================================= -->
-
-<script>
-
-    window.scheduleSettingsData = {
-
-        groups: @Html.Raw(
-            System.Text.Json.JsonSerializer.Serialize(
-                groups.Select(g => new
-                {
-                    id = g.Id,
-                    name = g.Name,
-                    course = g.Course,
-                    specialty = g.Specialty,
-                    studentCount = g.StudentCount
-                })
-            )
-        ),
-
-        subjects: @Html.Raw(
-            System.Text.Json.JsonSerializer.Serialize(
-                subjects.Select(s => new
-                {
-                    id = s.Id,
-                    name = s.Name,
-                    course = s.Course
-                })
-            )
-        ),
-
-        groupSubjects: @Html.Raw(
-            System.Text.Json.JsonSerializer.Serialize(
-                groupSubjects.Select(gs => new
-                {
-                    id = gs.Id,
-                    groupId = gs.GroupId,
-                    subjectId = gs.SubjectId,
-                    weeklyLessons = gs.WeeklyLessons
-                })
-            )
-        )
-
-    };
-
-</script>
 
 <script src="~/js/Account/Settings.js"
         asp-append-version="true"></script>
+

@@ -464,6 +464,18 @@ public class AccountController : Controller
         return View();
     }
 
+    // ============================================================
+    // STUDY LOAD
+    // ============================================================
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> StudyLoad()
+    {
+        await LoadStudyLoadDataAsync();
+
+        return View();
+    }
 
     // ============================================================
     // USER VIEW DATA

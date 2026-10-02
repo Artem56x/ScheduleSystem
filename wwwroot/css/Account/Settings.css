@@ -111,6 +111,7 @@
 
 .settings-back-button:hover {
     transform: translateX(-2px);
+
     background: rgba(255, 255, 255, 0.95);
 
     box-shadow:
@@ -170,6 +171,8 @@
     width: 25px;
     height: 25px;
 
+    flex: 0 0 25px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -224,13 +227,13 @@
 }
 
 .settings-tab {
+    min-height: 42px;
+    padding: 0 20px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
-
-    min-height: 42px;
-    padding: 0 20px;
 
     border: 0;
     border-radius: 13px;
@@ -269,6 +272,11 @@
 .settings-tab:active {
     transform: scale(0.98);
 }
+
+.settings-tab-icon {
+    line-height: 1;
+}
+
 
 /* =========================================================
    TAB CONTENT
@@ -408,10 +416,11 @@
 }
 
 .settings-profile-info strong {
+    overflow: hidden;
+
     font-size: 17px;
     font-weight: 700;
 
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -423,13 +432,13 @@
 
 .settings-profile-info .settings-role {
     width: fit-content;
+
     margin-top: 4px;
     padding: 4px 9px;
 
     border-radius: 8px;
 
     background: var(--settings-blue-light);
-
     color: var(--settings-blue);
 
     font-size: 12px;
@@ -696,606 +705,6 @@ select.settings-input {
 
     font-size: 12px;
     font-weight: 650;
-}
-
-
-/* =========================================================
-   STUDY LOAD
-   ========================================================= */
-
-.study-load-card {
-    padding: 0;
-
-    overflow: hidden;
-}
-
-
-/* ---------------------------------------------------------
-   TOOLBAR
-   --------------------------------------------------------- */
-
-.study-load-toolbar {
-    padding: 21px 24px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-
-    border-bottom: 1px solid var(--settings-border-light);
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.74),
-            rgba(255, 255, 255, 0.48)
-        );
-}
-
-.study-load-toolbar-text {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.study-load-toolbar-text strong {
-    font-size: 15px;
-    font-weight: 720;
-}
-
-.study-load-toolbar-text span {
-    color: var(--settings-text-secondary);
-
-    font-size: 13px;
-    line-height: 1.4;
-}
-
-.study-load-group-field {
-    width: min(360px, 100%);
-}
-
-.study-load-select {
-    min-width: 260px;
-    background-color: rgba(255, 255, 255, 0.92);
-}
-
-
-/* ---------------------------------------------------------
-   MAIN CONTAINER
-   --------------------------------------------------------- */
-
-.study-load-container {
-    padding: 24px;
-}
-
-.study-load-placeholder {
-    min-height: 230px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    padding: 35px 20px;
-
-    border: 1px dashed rgba(0, 122, 255, 0.22);
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0, 122, 255, 0.035),
-            rgba(255, 255, 255, 0.45)
-        );
-
-    text-align: center;
-}
-
-.study-load-placeholder-icon {
-    width: 60px;
-    height: 60px;
-
-    margin-bottom: 14px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 18px;
-
-    background: var(--settings-blue-light);
-
-    font-size: 27px;
-}
-
-.study-load-placeholder strong {
-    margin-bottom: 6px;
-
-    font-size: 16px;
-    font-weight: 720;
-}
-
-.study-load-placeholder span {
-    max-width: 420px;
-
-    color: var(--settings-text-secondary);
-
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-
-/* ---------------------------------------------------------
-   SELECTED GROUP HEADER
-   --------------------------------------------------------- */
-
-.study-load-selected-header {
-    margin-bottom: 16px;
-    padding: 17px 19px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-
-    border: 1px solid rgba(0, 122, 255, 0.12);
-    border-radius: 17px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(0, 122, 255, 0.07),
-            rgba(255, 255, 255, 0.6)
-        );
-}
-
-.study-load-label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.study-load-label strong {
-    font-size: 16px;
-    font-weight: 720;
-}
-
-.study-load-label span {
-    color: var(--settings-text-secondary);
-
-    font-size: 12px;
-}
-
-.study-load-total {
-    flex: 0 0 auto;
-
-    padding: 8px 12px;
-
-    border-radius: 11px;
-
-    background: rgba(0, 122, 255, 0.10);
-
-    color: var(--settings-blue);
-
-    font-size: 13px;
-    font-weight: 720;
-
-    white-space: nowrap;
-}
-
-
-/* ---------------------------------------------------------
-   SUBJECT LIST
-   --------------------------------------------------------- */
-
-.study-load-list {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-}
-
-.study-load-item {
-    min-height: 66px;
-
-    padding: 11px 13px;
-
-    display: flex;
-    align-items: center;
-    gap: 13px;
-
-    border: 1px solid var(--settings-border-light);
-    border-radius: 16px;
-
-    background: rgba(255, 255, 255, 0.64);
-
-    transition:
-        border-color 0.18s ease,
-        background 0.18s ease,
-        box-shadow 0.18s ease;
-}
-
-.study-load-item:hover {
-    border-color: rgba(0, 122, 255, 0.17);
-
-    background: rgba(255, 255, 255, 0.86);
-
-    box-shadow:
-        0 5px 18px rgba(0, 0, 0, 0.035);
-}
-
-.study-load-item-icon {
-    width: 39px;
-    height: 39px;
-
-    flex: 0 0 39px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 11px;
-
-    background: var(--settings-blue-light);
-
-    color: var(--settings-blue);
-
-    font-size: 17px;
-}
-
-.study-load-item-content {
-    min-width: 0;
-
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.study-load-item-content strong {
-    overflow: hidden;
-
-    color: var(--settings-text);
-
-    font-size: 14px;
-    font-weight: 680;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.study-load-item-content span {
-    color: var(--settings-text-muted);
-
-    font-size: 11px;
-}
-
-.study-load-item-value {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-
-.study-load-lessons-input {
-    width: 76px;
-    height: 40px;
-
-    padding: 0 9px;
-
-    border: 1px solid rgba(60, 60, 67, 0.15);
-    border-radius: 11px;
-
-    background: rgba(255, 255, 255, 0.92);
-
-    color: var(--settings-text);
-
-    font: inherit;
-    font-size: 14px;
-    font-weight: 700;
-
-    text-align: center;
-
-    outline: none;
-
-    transition:
-        border-color 0.18s ease,
-        box-shadow 0.18s ease;
-}
-
-.study-load-lessons-input:focus {
-    border-color: rgba(0, 122, 255, 0.58);
-
-    box-shadow:
-        0 0 0 3px rgba(0, 122, 255, 0.10);
-}
-
-.study-load-delete-button {
-    width: 36px;
-    height: 36px;
-
-    flex: 0 0 36px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 0;
-    border-radius: 10px;
-
-    background: transparent;
-
-    color: var(--settings-text-muted);
-
-    font-size: 18px;
-
-    cursor: pointer;
-
-    transition:
-        background 0.18s ease,
-        color 0.18s ease;
-}
-
-.study-load-delete-button:hover {
-    background: rgba(255, 59, 48, 0.09);
-    color: var(--settings-danger);
-}
-
-
-/* ---------------------------------------------------------
-   NO SUBJECTS
-   --------------------------------------------------------- */
-
-.study-load-no-subjects {
-    padding: 28px 20px;
-
-    border: 1px dashed rgba(142, 142, 147, 0.25);
-    border-radius: 17px;
-
-    background: rgba(142, 142, 147, 0.035);
-
-    color: var(--settings-text-secondary);
-
-    text-align: center;
-}
-
-.study-load-no-subjects strong {
-    display: block;
-
-    margin-bottom: 5px;
-
-    color: var(--settings-text);
-
-    font-size: 14px;
-}
-
-.study-load-no-subjects span {
-    font-size: 13px;
-}
-
-
-/* ---------------------------------------------------------
-   ADD SUBJECT AREA
-   --------------------------------------------------------- */
-
-.study-load-add-area {
-    padding: 0 24px 22px;
-}
-
-.study-load-add-button {
-    width: 100%;
-    min-height: 48px;
-
-    border-style: dashed;
-
-    background: rgba(0, 122, 255, 0.035);
-
-    color: var(--settings-blue);
-}
-
-.study-load-add-button:hover {
-    background: rgba(0, 122, 255, 0.075);
-}
-
-.study-load-add-button span {
-    font-size: 19px;
-    line-height: 1;
-}
-
-
-/* ---------------------------------------------------------
-   ADD SUBJECT FORM
-   --------------------------------------------------------- */
-
-.study-load-add-form {
-    margin: 0 24px 22px;
-
-    padding: 20px;
-
-    border: 1px solid rgba(0, 122, 255, 0.15);
-    border-radius: 19px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0, 122, 255, 0.045),
-            rgba(255, 255, 255, 0.72)
-        );
-
-    animation: studyLoadFormAppear 0.2s ease;
-}
-
-@keyframes studyLoadFormAppear {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.study-load-add-form-header {
-    margin-bottom: 17px;
-
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 15px;
-}
-
-.study-load-add-form-header > div {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.study-load-add-form-header strong {
-    font-size: 15px;
-    font-weight: 720;
-}
-
-.study-load-add-form-header span {
-    color: var(--settings-text-secondary);
-
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-.study-load-close-button {
-    width: 32px;
-    height: 32px;
-
-    flex: 0 0 32px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 0;
-    border-radius: 9px;
-
-    background: rgba(142, 142, 147, 0.08);
-
-    color: var(--settings-text-secondary);
-
-    font-size: 22px;
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition:
-        background 0.18s ease,
-        color 0.18s ease;
-}
-
-.study-load-close-button:hover {
-    background: rgba(255, 59, 48, 0.09);
-    color: var(--settings-danger);
-}
-
-.study-load-add-form .settings-form-grid {
-    gap: 14px;
-}
-
-.study-load-add-form .settings-form-actions {
-    margin-top: 17px;
-
-    justify-content: flex-start;
-}
-
-
-/* ---------------------------------------------------------
-   SAVE AREA
-   --------------------------------------------------------- */
-
-.study-load-save-form {
-    margin: 0;
-}
-
-.study-load-save-area {
-    padding: 18px 24px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-
-    border-top: 1px solid var(--settings-border-light);
-
-    background:
-        rgba(248, 249, 252, 0.76);
-}
-
-.study-load-unsaved-status {
-    min-width: 0;
-
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    color: var(--settings-text-secondary);
-
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.study-load-status-dot {
-    width: 8px;
-    height: 8px;
-
-    flex: 0 0 8px;
-
-    border-radius: 50%;
-
-    background: #a1a1a6;
-
-    transition:
-        background 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.study-load-unsaved-status.has-changes .study-load-status-dot,
-.study-load-unsaved-status.unsaved .study-load-status-dot {
-    background: var(--settings-warning);
-
-    box-shadow:
-        0 0 0 4px rgba(255, 149, 0, 0.12);
-}
-
-.study-load-unsaved-status.has-changes,
-.study-load-unsaved-status.unsaved {
-    color: #a26100;
-}
-
-.study-load-save-button {
-    flex: 0 0 auto;
-}
-
-
-/* ---------------------------------------------------------
-   HISTORY
-   --------------------------------------------------------- */
-
-.study-load-history {
-    margin-top: 12px;
-
-    text-align: right;
-}
-
-.study-load-history a {
-    color: var(--settings-blue);
-    text-decoration: none;
-
-    font-size: 13px;
-    font-weight: 650;
-}
-
-.study-load-history a:hover {
-    text-decoration: underline;
 }
 
 
@@ -1740,29 +1149,6 @@ select.settings-input {
         grid-template-columns: 1fr;
     }
 
-    .study-load-toolbar {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .study-load-group-field {
-        width: 100%;
-    }
-
-    .study-load-select {
-        width: 100%;
-        min-width: 0;
-    }
-
-    .study-load-save-area {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .study-load-save-button {
-        width: 100%;
-    }
-
 }
 
 
@@ -1881,89 +1267,6 @@ select.settings-input {
 
 
     /* -----------------------------------------
-       STUDY LOAD MOBILE
-       ----------------------------------------- */
-
-    .study-load-toolbar {
-        padding: 18px;
-    }
-
-    .study-load-container {
-        padding: 18px;
-    }
-
-    .study-load-placeholder {
-        min-height: 190px;
-    }
-
-    .study-load-selected-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .study-load-total {
-        align-self: flex-start;
-    }
-
-    .study-load-item {
-        align-items: flex-start;
-        flex-wrap: wrap;
-
-        padding: 12px;
-    }
-
-    .study-load-item-content {
-        width: calc(100% - 58px);
-    }
-
-    .study-load-item-value {
-        width: 100%;
-
-        margin-left: 52px;
-
-        justify-content: space-between;
-    }
-
-    .study-load-lessons-input {
-        width: 82px;
-    }
-
-    .study-load-delete-button {
-        margin-left: auto;
-    }
-
-    .study-load-add-area {
-        padding: 0 18px 18px;
-    }
-
-    .study-load-add-form {
-        margin: 0 18px 18px;
-
-        padding: 16px;
-    }
-
-    .study-load-add-form .settings-form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .study-load-add-form .settings-form-actions {
-        flex-direction: column;
-    }
-
-    .study-load-add-form .settings-form-actions button {
-        width: 100%;
-    }
-
-    .study-load-save-area {
-        padding: 16px 18px;
-    }
-
-    .study-load-unsaved-status {
-        white-space: normal;
-    }
-
-
-    /* -----------------------------------------
        ABOUT MOBILE
        ----------------------------------------- */
 
@@ -2053,6 +1356,7 @@ select.settings-input {
 @media print {
 
     .settings-page {
+        min-height: auto;
         padding: 0;
 
         background: #fff;
@@ -2061,11 +1365,9 @@ select.settings-input {
     .settings-tabs,
     .settings-back-button,
     .settings-form-actions,
-    .settings-save-area,
-    .study-load-add-area,
-    .study-load-add-form,
     .settings-danger-button,
-    .settings-secondary-button {
+    .settings-secondary-button,
+    .settings-modal {
         display: none !important;
     }
 
