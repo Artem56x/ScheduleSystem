@@ -63,6 +63,7 @@ builder.Services.AddScoped<ScheduleExportService>();
 builder.Services.AddScoped<ScheduleValidationService>();
 builder.Services.AddScoped<ClassroomRecommendationService>();
 builder.Services.AddScoped<ScheduleGeneratorService>();
+builder.Services.AddScoped<TeacherRecommendationService>();
 
 // ============================================================
 // MVC

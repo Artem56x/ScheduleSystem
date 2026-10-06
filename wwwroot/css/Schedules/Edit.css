@@ -1,5 +1,5 @@
 /* =========================================================
-   SCHEDULE CREATE
+   SCHEDULE EDIT
    Liquid Glass — Unified ScheduleSystem
    ========================================================= */
 
@@ -547,7 +547,7 @@ form {
 
 
 /* =========================================================
-   WARNING MODAL
+   WARNING OVERLAY
    ========================================================= */
 
 .warning-overlay {
@@ -570,6 +570,11 @@ form {
 
     animation: fadeIn 0.2s ease;
 }
+
+
+/* =========================================================
+   STANDARD WARNING MODAL
+   ========================================================= */
 
 .warning-modal {
     width: 100%;
@@ -707,6 +712,279 @@ form {
     background: #ffe9ec;
 
     transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   TEACHER RECOMMENDATION / CONFLICT MODAL
+   ========================================================= */
+
+.teacher-recommendation-modal {
+    width: 100%;
+    max-width: 620px;
+    max-height: 85vh;
+
+    overflow-y: auto;
+
+    padding: 28px;
+
+    border: 1px solid rgba(220, 228, 239, 0.95);
+    border-radius: 23px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.99),
+            rgba(247, 250, 255, 0.97)
+        );
+
+    box-shadow:
+        0 28px 70px rgba(30, 55, 90, 0.17),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+
+    animation: modalIn 0.25s ease;
+}
+
+.teacher-recommendation-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 56px;
+    height: 56px;
+
+    margin: 0 auto 16px;
+
+    border: 1px solid #d7e7fb;
+    border-radius: 16px;
+
+    background: #edf5ff;
+
+    color: #3478dc;
+
+    font-size: 27px;
+}
+
+.teacher-recommendation-modal h2 {
+    margin: 0;
+
+    color: #202936;
+
+    text-align: center;
+
+    font-size: 19px;
+    font-weight: 750;
+
+    line-height: 1.3;
+}
+
+.teacher-recommendation-description {
+    max-width: 500px;
+
+    margin: 10px auto 0;
+
+    color: #697689;
+
+    text-align: center;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    line-height: 1.55;
+}
+
+.teacher-recommendation-description strong {
+    color: #374354;
+}
+
+.teacher-recommendation-subtitle {
+    margin: 21px 0 11px;
+
+    color: #4a5667;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    line-height: 1.35;
+}
+
+.teacher-problem {
+    margin: 16px auto 0;
+
+    padding: 11px 13px;
+
+    border: 1px solid #f0d9dc;
+    border-radius: 11px;
+
+    background: #fff5f6;
+
+    color: #b83f4b;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TEACHER LIST
+   ========================================================= */
+
+.recommended-teacher-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    max-height: 42vh;
+
+    overflow-y: auto;
+
+    padding-right: 3px;
+}
+
+.recommended-teacher {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 13px;
+
+    border: 1px solid #e0e7ef;
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #f8fafc
+        );
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.recommended-teacher:hover {
+    transform: translateY(-1px);
+
+    border-color: #cddceb;
+
+    box-shadow:
+        0 8px 20px rgba(30, 55, 90, 0.05);
+}
+
+.recommended-teacher-info {
+    min-width: 0;
+}
+
+.recommended-teacher-name {
+    color: #202936;
+
+    font-size: 14px;
+    font-weight: 750;
+
+    line-height: 1.35;
+
+    word-break: break-word;
+}
+
+.recommended-teacher-details {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 6px 10px;
+
+    margin-top: 5px;
+
+    color: #7b8797;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   SELECT TEACHER
+   ========================================================= */
+
+.select-teacher-button {
+    flex: 0 0 auto;
+
+    min-height: 39px;
+
+    padding: 0 13px;
+
+    border: 1px solid #cfe2fa;
+    border-radius: 10px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-family: inherit;
+
+    font-size: 11px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.select-teacher-button:hover {
+    transform: translateY(-1px);
+
+    border-color: #bdd7f6;
+
+    background: #e4f0ff;
+    color: #286dcc;
+}
+
+
+/* =========================================================
+   TEACHER RECOMMENDATION ACTIONS
+   ========================================================= */
+
+.teacher-recommendation-actions {
+    display: flex;
+    justify-content: center;
+
+    margin-top: 19px;
+
+    padding-top: 17px;
+
+    border-top: 1px solid #e7edf4;
+}
+
+.teacher-recommendation-actions .warning-cancel {
+    min-height: 41px;
+
+    padding: 0 18px;
+
+    border-radius: 11px;
+
+    font-family: inherit;
+
+    font-size: 11px;
+    font-weight: 650;
+
+    cursor: pointer;
 }
 
 
@@ -1010,6 +1288,59 @@ form {
 
 
 /* =========================================================
+   VALIDATION ERROR MODAL
+   ========================================================= */
+
+.validation-error-modal {
+    text-align: left;
+}
+
+.validation-error-modal .warning-icon {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.validation-error-modal h2 {
+    text-align: center;
+}
+
+.validation-error-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 17px;
+
+    padding: 13px 14px;
+
+    border: 1px solid #f0d9dc;
+    border-radius: 12px;
+
+    background: #fff5f6;
+}
+
+.validation-error-item {
+    color: #b83f4b;
+
+    font-size: 11.5px;
+    font-weight: 500;
+
+    line-height: 1.5;
+}
+
+.validation-error-modal .warning-actions {
+    justify-content: center;
+}
+
+.validation-error-modal .warning-actions button {
+    flex: 0 1 auto;
+
+    min-width: 130px;
+}
+
+
+/* =========================================================
    FOCUS
    ========================================================= */
 
@@ -1017,7 +1348,9 @@ form {
 .footer-button:focus-visible,
 .glass-input:focus-visible,
 .warning-actions button:focus-visible,
+.select-teacher-button:focus-visible,
 .select-classroom-button:focus-visible,
+.teacher-recommendation-actions button:focus-visible,
 .classroom-recommendation-actions button:focus-visible {
     outline: none;
 
@@ -1027,10 +1360,36 @@ form {
 
 
 /* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.teacher-recommendation-modal::-webkit-scrollbar,
+.classroom-recommendation-modal::-webkit-scrollbar,
+.recommended-teacher-list::-webkit-scrollbar {
+    width: 7px;
+}
+
+.teacher-recommendation-modal::-webkit-scrollbar-track,
+.classroom-recommendation-modal::-webkit-scrollbar-track,
+.recommended-teacher-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.teacher-recommendation-modal::-webkit-scrollbar-thumb,
+.classroom-recommendation-modal::-webkit-scrollbar-thumb,
+.recommended-teacher-list::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+
+    background: #d7e0eb;
+}
+
+
+/* =========================================================
    ANIMATIONS
    ========================================================= */
 
 @keyframes fadeIn {
+
     from {
         opacity: 0;
     }
@@ -1041,6 +1400,7 @@ form {
 }
 
 @keyframes modalIn {
+
     from {
         opacity: 0;
 
@@ -1196,6 +1556,58 @@ form {
         width: 100%;
     }
 
+    .teacher-recommendation-modal {
+        max-height: 88vh;
+
+        padding: 23px 17px;
+
+        border-radius: 20px;
+    }
+
+    .teacher-recommendation-modal h2 {
+        font-size: 18px;
+    }
+
+    .teacher-recommendation-description {
+        font-size: 11.5px;
+    }
+
+    .teacher-recommendation-subtitle {
+        margin-top: 18px;
+    }
+
+    .recommended-teacher {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .recommended-teacher-info {
+        width: 100%;
+    }
+
+    .recommended-teacher-name {
+        font-size: 13px;
+    }
+
+    .recommended-teacher-details {
+        font-size: 9.5px;
+    }
+
+    .select-teacher-button {
+        width: 100%;
+    }
+
+    .teacher-recommendation-actions {
+        margin-top: 16px;
+    }
+
+    .teacher-recommendation-actions .warning-cancel {
+        width: 100%;
+    }
+
     .classroom-recommendation-modal {
         padding: 23px 17px;
 
@@ -1218,6 +1630,19 @@ form {
         width: 100%;
     }
 
+    .validation-error-modal {
+        text-align: center;
+    }
+
+    .validation-error-list {
+        text-align: left;
+    }
+
+    .validation-error-modal .warning-actions button {
+        width: 100%;
+
+        min-width: 0;
+    }
 }
 
 
@@ -1231,6 +1656,9 @@ form {
     .footer-button,
     .glass-input,
     .warning-actions button,
+    .recommended-teacher,
+    .select-teacher-button,
+    .teacher-recommendation-actions button,
     .recommended-classroom,
     .select-classroom-button,
     .classroom-recommendation-actions button {
@@ -1240,10 +1668,11 @@ form {
     .glass-button:hover,
     .footer-button:hover,
     .warning-actions button:hover,
+    .recommended-teacher:hover,
+    .select-teacher-button:hover,
     .recommended-classroom:hover,
     .select-classroom-button:hover,
     .classroom-recommendation-actions button:hover {
         transform: none;
     }
-
 }

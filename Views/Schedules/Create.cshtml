@@ -3,8 +3,49 @@
 @{
     ViewData["Title"] = "Добавить занятие";
 
+    // =========================================================
+    // ПРЕДУПРЕЖДЕНИЕ О ПРЕПОДАВАТЕЛЕ
+    // =========================================================
+
     bool showTeacherWarning =
         ViewBag.TeacherSubjectWarning == true;
+
+
+    // =========================================================
+    // КОНФЛИКТ ПРЕПОДАВАТЕЛЯ
+    // =========================================================
+
+    bool hasTeacherConflict =
+        ViewBag.TeacherConflict == true;
+
+
+    // =========================================================
+    // РЕКОМЕНДАЦИИ ПРЕПОДАВАТЕЛЕЙ
+    // =========================================================
+
+    var recommendedTeachers =
+        ViewBag.RecommendedTeachers
+        as List<ScheduleSystem.Models.Teacher>;
+
+    bool showTeacherRecommendations =
+        hasTeacherConflict &&
+        recommendedTeachers != null &&
+        recommendedTeachers.Any();
+
+
+    // =========================================================
+    // НЕТ СВОБОДНЫХ ПРЕПОДАВАТЕЛЕЙ
+    // =========================================================
+
+    bool showTeacherConflictWithoutRecommendations =
+        hasTeacherConflict &&
+        (recommendedTeachers == null ||
+         !recommendedTeachers.Any());
+
+
+    // =========================================================
+    // РЕКОМЕНДАЦИИ АУДИТОРИЙ
+    // =========================================================
 
     var recommendedClassrooms =
         ViewBag.RecommendedClassrooms
@@ -14,14 +55,19 @@
         recommendedClassrooms != null &&
         recommendedClassrooms.Any();
 
+
     bool showNoClassroomRecommendations =
         recommendedClassrooms != null &&
         !recommendedClassrooms.Any();
 }
 
+
 @section Styles {
+
     <link rel="stylesheet" href="~/css/Schedules/Create.css" asp-append-version="true" />
+
 }
+
 
 <div class="schedule-create-page">
 
@@ -47,10 +93,13 @@
 
         </div>
 
+
         <div class="header-actions">
 
             <a asp-action="Index" class="glass-button secondary-button">
+
                 ← Назад
+
             </a>
 
         </div>
@@ -64,13 +113,16 @@
 
     <div class="create-main-card">
 
+        <!-- ================================================= -->
         <!-- CARD TOP -->
+        <!-- ================================================= -->
 
         <div class="create-card-top">
 
             <div class="create-icon">
                 📅
             </div>
+
 
             <div class="create-title-block">
 
@@ -99,14 +151,19 @@
 
             @Html.AntiForgeryToken()
 
-            <input type="hidden"
-                   name="confirmTeacherSubject"
-                   id="confirmTeacherSubject"
-                   value="false" />
+
+            <!-- ================================================= -->
+            <!-- ПОДТВЕРЖДЕНИЕ ПРЕДМЕТА ПРЕПОДАВАТЕЛЯ -->
+            <!-- ================================================= -->
+
+            <input type="hidden" name="confirmTeacherSubject" id="confirmTeacherSubject" value="false" />
 
 
-            <div asp-validation-summary="ModelOnly"
-                 class="glass-validation">
+            <!-- ================================================= -->
+            <!-- VALIDATION SUMMARY -->
+            <!-- ================================================= -->
+
+            <div asp-validation-summary="ModelOnly" class="glass-validation" style="display:none;">
             </div>
 
 
@@ -123,20 +180,21 @@
 
                 <div class="form-grid">
 
+
+                    <!-- ================================================= -->
                     <!-- ПРЕПОДАВАТЕЛЬ -->
+                    <!-- ================================================= -->
 
                     <div class="form-group">
 
-                        <label asp-for="TeacherId"
-                               class="form-label">
+                        <label asp-for="TeacherId" class="form-label">
 
                             Преподаватель
 
                         </label>
 
-                        <select asp-for="TeacherId"
-                                class="form-control glass-input"
-                                asp-items="ViewBag.TeacherId">
+
+                        <select asp-for="TeacherId" class="form-control glass-input" asp-items="ViewBag.TeacherId">
 
                             <option value="">
                                 Выберите преподавателя
@@ -144,27 +202,27 @@
 
                         </select>
 
-                        <span asp-validation-for="TeacherId"
-                              class="text-danger">
+
+                        <span asp-validation-for="TeacherId" class="text-danger">
                         </span>
 
                     </div>
 
 
+                    <!-- ================================================= -->
                     <!-- ПРЕДМЕТ -->
+                    <!-- ================================================= -->
 
                     <div class="form-group">
 
-                        <label asp-for="SubjectId"
-                               class="form-label">
+                        <label asp-for="SubjectId" class="form-label">
 
                             Предмет
 
                         </label>
 
-                        <select asp-for="SubjectId"
-                                class="form-control glass-input"
-                                asp-items="ViewBag.SubjectId">
+
+                        <select asp-for="SubjectId" class="form-control glass-input" asp-items="ViewBag.SubjectId">
 
                             <option value="">
                                 Выберите предмет
@@ -172,27 +230,27 @@
 
                         </select>
 
-                        <span asp-validation-for="SubjectId"
-                              class="text-danger">
+
+                        <span asp-validation-for="SubjectId" class="text-danger">
                         </span>
 
                     </div>
 
 
+                    <!-- ================================================= -->
                     <!-- ГРУППА -->
+                    <!-- ================================================= -->
 
                     <div class="form-group">
 
-                        <label asp-for="GroupId"
-                               class="form-label">
+                        <label asp-for="GroupId" class="form-label">
 
                             Группа
 
                         </label>
 
-                        <select asp-for="GroupId"
-                                class="form-control glass-input"
-                                asp-items="ViewBag.GroupId">
+
+                        <select asp-for="GroupId" class="form-control glass-input" asp-items="ViewBag.GroupId">
 
                             <option value="">
                                 Выберите группу
@@ -200,27 +258,27 @@
 
                         </select>
 
-                        <span asp-validation-for="GroupId"
-                              class="text-danger">
+
+                        <span asp-validation-for="GroupId" class="text-danger">
                         </span>
 
                     </div>
 
 
+                    <!-- ================================================= -->
                     <!-- АУДИТОРИЯ -->
+                    <!-- ================================================= -->
 
                     <div class="form-group">
 
-                        <label asp-for="ClassroomId"
-                               class="form-label">
+                        <label asp-for="ClassroomId" class="form-label">
 
                             Аудитория
 
                         </label>
 
-                        <select asp-for="ClassroomId"
-                                class="form-control glass-input"
-                                asp-items="ViewBag.ClassroomId">
+
+                        <select asp-for="ClassroomId" class="form-control glass-input" asp-items="ViewBag.ClassroomId">
 
                             <option value="">
                                 Выберите аудиторию
@@ -228,8 +286,8 @@
 
                         </select>
 
-                        <span asp-validation-for="ClassroomId"
-                              class="text-danger">
+
+                        <span asp-validation-for="ClassroomId" class="text-danger">
                         </span>
 
                     </div>
@@ -240,7 +298,7 @@
 
 
             <!-- ================================================= -->
-            <!-- ВРЕМЯ -->
+            <!-- ВРЕМЯ ЗАНЯТИЯ -->
             <!-- ================================================= -->
 
             <div class="form-section">
@@ -250,20 +308,20 @@
                 </div>
 
 
+                <!-- ================================================= -->
                 <!-- ДЕНЬ НЕДЕЛИ -->
+                <!-- ================================================= -->
 
                 <div class="form-group">
 
-                    <label asp-for="DayOfWeek"
-                           class="form-label">
+                    <label asp-for="DayOfWeek" class="form-label">
 
                         День недели
 
                     </label>
 
-                    <select asp-for="DayOfWeek"
-                            class="form-control glass-input"
-                            asp-items="ViewBag.DayOfWeek">
+
+                    <select asp-for="DayOfWeek" class="form-control glass-input" asp-items="ViewBag.DayOfWeek">
 
                         <option value="">
                             Выберите день недели
@@ -271,57 +329,63 @@
 
                     </select>
 
-                    <span asp-validation-for="DayOfWeek"
-                          class="text-danger">
+
+                    <span asp-validation-for="DayOfWeek" class="text-danger">
                     </span>
 
                 </div>
 
 
+                <!-- ================================================= -->
                 <!-- ВРЕМЯ -->
+                <!-- ================================================= -->
 
                 <div class="time-row">
 
+
+                    <!-- ================================================= -->
                     <!-- НАЧАЛО -->
+                    <!-- ================================================= -->
 
                     <div class="form-group">
 
-                        <label asp-for="StartTime"
-                               class="form-label">
+                        <label asp-for="StartTime" class="form-label">
 
                             Время начала
 
                         </label>
 
+
                         <div class="time-input-wrapper">
 
                             <span class="time-input-icon">
                                 🕐
                             </span>
 
-                            <input asp-for="StartTime"
-                                   type="time"
-                                   class="form-control glass-input" />
+
+                            <input asp-for="StartTime" type="time" class="form-control glass-input" />
 
                         </div>
 
-                        <span asp-validation-for="StartTime"
-                              class="text-danger">
+
+                        <span asp-validation-for="StartTime" class="text-danger">
                         </span>
 
                     </div>
 
 
+                    <!-- ================================================= -->
                     <!-- ОКОНЧАНИЕ -->
+                    <!-- ================================================= -->
 
                     <div class="form-group">
 
-                        <label asp-for="EndTime"
-                               class="form-label">
+                        <label asp-for="EndTime" class="form-label">
 
                             Время окончания
 
                         </label>
+
 
                         <div class="time-input-wrapper">
 
@@ -329,14 +393,13 @@
                                 🕐
                             </span>
 
-                            <input asp-for="EndTime"
-                                   type="time"
-                                   class="form-control glass-input" />
+
+                            <input asp-for="EndTime" type="time" class="form-control glass-input" />
 
                         </div>
 
-                        <span asp-validation-for="EndTime"
-                              class="text-danger">
+
+                        <span asp-validation-for="EndTime" class="text-danger">
                         </span>
 
                     </div>
@@ -352,18 +415,19 @@
 
             <div class="form-actions">
 
-                <a asp-action="Index"
-                   class="footer-button secondary-button">
+
+                <a asp-action="Index" class="footer-button secondary-button">
 
                     Отмена
 
                 </a>
 
 
-                <button type="submit"
-                        class="footer-button primary-button">
+                <button type="submit" class="footer-button primary-button">
 
-                    <span>✓</span>
+                    <span>
+                        ✓
+                    </span>
 
                     Добавить занятие
 
@@ -379,23 +443,26 @@
 
 
 <!-- ===================================================== -->
-<!-- ПРЕДУПРЕЖДЕНИЕ ПРЕПОДАВАТЕЛЯ -->
+<!-- ПРЕДУПРЕЖДЕНИЕ О ПРЕДМЕТЕ ПРЕПОДАВАТЕЛЯ -->
 <!-- ===================================================== -->
 
 @if (showTeacherWarning)
 {
-    <div class="warning-overlay"
-         id="teacherWarning">
+    <div class="warning-overlay" id="teacherWarning">
+
 
         <div class="warning-modal">
+
 
             <div class="warning-icon">
                 ⚠️
             </div>
 
+
             <h2>
                 Проверьте преподавателя
             </h2>
+
 
             <p>
 
@@ -413,6 +480,7 @@
 
             </p>
 
+
             <p>
 
                 Вы выбрали предмет
@@ -423,6 +491,7 @@
 
             </p>
 
+
             <p class="warning-question">
                 Продолжить создание занятия?
             </p>
@@ -430,20 +499,225 @@
 
             <div class="warning-actions">
 
-                <button type="button"
-                        class="warning-cancel"
-                        onclick="closeTeacherWarning()">
+
+                <button type="button" class="warning-cancel" onclick="closeTeacherWarning()">
 
                     Вернуться
 
                 </button>
 
 
-                <button type="button"
-                        class="warning-confirm"
-                        onclick="confirmTeacher()">
+                <button type="button" class="warning-confirm" onclick="confirmTeacher()">
 
                     Да, оставить
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- РЕКОМЕНДАЦИИ ПРЕПОДАВАТЕЛЕЙ -->
+<!-- ===================================================== -->
+
+@if (showTeacherRecommendations)
+{
+    <div class="warning-overlay" id="teacherRecommendationModal">
+
+
+        <div class="teacher-recommendation-modal">
+
+
+            <div class="teacher-recommendation-icon">
+                👨‍🏫
+            </div>
+
+
+            <h2>
+                Преподаватель уже занят
+            </h2>
+
+
+            <p class="teacher-recommendation-description">
+
+                Преподаватель
+
+                <strong>
+                    «@ViewBag.SelectedTeacherName»
+                </strong>
+
+                занят в выбранное время.
+
+            </p>
+
+
+            @if (!string.IsNullOrWhiteSpace(
+                ViewBag.TeacherProblem as string))
+            {
+                <div class="teacher-problem">
+
+                    @ViewBag.TeacherProblem
+
+                </div>
+            }
+
+
+            <p class="teacher-recommendation-subtitle">
+
+                Подходящие свободные преподаватели:
+
+            </p>
+
+
+            <div class="recommended-teacher-list">
+
+
+                @foreach (var teacher in recommendedTeachers!)
+                {
+                    <div class="recommended-teacher">
+
+
+                        <div class="recommended-teacher-info">
+
+
+                            <div class="recommended-teacher-name">
+
+                                @teacher.FullName
+
+                            </div>
+
+
+                            <div class="recommended-teacher-details">
+
+
+                                <span>
+
+                                    📚
+
+                                    @(teacher.Subject?.Name
+                                      ?? "Предмет не указан")
+
+                                </span>
+
+
+                                <span>
+
+                                    ✓ Свободен
+
+                                </span>
+
+
+                                <span>
+
+                                    🕐
+
+                                    @Model.StartTime?.ToString(@"hh\:mm")
+
+                                    –
+
+                                    @Model.EndTime?.ToString(@"hh\:mm")
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="button" class="select-teacher-button" onclick="selectTeacher(@teacher.Id)">
+
+                            Выбрать
+
+                        </button>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <div class="teacher-recommendation-actions">
+
+
+                <button type="button" class="warning-cancel" onclick="closeTeacherRecommendations()">
+
+                    Оставить выбранного
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- КОНФЛИКТ ПРЕПОДАВАТЕЛЯ БЕЗ РЕКОМЕНДАЦИЙ -->
+<!-- ===================================================== -->
+
+@if (showTeacherConflictWithoutRecommendations)
+{
+    <div class="warning-overlay" id="teacherConflictModal">
+
+
+        <div class="teacher-recommendation-modal">
+
+
+            <div class="teacher-recommendation-icon">
+                👨‍🏫
+            </div>
+
+
+            <h2>
+                Преподаватель уже занят
+            </h2>
+
+
+            <p class="teacher-recommendation-description">
+
+                Преподаватель
+
+                <strong>
+                    «@ViewBag.SelectedTeacherName»
+                </strong>
+
+                уже занят в выбранное время.
+
+            </p>
+
+
+            @if (!string.IsNullOrWhiteSpace(
+                ViewBag.TeacherProblem as string))
+            {
+                <div class="teacher-problem">
+
+                    @ViewBag.TeacherProblem
+
+                </div>
+            }
+
+
+            <p class="teacher-recommendation-subtitle">
+
+                Свободных преподавателей для этого предмета
+                на выбранное время не найдено.
+
+            </p>
+
+
+            <div class="teacher-recommendation-actions">
+
+
+                <button type="button" class="warning-cancel" onclick="closeTeacherConflict()">
+
+                    Вернуться к редактированию
 
                 </button>
 
@@ -461,10 +735,11 @@
 
 @if (showClassroomRecommendations)
 {
-    <div class="warning-overlay"
-         id="classroomRecommendationModal">
+    <div class="warning-overlay" id="classroomRecommendationModal">
+
 
         <div class="classroom-recommendation-modal">
+
 
             <div class="classroom-recommendation-icon">
                 💡
@@ -486,6 +761,21 @@
 
                 не подходит для этого занятия.
 
+
+                @if (!string.IsNullOrWhiteSpace(
+                    ViewBag.SelectedClassroomProblem as string))
+                {
+                    <br />
+
+
+                    <span class="classroom-problem-text">
+
+                        Причина:
+                        @ViewBag.SelectedClassroomProblem
+
+                    </span>
+                }
+
             </p>
 
 
@@ -498,31 +788,41 @@
 
             <div class="recommended-classroom-list">
 
-                @for (int i = 0;
-                      i < recommendedClassrooms!.Count;
-                      i++)
+
+                @for (
+                    int i = 0;
+                    i < recommendedClassrooms!.Count;
+                    i++)
                 {
                     var classroom =
                         recommendedClassrooms[i];
 
-                    bool isOptimal = i == 0;
+                    bool isOptimal =
+                        i == 0;
 
 
                     <div class="recommended-classroom @(isOptimal ? "recommended-optimal" : "")">
 
+
                         <div class="recommended-classroom-info">
+
 
                             <div class="recommended-classroom-name-row">
 
+
                                 <span class="recommended-classroom-name">
+
                                     @classroom.Name
+
                                 </span>
 
 
                                 @if (isOptimal)
                                 {
                                     <span class="optimal-badge">
+
                                         Оптимальный
+
                                     </span>
                                 }
 
@@ -532,7 +832,10 @@
                             <div class="recommended-classroom-details">
 
                                 <span>
-                                    🪑 @classroom.Capacity мест
+
+                                    🪑
+                                    @classroom.Capacity мест
+
                                 </span>
 
                             </div>
@@ -540,9 +843,7 @@
                         </div>
 
 
-                        <button type="button"
-                                class="select-classroom-button"
-                                onclick="selectClassroom(@classroom.Id)">
+                        <button type="button" class="select-classroom-button" onclick="selectClassroom(@classroom.Id)">
 
                             Выбрать
 
@@ -556,9 +857,8 @@
 
             <div class="classroom-recommendation-actions">
 
-                <button type="button"
-                        class="warning-cancel"
-                        onclick="closeClassroomRecommendations()">
+
+                <button type="button" class="warning-cancel" onclick="closeClassroomRecommendations()">
 
                     Оставить выбранную
 
@@ -573,15 +873,16 @@
 
 
 <!-- ===================================================== -->
-<!-- НЕТ РЕКОМЕНДАЦИЙ -->
+<!-- НЕТ РЕКОМЕНДАЦИЙ АУДИТОРИЙ -->
 <!-- ===================================================== -->
 
 @if (showNoClassroomRecommendations)
 {
-    <div class="warning-overlay"
-         id="classroomNoRecommendationModal">
+    <div class="warning-overlay" id="classroomNoRecommendationModal">
+
 
         <div class="warning-modal">
+
 
             <div class="warning-icon">
                 ⚠️
@@ -604,11 +905,100 @@
 
             <div class="warning-actions">
 
-                <button type="button"
-                        class="warning-cancel"
-                        onclick="closeNoClassroomRecommendations()">
+
+                <button type="button" class="warning-cancel" onclick="closeNoClassroomRecommendations()">
 
                     Вернуться
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- ОБЩАЯ ОШИБКА ВАЛИДАЦИИ -->
+<!-- ===================================================== -->
+
+@{
+    var validationErrors =
+        ViewData.ModelState
+            .Where(x => x.Value != null)
+            .SelectMany(x => x.Value!.Errors)
+            .Select(x => x.ErrorMessage)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct()
+            .ToList();
+
+
+    bool showValidationModal =
+        validationErrors.Any() &&
+        !hasTeacherConflict;
+}
+
+
+@if (showValidationModal)
+{
+    <div class="warning-overlay" id="validationErrorModal">
+
+
+        <div class="validation-error-modal">
+
+
+            <div class="validation-error-icon">
+                ⚠️
+            </div>
+
+
+            <h2>
+                Не удалось создать расписание
+            </h2>
+
+
+            @if (validationErrors.Count == 1)
+            {
+                <div class="validation-error-single">
+
+                    @validationErrors[0]
+
+                </div>
+            }
+            else
+            {
+                <div class="validation-error-list">
+
+
+                    @foreach (var error in validationErrors)
+                    {
+                        <div class="validation-error-item">
+
+
+                            <span class="validation-error-bullet">
+                                •
+                            </span>
+
+
+                            <span>
+                                @error
+                            </span>
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+
+            <div class="validation-error-actions">
+
+
+                <button type="button" class="validation-error-button" onclick="closeValidationError()">
+
+                    Вернуться к редактированию
 
                 </button>
 
@@ -623,12 +1013,16 @@
 @section Scripts {
 
     @{
+
         await Html.RenderPartialAsync(
             "_ValidationScriptsPartial"
         );
+
     }
 
-    <script src="~/js/Schedules/Create.js"
-            asp-append-version="true"></script>
+
+    <script src="~/js/Schedules/Create.js" asp-append-version="true">
+    </script>
+
 }
 

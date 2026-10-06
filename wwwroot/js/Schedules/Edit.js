@@ -1,114 +1,169 @@
-    /* ================================================= */
-    /* ПРЕПОДАВАТЕЛЬ */
-    /* ================================================= */
+/* =========================================================
+   ПРЕПОДАВАТЕЛЬ
+   ========================================================= */
 
-    function confirmTeacher() {
+function confirmTeacher() {
 
-        const confirmInput =
-            document.getElementById(
-                "confirmTeacherSubject"
-            );
-
-        const form =
-            document.getElementById(
-                "scheduleForm"
-            );
-
-        if (confirmInput) {
-
-            confirmInput.value = "true";
-
-        }
-
-        if (form) {
-
-            form.submit();
-
-        }
-
-    }
-
-
-    function closeTeacherWarning() {
-
-        const warning =
-            document.getElementById(
-                "teacherWarning"
-            );
-
-        if (warning) {
-
-            warning.remove();
-
-        }
-
-    }
-
-
-    /* ================================================= */
-    /* АУДИТОРИИ */
-    /* ================================================= */
-
-    function selectClassroom(classroomId) {
-
-        const classroomSelect =
-            document.getElementById(
-                "ClassroomId"
-            );
-
-        if (!classroomSelect) {
-
-            return;
-
-        }
-
-
-        classroomSelect.value =
-            classroomId;
-
-
-        classroomSelect.dispatchEvent(
-            new Event("change", {
-                bubbles: true
-            })
+    const confirmInput =
+        document.getElementById(
+            "confirmTeacherSubject"
         );
 
+    const form =
+        document.getElementById(
+            "scheduleForm"
+        );
 
-        classroomSelect.focus();
-
-
-        closeClassroomRecommendations();
-
+    if (confirmInput) {
+        confirmInput.value = "true";
     }
 
+    if (form) {
+        form.submit();
+    }
+}
 
-    function closeClassroomRecommendations() {
 
-        const modal =
-            document.getElementById(
-                "classroomRecommendationModal"
-            );
+function closeTeacherWarning() {
 
-        if (modal) {
+    const warning =
+        document.getElementById(
+            "teacherWarning"
+        );
 
-            modal.remove();
+    if (warning) {
+        warning.remove();
+    }
+}
 
-        }
 
+function selectTeacher(teacherId) {
+
+    const select =
+        document.getElementById(
+            "TeacherId"
+        );
+
+    if (!select) {
+        return;
     }
 
+    select.value = teacherId;
 
-    function closeNoClassroomRecommendations() {
+    select.dispatchEvent(
+        new Event("change", {
+            bubbles: true
+        })
+    );
 
-        const modal =
-            document.getElementById(
-                "classroomNoRecommendationModal"
-            );
+    closeTeacherRecommendations();
+}
 
-        if (modal) {
 
-            modal.remove();
+function closeTeacherRecommendations() {
 
-        }
+    const modal =
+        document.getElementById(
+            "teacherRecommendationModal"
+        );
 
+    if (!modal) {
+        return;
     }
+
+    modal.remove();
+}
+
+
+function closeTeacherConflict() {
+
+    const modal =
+        document.getElementById(
+            "teacherConflictModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.remove();
+}
+
+
+/* =========================================================
+   АУДИТОРИИ
+   ========================================================= */
+
+function selectClassroom(classroomId) {
+
+    const classroomSelect =
+        document.getElementById(
+            "ClassroomId"
+        );
+
+    if (!classroomSelect) {
+        return;
+    }
+
+    classroomSelect.value =
+        classroomId;
+
+    classroomSelect.dispatchEvent(
+        new Event("change", {
+            bubbles: true
+        })
+    );
+
+    classroomSelect.focus();
+
+    closeClassroomRecommendations();
+}
+
+
+function closeClassroomRecommendations() {
+
+    const modal =
+        document.getElementById(
+            "classroomRecommendationModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.remove();
+}
+
+
+function closeNoClassroomRecommendations() {
+
+    const modal =
+        document.getElementById(
+            "classroomNoRecommendationModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.remove();
+}
+
+
+/* =========================================================
+   ОБЩАЯ ВАЛИДАЦИЯ
+   ========================================================= */
+
+function closeValidationError() {
+
+    const modal =
+        document.getElementById(
+            "validationErrorModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.remove();
+}

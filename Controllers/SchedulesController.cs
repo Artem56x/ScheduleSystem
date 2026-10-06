@@ -16,18 +16,25 @@ public class SchedulesController : Controller
     private readonly ScheduleValidationService _validationService;
     private readonly ClassroomRecommendationService _classroomRecommendationService;
 
+    private readonly TeacherRecommendationService
+        _teacherRecommendationService;
+
     public SchedulesController(
         ApplicationDbContext context,
         ScheduleExportService exportService,
         ScheduleValidationService validationService,
-        ClassroomRecommendationService classroomRecommendationService)
+        ClassroomRecommendationService classroomRecommendationService,
+        TeacherRecommendationService teacherRecommendationService)
     {
         _context = context;
         _exportService = exportService;
         _validationService = validationService;
-        _classroomRecommendationService = classroomRecommendationService;
-    }
+        _classroomRecommendationService =
+            classroomRecommendationService;
 
+        _teacherRecommendationService =
+            teacherRecommendationService;
+    }
 
     // ============================================================
     // INDEX
@@ -1037,6 +1044,9 @@ public class SchedulesController : Controller
         ViewBag.TeacherSubjectWarning =
             result.TeacherSubjectWarning;
 
+        ViewBag.TeacherConflict =
+    result.TeacherConflict;
+
         ViewBag.TeacherName =
             result.TeacherName;
 
@@ -1054,13 +1064,68 @@ public class SchedulesController : Controller
     {
         await PopulateSelectListsAsync(schedule);
 
+        // =========================================================
+        // РЕКОМЕНДАЦИИ ПРЕПОДАВАТЕЛЯ
+        // =========================================================
+
+        if (validationResult.TeacherConflict)
+        {
+            var teacherSubject = await _context.Subjects
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    s => s.Id == schedule.SubjectId);
+
+            var teacherGroup = await _context.Groups
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    g => g.Id == schedule.GroupId);
+
+            if (teacherSubject != null &&
+                teacherGroup != null)
+            {
+                var teacherRecommendations =
+                    await _teacherRecommendationService
+                        .GetRecommendationsAsync(
+                            schedule,
+                            teacherSubject,
+                            teacherGroup);
+
+                ViewBag.RecommendedTeachers =
+                    teacherRecommendations;
+
+                ViewBag.SelectedTeacherName =
+                    await _context.Teachers
+                        .AsNoTracking()
+                        .Where(t =>
+                            t.Id == schedule.TeacherId)
+                        .Select(t => t.FullName)
+                        .FirstOrDefaultAsync();
+
+                ViewBag.TeacherProblem =
+                    await _teacherRecommendationService
+                        .GetTeacherProblemAsync(
+                            schedule);
+            }
+        }
+
+        // =========================================================
+        // ЕСЛИ НЕТ ПРОБЛЕМЫ С АУДИТОРИЕЙ —
+        // НА ЭТОМ ЗАКАНЧИВАЕМ
+        // =========================================================
+
         if (!validationResult.ClassroomRecommendationNeeded)
         {
             return;
         }
 
+        // =========================================================
+        // ДАННЫЕ ДЛЯ АУДИТОРИИ
+        // =========================================================
+
         var subject = await _context.Subjects
             .AsNoTracking()
+            .Include(s => s.ClassroomCategoryRequirements)
+                .ThenInclude(x => x.ClassroomCategory)
             .FirstOrDefaultAsync(
                 s => s.Id == schedule.SubjectId);
 
@@ -1074,6 +1139,10 @@ public class SchedulesController : Controller
             return;
         }
 
+        // =========================================================
+        // РЕКОМЕНДАЦИИ АУДИТОРИЙ
+        // =========================================================
+
         var recommendations =
             await _classroomRecommendationService
                 .GetRecommendationsAsync(
@@ -1084,10 +1153,25 @@ public class SchedulesController : Controller
         ViewBag.RecommendedClassrooms =
             recommendations;
 
+        // =========================================================
+        // ВЫБРАННАЯ АУДИТОРИЯ
+        // =========================================================
+
         ViewBag.SelectedClassroomName =
             await _classroomRecommendationService
                 .GetSelectedClassroomNameAsync(
                     schedule.ClassroomId);
+
+        // =========================================================
+        // ПРИЧИНА ПРОБЛЕМЫ С АУДИТОРИЕЙ
+        // =========================================================
+
+        ViewBag.SelectedClassroomProblem =
+            await _classroomRecommendationService
+                .GetClassroomProblemAsync(
+                    schedule,
+                    subject,
+                    group);
     }
 
 

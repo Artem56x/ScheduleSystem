@@ -19,9 +19,9 @@ public class ScheduleValidationService
     {
         var result = new ScheduleValidationResult();
 
-        // --------------------------------------------------------
-        // Базовая проверка
-        // --------------------------------------------------------
+        // =========================================================
+        // BASIC VALIDATION
+        // =========================================================
 
         if (!schedule.DayOfWeek.HasValue)
         {
@@ -49,9 +49,9 @@ public class ScheduleValidationService
             return result;
         }
 
-        // --------------------------------------------------------
-        // Проверяем связанные сущности
-        // --------------------------------------------------------
+        // =========================================================
+        // RELATED ENTITIES
+        // =========================================================
 
         var teacher = await _context.Teachers
             .AsNoTracking()
@@ -109,17 +109,9 @@ public class ScheduleValidationService
             return result;
         }
 
-        // --------------------------------------------------------
-        // Курс группы / курс предмета
-        // --------------------------------------------------------
-        //
-        // Предмет должен соответствовать курсу группы.
-        //
-        // Например:
-        // группа 1 курса -> только предметы 1 курса
-        // группа 2 курса -> только предметы 2 курса
-        // группа 3 курса -> только предметы 3 курса
-        // --------------------------------------------------------
+        // =========================================================
+        // COURSE CHECK
+        // =========================================================
 
         if (group!.Course != subject!.Course)
         {
@@ -132,9 +124,9 @@ public class ScheduleValidationService
             return result;
         }
 
-        // --------------------------------------------------------
-        // Преподаватель / предмет
-        // --------------------------------------------------------
+        // =========================================================
+        // TEACHER / SUBJECT WARNING
+        // =========================================================
 
         if (teacher!.SubjectId.HasValue &&
             teacher.SubjectId.Value != subject!.Id)
@@ -162,9 +154,9 @@ public class ScheduleValidationService
             }
         }
 
-        // --------------------------------------------------------
-        // Вместимость группы / аудитории
-        // --------------------------------------------------------
+        // =========================================================
+        // CAPACITY
+        // =========================================================
 
         if (group!.StudentCount > classroom!.Capacity)
         {
@@ -177,37 +169,9 @@ public class ScheduleValidationService
             result.ClassroomRecommendationNeeded = true;
         }
 
-        // --------------------------------------------------------
-        // Требования к категории аудитории
-        // --------------------------------------------------------
-        //
-        // Теперь предмет не содержит RequiresComputers.
-        //
-        // Если у предмета есть требования к категориям,
-        // выбранная аудитория должна соответствовать
-        // хотя бы одной из них.
-        //
-        // Например:
-        //
-        // Базы данных
-        // └── Компьютерный класс
-        //
-        // Аудитория 101
-        // └── Компьютерный класс
-        //
-        // => подходит.
-        //
-        // Если у предмета несколько категорий, они считаются
-        // альтернативными вариантами помещений (OR).
-        //
-        // Например:
-        //
-        // Электротехника
-        // ├── Лаборатория
-        // └── Мастерская
-        //
-        // Подойдёт либо лаборатория, либо мастерская.
-        // --------------------------------------------------------
+        // =========================================================
+        // CLASSROOM CATEGORY REQUIREMENTS
+        // =========================================================
 
         var requiredCategoryIds = subject!
             .ClassroomCategoryRequirements
@@ -253,57 +217,78 @@ public class ScheduleValidationService
             }
         }
 
-        // --------------------------------------------------------
-        // Конфликт аудитории
-        // --------------------------------------------------------
+        // =========================================================
+        // CLASSROOM CONFLICT
+        // =========================================================
 
-        if (await HasClassroomConflictAsync(schedule))
+        var classroomConflict =
+            await FindClassroomConflictAsync(schedule);
+
+        if (classroomConflict != null)
         {
             result.AddError(
                 "ClassroomId",
-                $"Аудитория «{classroom!.Name}» уже занята " +
-                $"в выбранное время.");
+                $"Аудитория «{classroom!.Name}» уже занята: " +
+                $"«{classroomConflict.Subject?.Name ?? "Неизвестный предмет"}» — " +
+                $"группа «{classroomConflict.Group?.Name ?? "Неизвестная группа"}» — " +
+                $"{FormatTimeRange(classroomConflict.StartTime, classroomConflict.EndTime)}.");
 
             result.ClassroomRecommendationNeeded = true;
         }
 
-        // --------------------------------------------------------
-        // Конфликт группы
-        // --------------------------------------------------------
+        // =========================================================
+        // GROUP CONFLICT
+        // =========================================================
 
-        if (await HasGroupConflictAsync(schedule))
+        var groupConflict =
+            await FindGroupConflictAsync(schedule);
+
+        if (groupConflict != null)
         {
             result.AddError(
                 "GroupId",
-                $"У группы «{group!.Name}» уже есть занятие " +
-                $"в выбранное время.");
+                $"У группы «{group!.Name}» уже есть занятие: " +
+                $"«{groupConflict.Subject?.Name ?? "Неизвестный предмет"}» — " +
+                $"преподаватель «{groupConflict.Teacher?.FullName ?? "Неизвестный преподаватель"}» — " +
+                $"{FormatTimeRange(groupConflict.StartTime, groupConflict.EndTime)}.");
         }
 
-        // --------------------------------------------------------
-        // Конфликт преподавателя
-        // --------------------------------------------------------
+        // =========================================================
+        // TEACHER CONFLICT
+        // =========================================================
 
-        if (await HasTeacherConflictAsync(schedule))
+        var teacherConflict =
+            await FindTeacherConflictAsync(schedule);
+
+        if (teacherConflict != null)
         {
+            result.TeacherConflict = true;
+
             result.AddError(
                 "TeacherId",
-                $"У преподавателя «{teacher!.FullName}» уже есть " +
-                $"занятие в выбранное время.");
+                $"У преподавателя «{teacher!.FullName}» уже есть занятие: " +
+                $"«{teacherConflict.Subject?.Name ?? "Неизвестный предмет"}» — " +
+                $"группа «{teacherConflict.Group?.Name ?? "Неизвестная группа"}» — " +
+                $"{FormatTimeRange(
+                    teacherConflict.StartTime,
+                    teacherConflict.EndTime)}.");
         }
 
         return result;
     }
 
-    // ============================================================
-    // CONFLICTS
-    // ============================================================
+    // =============================================================
+    // CONFLICT SEARCH
+    // =============================================================
 
-    private async Task<bool> HasClassroomConflictAsync(
+    private async Task<Schedule?> FindClassroomConflictAsync(
         Schedule schedule)
     {
         return await _context.Schedules
             .AsNoTracking()
-            .AnyAsync(s =>
+            .Include(s => s.Subject)
+            .Include(s => s.Group)
+            .FirstOrDefaultAsync(s =>
                 s.Id != schedule.Id &&
                 s.ClassroomId == schedule.ClassroomId &&
                 s.DayOfWeek == schedule.DayOfWeek &&
@@ -311,12 +296,14 @@ public class ScheduleValidationService
                 s.EndTime > schedule.StartTime);
     }
 
-    private async Task<bool> HasGroupConflictAsync(
+    private async Task<Schedule?> FindGroupConflictAsync(
         Schedule schedule)
     {
         return await _context.Schedules
             .AsNoTracking()
-            .AnyAsync(s =>
+            .Include(s => s.Subject)
+            .Include(s => s.Teacher)
+            .FirstOrDefaultAsync(s =>
                 s.Id != schedule.Id &&
                 s.GroupId == schedule.GroupId &&
                 s.DayOfWeek == schedule.DayOfWeek &&
@@ -324,24 +311,44 @@ public class ScheduleValidationService
                 s.EndTime > schedule.StartTime);
     }
 
-    private async Task<bool> HasTeacherConflictAsync(
+    private async Task<Schedule?> FindTeacherConflictAsync(
         Schedule schedule)
     {
         return await _context.Schedules
             .AsNoTracking()
-            .AnyAsync(s =>
+            .Include(s => s.Subject)
+            .Include(s => s.Group)
+            .FirstOrDefaultAsync(s =>
                 s.Id != schedule.Id &&
                 s.TeacherId == schedule.TeacherId &&
                 s.DayOfWeek == schedule.DayOfWeek &&
                 s.StartTime < schedule.EndTime &&
                 s.EndTime > schedule.StartTime);
     }
+
+    // =============================================================
+    // HELPERS
+    // =============================================================
+
+    private static string FormatTimeRange(
+        TimeSpan? startTime,
+        TimeSpan? endTime)
+    {
+        var start = startTime.HasValue
+            ? startTime.Value.ToString(@"hh\:mm")
+            : "—";
+
+        var end = endTime.HasValue
+            ? endTime.Value.ToString(@"hh\:mm")
+            : "—";
+
+        return $"{start}–{end}";
+    }
 }
 
-
-// ============================================================
+// =============================================================
 // VALIDATION RESULT
-// ============================================================
+// =============================================================
 
 public class ScheduleValidationResult
 {
@@ -354,6 +361,8 @@ public class ScheduleValidationResult
         _errors.Count == 0;
 
     public bool TeacherSubjectWarning { get; set; }
+
+    public bool TeacherConflict { get; set; }
 
     public string? TeacherName { get; set; }
 
@@ -368,10 +377,15 @@ public class ScheduleValidationResult
         string message)
     {
         _errors.Add(
-            new ScheduleValidationError(key, message));
+            new ScheduleValidationError(
+                key,
+                message));
     }
 }
 
+// =============================================================
+// VALIDATION ERROR
+// =============================================================
 
 public class ScheduleValidationError
 {

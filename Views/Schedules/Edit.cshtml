@@ -3,8 +3,34 @@
 @{
     ViewData["Title"] = "Редактировать занятие";
 
+    /* =========================================================
+       ПРЕПОДАВАТЕЛЬ
+       ========================================================= */
+
     bool showTeacherWarning =
         ViewBag.TeacherSubjectWarning == true;
+
+    var recommendedTeachers =
+        ViewBag.RecommendedTeachers
+        as List<ScheduleSystem.Models.Teacher>;
+
+    bool hasTeacherConflict =
+        ViewBag.TeacherConflict == true;
+
+    bool showTeacherRecommendations =
+        hasTeacherConflict &&
+        recommendedTeachers != null &&
+        recommendedTeachers.Any();
+
+    bool showTeacherConflictWithoutRecommendations =
+        hasTeacherConflict &&
+        (recommendedTeachers == null ||
+         !recommendedTeachers.Any());
+
+
+    /* =========================================================
+       АУДИТОРИИ
+       ========================================================= */
 
     var recommendedClassrooms =
         ViewBag.RecommendedClassrooms
@@ -17,6 +43,23 @@
     bool showNoClassroomRecommendations =
         recommendedClassrooms != null &&
         !recommendedClassrooms.Any();
+
+
+    /* =========================================================
+       ОБЩИЕ ОШИБКИ ВАЛИДАЦИИ
+       ========================================================= */
+
+    var validationErrors = ViewData.ModelState
+        .Where(x => x.Value != null)
+        .SelectMany(x => x.Value!.Errors)
+        .Select(x => x.ErrorMessage)
+        .Where(x => !string.IsNullOrWhiteSpace(x))
+        .Distinct()
+        .ToList();
+
+    bool showValidationModal =
+        validationErrors.Any() &&
+        !hasTeacherConflict;
 }
 
 @section Styles {
@@ -24,6 +67,7 @@
           href="~/css/Schedules/Edit.css"
           asp-append-version="true" />
 }
+
 
 <div class="schedule-create-page">
 
@@ -389,7 +433,7 @@
 
 
 <!-- ===================================================== -->
-<!-- ПРЕДУПРЕЖДЕНИЕ ПРЕПОДАВАТЕЛЯ -->
+<!-- ПРЕДУПРЕЖДЕНИЕ ПРЕПОДАВАТЕЛЯ / ПРЕДМЕТА -->
 <!-- ===================================================== -->
 
 @if (showTeacherWarning)
@@ -408,7 +452,6 @@
             </h2>
 
             <p>
-
                 Преподаватель
 
                 <strong>
@@ -420,23 +463,18 @@
                 <strong>
                     «@ViewBag.TeacherSubjectName»
                 </strong>.
-
             </p>
 
             <p>
-
                 Сейчас выбран предмет
 
                 <strong>
                     «@ViewBag.SelectedSubjectName»
                 </strong>.
-
             </p>
 
             <p class="warning-question">
-
                 Вы точно хотите оставить этого преподавателя?
-
             </p>
 
 
@@ -456,6 +494,188 @@
                         onclick="confirmTeacher()">
 
                     Да, оставить
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- РЕКОМЕНДАЦИИ ПРЕПОДАВАТЕЛЕЙ -->
+<!-- ===================================================== -->
+
+@if (showTeacherRecommendations)
+{
+    <div class="warning-overlay"
+         id="teacherRecommendationModal">
+
+        <div class="teacher-recommendation-modal">
+
+            <div class="teacher-recommendation-icon">
+                👨‍🏫
+            </div>
+
+            <h2>
+                Преподаватель уже занят
+            </h2>
+
+            <p class="teacher-recommendation-description">
+
+                Преподаватель
+
+                <strong>
+                    «@ViewBag.SelectedTeacherName»
+                </strong>
+
+                занят в выбранное время.
+
+            </p>
+
+
+            @if (!string.IsNullOrWhiteSpace(
+                ViewBag.TeacherProblem as string))
+            {
+                <div class="teacher-problem">
+                    @ViewBag.TeacherProblem
+                </div>
+            }
+
+
+            <p class="teacher-recommendation-subtitle">
+                Подходящие свободные преподаватели:
+            </p>
+
+
+            <div class="recommended-teacher-list">
+
+                @foreach (var teacher in recommendedTeachers!)
+                {
+                    <div class="recommended-teacher">
+
+                        <div class="recommended-teacher-info">
+
+                            <div class="recommended-teacher-name">
+                                @teacher.FullName
+                            </div>
+
+                            <div class="recommended-teacher-details">
+
+                                <span>
+                                    📚
+                                    @(teacher.Subject?.Name
+                                      ?? "Предмет не указан")
+                                </span>
+
+                                <span>
+                                    ✓ Свободен
+                                </span>
+
+                                <span>
+                                    🕐
+                                    @Model.StartTime?.ToString(@"hh\:mm")
+                                    –
+                                    @Model.EndTime?.ToString(@"hh\:mm")
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="select-teacher-button"
+                                onclick="selectTeacher(@teacher.Id)">
+
+                            Выбрать
+
+                        </button>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <div class="teacher-recommendation-actions">
+
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeTeacherRecommendations()">
+
+                    Оставить выбранного
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- КОНФЛИКТ ПРЕПОДАВАТЕЛЯ БЕЗ РЕКОМЕНДАЦИЙ -->
+<!-- ===================================================== -->
+
+@if (showTeacherConflictWithoutRecommendations)
+{
+    <div class="warning-overlay"
+         id="teacherConflictModal">
+
+        <div class="teacher-recommendation-modal">
+
+            <div class="teacher-recommendation-icon">
+                👨‍🏫
+            </div>
+
+            <h2>
+                Преподаватель уже занят
+            </h2>
+
+
+            <p class="teacher-recommendation-description">
+
+                Преподаватель
+
+                <strong>
+                    «@ViewBag.SelectedTeacherName»
+                </strong>
+
+                уже занят в выбранное время.
+
+            </p>
+
+
+            @if (!string.IsNullOrWhiteSpace(
+                ViewBag.TeacherProblem as string))
+            {
+                <div class="teacher-problem">
+                    @ViewBag.TeacherProblem
+                </div>
+            }
+
+
+            <p class="teacher-recommendation-subtitle">
+
+                Свободных преподавателей для предмета
+                на это время не найдено.
+
+            </p>
+
+
+            <div class="teacher-recommendation-actions">
+
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeTeacherConflict()">
+
+                    Вернуться к редактированию
 
                 </button>
 
@@ -502,15 +722,9 @@
 
 
             <p class="classroom-recommendation-subtitle">
-
                 Подходящие свободные аудитории:
-
             </p>
 
-
-            <!-- ================================================= -->
-            <!-- LIST -->
-            <!-- ================================================= -->
 
             <div class="recommended-classroom-list">
 
@@ -570,10 +784,6 @@
             </div>
 
 
-            <!-- ================================================= -->
-            <!-- CLOSE -->
-            <!-- ================================================= -->
-
             <div class="classroom-recommendation-actions">
 
                 <button type="button"
@@ -593,8 +803,8 @@
 
 
 <!-- ===================================================== -->
-<!-- НЕТ РЕКОМЕНДАЦИЙ -->
-<!-- ================================================= -->
+<!-- НЕТ РЕКОМЕНДАЦИЙ АУДИТОРИЙ -->
+<!-- ===================================================== -->
 
 @if (showNoClassroomRecommendations)
 {
@@ -614,11 +824,9 @@
 
 
             <p>
-
                 Сейчас нет свободной аудитории,
                 которая подходит по вместимости
                 и требованиям предмета.
-
             </p>
 
 
@@ -627,6 +835,57 @@
                 <button type="button"
                         class="warning-cancel"
                         onclick="closeNoClassroomRecommendations()">
+
+                    Вернуться
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- ОБЩАЯ ВАЛИДАЦИЯ -->
+<!-- ===================================================== -->
+
+@if (showValidationModal)
+{
+    <div class="warning-overlay"
+         id="validationErrorModal">
+
+        <div class="warning-modal validation-error-modal">
+
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+
+            <h2>
+                Не удалось сохранить изменения
+            </h2>
+
+
+            <div class="validation-error-list">
+
+                @foreach (var error in validationErrors)
+                {
+                    <div class="validation-error-item">
+                        • @error
+                    </div>
+                }
+
+            </div>
+
+
+            <div class="warning-actions">
+
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeValidationError()">
 
                     Вернуться
 
@@ -651,4 +910,3 @@
     <script src="~/js/Schedules/Edit.js"
             asp-append-version="true"></script>
 }
-
