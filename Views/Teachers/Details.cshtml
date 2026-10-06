@@ -1,0 +1,214 @@
+@model ScheduleSystem.Models.Teacher
+
+@{
+    ViewData["Title"] = "Информация о преподавателе";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teachers/Details.css" asp-append-version="true" />
+}
+
+<div class="schedule-details-page">
+
+    <!-- HEADER -->
+    <div class="details-header">
+
+        <div>
+
+            <span class="page-badge">
+                ПРЕПОДАВАТЕЛИ
+            </span>
+
+            <h1>
+                Информация о преподавателе
+            </h1>
+
+            <p>
+                Подробная информация о преподавателе
+            </p>
+
+        </div>
+
+        <div class="details-actions">
+
+            <a asp-action="Index" class="glass-button secondary-button">
+                ← Назад
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAIN CARD -->
+    <div class="lesson-main-card">
+
+        <!-- PROFILE -->
+        <div class="teacher-profile">
+
+            <div class="teacher-avatar">
+
+                @if (!string.IsNullOrWhiteSpace(Model.FullName))
+                {
+                    @Model.FullName.Substring(0, 1).ToUpper()
+                }
+                else
+                {
+                    <span>?</span>
+                }
+
+            </div>
+
+
+            <div class="teacher-main-info">
+
+                <span class="lesson-label">
+                    ПРЕПОДАВАТЕЛЬ
+                </span>
+
+                <h2>
+                    @Model.FullName
+                </h2>
+
+                @if (Model.Subject != null)
+                {
+                    <span class="subject-badge">
+                        📚 @Model.Subject.Name
+                    </span>
+                }
+                else
+                {
+                    <span class="subject-badge">
+                        Преподаватель
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- INFORMATION -->
+        <div class="lesson-info-grid">
+
+            <!-- ФИО -->
+            <div class="info-card">
+
+                <div class="info-icon">
+                    👤
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        ФИО
+                    </span>
+
+                    <strong>
+                        @Model.FullName
+                    </strong>
+
+                    <small>
+                        Имя преподавателя
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUBJECT -->
+            <div class="info-card">
+
+                <div class="info-icon">
+                    📚
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        Предмет
+                    </span>
+
+                    @if (Model.Subject != null)
+                    {
+                        <strong>
+                            @Model.Subject.Name
+                        </strong>
+                    }
+                    else
+                    {
+                        <strong class="empty-value">
+                            Не указан
+                        </strong>
+                    }
+
+                    <small>
+                        Основной предмет
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- EMAIL -->
+            <div class="info-card">
+
+                <div class="info-icon">
+                    ✉️
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        Email
+                    </span>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Email))
+                    {
+                        <strong>
+                            @Model.Email
+                        </strong>
+                    }
+                    else
+                    {
+                        <strong class="empty-value">
+                            Не указан
+                        </strong>
+                    }
+
+                    <small>
+                        Электронная почта
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+        <div class="details-footer">
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button primary-button">
+                    ✏️ Изменить
+                </a>
+
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="glass-button delete-button">
+                    🗑 Удалить
+                </a>
+            }
+
+            <a asp-action="Index" class="glass-button secondary-button">
+                ← Назад
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

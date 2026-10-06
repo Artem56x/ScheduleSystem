@@ -1,0 +1,123 @@
+@model ScheduleSystem.Models.Classroom
+
+@{
+    ViewData["Title"] = "Редактировать аудиторию";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Classrooms/Edit.css" asp-append-version="true" />
+}
+
+<div class="classroom-form-page">
+
+
+    <div class="page-header">
+        <div>
+            <h1>Редактировать аудиторию</h1>
+            <p>Изменение информации об учебной аудитории</p>
+        </div>
+    </div>
+
+    <div class="glass-form-card">
+
+        <div class="form-icon">
+            ✏️
+        </div>
+
+        <div class="form-title">
+            <h2>Информация об аудитории</h2>
+            <p>Измените номер, категорию и количество мест.</p>
+        </div>
+
+        <form asp-action="Edit" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly" class="glass-validation">
+            </div>
+
+            <!-- НОМЕР АУДИТОРИИ -->
+
+            <div class="form-group">
+
+                <label asp-for="Name" class="form-label">
+                    Номер аудитории
+                </label>
+
+                <input asp-for="Name" class="form-control glass-input" placeholder="Например: 305" autocomplete="off" />
+
+                <span asp-validation-for="Name" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- КАТЕГОРИЯ -->
+
+            <div class="form-group">
+
+                <label asp-for="ClassroomCategoryId" class="form-label">
+                    Категория
+                </label>
+
+                <select asp-for="ClassroomCategoryId" asp-items="ViewBag.ClassroomCategories"
+                        class="form-control glass-input">
+
+                    <option value="">
+                        Выберите категорию
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="ClassroomCategoryId" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- КОЛИЧЕСТВО МЕСТ -->
+
+            <div class="form-group">
+
+                <label asp-for="Capacity" class="form-label">
+                    Количество мест
+                </label>
+
+                <input asp-for="Capacity" type="number" min="1" max="500" class="form-control glass-input"
+                       placeholder="Например: 30" />
+
+                <span asp-validation-for="Capacity" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- КНОПКИ -->
+
+            <div class="form-actions">
+
+                <button type="submit" class="btn save-btn">
+                    Сохранить изменения
+                </button>
+
+                <a asp-action="Index" class="btn cancel-btn">
+                    Отмена
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+</div>
+
+@section Scripts {
+
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+}

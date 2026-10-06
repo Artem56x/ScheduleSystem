@@ -1,0 +1,496 @@
+@{
+    ViewData["Title"] = "Профиль";
+
+    var email = ViewBag.Email as string ?? "";
+    var displayName = ViewBag.DisplayName as string ?? "Пользователь";
+
+    var firstLetter = !string.IsNullOrWhiteSpace(displayName)
+        ? displayName.Substring(0, 1).ToUpper()
+        : "U";
+
+    bool isAdmin = ViewBag.IsAdmin == true;
+
+    var lastLoginAt = ViewBag.LastLoginAt as DateTime?;
+    var lastLoginDevice = ViewBag.LastLoginDevice as string
+        ?? "Неизвестное устройство";
+
+    var accountStatus = ViewBag.AccountStatus as string
+        ?? "Неактивен";
+
+    var scheduleNotificationsEnabled =
+        ViewBag.ScheduleNotificationsEnabled == true;
+
+    var systemNotificationsEnabled =
+        ViewBag.SystemNotificationsEnabled == true;
+
+    var allNotificationsEnabled =
+        scheduleNotificationsEnabled &&
+        systemNotificationsEnabled;
+
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Account/Profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+
+    <!-- HEADER -->
+
+    <header class="profile-page-header">
+
+        <div class="profile-page-title">
+
+            <div class="profile-page-title-icon">
+            </div>
+
+            <div>
+                <h1>Профиль</h1>
+                <p>Ваши личные данные и настройки аккаунта</p>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- CONTENT -->
+
+    <div class="profile-layout">
+
+        <!-- LEFT COLUMN -->
+
+        <main class="profile-main-column">
+
+            <!-- PERSONAL DATA -->
+
+            <section class="profile-card personal-card">
+
+                <div class="profile-card-header">
+
+                    <div>
+                        <h2>Личные данные</h2>
+                        <p>Основная информация о вашем аккаунте</p>
+                    </div>
+
+                </div>
+
+                <div class="personal-data">
+
+                    <div class="profile-avatar-wrapper">
+
+<div class="profile-page-avatar">
+    @firstLetter
+</div>
+
+                    </div>
+
+                    <div class="profile-data-list">
+
+                        <div class="profile-data-row">
+
+                            <div class="profile-data-label">
+                                <span class="data-icon">♙</span>
+                                <span>ФИО</span>
+                            </div>
+
+                            <div class="profile-data-value">
+                                @displayName
+                            </div>
+
+                        </div>
+
+                        <div class="profile-data-row">
+
+                            <div class="profile-data-label">
+                                <span class="data-icon">✉</span>
+                                <span>Email</span>
+                            </div>
+
+                            <div class="profile-data-value">
+                                @email
+                            </div>
+
+                        </div>
+
+                        <div class="profile-data-row">
+
+                            <div class="profile-data-label">
+                                <span class="data-icon">♙</span>
+                                <span>Роль</span>
+                            </div>
+
+                            <div class="profile-data-value role-value">
+
+                                @if (isAdmin)
+                                {
+                                    <span class="profile-role-badge admin">
+                                        Администратор
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="profile-role-badge">
+                                        Пользователь
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- NOTIFICATIONS -->
+<form style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+           <section class="profile-card notifications-card">
+
+    <div class="card-header">
+        <div>
+            <h2>Уведомления</h2>
+            <p>Управление уведомлениями аккаунта</p>
+        </div>
+
+        <label class="notification-switch">
+            <input
+                type="checkbox"
+                id="allNotificationsToggle"
+                @(allNotificationsEnabled ? "checked" : "") />
+
+            <span class="notification-switch-slider"></span>
+        </label>
+    </div>
+
+
+    <div class="notification-settings">
+
+        <div class="notification-setting">
+            <div class="notification-setting-icon">
+                ◷
+            </div>
+
+            <div class="notification-setting-content">
+                <div class="notification-setting-title">
+                    Изменения в расписании
+                </div>
+
+                <div class="notification-setting-description">
+                    Уведомления об изменениях занятий и расписания
+                </div>
+            </div>
+
+            <label class="notification-switch">
+                <input
+                    type="checkbox"
+                    class="notification-toggle"
+                    data-notification="schedule"
+                    @(scheduleNotificationsEnabled ? "checked" : "") />
+
+                <span class="notification-switch-slider"></span>
+            </label>
+        </div>
+
+
+        <div class="notification-setting">
+            <div class="notification-setting-icon">
+                ◎
+            </div>
+
+            <div class="notification-setting-content">
+                <div class="notification-setting-title">
+                    Системные уведомления
+                </div>
+
+                <div class="notification-setting-description">
+                    Важные сообщения и уведомления системы
+                </div>
+            </div>
+
+            <label class="notification-switch">
+                <input
+                    type="checkbox"
+                    class="notification-toggle"
+                    data-notification="system"
+                    @(systemNotificationsEnabled ? "checked" : "") />
+
+                <span class="notification-switch-slider"></span>
+            </label>
+        </div>
+
+    </div>
+
+    <div
+        class="notification-save-status"
+        id="notificationSaveStatus"
+        aria-live="polite">
+    </div>
+
+</section>
+
+        </main>
+
+
+        <!-- RIGHT COLUMN -->
+
+        <aside class="profile-sidebar">
+
+            <!-- ACCOUNT STATUS -->
+
+            <section class="profile-card status-card">
+                <div class="sidebar-card-header">
+                    <h2>Статус аккаунта</h2>
+
+                    <span class="account-status">
+                        <span class="status-dot"></span>
+                        @accountStatus
+                    </span>
+                </div>
+
+                <div class="status-list">
+
+                    <div class="status-row">
+                        <span class="status-row-icon">◷</span>
+
+                        <div class="status-row-content">
+                            <span class="status-row-label">Последний вход</span>
+
+                            <span class="status-row-value">
+                                @if (lastLoginAt.HasValue)
+                                {
+                                    @lastLoginAt.Value.ToLocalTime().ToString("dd.MM.yyyy, HH:mm")
+                                }
+                                else
+                                {
+                                    <span>Первый вход</span>
+                                }
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="status-row">
+                        <span class="status-row-icon">▣</span>
+
+                        <div class="status-row-content">
+                            <span class="status-row-label">Устройство</span>
+
+                            <span class="status-row-value">
+                                @lastLoginDevice
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="status-row">
+                        <span class="status-row-icon">◎</span>
+
+                        <div class="status-row-content">
+                            <span class="status-row-label">Система</span>
+
+                            <span class="status-row-value">
+                                ScheduleSystem
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- QUICK ACTIONS -->
+
+            <section class="profile-card quick-actions-card">
+
+                <div class="sidebar-card-header">
+
+                    <h2>Быстрые действия</h2>
+
+                </div>
+
+
+                <div class="quick-actions">
+
+                    <a asp-controller="Account" asp-action="ChangePassword" class="quick-action">
+
+                        <span class="quick-action-icon">
+                            ✎
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Изменить пароль</strong>
+                        </span>
+
+                        <span class="quick-action-arrow">
+                            ›
+                        </span>
+
+                    </a>
+
+
+                    <a asp-controller="Account" asp-action="Settings" class="quick-action">
+
+                        <span class="quick-action-icon">
+                            ♧
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Настроить профиль</strong>
+                        </span>
+
+                        <span class="quick-action-arrow">
+                            ›
+                        </span>
+
+                    </a>
+
+
+                    <a asp-controller="Account" asp-action="Settings" class="quick-action">
+
+                        <span class="quick-action-icon">
+                            ⚙
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Настройки программы</strong>
+                        </span>
+
+                        <span class="quick-action-arrow">
+                            ›
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+
+    @section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const allToggle =
+                document.getElementById("allNotificationsToggle");
+
+            const notificationToggles =
+                document.querySelectorAll(".notification-toggle");
+
+            const saveStatus =
+                document.getElementById("notificationSaveStatus");
+
+            function getState() {
+                let schedule = false;
+                let system = false;
+
+                notificationToggles.forEach(toggle => {
+                    if (toggle.dataset.notification === "schedule") {
+                        schedule = toggle.checked;
+                    }
+
+                    if (toggle.dataset.notification === "system") {
+                        system = toggle.checked;
+                    }
+                });
+
+                return {
+                    schedule,
+                    system
+                };
+            }
+
+            function updateMainToggle() {
+                const state = getState();
+
+                allToggle.checked =
+                    state.schedule &&
+                    state.system;
+            }
+
+            async function saveNotifications() {
+                const state = getState();
+
+                const token =
+                    document.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    )?.value;
+
+                const formData = new FormData();
+
+                formData.append(
+                    "scheduleNotificationsEnabled",
+                    state.schedule
+                );
+
+                formData.append(
+                    "systemNotificationsEnabled",
+                    state.system
+                );
+
+                if (token) {
+                    formData.append(
+                        "__RequestVerificationToken",
+                        token
+                    );
+                }
+
+                try {
+                    const response = await fetch(
+                        "/Account/UpdateNotifications",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "Не удалось сохранить настройки."
+                        );
+                    }
+
+                    saveStatus.textContent =
+                        "Настройки сохранены";
+
+                    saveStatus.classList.add("visible");
+
+                    setTimeout(() => {
+                        saveStatus.classList.remove("visible");
+                    }, 1800);
+
+                } catch (error) {
+                    saveStatus.textContent =
+                        "Не удалось сохранить настройки.";
+
+                    saveStatus.classList.add("error");
+                    saveStatus.classList.add("visible");
+                }
+            }
+
+            allToggle.addEventListener("change", function () {
+                const enabled = allToggle.checked;
+
+                notificationToggles.forEach(toggle => {
+                    toggle.checked = enabled;
+                });
+
+                saveNotifications();
+            });
+
+            notificationToggles.forEach(toggle => {
+                toggle.addEventListener("change", function () {
+                    updateMainToggle();
+                    saveNotifications();
+                });
+            });
+
+            updateMainToggle();
+        });
+    </script>
+}

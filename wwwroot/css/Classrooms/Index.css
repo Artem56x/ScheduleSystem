@@ -1,0 +1,964 @@
+/* =========================================================
+   CLASSROOMS INDEX
+   Liquid Glass — Unified Design
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.classrooms-page {
+    width: 100%;
+    min-width: 0;
+
+    color: #202936;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+}
+
+.page-header h1 {
+    margin: 0 0 5px;
+
+    color: #202936;
+
+    font-size: 2rem;
+    font-weight: 750;
+    line-height: 1.2;
+
+    letter-spacing: -.04em;
+}
+
+.page-header p {
+    margin: 0;
+
+    color: #697689;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   ADD BUTTON
+   ========================================================= */
+
+.add-classroom-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    min-height: 42px;
+
+    padding: 9px 16px;
+
+    border: 1px solid #d2e4fc;
+    border-radius: 12px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 7px 18px rgba(52, 120, 220, .07),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+
+    transition:
+        transform .2s ease,
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        box-shadow .2s ease;
+}
+
+.add-classroom-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: #c3daf7;
+
+    background: #e5f0ff;
+    color: #286dcc;
+
+    box-shadow:
+        0 9px 21px rgba(52, 120, 220, .10),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.add-classroom-btn span {
+    font-size: 17px;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.search-card {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    margin-bottom: 20px;
+    padding: 9px;
+
+    border: 1px solid rgba(220, 228, 239, .88);
+    border-radius: 17px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .97),
+            rgba(247, 250, 255, .94)
+        );
+
+    box-shadow:
+        0 9px 26px rgba(30, 55, 90, .045),
+        inset 0 1px 0 rgba(255, 255, 255, .96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.search-wrapper {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    flex: 1;
+    min-width: 0;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+
+    color: #8793a3;
+
+    font-size: 20px;
+    line-height: 1;
+
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    height: 44px;
+
+    padding: 0 42px 0 43px;
+
+    border: 1px solid rgba(210, 219, 231, .95);
+    border-radius: 12px;
+
+    outline: none;
+
+    background: #fff;
+    color: #27313e;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+
+    box-shadow:
+        inset 0 1px 2px rgba(30, 55, 90, .025);
+
+    transition:
+        border-color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.search-input::placeholder {
+    color: #9aa5b4;
+}
+
+.search-input:focus {
+    border-color: #8db5e9;
+
+    background: #fff;
+
+    box-shadow:
+        0 0 0 3px rgba(52, 120, 220, .10);
+}
+
+.clear-search {
+    position: absolute;
+    right: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 25px;
+    height: 25px;
+
+    border-radius: 50%;
+
+    color: #8b97a7;
+
+    font-size: 19px;
+    line-height: 1;
+
+    text-decoration: none;
+
+    transition:
+        background-color .2s ease,
+        color .2s ease;
+}
+
+.clear-search:hover {
+    background: #eef2f7;
+    color: #465467;
+}
+
+.search-btn {
+    flex: 0 0 auto;
+
+    height: 44px;
+
+    padding: 0 18px;
+
+    border: 1px solid #d2e4fc;
+    border-radius: 12px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.search-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: #c3daf7;
+
+    background: #e5f0ff;
+    color: #286dcc;
+}
+
+
+/* =========================================================
+   ALERT
+   ========================================================= */
+
+.glass-alert {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+    padding: 13px 16px;
+
+    border: 1px solid rgba(199, 67, 79, .16);
+    border-radius: 15px;
+
+    background: #fff3f4;
+    color: #b83b48;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+
+
+/* =========================================================
+   COUNT
+   ========================================================= */
+
+.classrooms-count {
+    margin: 0 0 12px 4px;
+
+    color: #697689;
+
+    font-size: 12px;
+    font-weight: 550;
+}
+
+.classrooms-count strong {
+    color: #27313e;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.glass-table-card {
+    width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(220, 228, 239, .88);
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .98),
+            rgba(247, 250, 255, .94)
+        );
+
+    box-shadow:
+        0 12px 34px rgba(30, 55, 90, .055),
+        inset 0 1px 0 rgba(255, 255, 255, .96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+
+/* =========================================================
+   TABLE GRID
+   ========================================================= */
+
+.table-header,
+.classroom-row {
+    display: grid;
+
+    grid-template-columns:
+        1.3fr
+        1.2fr
+        .7fr
+        1.5fr;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 16px 22px;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.table-header {
+    color: #7a8798;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .045em;
+
+    background: rgba(246, 249, 253, .72);
+
+    border-bottom: 1px solid rgba(214, 222, 233, .78);
+}
+
+.table-header > div:last-child {
+    text-align: right;
+}
+
+
+/* =========================================================
+   TABLE ROW
+   ========================================================= */
+
+.classroom-row {
+    min-height: 82px;
+
+    border-bottom: 1px solid rgba(214, 222, 233, .68);
+
+    transition:
+        background-color .2s ease;
+}
+
+.classroom-row:last-child {
+    border-bottom: none;
+}
+
+.classroom-row:hover {
+    background: rgba(239, 246, 255, .45);
+}
+
+
+/* =========================================================
+   CLASSROOM
+   ========================================================= */
+
+.classroom-info {
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    min-width: 0;
+}
+
+.classroom-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 48px;
+
+    width: 48px;
+    height: 48px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 14px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 18px;
+    font-weight: 750;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .92);
+}
+
+.classroom-text {
+    min-width: 0;
+}
+
+.classroom-name {
+    overflow-wrap: anywhere;
+
+    color: #27313e;
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.classroom-label {
+    margin-top: 3px;
+
+    color: #8a96a6;
+
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   CATEGORY
+   ========================================================= */
+
+.category-info {
+    min-width: 0;
+}
+
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+
+    max-width: 100%;
+
+    padding: 7px 11px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 10px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.3;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   EMPTY VALUE
+   ========================================================= */
+
+.empty-value {
+    color: #9aa5b4;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   CAPACITY
+   ========================================================= */
+
+.capacity-info {
+    display: flex;
+    align-items: baseline;
+
+    gap: 5px;
+}
+
+.capacity-number {
+    color: #27313e;
+
+    font-size: 16px;
+    font-weight: 750;
+    line-height: 1;
+}
+
+.capacity-label {
+    color: #7f8b9b;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.classroom-actions {
+    display: flex;
+    flex-wrap: wrap;
+
+    justify-content: flex-end;
+
+    gap: 7px;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+
+    padding: 7px 11px;
+
+    border-radius: 10px;
+
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1;
+
+    text-decoration: none;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   DETAILS
+   ========================================================= */
+
+.details-btn {
+    border: 1px solid #dce9fb;
+
+    background: #edf5ff;
+    color: #3478dc;
+}
+
+.details-btn:hover {
+    border-color: #c9dcf5;
+
+    background: #e4f0ff;
+    color: #286dcc;
+}
+
+
+/* =========================================================
+   EDIT
+   ========================================================= */
+
+.edit-btn {
+    border: 1px solid rgba(210, 228, 252, .95);
+
+    background: #f1f7ff;
+    color: #397bd4;
+}
+
+.edit-btn:hover {
+    border-color: #c5dbf6;
+
+    background: #e7f1ff;
+    color: #286dcc;
+}
+
+
+/* =========================================================
+   DELETE
+   ========================================================= */
+
+.delete-btn {
+    border: 1px solid rgba(199, 67, 79, .14);
+
+    background: #fff3f4;
+    color: #c7434f;
+}
+
+.delete-btn:hover {
+    border-color: rgba(199, 67, 79, .22);
+
+    background: #ffe9eb;
+    color: #b53643;
+}
+
+
+/* =========================================================
+   SEARCH RESULT
+   ========================================================= */
+
+.search-result-info {
+    margin-top: 11px;
+    padding-left: 4px;
+
+    color: #697689;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.search-result-info strong {
+    color: #27313e;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+    padding: 65px 25px;
+
+    text-align: center;
+
+    border: 1px solid rgba(220, 228, 239, .88);
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .98),
+            rgba(247, 250, 255, .94)
+        );
+
+    box-shadow:
+        0 12px 34px rgba(30, 55, 90, .055),
+        inset 0 1px 0 rgba(255, 255, 255, .96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 17px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 18px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 27px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+
+.empty-state h2 {
+    margin: 0 0 7px;
+
+    color: #27313e;
+
+    font-size: 19px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.empty-state p {
+    max-width: 420px;
+
+    margin: 0 auto 20px;
+
+    color: #7a8798;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.clear-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 9px 16px;
+
+    border: 1px solid #d2e4fc;
+    border-radius: 12px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    text-decoration: none;
+
+    transition:
+        transform .2s ease,
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+
+.clear-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: #c3daf7;
+
+    background: #e5f0ff;
+    color: #286dcc;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .table-header,
+    .classroom-row {
+        grid-template-columns:
+            1.25fr
+            1.1fr
+            .7fr
+            1.4fr;
+
+        gap: 14px;
+
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .action-btn {
+        padding: 7px 9px;
+
+        font-size: 11px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE / TABLET
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+    .table-header {
+        display: none;
+    }
+
+    .classroom-row {
+        display: grid;
+
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+
+        padding: 20px;
+    }
+
+    .category-info,
+    .capacity-info {
+        margin-left: 61px;
+    }
+
+    .classroom-actions {
+        justify-content: flex-start;
+
+        margin-left: 61px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .page-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .add-classroom-btn {
+        width: 100%;
+    }
+
+    .search-card {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .search-btn {
+        width: 100%;
+    }
+
+    .glass-table-card {
+        border-radius: 18px;
+    }
+
+    .classroom-row {
+        padding: 18px;
+    }
+
+    .category-info,
+    .capacity-info,
+    .classroom-actions {
+        margin-left: 0;
+    }
+
+    .classroom-actions {
+        display: grid;
+
+        grid-template-columns: 1fr;
+    }
+
+    .action-btn {
+        width: 100%;
+    }
+
+    .empty-state {
+        padding: 52px 18px;
+
+        border-radius: 18px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .page-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .search-card {
+        padding: 8px;
+    }
+
+    .classroom-row {
+        padding: 16px;
+    }
+
+    .classroom-avatar {
+        flex-basis: 44px;
+
+        width: 44px;
+        height: 44px;
+    }
+
+    .classroom-name {
+        font-size: 12px;
+    }
+
+    .category-badge {
+        font-size: 10px;
+    }
+
+    .empty-state h2 {
+        font-size: 17px;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .add-classroom-btn,
+    .search-input,
+    .clear-search,
+    .search-btn,
+    .classroom-row,
+    .action-btn,
+    .details-btn,
+    .edit-btn,
+    .delete-btn,
+    .clear-btn {
+        transition: none;
+    }
+
+    .add-classroom-btn:hover,
+    .search-btn:hover,
+    .action-btn:hover,
+    .clear-btn:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,224 @@
+@model IEnumerable<ScheduleSystem.Models.Group>
+
+@{
+    ViewData["Title"] = "Группы";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Groups/Index.css" asp-append-version="true" />
+}
+
+<div class="groups-page">
+
+    <!-- Заголовок -->
+    <div class="page-header">
+
+        <div>
+            <h1>Группы</h1>
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="add-group-btn">
+                <span>＋</span>
+                Добавить группу
+            </a>
+        }
+
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="error-message-glass">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Поиск -->
+    <form asp-action="Index" method="get" class="search-card">
+
+        <div class="search-wrapper">
+
+            <span class="search-icon">⌕</span>
+
+            <input type="text" name="search" value="@ViewBag.Search" class="search-input"
+                   placeholder="Поиск по названию группы или специальности..." />
+
+            @if (!string.IsNullOrWhiteSpace(ViewBag.Search as string))
+            {
+                <a asp-action="Index" class="clear-search">
+                    ×
+                </a>
+            }
+
+        </div>
+
+        <button type="submit" class="search-btn">
+            Найти
+        </button>
+
+    </form>
+
+    @if (Model.Any())
+    {
+        <div class="groups-count">
+            Найдено групп: <strong>@Model.Count()</strong>
+        </div>
+
+        <!-- Таблица -->
+        <div class="glass-table-card">
+
+            <div class="table-header">
+
+                <div>Группа</div>
+
+                <div>Специальность</div>
+
+                <div>Курс</div>
+
+                <div>Количество человек</div>
+
+                <div>Действия</div>
+
+            </div>
+
+            @foreach (var item in Model)
+            {
+                <div class="group-row">
+
+                    <!-- Группа -->
+                    <div class="group-info">
+
+                        <div class="group-avatar">
+                            @(string.IsNullOrWhiteSpace(item.Name)
+                                ? "?"
+                                : item.Name.Substring(0, 1).ToUpper())
+                        </div>
+
+                        <div class="group-text">
+
+                            <div class="group-name">
+                                @item.Name
+                            </div>
+
+                            <div class="group-label">
+                                Учебная группа
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Специальность -->
+                    <div class="group-specialty">
+
+                        @if (!string.IsNullOrWhiteSpace(item.Specialty))
+                        {
+                            <span>
+                                @item.Specialty
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="empty-value">
+                                Не указана
+                            </span>
+                        }
+
+                    </div>
+
+                    <!-- Курс -->
+                    <div class="group-course">
+
+                        <span class="course-badge">
+                            @item.Course курс
+                        </span>
+
+                    </div>
+
+                    <!-- Количество студентов -->
+                    <div>
+
+                        <span class="student-count">
+                            <span class="student-icon">👥</span>
+                            @item.StudentCount
+                            <span class="student-label">
+                                чел.
+                            </span>
+                        </span>
+
+                    </div>
+
+                    <!-- Действия -->
+                    <div class="group-actions">
+
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+                            Подробнее
+                        </a>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                                Изменить
+                            </a>
+
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                                Удалить
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+
+            @if (!string.IsNullOrWhiteSpace(ViewBag.Search as string))
+            {
+                <div class="empty-icon">
+                    🔍
+                </div>
+
+                <h2>Группы не найдены</h2>
+
+                <p>
+                    По запросу
+                    <strong>«@ViewBag.Search»</strong>
+                    ничего не найдено.
+                </p>
+
+                <a asp-action="Index" class="clear-btn">
+                    Сбросить поиск
+                </a>
+            }
+            else
+            {
+                <div class="empty-icon">
+                    👥
+                </div>
+
+                <h2>Групп пока нет</h2>
+
+                <p>
+                    Добавьте первую учебную группу,
+                    чтобы она появилась в системе.
+                </p>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="add-group-btn">
+                        <span>＋</span>
+                        Добавить группу
+                    </a>
+                }
+            }
+
+        </div>
+    }
+
+</div>

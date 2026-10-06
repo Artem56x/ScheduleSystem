@@ -1,0 +1,112 @@
+@model IEnumerable<ScheduleSystem.Models.AuditLog>
+
+@{
+    ViewData["Title"] = "История изменений";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/AuditLogs/Index.css" asp-append-version="true" />
+}
+
+<div class="audit-page">
+
+    <div class="audit-container">
+
+        <div class="audit-header">
+
+            <div class="audit-header-left">
+                <a asp-controller="Account" asp-action="Settings" class="audit-back-button">
+                    ←
+                </a>
+
+                <div>
+                    <h1>История изменений</h1>
+                    <p>
+                        Журнал действий и изменений расписания
+                    </p>
+                </div>
+            </div>
+
+            <div class="audit-header-icon">
+                🕘
+            </div>
+
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="audit-empty glass-card">
+
+                <div class="audit-empty-icon">
+                    📋
+                </div>
+
+                <h2>История пока пуста</h2>
+
+                <p>
+                    Здесь будут отображаться действия,
+                    связанные с изменением расписания.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            <div class="audit-list">
+
+                @foreach (var log in Model)
+                {
+                    <div class="audit-card glass-card">
+
+                        <div class="audit-card-icon">
+                            @if (log.Action.Contains("Добав"))
+                            {
+                                <span>＋</span>
+                            }
+                            else if (log.Action.Contains("Удал"))
+                            {
+                                <span>×</span>
+                            }
+                            else
+                            {
+                                <span>✎</span>
+                            }
+                        </div>
+
+                        <div class="audit-card-content">
+
+                            <div class="audit-card-top">
+
+                                <div class="audit-action">
+                                    @log.Action
+                                </div>
+
+                                <div class="audit-date">
+                                    <span>◷</span>
+                                    @(log.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm"))
+                                </div>
+
+                            </div>
+
+                            <div class="audit-user">
+                                👤
+                                @(log.User?.DisplayName
+                                    ?? log.User?.UserName
+                                    ?? "Неизвестный пользователь")
+                            </div>
+
+                            <div class="audit-description">
+                                @log.Description
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</div>

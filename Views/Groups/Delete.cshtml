@@ -1,0 +1,186 @@
+@model ScheduleSystem.Models.Group
+
+@{
+    ViewData["Title"] = "Удаление группы";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Groups/Delete.css" asp-append-version="true" />
+}
+
+<div class="delete-page">
+
+    <!-- Заголовок -->
+    <div class="delete-header">
+
+        <div class="delete-icon">
+            ⚠️
+        </div>
+
+        <div>
+            <h1>Удаление группы</h1>
+            <p>Вы действительно хотите удалить эту группу?</p>
+        </div>
+
+    </div>
+
+    <!-- Карточка -->
+    <div class="glass-delete-card">
+
+        <!-- Информация о группе -->
+        <div class="group-info">
+
+            <div class="group-avatar">
+                @(string.IsNullOrWhiteSpace(Model.Name)
+                    ? "?"
+                    : Model.Name.Substring(0, 1).ToUpper())
+            </div>
+
+            <div class="group-details">
+
+                <h2>
+                    @Model.Name
+                </h2>
+
+                <div class="group-specialty">
+                    @if (!string.IsNullOrWhiteSpace(Model.Specialty))
+                    {
+                        @Model.Specialty
+                    }
+                    else
+                    {
+                        <span>Специальность не указана</span>
+                    }
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Данные группы -->
+        <div class="group-stats">
+
+            <!-- Специальность -->
+            <div class="stat-item">
+
+                <div class="stat-icon">
+                    🎓
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Специальность
+                    </span>
+
+                    <strong>
+                        @(string.IsNullOrWhiteSpace(Model.Specialty)
+                            ? "Не указана"
+                            : Model.Specialty)
+                    </strong>
+                </div>
+
+            </div>
+
+            <!-- Курс -->
+            <div class="stat-item">
+
+                <div class="stat-icon">
+                    📚
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Курс
+                    </span>
+
+                    <strong>
+                        @Model.Course курс
+                    </strong>
+                </div>
+
+            </div>
+
+            <!-- Количество человек -->
+            <div class="stat-item">
+
+                <div class="stat-icon">
+                    👥
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Количество человек
+                    </span>
+
+                    <strong>
+                        @Model.StudentCount чел.
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Описание -->
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="description-block">
+
+                <span class="description-label">
+                    Описание
+                </span>
+
+                <p>
+                    @Model.Description
+                </p>
+
+            </div>
+        }
+
+        <!-- Предупреждение -->
+        <div class="warning-message">
+
+            <span class="warning-icon">
+                ⚠
+            </span>
+
+            <div>
+
+                <strong>
+                    Внимание
+                </strong>
+
+                <p>
+                    После удаления восстановить данные группы
+                    будет невозможно.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Кнопки -->
+        <form asp-action="Delete" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="delete-actions">
+
+                <button type="submit" class="delete-btn">
+                    Удалить группу
+                </button>
+
+                <a asp-action="Index" class="cancel-btn">
+                    Отмена
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+

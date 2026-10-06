@@ -1,0 +1,121 @@
+@model ScheduleSystem.Models.Classroom
+
+@{
+    ViewData["Title"] = "Удаление аудитории";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Classrooms/Delete.css" asp-append-version="true" />
+}
+
+<div class="classroom-delete-page">
+
+    ```
+    <div class="page-header">
+        <div>
+            <h1>Удаление аудитории</h1>
+            <p>Удаление учебной аудитории из системы</p>
+        </div>
+    </div>
+
+    <div class="glass-delete-card">
+
+        <div class="delete-icon">
+            ⚠️
+        </div>
+
+        <div class="delete-title">
+            <h2>Вы уверены, что хотите удалить аудиторию?</h2>
+            <p>
+                Это действие нельзя отменить. Аудитория будет удалена из системы.
+            </p>
+        </div>
+
+        <div class="classroom-info-card">
+
+            <div class="classroom-avatar">
+                @(string.IsNullOrWhiteSpace(Model.Name)
+                    ? "?"
+                    : Model.Name.Substring(0, 1).ToUpper())
+            </div>
+
+            <div class="classroom-main-info">
+
+                <div class="classroom-name">
+                    @Model.Name
+                </div>
+
+                <div class="classroom-label">
+                    @(Model.ClassroomCategory?.Name ?? "Категория не указана")
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="details-list">
+
+            <div class="detail-row">
+                <span class="detail-label">
+                    Номер аудитории
+                </span>
+
+                <span class="detail-value">
+                    @Model.Name
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">
+                    Категория
+                </span>
+
+                <span class="detail-value">
+                    @(Model.ClassroomCategory?.Name ?? "Не указана")
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">
+                    Количество мест
+                </span>
+
+                <span class="detail-value">
+                    @Model.Capacity мест
+                </span>
+            </div>
+
+        </div>
+
+        <div class="warning-message">
+            <span>⚠</span>
+            <span>
+                Если аудитория используется в расписании,
+                удалить её будет невозможно.
+            </span>
+        </div>
+
+        <form asp-action="Delete" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-actions">
+
+                <button type="submit" class="btn delete-btn">
+                    Удалить аудиторию
+                </button>
+
+                <a asp-action="Index" class="btn cancel-btn">
+                    Отмена
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+</div>

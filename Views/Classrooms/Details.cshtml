@@ -1,0 +1,119 @@
+@model ScheduleSystem.Models.Classroom
+
+@{
+    ViewData["Title"] = "Информация об аудитории";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Classrooms/Details.css" asp-append-version="true" />
+}
+
+<div class="classroom-details-page">
+
+
+    <div class="page-header">
+        <div>
+            <h1>Информация об аудитории</h1>
+            <p>Подробная информация об учебной аудитории</p>
+        </div>
+    </div>
+
+    <div class="glass-details-card">
+
+        <div class="classroom-profile">
+
+            <div class="classroom-avatar">
+                @(string.IsNullOrWhiteSpace(Model.Name)
+                    ? "?"
+                    : Model.Name.Substring(0, 1).ToUpper())
+            </div>
+
+            <div>
+                <h2>@Model.Name</h2>
+
+                <p>
+                    @(Model.ClassroomCategory?.Name ?? "Категория не указана")
+                </p>
+            </div>
+
+        </div>
+
+        <div class="details-list">
+
+            <!-- НОМЕР -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Номер аудитории
+                </div>
+
+                <div class="detail-value">
+                    @Model.Name
+                </div>
+
+            </div>
+
+            <!-- КАТЕГОРИЯ -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Категория
+                </div>
+
+                <div class="detail-value">
+
+                    <span class="category-badge">
+                        @(Model.ClassroomCategory?.Name ?? "Не указана")
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- КОЛИЧЕСТВО МЕСТ -->
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+                    Количество мест
+                </div>
+
+                <div class="detail-value capacity-value">
+
+                    @Model.Capacity
+
+                    <span>
+                        мест
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn edit-btn">
+                    Изменить
+                </a>
+
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn delete-btn">
+                    Удалить
+                </a>
+            }
+
+            <a asp-action="Index" class="btn cancel-btn">
+                Назад
+            </a>
+
+        </div>
+
+    </div>
+
+
+</div>

@@ -1,0 +1,254 @@
+@model IEnumerable<ScheduleSystem.Models.Classroom>
+
+@{
+    ViewData["Title"] = "Аудитории";
+    var search = ViewBag.Search as string;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Classrooms/Index.css" asp-append-version="true" />
+}
+
+<div class="classrooms-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <div>
+            <h1>Аудитории</h1>
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="add-classroom-btn">
+
+                <span>＋</span>
+                Добавить аудиторию
+
+            </a>
+        }
+
+    </div>
+
+    <!-- ERROR -->
+    @if (TempData["ErrorMessage"] is string errorMessage)
+    {
+        <div class="glass-alert">
+
+            <span>⚠</span>
+            <span>@errorMessage</span>
+
+        </div>
+    }
+
+    <!-- SEARCH -->
+    <form asp-action="Index" method="get" class="search-card">
+
+        <div class="search-wrapper">
+
+            <span class="search-icon">⌕</span>
+
+            <input type="text" name="search" value="@search" class="search-input"
+                   placeholder="Поиск по номеру или категории..." autocomplete="off" />
+
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a asp-action="Index" class="clear-search" title="Очистить поиск">
+
+                    ×
+
+                </a>
+            }
+
+        </div>
+
+        <button type="submit" class="search-btn">
+
+            Найти
+
+        </button>
+
+    </form>
+
+    @if (Model.Any())
+    {
+        <div class="classrooms-count">
+
+            Найдено аудиторий:
+            <strong>@Model.Count()</strong>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="glass-table-card">
+
+            <!-- TABLE HEADER -->
+            <div class="table-header">
+
+                <div>Аудитория</div>
+                <div>Категория</div>
+                <div>Места</div>
+                <div>Действия</div>
+
+            </div>
+
+            @foreach (var item in Model)
+            {
+                <div class="classroom-row">
+
+                    <!-- АУДИТОРИЯ -->
+                    <div class="classroom-info">
+
+                        <div class="classroom-avatar">
+
+                            @(string.IsNullOrWhiteSpace(item.Name)
+                                ? "?"
+                                : item.Name.Substring(0, 1).ToUpper())
+
+                        </div>
+
+                        <div class="classroom-text">
+
+                            <div class="classroom-name">
+                                @item.Name
+                            </div>
+
+                            <div class="classroom-label">
+                                Номер аудитории
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- КАТЕГОРИЯ -->
+                    <div class="category-info">
+
+                        @if (item.ClassroomCategory != null)
+                        {
+                            <span class="category-badge">
+
+                                @item.ClassroomCategory.Name
+
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="empty-value">
+                                Не указана
+                            </span>
+                        }
+
+                    </div>
+
+                    <!-- ВМЕСТИМОСТЬ -->
+                    <div class="capacity-info">
+
+                        <span class="capacity-number">
+                            @item.Capacity
+                        </span>
+
+                        <span class="capacity-label">
+                            мест
+                        </span>
+
+                    </div>
+
+                    <!-- ДЕЙСТВИЯ -->
+                    <div class="classroom-actions">
+
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+
+                            Подробнее
+
+                        </a>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+
+                                Изменить
+
+                            </a>
+
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+
+                                Удалить
+
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(search))
+        {
+            <div class="search-result-info">
+
+                По запросу «@search» найдено:
+                <strong>@Model.Count()</strong>
+
+            </div>
+        }
+    }
+    else
+    {
+        <!-- EMPTY STATE -->
+        <div class="empty-state">
+
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <div class="empty-icon">
+                    🔍
+                </div>
+
+                <h2>Аудитории не найдены</h2>
+
+                <p>
+
+                    По запросу
+                    <strong>«@search»</strong>
+                    ничего не найдено.
+
+                </p>
+
+                <a asp-action="Index" class="clear-btn">
+
+                    Сбросить поиск
+
+                </a>
+            }
+            else
+            {
+                <div class="empty-icon">
+                    🏫
+                </div>
+
+                <h2>Аудиторий пока нет</h2>
+
+                <p>
+
+                    Добавьте первую аудиторию,
+                    чтобы использовать её в расписании.
+
+                </p>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="add-classroom-btn">
+
+                        <span>＋</span>
+                        Добавить аудиторию
+
+                    </a>
+                }
+            }
+
+        </div>
+    }
+
+</div>

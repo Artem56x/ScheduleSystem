@@ -1,0 +1,475 @@
+/* =========================================================
+   CLASSROOM FORM
+   Liquid Glass — Unified Design
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.classroom-form-page {
+    width: 100%;
+    max-width: 700px;
+    min-width: 0;
+
+    margin: 0 auto;
+
+    color: #202936;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0 0 5px;
+
+    color: #202936;
+
+    font-size: 2rem;
+    font-weight: 750;
+    line-height: 1.2;
+
+    letter-spacing: -.04em;
+}
+
+.page-header p {
+    margin: 0;
+
+    color: #697689;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   FORM CARD
+   ========================================================= */
+
+.glass-form-card {
+    width: 100%;
+    min-width: 0;
+
+    padding: 30px;
+
+    border: 1px solid rgba(220, 228, 239, .9);
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .98),
+            rgba(246, 249, 255, .94)
+        );
+
+    box-shadow:
+        0 12px 34px rgba(30, 55, 90, .055),
+        inset 0 1px 0 rgba(255, 255, 255, .96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+
+/* =========================================================
+   ICON
+   ========================================================= */
+
+.form-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 54px;
+    height: 54px;
+
+    margin-bottom: 17px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 16px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 23px;
+    line-height: 1;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .92);
+}
+
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.form-title {
+    margin-bottom: 24px;
+}
+
+.form-title h2 {
+    margin: 0 0 5px;
+
+    color: #27313e;
+
+    font-size: 19px;
+    font-weight: 750;
+    line-height: 1.3;
+
+    letter-spacing: -.025em;
+}
+
+.form-title p {
+    margin: 0;
+
+    color: #697689;
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   VALIDATION
+   ========================================================= */
+
+.glass-validation {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+
+    border: 1px solid rgba(199, 67, 79, .15);
+    border-radius: 13px;
+
+    background: #fff3f4;
+    color: #b83b48;
+
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.5;
+}
+
+.glass-validation:empty {
+    display: none;
+}
+
+
+/* =========================================================
+   FORM GROUP
+   ========================================================= */
+
+.form-group {
+    margin-bottom: 21px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #4f5d6e;
+
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.glass-input {
+    display: block;
+
+    width: 100%;
+    min-height: 46px;
+
+    padding: 10px 13px;
+
+    border: 1px solid rgba(210, 219, 231, .95);
+    border-radius: 12px;
+
+    outline: none;
+
+    background: #fff;
+    color: #27313e;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+
+    box-shadow:
+        inset 0 1px 2px rgba(30, 55, 90, .025),
+        0 1px 0 rgba(255, 255, 255, .8);
+
+    transition:
+        border-color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.glass-input:hover {
+    border-color: #c8d4e3;
+}
+
+.glass-input::placeholder {
+    color: #9aa5b4;
+}
+
+.glass-input:focus {
+    border-color: #8db5e9;
+
+    background: #fff;
+
+    box-shadow:
+        0 0 0 3px rgba(52, 120, 220, .10),
+        0 6px 16px rgba(30, 55, 90, .035);
+}
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+select.glass-input {
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.text-danger {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #c7434f;
+
+    font-size: 11px;
+    font-weight: 550;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.form-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    margin-top: 21px;
+    padding-top: 21px;
+
+    border-top: 1px solid rgba(214, 222, 233, .78);
+}
+
+.form-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 9px 17px;
+
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        box-shadow .2s ease;
+}
+
+
+/* =========================================================
+   SAVE
+   ========================================================= */
+
+.save-btn {
+    border: 1px solid #d2e4fc;
+    border-radius: 12px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    box-shadow:
+        0 7px 18px rgba(52, 120, 220, .07),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.save-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: #c3daf7;
+
+    background: #e5f0ff;
+    color: #286dcc;
+
+    box-shadow:
+        0 9px 21px rgba(52, 120, 220, .10),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+
+/* =========================================================
+   CANCEL
+   ========================================================= */
+
+.cancel-btn {
+    border: 1px solid rgba(220, 228, 239, .95);
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, .92);
+    color: #596678;
+
+    box-shadow:
+        0 5px 16px rgba(30, 55, 90, .045),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.cancel-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: #ccd9ea;
+
+    background: #fff;
+    color: #27313e;
+
+    box-shadow:
+        0 8px 20px rgba(30, 55, 90, .07),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.form-actions .btn:focus-visible,
+.save-btn:focus-visible,
+.cancel-btn:focus-visible {
+    outline: 3px solid rgba(52, 120, 220, .12);
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .classroom-form-page {
+        width: 100%;
+        max-width: none;
+    }
+
+    .page-header h1 {
+        font-size: 1.65rem;
+    }
+
+    .glass-form-card {
+        padding: 22px 18px;
+
+        border-radius: 20px;
+    }
+
+    .form-icon {
+        width: 50px;
+        height: 50px;
+
+        border-radius: 15px;
+
+        font-size: 21px;
+    }
+
+    .form-title {
+        margin-bottom: 21px;
+    }
+
+    .form-title h2 {
+        font-size: 18px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .glass-form-card {
+        padding: 19px 15px;
+
+        border-radius: 18px;
+    }
+
+    .page-header h1 {
+        font-size: 1.55rem;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .glass-input,
+    .form-actions .btn,
+    .save-btn,
+    .cancel-btn {
+        transition: none;
+    }
+
+    .save-btn:hover,
+    .cancel-btn:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,610 @@
+/* =========================================================
+   SCHEDULE DELETE
+   Liquid Glass — Unified White / Blue / Danger
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.schedule-details-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 28px 60px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.details-badge {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 28px;
+    margin-bottom: 10px;
+    padding: 0 12px;
+
+    border: 1px solid #d8e8fb;
+    border-radius: 999px;
+
+    background: #edf5ff;
+
+    color: #3478dc;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.details-header h1 {
+    margin: 0;
+
+    color: #202936;
+    font-size: 36px;
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -1px;
+}
+
+.details-header p {
+    margin: 8px 0 0;
+
+    color: #697689;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   HEADER BUTTONS
+   ========================================================= */
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.glass-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+    padding: 0 18px;
+
+    border: 1px solid #dce4ef;
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    color: #405066;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1;
+    text-decoration: none;
+
+    box-shadow:
+        0 4px 14px rgba(30, 55, 90, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.glass-button:hover {
+    transform: translateY(-2px);
+
+    background: #f7faff;
+    border-color: #cbd9ea;
+
+    color: #3478dc;
+    text-decoration: none;
+
+    box-shadow:
+        0 8px 20px rgba(30, 55, 90, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.secondary-button {
+    background: #ffffff;
+    color: #405066;
+}
+
+.secondary-button:hover {
+    background: #f6f9fd;
+    color: #202936;
+}
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.lesson-main-card {
+    padding: 30px;
+
+    border: 1px solid rgba(220, 228, 239, 0.9);
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #fafdff 55%,
+            #f1f7ff 100%
+        );
+
+    box-shadow:
+        0 16px 40px rgba(30, 55, 90, 0.06),
+        0 3px 10px rgba(30, 55, 90, 0.025),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+
+/* =========================================================
+   CARD TOP
+   ========================================================= */
+
+.lesson-card-top {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    padding-bottom: 28px;
+
+    border-bottom: 1px solid #e7edf4;
+}
+
+
+/* =========================================================
+   DELETE ICON
+   ========================================================= */
+
+.lesson-icon {
+    width: 68px;
+    height: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 20px;
+
+    font-size: 30px;
+}
+
+.delete-icon {
+    background: #fff2f3;
+    border: 1px solid #f5d5d9;
+
+    color: #d33b4b;
+
+    box-shadow:
+        0 8px 20px rgba(211, 59, 75, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.lesson-label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #7b8899;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 1.5px;
+}
+
+.delete-label {
+    color: #c93646;
+}
+
+.lesson-title-block {
+    min-width: 0;
+}
+
+.lesson-title-block h2 {
+    margin: 0;
+
+    color: #202936;
+    font-size: 28px;
+    font-weight: 750;
+    line-height: 1.2;
+}
+
+.lesson-title-block p {
+    margin: 6px 0 0;
+
+    color: #697689;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   INFO GRID
+   ========================================================= */
+
+.lesson-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+
+    margin-top: 24px;
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    min-width: 0;
+    padding: 18px;
+
+    border: 1px solid #e0e8f1;
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.8);
+
+    box-shadow:
+        0 3px 12px rgba(30, 55, 90, 0.025),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-1px);
+
+    border-color: #d2e1f1;
+
+    box-shadow:
+        0 7px 18px rgba(30, 55, 90, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.info-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border: 1px solid #dce8f7;
+    border-radius: 14px;
+
+    background: #edf5ff;
+
+    color: #3478dc;
+    font-size: 20px;
+}
+
+.info-content {
+    min-width: 0;
+}
+
+.info-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #7b8899;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.info-content strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #273342;
+    font-size: 15px;
+    font-weight: 700;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   WARNING
+   ========================================================= */
+
+.warning-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    margin-top: 24px;
+    padding: 18px;
+
+    border: 1px solid #f0d7da;
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #fff8f8 0%,
+            #fff3f4 100%
+        );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.warning-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border: 1px solid #f2d0d4;
+    border-radius: 14px;
+
+    background: #ffecee;
+
+    color: #c93646;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.warning-content {
+    min-width: 0;
+}
+
+.warning-content strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #a92d3c;
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.warning-content p {
+    margin: 0;
+
+    color: #9f4a54;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.details-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin-top: 28px;
+    padding-top: 22px;
+
+    border-top: 1px solid #e4eaf1;
+}
+
+.footer-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+    padding: 0 18px;
+
+    border-radius: 14px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.footer-button:hover {
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   DELETE BUTTON
+   ========================================================= */
+
+.delete-button {
+    border: 1px solid #e8b8be;
+
+    background: #fff0f2;
+
+    color: #c93646;
+
+    box-shadow:
+        0 5px 16px rgba(211, 59, 75, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.delete-button:hover {
+    background: #ffe7ea;
+    border-color: #e1a3aa;
+
+    color: #b82f3f;
+
+    box-shadow:
+        0 8px 20px rgba(211, 59, 75, 0.11),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .details-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .header-actions .glass-button {
+        flex: 1;
+    }
+
+    .lesson-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .schedule-details-page {
+        padding: 20px 14px 40px;
+    }
+
+    .lesson-main-card {
+        padding: 20px;
+        border-radius: 22px;
+    }
+
+    .details-header h1 {
+        font-size: 29px;
+    }
+
+    .lesson-title-block h2 {
+        font-size: 23px;
+    }
+
+    .lesson-card-top {
+        align-items: flex-start;
+    }
+
+    .info-card {
+        padding: 15px;
+    }
+
+    .warning-section {
+        padding: 15px;
+    }
+
+    .details-footer {
+        flex-direction: column;
+    }
+
+    .details-footer .footer-button {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .details-header h1 {
+        font-size: 26px;
+    }
+
+    .lesson-main-card {
+        padding: 16px;
+    }
+
+    .lesson-card-top {
+        flex-direction: column;
+    }
+
+    .lesson-icon {
+        width: 58px;
+        height: 58px;
+
+        font-size: 25px;
+    }
+
+    .lesson-title-block h2 {
+        font-size: 21px;
+    }
+
+    .info-card {
+        gap: 10px;
+        padding: 13px;
+    }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+
+        font-size: 18px;
+    }
+
+    .warning-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .schedule-details-page *,
+    .schedule-details-page *::before,
+    .schedule-details-page *::after {
+        transition: none !important;
+    }
+
+    .schedule-details-page *:hover {
+        transform: none !important;
+    }
+}

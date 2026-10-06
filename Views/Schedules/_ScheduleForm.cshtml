@@ -1,0 +1,48 @@
+@model ScheduleSystem.Models.Schedule
+
+<div class="form-group mb-3">
+    <label asp-for="TeacherId" class="control-label">Преподаватель</label>
+    <select asp-for="TeacherId" class="form-select" asp-items="ViewBag.TeacherId">
+        <option value="">-- выберите преподавателя --</option>
+    </select>
+    <span asp-validation-for="TeacherId" class="text-danger"></span>
+</div>
+
+<div class="form-group mb-3">
+    <label asp-for="GroupId" class="control-label">Группа</label>
+    <select asp-for="GroupId" class="form-select" asp-items="ViewBag.GroupId">
+        <option value="">-- выберите группу --</option>
+    </select>
+    <span asp-validation-for="GroupId" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="SubjectId" class="control-label">Предмет</label>
+    <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId">
+        <option value="">-- выберите предмет --</option>
+    </select>
+    <span asp-validation-for="SubjectId" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="ClassroomId" class="control-label">Аудитория</label>
+    <select asp-for="ClassroomId" class="form-select" asp-items="ViewBag.ClassroomId">
+        <option value="">-- выберите аудиторию --</option>
+    </select>
+    <span asp-validation-for="ClassroomId" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="DayOfWeek" class="control-label">День недели</label>
+    <select asp-for="DayOfWeek" class="form-select" asp-items="ViewBag.DayOfWeek">
+        <option value="">-- выберите день --</option>
+    </select>
+    <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="StartTime" class="control-label">Время начала</label>
+    <input asp-for="StartTime" type="time" step="60" class="form-control" />
+    <span asp-validation-for="StartTime" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="EndTime" class="control-label">Время окончания</label>
+    <input asp-for="EndTime" type="time" step="60" class="form-control" />
+    <span asp-validation-for="EndTime" class="text-danger"></span>
+</div>

@@ -1,0 +1,716 @@
+/* =========================================================
+   SUBJECT CREATE
+   Liquid Glass — Unified Design
+   ========================================================= */
+
+.subject-form-page {
+    width: 100%;
+    max-width: 760px;
+    min-width: 0;
+
+    margin: 0 auto;
+
+    color: #202936;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0 0 5px;
+
+    color: #202936;
+
+    font-size: clamp(1.8rem, 3vw, 2.15rem);
+    font-weight: 750;
+    line-height: 1.2;
+    letter-spacing: -.04em;
+}
+
+.page-header p {
+    margin: 0;
+
+    color: #697689;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.subject-form {
+    width: 100%;
+    min-width: 0;
+}
+
+/* =========================================================
+   MAIN FORM CARD
+   ========================================================= */
+
+.form-card {
+    width: 100%;
+    min-width: 0;
+
+    padding: 30px;
+
+    border: 1px solid rgba(220, 228, 239, .9);
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .98),
+            rgba(246, 249, 255, .94)
+        );
+
+    box-shadow:
+        0 12px 34px rgba(30, 55, 90, .055),
+        inset 0 1px 0 rgba(255, 255, 255, .96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+/* =========================================================
+   FORM GROUP
+   ========================================================= */
+
+.form-group {
+    min-width: 0;
+
+    margin-bottom: 21px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #4f5d6e;
+
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   TWO-COLUMN ROW
+   ========================================================= */
+
+.form-row {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+/* =========================================================
+   INPUT / SELECT
+   ========================================================= */
+
+.form-control {
+    display: block;
+
+    width: 100%;
+    min-height: 46px;
+
+    padding: 10px 13px;
+
+    border: 1px solid rgba(210, 219, 231, .95);
+    border-radius: 12px;
+
+    background: #fff;
+    color: #27313e;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+
+    box-shadow:
+        inset 0 1px 2px rgba(30, 55, 90, .025),
+        0 1px 0 rgba(255, 255, 255, .8);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background-color .2s ease;
+}
+
+.form-control:hover {
+    border-color: #c8d4e3;
+}
+
+.form-control:focus {
+    outline: none;
+
+    border-color: #8db5e9;
+
+    background: #fff;
+
+    box-shadow:
+        0 0 0 3px rgba(52, 120, 220, .10),
+        0 6px 16px rgba(30, 55, 90, .035);
+}
+
+.form-control::placeholder {
+    color: #9aa5b4;
+}
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+select.form-control {
+    cursor: pointer;
+
+    appearance: auto;
+    -webkit-appearance: auto;
+}
+
+/* =========================================================
+   VALIDATION SUMMARY
+   ========================================================= */
+
+.validation-summary {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+
+    border: 1px solid rgba(220, 83, 96, .15);
+    border-radius: 13px;
+
+    background: #fff3f4;
+    color: #b93442;
+
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.5;
+}
+
+.validation-summary:empty {
+    display: none;
+}
+
+.validation-summary ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.validation-summary li {
+    margin: 2px 0;
+}
+
+/* =========================================================
+   FIELD VALIDATION
+   ========================================================= */
+
+.field-validation {
+    display: block;
+
+    min-height: 0;
+
+    margin-top: 6px;
+
+    color: #c7434f;
+
+    font-size: 11px;
+    font-weight: 550;
+    line-height: 1.4;
+}
+
+.field-validation:empty {
+    display: none;
+}
+
+/* =========================================================
+   REQUIREMENTS
+   ========================================================= */
+
+.requirements-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-top: 18px;
+}
+
+.requirement-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 17px 18px;
+
+    border: 1px solid rgba(220, 228, 239, .86);
+    border-radius: 17px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .96),
+            rgba(247, 250, 255, .92)
+        );
+
+    box-shadow:
+        0 7px 20px rgba(30, 55, 90, .045),
+        inset 0 1px 0 rgba(255, 255, 255, .94);
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background-color .2s ease;
+}
+
+.requirement-card:hover {
+    transform: translateY(-1px);
+
+    border-color: #cbdced;
+
+    box-shadow:
+        0 10px 25px rgba(30, 55, 90, .065),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.requirement-info {
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    min-width: 0;
+}
+
+.requirement-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 44px;
+
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 13px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 20px;
+    line-height: 1;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+
+.requirement-text {
+    min-width: 0;
+}
+
+.requirement-title {
+    color: #27313e;
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+
+    overflow-wrap: anywhere;
+}
+
+.requirement-description {
+    margin-top: 4px;
+
+    color: #7a8798;
+
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.45;
+
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   SWITCH
+   ========================================================= */
+
+.switch {
+    position: relative;
+
+    display: inline-block;
+
+    flex: 0 0 52px;
+
+    width: 52px;
+    height: 31px;
+
+    cursor: pointer;
+}
+
+.switch input {
+    position: absolute;
+
+    width: 0;
+    height: 0;
+
+    opacity: 0;
+}
+
+.slider {
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 999px;
+
+    background: #d8dee8;
+
+    transition: background-color .25s ease;
+}
+
+.slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 25px;
+    height: 25px;
+
+    left: 3px;
+    top: 3px;
+
+    border-radius: 50%;
+
+    background: #fff;
+
+    box-shadow:
+        0 2px 7px rgba(30, 55, 90, .18);
+
+    transition: transform .25s ease;
+}
+
+.switch input:checked + .slider {
+    background: #4d8fe8;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(21px);
+}
+
+.switch input:focus-visible + .slider {
+    outline: 3px solid rgba(77, 143, 232, .18);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   EMPTY REQUIREMENTS
+   ========================================================= */
+
+.empty-requirements {
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    margin-top: 18px;
+    padding: 16px 18px;
+
+    border: 1px solid rgba(220, 228, 239, .82);
+    border-radius: 16px;
+
+    background: #f7f9fc;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+
+.empty-requirements-icon {
+    flex: 0 0 auto;
+
+    color: #8b97a8;
+
+    font-size: 25px;
+    line-height: 1;
+}
+
+.empty-requirements strong {
+    display: block;
+
+    color: #4f5d6e;
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.empty-requirements p {
+    margin: 4px 0 0;
+
+    color: #7a8798;
+
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    margin-top: 21px;
+    padding-top: 21px;
+
+    border-top: 1px solid rgba(214, 222, 233, .78);
+}
+
+.form-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 9px 17px;
+
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        box-shadow .2s ease;
+}
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
+.form-actions .btn-primary {
+    border: 1px solid #d2e4fc;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    box-shadow:
+        0 7px 18px rgba(52, 120, 220, .07),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.form-actions .btn-primary:hover {
+    transform: translateY(-1px);
+
+    border-color: #c3daf7;
+
+    background: #e5f0ff;
+    color: #286dcc;
+
+    box-shadow:
+        0 9px 21px rgba(52, 120, 220, .10),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* =========================================================
+   SECONDARY BUTTON
+   ========================================================= */
+
+.form-actions .btn-secondary {
+    border: 1px solid rgba(220, 228, 239, .95);
+
+    background: rgba(255, 255, 255, .9);
+    color: #596678;
+
+    box-shadow:
+        0 5px 16px rgba(30, 55, 90, .045),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.form-actions .btn-secondary:hover {
+    transform: translateY(-1px);
+
+    border-color: #ccd9ea;
+
+    background: #fff;
+    color: #27313e;
+
+    box-shadow:
+        0 8px 20px rgba(30, 55, 90, .07),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.form-actions .btn:focus-visible {
+    outline: 3px solid rgba(52, 120, 220, .12);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    .subject-form-page {
+        width: 100%;
+        max-width: none;
+    }
+
+    .page-header h1 {
+        font-size: 1.65rem;
+    }
+
+    .form-card {
+        padding: 22px 18px;
+
+        border-radius: 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+
+        gap: 0;
+    }
+
+    .requirement-card {
+        padding: 15px;
+    }
+
+    .requirement-info {
+        gap: 11px;
+    }
+
+    .requirement-icon {
+        flex-basis: 41px;
+
+        width: 41px;
+        height: 41px;
+
+        border-radius: 12px;
+
+        font-size: 19px;
+    }
+
+    .requirement-title {
+        font-size: 12px;
+    }
+
+    .requirement-description {
+        font-size: 11px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .form-card {
+        padding: 19px 15px;
+
+        border-radius: 18px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .requirement-card {
+        gap: 10px;
+        padding: 13px;
+    }
+
+    .requirement-icon {
+        flex-basis: 38px;
+
+        width: 38px;
+        height: 38px;
+
+        font-size: 18px;
+    }
+
+    .switch {
+        flex-basis: 48px;
+
+        width: 48px;
+        height: 29px;
+    }
+
+    .slider::before {
+        width: 23px;
+        height: 23px;
+    }
+
+    .switch input:checked + .slider::before {
+        transform: translateX(19px);
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .form-control,
+    .requirement-card,
+    .slider,
+    .slider::before,
+    .form-actions .btn {
+        transition: none;
+    }
+
+    .requirement-card:hover,
+    .form-actions .btn:hover {
+        transform: none;
+    }
+}

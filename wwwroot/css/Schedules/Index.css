@@ -1,0 +1,1756 @@
+/* =========================================================
+   SCHEDULE
+   Liquid Glass — Unified Layout
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.schedule-page {
+    width: 100%;
+    max-width: 1440px;
+    min-width: 0;
+
+    margin: 0 auto;
+    padding: 30px 28px 60px;
+
+    color: #202936;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.schedule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    margin-bottom: 25px;
+}
+
+.schedule-header > div:first-child {
+    min-width: 0;
+}
+
+.schedule-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+.schedule-kicker,
+.section-label {
+    margin-bottom: 6px;
+
+    color: #7a8697;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.35px;
+    line-height: 1.3;
+}
+
+.schedule-header h1 {
+    margin: 0;
+
+    color: #202936;
+
+    font-size: clamp(1.85rem, 3vw, 2.2rem);
+    font-weight: 750;
+    line-height: 1.2;
+
+    letter-spacing: -0.035em;
+}
+
+.schedule-header p {
+    margin: 7px 0 0;
+
+    color: #697689;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   HEADER BUTTONS
+   ========================================================= */
+
+.export-header-button,
+.print-header-button,
+.auto-generate-button,
+.add-lesson-button {
+    min-height: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 14px;
+
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 650;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* ---------------------------------------------------------
+   EXPORT
+   --------------------------------------------------------- */
+
+.export-header-button {
+    border: 1px solid #dce4ef;
+
+    background: rgba(255, 255, 255, 0.9);
+    color: #5f6c7d;
+
+    box-shadow:
+        0 7px 18px rgba(30, 55, 90, 0.035),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.export-header-button:hover {
+    color: #3478dc;
+
+    border-color: #d0e2f8;
+    background: #f3f8ff;
+
+    transform: translateY(-1px);
+}
+
+
+/* ---------------------------------------------------------
+   PRINT
+   --------------------------------------------------------- */
+
+.print-header-button {
+    border: 1px solid #dce4ef;
+
+    background: rgba(255, 255, 255, 0.9);
+    color: #5f6c7d;
+
+    box-shadow:
+        0 7px 18px rgba(30, 55, 90, 0.035),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.print-header-button:hover {
+    color: #3478dc;
+
+    border-color: #d0e2f8;
+    background: #f3f8ff;
+
+    transform: translateY(-1px);
+}
+
+.print-header-button:active {
+    transform: translateY(0);
+}
+
+.print-header-button:focus-visible,
+.auto-generate-button:focus-visible {
+    outline: none;
+
+    box-shadow:
+        0 0 0 3px rgba(52, 120, 220, 0.1);
+}
+
+
+/* =========================================================
+   ADD LESSON BUTTON
+   ========================================================= */
+
+.add-lesson-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 42px;
+    padding: 0 16px;
+
+    border: 1px solid #cfe2fa;
+    border-radius: 12px;
+
+    background: #edf5ff !important;
+    color: #3478dc !important;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none !important;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(52, 120, 220, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+}
+
+.add-lesson-button:hover {
+    border-color: #bdd7f6;
+
+    background: #e5f0ff !important;
+    color: #286dcc !important;
+
+    text-decoration: none !important;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 11px 24px rgba(52, 120, 220, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98);
+}
+
+.add-lesson-button:focus,
+.add-lesson-button:focus-visible {
+    background: #edf5ff !important;
+    color: #3478dc !important;
+    text-decoration: none !important;
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 3px rgba(52, 120, 220, 0.12),
+        0 8px 20px rgba(52, 120, 220, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.add-lesson-button:active {
+    background: #dcecff !important;
+    color: #286dcc !important;
+
+    transform: translateY(0);
+
+    box-shadow:
+        0 5px 12px rgba(52, 120, 220, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+
+/* =========================================================
+   ICON
+   ========================================================= */
+
+.add-lesson-button .button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 18px;
+    height: 18px;
+
+    flex: 0 0 18px;
+
+    color: inherit !important;
+
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 18px;
+}
+
+/* ---------------------------------------------------------
+   AUTO GENERATION
+   --------------------------------------------------------- */
+
+.auto-generate-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 42px;
+    padding: 0 16px;
+
+    border: 1px solid #cfe2fa;
+    border-radius: 12px;
+
+    background: #edf5ff !important;
+    color: #3478dc !important;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none !important;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(52, 120, 220, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+}
+
+.auto-generate-button:hover {
+    color: #286dcc;
+
+    background: #eaf3ff;
+    border-color: #c2daf5;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 10px 24px rgba(52, 120, 220, 0.08);
+}
+
+.auto-generate-button:active {
+    transform: translateY(0);
+}
+
+.auto-generate-button .button-icon {
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+.schedule-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    min-height: 92px;
+
+    padding: 17px 18px;
+
+    border: 1px solid rgba(220, 228, 239, 0.88);
+    border-radius: 19px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.98),
+            rgba(247, 250, 255, 0.95)
+        );
+
+    color: inherit;
+    text-decoration: none;
+
+    box-shadow:
+        0 9px 25px rgba(30, 55, 90, 0.045),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    overflow: hidden;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(199, 214, 233, 0.98);
+
+    box-shadow:
+        0 13px 30px rgba(30, 55, 90, 0.065),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.stat-icon {
+    flex: 0 0 40px;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #dce9fb;
+    border-radius: 12px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 16px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.stat-label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #697689;
+
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.stat-card strong {
+    display: block;
+
+    color: #202936;
+
+    font-size: 20px;
+    font-weight: 750;
+    line-height: 1;
+
+    letter-spacing: -0.03em;
+}
+
+
+/* =========================================================
+   SECTION
+   ========================================================= */
+
+.schedule-section {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.schedule-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 13px;
+}
+
+.schedule-section-header h2 {
+    margin: 0;
+
+    color: #202936;
+
+    font-size: 21px;
+    font-weight: 750;
+    line-height: 1.25;
+
+    letter-spacing: -0.025em;
+}
+
+.total-lessons {
+    display: flex;
+    align-items: baseline;
+
+    gap: 5px;
+
+    color: #7b8797;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.total-lessons span:first-child {
+    color: #202936;
+
+    font-size: 15px;
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
+.schedule-filters {
+    width: 100%;
+    min-width: 0;
+
+    margin-bottom: 18px;
+    padding: 13px;
+
+    border: 1px solid rgba(220, 228, 239, 0.9);
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.94),
+            rgba(247, 250, 255, 0.91)
+        );
+
+    box-shadow:
+        0 8px 24px rgba(30, 55, 90, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.filters-main-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(210px, 1.35fr)
+        repeat(5, minmax(90px, 1fr));
+
+    gap: 8px;
+}
+
+.filter-search {
+    position: relative;
+    min-width: 0;
+}
+
+.filter-search-icon {
+    position: absolute;
+
+    left: 11px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #98a3b2;
+
+    font-size: 17px;
+
+    pointer-events: none;
+}
+
+.filter-search input,
+.schedule-filter-select,
+.time-filter input {
+    width: 100%;
+    height: 38px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dce3ed;
+    border-radius: 10px;
+
+    outline: none;
+
+    background: rgba(255, 255, 255, 0.92);
+    color: #445164;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+.filter-search input {
+    padding: 0 12px 0 33px;
+}
+
+.schedule-filter-select {
+    padding: 0 28px 0 11px;
+
+    cursor: pointer;
+}
+
+.filter-search input:hover,
+.schedule-filter-select:hover,
+.time-filter input:hover {
+    border-color: #cbd6e4;
+}
+
+.filter-search input:focus,
+.schedule-filter-select:focus,
+.time-filter input:focus {
+    border-color: #9fc4ef;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(52, 120, 220, 0.08);
+}
+
+
+/* =========================================================
+   SECONDARY FILTERS
+   ========================================================= */
+
+.filters-secondary-row {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 9px;
+}
+
+.time-filter {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+}
+
+.time-filter > span:first-child {
+    margin-right: 2px;
+
+    color: #788596;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.time-filter input {
+    width: 105px;
+
+    padding: 0 8px;
+}
+
+.time-dash {
+    color: #a0a9b6;
+    font-size: 12px;
+}
+
+.filter-result {
+    margin-left: auto;
+
+    color: #7b8797;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.filter-result strong {
+    color: #3478dc;
+    font-weight: 700;
+}
+
+.reset-filters {
+    border: 0;
+    border-radius: 8px;
+
+    padding: 7px 8px;
+
+    background: transparent;
+    color: #788596;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        color 0.18s ease;
+}
+
+.reset-filters:hover {
+    color: #3478dc;
+    background: #edf5ff;
+}
+
+
+/* =========================================================
+   ANALYTICS
+   ========================================================= */
+
+.filter-analytics {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 5px;
+
+    min-height: 18px;
+
+    margin-top: 8px;
+    padding: 2px 3px 0;
+
+    color: #697689;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.analytics-muted {
+    color: #9aa5b4;
+}
+
+.filter-analytics strong {
+    color: #3478dc;
+    font-weight: 700;
+}
+
+.analytics-item {
+    color: #536174;
+}
+
+
+/* =========================================================
+   DAY CARD
+   ========================================================= */
+
+.day-card {
+    width: 100%;
+    min-width: 0;
+
+    margin-bottom: 14px;
+
+    border: 1px solid rgba(220, 228, 239, 0.9);
+    border-radius: 19px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.96),
+            rgba(247, 250, 255, 0.92)
+        );
+
+    box-shadow:
+        0 8px 25px rgba(30, 55, 90, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    overflow: hidden;
+}
+
+.day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 13px 16px;
+
+    border-bottom: 1px solid #e7edf4;
+
+    background: rgba(249, 251, 254, 0.55);
+}
+
+.day-title {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.day-dot {
+    flex: 0 0 7px;
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #3478dc;
+
+    box-shadow:
+        0 0 0 4px rgba(52, 120, 220, 0.08);
+}
+
+.day-title h3 {
+    margin: 0;
+
+    color: #202936;
+
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.day-count {
+    display: flex;
+    align-items: baseline;
+
+    gap: 4px;
+
+    color: #8a95a5;
+
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.day-count span:first-child {
+    color: #697689;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   LESSONS
+   ========================================================= */
+
+.lessons-list {
+    padding: 5px 8px 8px;
+}
+
+.lesson-card {
+    display: grid;
+
+    grid-template-columns:
+        82px
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 12px 9px;
+
+    border-bottom: 1px solid #edf0f4;
+
+    transition:
+        background 0.18s ease,
+        border-radius 0.18s ease;
+}
+
+.lesson-card:last-child {
+    border-bottom: 0;
+}
+
+.lesson-card:hover {
+    border-radius: 11px;
+
+    background: rgba(238, 245, 255, 0.52);
+}
+
+.lesson-card.is-filter-hidden {
+    display: none;
+}
+
+
+/* =========================================================
+   LESSON TIME
+   ========================================================= */
+
+.lesson-time {
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+
+    padding-left: 2px;
+}
+
+.lesson-time strong {
+    color: #202936;
+
+    font-size: 15px;
+    font-weight: 750;
+    line-height: 1.2;
+
+    letter-spacing: -0.02em;
+}
+
+.lesson-time span {
+    color: #8a95a5;
+
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   LESSON INFO
+   ========================================================= */
+
+.lesson-info {
+    min-width: 0;
+}
+
+.lesson-subject {
+    overflow: hidden;
+
+    color: #202936;
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lesson-meta {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 7px 13px;
+
+    margin-top: 4px;
+
+    color: #697689;
+
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.lesson-meta span {
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   LESSON ACTIONS
+   ========================================================= */
+
+.lesson-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+}
+
+.lesson-action {
+    padding: 6px 8px;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    font-size: 10px;
+    font-weight: 650;
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.lesson-action.details {
+    color: #3478dc;
+    background: #edf5ff;
+    border-color: #e0ecfb;
+}
+
+.lesson-action.details:hover {
+    background: #e4f0ff;
+    border-color: #d2e4f8;
+    transform: translateY(-1px);
+}
+
+.lesson-action.edit {
+    color: #657285;
+    background: #f4f6f9;
+    border-color: #e9edf2;
+}
+
+.lesson-action.edit:hover {
+    color: #475467;
+    background: #eef1f5;
+    transform: translateY(-1px);
+}
+
+.lesson-action.delete {
+    color: #c7434f;
+    background: #fff3f4;
+    border-color: #f1dfe1;
+}
+
+.lesson-action.delete:hover {
+    background: #ffecee;
+    border-color: #e9c8cc;
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   EMPTY SCHEDULE
+   ========================================================= */
+
+.empty-schedule {
+    min-height: 260px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 35px;
+
+    border: 1px dashed #cbd6e4;
+    border-radius: 19px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.72),
+            rgba(247, 250, 255, 0.6)
+        );
+
+    text-align: center;
+}
+
+.empty-icon {
+    margin-bottom: 12px;
+
+    color: #8c98a8;
+
+    font-size: 31px;
+    line-height: 1;
+}
+
+.empty-schedule h3 {
+    margin: 0;
+
+    color: #374354;
+
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.empty-schedule p {
+    margin: 7px 0 18px;
+
+    color: #8a95a5;
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+.empty-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+
+    padding: 0 14px;
+
+    border: 1px solid #cfe2fa;
+    border-radius: 10px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 650;
+
+    transition: 0.18s ease;
+}
+
+.empty-button:hover {
+    background: #e4f0ff;
+    border-color: #bfd8f4;
+    color: #286dcc;
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   NO RESULTS
+   ========================================================= */
+
+.filter-no-results {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+
+    min-height: 190px;
+
+    padding: 30px;
+
+    border: 1px dashed #cbd6e4;
+    border-radius: 19px;
+
+    background: rgba(255, 255, 255, 0.58);
+
+    text-align: center;
+}
+
+.filter-no-results-icon {
+    margin-bottom: 5px;
+
+    color: #9aa5b4;
+
+    font-size: 28px;
+}
+
+.filter-no-results strong {
+    color: #445164;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.filter-no-results span {
+    color: #8a95a5;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.filter-no-results button {
+    margin-top: 9px;
+
+    padding: 7px 11px;
+
+    border: 1px solid #d7e7fb;
+    border-radius: 8px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition: 0.18s ease;
+}
+
+.filter-no-results button:hover {
+    background: #e4f0ff;
+    border-color: #c7ddf7;
+}
+
+
+/* =========================================================
+   RESPONSIVE — 1100
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .filters-main-row {
+        grid-template-columns:
+            minmax(180px, 1.3fr)
+            repeat(3, minmax(90px, 1fr));
+    }
+
+    .filter-search {
+        grid-column: span 2;
+    }
+
+    .schedule-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 850
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    .schedule-page {
+        padding: 24px 20px 50px;
+    }
+
+    .schedule-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 16px;
+    }
+
+    .schedule-header-actions {
+        width: 100%;
+
+        justify-content: flex-start;
+    }
+
+    .export-header-button,
+    .print-header-button,
+    .auto-generate-button,
+    .add-lesson-button {
+        flex: 1 1 0;
+    }
+
+    .filters-main-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .filter-search {
+        grid-column: span 2;
+    }
+
+    .filters-secondary-row {
+        flex-wrap: wrap;
+    }
+
+    .filter-result {
+        margin-left: 0;
+    }
+
+    .lesson-card {
+        grid-template-columns:
+            70px
+            minmax(0, 1fr);
+
+        gap: 11px;
+    }
+
+    .lesson-actions {
+        grid-column: 2;
+
+        justify-content: flex-start;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 600
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .schedule-page {
+        padding: 20px 14px 42px;
+    }
+
+    .schedule-header h1 {
+        font-size: 27px;
+    }
+
+    .schedule-header p {
+        font-size: 12.5px;
+    }
+
+    .schedule-header-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        width: 100%;
+    }
+
+    .schedule-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        gap: 9px;
+
+        margin-bottom: 22px;
+    }
+
+    .stat-card {
+        min-height: 84px;
+
+        padding: 13px;
+        gap: 10px;
+
+        border-radius: 16px;
+    }
+
+    .stat-icon {
+        flex-basis: 36px;
+
+        width: 36px;
+        height: 36px;
+
+        border-radius: 10px;
+        font-size: 15px;
+    }
+
+    .stat-label {
+        font-size: 9.5px;
+    }
+
+    .stat-card strong {
+        font-size: 17px;
+    }
+
+    .schedule-section-header {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 5px;
+    }
+
+    .schedule-section-header h2 {
+        font-size: 19px;
+    }
+
+    .schedule-filters {
+        padding: 10px;
+        border-radius: 16px;
+    }
+
+    .filters-main-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-search {
+        grid-column: auto;
+    }
+
+    .filters-secondary-row {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 9px;
+    }
+
+    .filter-result {
+        margin-left: 0;
+    }
+
+    .time-filter {
+        width: 100%;
+    }
+
+    .time-filter input {
+        flex: 1;
+
+        width: auto;
+    }
+
+    .reset-filters {
+        padding-left: 0;
+    }
+
+    .day-card {
+        border-radius: 16px;
+    }
+
+    .day-header {
+        padding: 12px 13px;
+    }
+
+    .lessons-list {
+        padding: 4px 6px 6px;
+    }
+
+    .lesson-card {
+        padding: 11px 7px;
+    }
+
+    .lesson-subject {
+        white-space: normal;
+    }
+
+    .lesson-meta {
+        flex-direction: column;
+
+        gap: 3px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 440
+   ========================================================= */
+
+@media (max-width: 440px) {
+
+    .schedule-page {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .schedule-header-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .export-header-button,
+    .print-header-button,
+    .auto-generate-button,
+    .add-lesson-button {
+        width: 100%;
+    }
+
+    .schedule-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        min-height: 76px;
+    }
+
+    .lesson-card {
+        grid-template-columns: 60px minmax(0, 1fr);
+        gap: 9px;
+    }
+
+    .lesson-actions {
+        grid-column: 2;
+
+        flex-wrap: wrap;
+    }
+
+    .lesson-action {
+        font-size: 9.5px;
+    }
+
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.export-header-button:focus-visible,
+.print-header-button:focus-visible,
+.add-lesson-button:focus-visible,
+.auto-generate-button:focus-visible,
+.lesson-action:focus-visible,
+.empty-button:focus-visible,
+.reset-filters:focus-visible,
+.filter-no-results button:focus-visible {
+    outline: 3px solid rgba(52, 120, 220, 0.12);
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .export-header-button,
+    .print-header-button,
+    .add-lesson-button,
+    .auto-generate-button,
+    .stat-card,
+    .lesson-card,
+    .lesson-action,
+    .empty-button {
+        transition: none;
+    }
+
+    .export-header-button:hover,
+    .print-header-button:hover,
+    .add-lesson-button:hover,
+    .auto-generate-button:hover,
+    .stat-card:hover,
+    .lesson-action:hover,
+    .empty-button:hover {
+        transform: none;
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+@media print {
+
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+    html,
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    nav,
+    header,
+    footer,
+    .navbar,
+    .site-header,
+    .site-footer {
+        display: none !important;
+    }
+
+    .schedule-page {
+        width: 100% !important;
+        max-width: none !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .schedule-header {
+        display: block !important;
+
+        margin-bottom: 20px !important;
+        padding-bottom: 12px !important;
+
+        border-bottom: 2px solid #111827 !important;
+    }
+
+    .schedule-kicker {
+        color: #555555 !important;
+        font-size: 9px !important;
+    }
+
+    .schedule-header h1 {
+        color: #000000 !important;
+        font-size: 24px !important;
+    }
+
+    .schedule-header p {
+        margin-top: 4px !important;
+
+        color: #555555 !important;
+        font-size: 10px !important;
+    }
+
+    .schedule-stats,
+    .schedule-filters,
+    .schedule-header-actions {
+        display: none !important;
+    }
+
+    .schedule-section-header {
+        margin-bottom: 12px !important;
+    }
+
+    .schedule-section-header h2 {
+        color: #000000 !important;
+        font-size: 18px !important;
+    }
+
+    .section-label {
+        color: #555555 !important;
+        font-size: 9px !important;
+    }
+
+    .total-lessons {
+        color: #555555 !important;
+    }
+
+    .total-lessons span:first-child {
+        color: #000000 !important;
+    }
+
+    .day-card {
+        margin-bottom: 12px !important;
+
+        border: 1px solid #bdbdbd !important;
+        border-radius: 0 !important;
+
+        background: #ffffff !important;
+
+        box-shadow: none !important;
+
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+
+        overflow: visible !important;
+
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .day-header {
+        padding: 8px 10px !important;
+
+        background: #f3f4f6 !important;
+
+        border-bottom: 1px solid #bdbdbd !important;
+
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .day-title {
+        gap: 7px !important;
+    }
+
+    .day-dot {
+        width: 6px !important;
+        height: 6px !important;
+
+        background: #000000 !important;
+
+        box-shadow: none !important;
+    }
+
+    .day-title h3 {
+        color: #000000 !important;
+        font-size: 13px !important;
+    }
+
+    .day-count {
+        color: #555555 !important;
+    }
+
+    .day-count span:first-child {
+        color: #000000 !important;
+    }
+
+    .lessons-list {
+        padding: 0 !important;
+    }
+
+    .lesson-card {
+        grid-template-columns: 70px minmax(0, 1fr) !important;
+
+        gap: 12px !important;
+
+        padding: 9px 10px !important;
+
+        border-bottom: 1px solid #dddddd !important;
+
+        background: #ffffff !important;
+
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .lesson-card:last-child {
+        border-bottom: 0 !important;
+    }
+
+    .lesson-card:hover {
+        background: #ffffff !important;
+    }
+
+    .lesson-time {
+        padding-left: 0 !important;
+    }
+
+    .lesson-time strong {
+        color: #000000 !important;
+        font-size: 12px !important;
+    }
+
+    .lesson-time span {
+        color: #555555 !important;
+        font-size: 9px !important;
+    }
+
+    .lesson-subject {
+        color: #000000 !important;
+
+        font-size: 11px !important;
+
+        white-space: normal !important;
+    }
+
+    .lesson-meta {
+        gap: 5px 12px !important;
+
+        margin-top: 3px !important;
+
+        color: #444444 !important;
+
+        font-size: 9px !important;
+    }
+
+    .lesson-meta span {
+        white-space: nowrap !important;
+    }
+
+    .lesson-actions,
+    .empty-button {
+        display: none !important;
+    }
+
+    .empty-schedule,
+    .filter-no-results {
+        min-height: 180px !important;
+
+        background: #ffffff !important;
+
+        border: 1px dashed #999999 !important;
+
+        box-shadow: none !important;
+
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    .schedule-page *,
+    .day-card,
+    .lesson-card {
+        text-shadow: none !important;
+
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .day-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .day-header {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .lesson-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+}

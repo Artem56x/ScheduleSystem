@@ -1,0 +1,248 @@
+@model IEnumerable<ScheduleSystem.Models.Teacher>
+
+@{
+    ViewData["Title"] = "Преподаватели";
+    var search = ViewBag.Search as string;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teachers/Index.css" asp-append-version="true" />
+}
+
+<div class="teachers-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <div>
+            <h1>Преподаватели</h1>
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="add-teacher-btn">
+                <span>＋</span>
+                Добавить преподавателя
+            </a>
+        }
+
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="error-message-glass">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- SEARCH -->
+    <form asp-action="Index" method="get" class="search-card">
+
+        <div class="search-wrapper">
+
+            <span class="search-icon">⌕</span>
+
+            <input type="text" name="search" value="@search" class="search-input"
+                   placeholder="Поиск по ФИО, предмету или Email..." autocomplete="off" />
+
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a asp-action="Index" class="clear-search" title="Очистить поиск">
+                    ×
+                </a>
+            }
+
+        </div>
+
+        <button type="submit" class="search-btn">
+            Найти
+        </button>
+
+    </form>
+
+
+    @if (Model.Any())
+    {
+        <div class="teachers-count">
+            Найдено преподавателей:
+            <strong>@Model.Count()</strong>
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="glass-table-card">
+
+            <!-- TABLE HEADER -->
+            <div class="table-header">
+
+                <div>
+                    Преподаватель
+                </div>
+
+                <div>
+                    Предмет
+                </div>
+
+                <div>
+                    Email
+                </div>
+
+                <div>
+                    Действия
+                </div>
+
+            </div>
+
+
+            <!-- ROWS -->
+            @foreach (var item in Model)
+            {
+                <div class="teacher-row">
+
+                    <!-- TEACHER -->
+                    <div class="teacher-info">
+
+                        <div class="teacher-avatar">
+                            @(string.IsNullOrWhiteSpace(item.FullName)
+                                ? "?"
+                                : item.FullName.Substring(0, 1).ToUpper())
+                        </div>
+
+                        <div class="teacher-text">
+
+                            <div class="teacher-name">
+                                @item.FullName
+                            </div>
+
+                            <div class="teacher-label">
+                                Преподаватель
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SUBJECT -->
+                    <div class="teacher-subject">
+
+                        @if (item.Subject != null)
+                        {
+                            <span class="subject-badge">
+                                <span class="subject-icon">📚</span>
+                                @item.Subject.Name
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="empty-value">
+                                Не указан
+                            </span>
+                        }
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+                    <div class="teacher-email">
+
+                        @if (!string.IsNullOrWhiteSpace(item.Email))
+                        {
+                            <span>
+                                @item.Email
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="empty-value">
+                                Не указан
+                            </span>
+                        }
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+                    <div class="teacher-actions">
+
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+                            Подробнее
+                        </a>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                                Изменить
+                            </a>
+
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                                Удалить
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+
+        @if (!string.IsNullOrWhiteSpace(search))
+        {
+            <div class="search-result-info">
+                По запросу «@search» найдено:
+                <strong>@Model.Count()</strong>
+            </div>
+        }
+    }
+    else
+    {
+        <!-- EMPTY -->
+        <div class="empty-state">
+
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <div class="empty-icon">
+                    🔍
+                </div>
+
+                <h2>Преподаватели не найдены</h2>
+
+                <p>
+                    По запросу
+                    <strong>«@search»</strong>
+                    ничего не найдено.
+                </p>
+
+                <a asp-action="Index" class="clear-btn">
+                    Сбросить поиск
+                </a>
+            }
+            else
+            {
+                <div class="empty-icon">
+                    👨‍🏫
+                </div>
+
+                <h2>Преподавателей пока нет</h2>
+
+                <p>
+                    Добавьте первого преподавателя,
+                    чтобы он появился в системе.
+                </p>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="add-teacher-btn">
+                        <span>＋</span>
+                        Добавить преподавателя
+                    </a>
+                }
+            }
+
+        </div>
+    }
+
+ 
+</div>

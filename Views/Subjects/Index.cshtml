@@ -1,0 +1,198 @@
+@model IEnumerable<ScheduleSystem.Models.Subject>
+
+@{
+    ViewData["Title"] = "Предметы";
+    var search = ViewBag.Search as string;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Subjects/Index.css" asp-append-version="true" />
+}
+
+<div class="subjects-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <div>
+            <h1>Предметы</h1>
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="add-subject-btn">
+                <span>＋</span>
+                Добавить предмет
+            </a>
+        }
+
+    </div>
+
+
+    <!-- ERROR -->
+    @if (TempData["ErrorMessage"] is string errorMessage)
+    {
+        <div class="glass-alert">
+            <span>⚠</span>
+            <span>@errorMessage</span>
+        </div>
+    }
+
+
+    <!-- SEARCH -->
+    <form asp-action="Index" method="get" class="search-card">
+
+        <div class="search-wrapper">
+
+            <span class="search-icon">⌕</span>
+
+            <input type="text" name="search" value="@search" class="search-input"
+                   placeholder="Поиск по названию предмета..." autocomplete="off" />
+
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a asp-action="Index" class="clear-search" title="Очистить поиск">
+                    ×
+                </a>
+            }
+
+        </div>
+
+        <button type="submit" class="search-btn">
+            Найти
+        </button>
+
+    </form>
+
+
+    @if (Model.Any())
+    {
+        <div class="subjects-count">
+            Найдено предметов:
+            <strong>@Model.Count()</strong>
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="glass-table-card">
+
+            <!-- TABLE HEADER -->
+            <div class="table-header">
+
+                <div>Предмет</div>
+                <div>Действия</div>
+
+            </div>
+
+
+            @foreach (var item in Model)
+            {
+                <div class="subject-row">
+
+                    <!-- ПРЕДМЕТ -->
+                    <div class="subject-info">
+
+                        <div class="subject-avatar">
+                            @(string.IsNullOrWhiteSpace(item.Name)
+                                ? "?"
+                                : item.Name.Substring(0, 1).ToUpper())
+                        </div>
+
+                        <div class="subject-text">
+
+                            <div class="subject-name">
+                                @item.Name
+                            </div>
+
+                            <div class="subject-label">
+                                Учебный предмет
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ДЕЙСТВИЯ -->
+                    <div class="subject-actions">
+
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+                            Подробнее
+                        </a>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                                Изменить
+                            </a>
+
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                                Удалить
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+
+        @if (!string.IsNullOrWhiteSpace(search))
+        {
+            <div class="search-result-info">
+                По запросу «@search» найдено:
+                <strong>@Model.Count()</strong>
+            </div>
+        }
+    }
+    else
+    {
+        <!-- EMPTY STATE -->
+        <div class="empty-state">
+
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <div class="empty-icon">
+                    🔍
+                </div>
+
+                <h2>Предметы не найдены</h2>
+
+                <p>
+                    По запросу
+                    <strong>«@search»</strong>
+                    ничего не найдено.
+                </p>
+
+                <a asp-action="Index" class="clear-btn">
+                    Сбросить поиск
+                </a>
+            }
+            else
+            {
+                <div class="empty-icon">
+                    📚
+                </div>
+
+                <h2>Предметов пока нет</h2>
+
+                <p>
+                    Добавьте первый учебный предмет,
+                    чтобы использовать его в расписании.
+                </p>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="add-subject-btn">
+                        <span>＋</span>
+                        Добавить предмет
+                    </a>
+                }
+            }
+
+        </div>
+    }
+
+</div>

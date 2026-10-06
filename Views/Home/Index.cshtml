@@ -1,0 +1,434 @@
+@model IEnumerable<ScheduleSystem.Models.Schedule>
+
+@{
+    ViewData["Title"] = "Главная";
+
+    var schedules = Model.ToList();
+
+    var dayNames = new Dictionary<DayOfWeek, string>
+    {
+        [DayOfWeek.Monday] = "Понедельник",
+        [DayOfWeek.Tuesday] = "Вторник",
+        [DayOfWeek.Wednesday] = "Среда",
+        [DayOfWeek.Thursday] = "Четверг",
+        [DayOfWeek.Friday] = "Пятница",
+        [DayOfWeek.Saturday] = "Суббота",
+        [DayOfWeek.Sunday] = "Воскресенье"
+    };
+
+    var upcoming = schedules
+        .OrderBy(s => s.DayOfWeek == DayOfWeek.Sunday ? 7 : (int?)s.DayOfWeek)
+        .ThenBy(s => s.StartTime)
+        .Take(8)
+        .ToList();
+
+    var latestNotifications =
+        ViewBag.LatestNotifications as IEnumerable<ScheduleSystem.Models.Notification>
+        ?? Enumerable.Empty<ScheduleSystem.Models.Notification>();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Home/Index.css" asp-append-version="true" />
+}
+
+<div class="dashboard-page">
+
+    <!-- =====================================================
+         WELCOME
+         ===================================================== -->
+
+    @{
+        var today = DateTime.Now;
+
+        var currentDayName = today.DayOfWeek switch
+        {
+            DayOfWeek.Monday => "Понедельник",
+            DayOfWeek.Tuesday => "Вторник",
+            DayOfWeek.Wednesday => "Среда",
+            DayOfWeek.Thursday => "Четверг",
+            DayOfWeek.Friday => "Пятница",
+            DayOfWeek.Saturday => "Суббота",
+            DayOfWeek.Sunday => "Воскресенье",
+            _ => ""
+        };
+
+        var currentMonthName = today.Month switch
+        {
+            1 => "января",
+            2 => "февраля",
+            3 => "марта",
+            4 => "апреля",
+            5 => "мая",
+            6 => "июня",
+            7 => "июля",
+            8 => "августа",
+            9 => "сентября",
+            10 => "октября",
+            11 => "ноября",
+            12 => "декабря",
+            _ => ""
+        };
+    }
+
+    <section class="welcome-section">
+
+        <div class="welcome-content">
+            <h1>Добро пожаловать @User.Identity?.Name</h1>
+
+            <p class="welcome-date">
+                @today.Day @currentMonthName @today.Year
+                ·
+                @currentDayName
+            </p>
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         STATISTICS
+         ===================================================== -->
+
+    <section class="dashboard-stats">
+
+        <a class="dashboard-stat stat-schedule" asp-controller="Schedules" asp-action="Index">
+
+            <div class="stat-content">
+                <span class="stat-label">Занятия</span>
+                <span class="stat-description">Расписание</span>
+            </div>
+
+            <strong class="stat-value">
+                @schedules.Count
+            </strong>
+
+            <span class="stat-arrow">›</span>
+
+        </a>
+
+
+        <a class="dashboard-stat stat-groups" asp-controller="Groups" asp-action="Index">
+
+            <div class="stat-content">
+                <span class="stat-label">Группы</span>
+                <span class="stat-description">Учебные группы</span>
+            </div>
+
+            <strong class="stat-value">
+                @ViewBag.GroupsCount
+            </strong>
+
+            <span class="stat-arrow">›</span>
+
+        </a>
+
+
+        <a class="dashboard-stat stat-teachers" asp-controller="Teachers" asp-action="Index">
+
+            <div class="stat-content">
+                <span class="stat-label">Преподаватели</span>
+                <span class="stat-description">В системе</span>
+            </div>
+
+            <strong class="stat-value">
+                @ViewBag.TeachersCount
+            </strong>
+
+            <span class="stat-arrow">›</span>
+
+        </a>
+
+
+        <a class="dashboard-stat stat-subjects" asp-controller="Subjects" asp-action="Index">
+
+            <div class="stat-content">
+                <span class="stat-label">Предметы</span>
+                <span class="stat-description">Учебные дисциплины</span>
+            </div>
+
+            <strong class="stat-value">
+                @ViewBag.SubjectsCount
+            </strong>
+
+            <span class="stat-arrow">›</span>
+
+        </a>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN DASHBOARD
+         ===================================================== -->
+
+    <div class="dashboard-grid">
+
+        <!-- =================================================
+             UPCOMING LESSONS
+             ================================================= -->
+
+        <section class="dashboard-panel glass-table-card">
+
+            <header class="dashboard-panel-header">
+
+                <div>
+                    <h2>
+                        Расписание
+                    </h2>
+                </div>
+
+                <a asp-controller="Schedules" asp-action="Index">
+                    Все
+                </a>
+
+            </header>
+
+
+            <div class="upcoming-list">
+
+                @if (!upcoming.Any())
+                {
+                    <div class="empty-state">
+
+                        <strong>
+                            Расписание пока пустое
+                        </strong>
+
+                        <p>
+                            Добавьте первое занятие или запустите автогенерацию.
+                        </p>
+
+                    </div>
+                }
+                else
+                {
+                    foreach (var item in upcoming)
+                    {
+                        var day =
+                            item.DayOfWeek.HasValue &&
+                            dayNames.TryGetValue(
+                                item.DayOfWeek.Value,
+                                out var dayName)
+                                ? dayName
+                                : "День не указан";
+
+                        <a class="upcoming-row" asp-controller="Schedules" asp-action="Details" asp-route-id="@item.Id">
+
+                            <div class="upcoming-time">
+                                @(item.StartTime?.ToString(@"hh\:mm") ?? "--:--")
+                                –
+                                @(item.EndTime?.ToString(@"hh\:mm") ?? "--:--")
+                            </div>
+
+
+                            <div class="upcoming-main">
+
+                                <div class="upcoming-subject">
+                                    @(item.Subject?.Name ?? "Предмет не указан")
+                                </div>
+
+                                <div class="upcoming-meta">
+                                    @day
+                                    ·
+                                    @(item.Teacher?.FullName ?? "Преподаватель")
+                                </div>
+
+                            </div>
+
+
+                            <span class="upcoming-pill">
+                                @(item.Group?.Name ?? "—")
+                            </span>
+
+
+                            <div class="upcoming-room">
+                                @(item.Classroom?.Name ?? "—")
+                            </div>
+
+                        </a>
+                    }
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SIDEBAR
+             ================================================= -->
+
+        <aside class="dashboard-side">
+
+            <!-- QUICK ACTIONS -->
+
+            <section class="quick-actions glass-card">
+
+                <h3>
+                    Быстрые действия
+                </h3>
+
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a class="quick-action" asp-controller="Schedules" asp-action="Create">
+
+                        <span class="quick-action-icon">
+                            +
+                        </span>
+
+                        Добавить занятие
+
+                    </a>
+
+
+                    <a class="quick-action" asp-controller="ScheduleGenerator" asp-action="Index">
+
+                        <span class="quick-action-icon">
+                            ✦
+                        </span>
+
+                        Генерация расписания
+
+                    </a>
+                }
+
+
+                <a class="quick-action" asp-controller="Schedules" asp-action="Export">
+
+                    <span class="quick-action-icon">
+                        ↓
+                    </span>
+
+                    Экспорт расписания
+
+                </a>
+
+
+                <a class="quick-action" asp-controller="Account" asp-action="Settings">
+
+                    <span class="quick-action-icon">
+                        ⚙
+                    </span>
+
+                    Настройки
+
+                </a>
+
+            </section>
+
+
+            <!-- NOTIFICATIONS -->
+
+            <section class="dashboard-notifications glass-card">
+
+                <div class="notifications-dashboard-header">
+
+                    <div>
+
+                        <h3>
+                            Последние уведомления
+                        </h3>
+
+                        <span>
+                            Изменения и события расписания
+                        </span>
+
+                    </div>
+
+
+                    <a asp-controller="Notifications" asp-action="Index" class="notifications-view-all">
+
+                        Все
+
+                    </a>
+
+                </div>
+
+
+                @if (latestNotifications.Any())
+                {
+                    <div class="notifications-dashboard-list">
+
+                        @foreach (var notification in latestNotifications.Take(3))
+                        {
+                            <a asp-controller="Notifications" asp-action="Index"
+                               class="dashboard-notification @(notification.IsRead ? "is-read" : "is-unread")">
+
+                                <div class="dashboard-notification-icon notification-@notification.Type">
+
+                                    @switch (notification.Type)
+                                    {
+                                        case "success":
+                                            <span>✓</span>
+                                            break;
+
+                                        case "warning":
+                                            <span>!</span>
+                                            break;
+
+                                        case "danger":
+                                            <span>×</span>
+                                            break;
+
+                                        default:
+                                            <span>i</span>
+                                            break;
+                                    }
+
+                                </div>
+
+
+                                <div class="dashboard-notification-content">
+
+                                    <div class="dashboard-notification-title">
+
+                                        <strong>
+                                            @notification.Title
+                                        </strong>
+
+                                        @if (!notification.IsRead)
+                                        {
+                                            <span class="dashboard-unread-dot"></span>
+                                        }
+
+                                    </div>
+
+
+                                    <p>
+                                        @notification.Message
+                                    </p>
+
+
+                                    <span class="dashboard-notification-date">
+                                        @(notification.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm"))
+                                    </span>
+
+                                </div>
+
+                            </a>
+                        }
+
+                    </div>
+                }
+                else
+                {
+                    <div class="dashboard-notifications-empty">
+
+                        <span>🔔</span>
+
+                        <p>
+                            Новых уведомлений нет
+                        </p>
+
+                    </div>
+                }
+
+            </section>
+
+        </aside>
+
+    </div>
+
+</div>
+

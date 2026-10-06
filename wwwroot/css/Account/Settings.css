@@ -1,0 +1,1506 @@
+/* =========================================================
+   SETTINGS
+   Liquid Glass — New Layout
+   ========================================================= */
+
+:root {
+    --settings-bg: #f4f7fb;
+
+    --settings-surface: rgba(255, 255, 255, 0.96);
+    --settings-surface-soft: rgba(247, 250, 255, 0.96);
+
+    --settings-border: rgba(220, 228, 239, 0.9);
+    --settings-border-soft: rgba(228, 234, 242, 0.9);
+
+    --settings-text: #202936;
+    --settings-text-secondary: #697689;
+    --settings-text-muted: #8a95a5;
+
+    --settings-blue: #3478dc;
+    --settings-blue-dark: #286dcc;
+
+    --settings-blue-soft: #edf5ff;
+    --settings-blue-border: #d7e7fb;
+
+    --settings-danger: #c7434f;
+    --settings-danger-soft: #fff3f4;
+    --settings-danger-border: #f1d5d9;
+
+    --settings-success: #31845d;
+    --settings-success-soft: #effaf4;
+    --settings-success-border: #d5eee0;
+
+    --settings-warning: #9b761e;
+    --settings-warning-soft: #fff9e8;
+    --settings-warning-border: #f1e4b9;
+
+    --settings-radius: 24px;
+
+    --settings-shadow:
+        0 14px 36px rgba(30, 55, 90, 0.055),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96);
+
+    --settings-transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.settings-page {
+    width: 100%;
+    max-width: 1080px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 28px 24px 64px;
+    color: var(--settings-text);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.settings-back-button {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--settings-border);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.9);
+
+    color: var(--settings-text-secondary);
+    text-decoration: none;
+
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1;
+
+    box-shadow:
+        0 8px 20px rgba(30, 55, 90, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    transition: var(--settings-transition);
+}
+
+.settings-back-button:hover {
+    color: var(--settings-blue);
+    border-color: var(--settings-blue-border);
+    background: var(--settings-blue-soft);
+    transform: translateY(-1px);
+}
+
+.settings-header-content {
+    min-width: 0;
+}
+
+.settings-header-content h1 {
+    margin: 0;
+    color: var(--settings-text);
+
+    font-size: clamp(1.65rem, 3vw, 2rem);
+    font-weight: 750;
+    line-height: 1.2;
+
+    letter-spacing: -0.035em;
+}
+
+.settings-header-content p {
+    margin: 6px 0 0;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
+.settings-message {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    margin-bottom: 16px;
+    padding: 13px 15px;
+
+    border: 1px solid;
+    border-radius: 14px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    box-shadow:
+        0 7px 18px rgba(30, 55, 90, 0.035),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.settings-message-icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.settings-message-success {
+    color: var(--settings-success);
+    background: var(--settings-success-soft);
+    border-color: var(--settings-success-border);
+}
+
+.settings-message-success .settings-message-icon {
+    background: rgba(49, 132, 93, 0.1);
+}
+
+.settings-message-error {
+    color: var(--settings-danger);
+    background: var(--settings-danger-soft);
+    border-color: var(--settings-danger-border);
+}
+
+.settings-message-error .settings-message-icon {
+    background: rgba(199, 67, 79, 0.1);
+}
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.settings-tabs {
+    width: min(660px, 100%);
+    min-width: 0;
+
+    display: flex;
+    align-items: stretch;
+
+    margin: 0 auto 28px;
+    padding: 5px;
+
+    gap: 5px;
+
+    border: 1px solid var(--settings-border);
+    border-radius: 17px;
+
+    background: rgba(255, 255, 255, 0.92);
+
+    box-shadow:
+        0 10px 28px rgba(30, 55, 90, 0.055),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.settings-tab {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    min-height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 12px;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: transparent;
+
+    color: var(--settings-text-secondary);
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition: var(--settings-transition);
+}
+
+.settings-tab:hover {
+    color: var(--settings-text);
+    background: #f5f8fc;
+}
+
+.settings-tab.active {
+    color: var(--settings-blue);
+    background: var(--settings-blue-soft);
+
+    box-shadow:
+        inset 0 0 0 1px rgba(215, 231, 251, 0.9),
+        0 3px 9px rgba(52, 120, 220, 0.055);
+}
+
+.settings-tab-icon {
+    flex: 0 0 auto;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 15px;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   TAB CONTENT
+   ========================================================= */
+
+.settings-tab-content {
+    display: none;
+    width: 100%;
+    min-width: 0;
+}
+
+.settings-tab-content.active {
+    display: block;
+}
+
+
+/* =========================================================
+   MAIN PANEL
+   ========================================================= */
+
+.settings-panel {
+    width: 100%;
+    min-width: 0;
+
+    padding: 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.98),
+            rgba(247, 250, 255, 0.96)
+        );
+
+    border: 1px solid var(--settings-border);
+    border-radius: var(--settings-radius);
+
+    box-shadow: var(--settings-shadow);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    overflow: hidden;
+
+    animation: settingsPanelIn 0.22s ease both;
+}
+
+@keyframes settingsPanelIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   PANEL HEADER
+   ========================================================= */
+
+.settings-panel-header {
+    width: 100%;
+}
+
+.settings-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    min-width: 0;
+}
+
+.settings-panel-icon {
+    flex: 0 0 50px;
+
+    width: 50px;
+    height: 50px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--settings-blue-border);
+    border-radius: 15px;
+
+    background: var(--settings-blue-soft);
+    color: var(--settings-blue);
+
+    font-size: 19px;
+    line-height: 1;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.settings-panel-title > div:last-child {
+    min-width: 0;
+}
+
+.settings-panel-title h2 {
+    margin: 0;
+
+    color: var(--settings-text);
+
+    font-size: 20px;
+    font-weight: 750;
+    line-height: 1.25;
+
+    letter-spacing: -0.025em;
+}
+
+.settings-panel-title p {
+    margin: 5px 0 0;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   DIVIDERS
+   ========================================================= */
+
+.settings-divider {
+    width: 100%;
+    height: 1px;
+
+    margin: 25px 0;
+
+    background: var(--settings-border-soft);
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.settings-profile-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    min-width: 0;
+}
+
+.settings-avatar {
+    flex: 0 0 68px;
+
+    width: 68px;
+    height: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--settings-blue-border);
+    border-radius: 20px;
+
+    background: var(--settings-blue-soft);
+    color: var(--settings-blue);
+
+    font-size: 25px;
+    font-weight: 750;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.settings-profile-info {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+.settings-profile-info strong {
+    display: block;
+
+    color: var(--settings-text);
+
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.settings-profile-info > span:not(.settings-role) {
+    margin-top: 4px;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-role {
+    align-self: flex-start;
+
+    margin-top: 8px;
+    padding: 4px 9px;
+
+    border: 1px solid var(--settings-blue-border);
+    border-radius: 8px;
+
+    background: var(--settings-blue-soft);
+    color: var(--settings-blue);
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.settings-form {
+    width: 100%;
+    min-width: 0;
+}
+
+.settings-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+
+    width: 100%;
+}
+
+.settings-field {
+    min-width: 0;
+}
+
+.settings-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--settings-text);
+
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.3;
+}
+
+.settings-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+
+    padding: 0 13px;
+
+    border: 1px solid rgba(210, 219, 231, 0.95);
+    border-radius: 12px;
+
+    outline: none;
+
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--settings-text);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    box-shadow:
+        inset 0 1px 2px rgba(30, 55, 90, 0.025);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.settings-input:hover {
+    border-color: rgba(195, 207, 222, 0.98);
+}
+
+.settings-input:focus {
+    border-color: #9fc4ef;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(52, 120, 220, 0.09);
+}
+
+.settings-input::placeholder {
+    color: #a0a9b6;
+}
+
+.settings-form-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 20px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.settings-save-button,
+.settings-secondary-button,
+.settings-danger-button {
+    min-height: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 17px;
+
+    border-radius: 11px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: var(--settings-transition);
+}
+
+.settings-save-button {
+    border: 1px solid var(--settings-blue-border);
+
+    background: var(--settings-blue-soft);
+    color: var(--settings-blue-dark);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.settings-save-button:hover {
+    background: #e5f0ff;
+    border-color: #c5dcf7;
+    transform: translateY(-1px);
+}
+
+.settings-secondary-button {
+    flex: 0 0 auto;
+
+    border: 1px solid rgba(211, 220, 231, 0.95);
+
+    background: rgba(255, 255, 255, 0.9);
+    color: #596678;
+
+    white-space: nowrap;
+}
+
+.settings-secondary-button:hover {
+    border-color: var(--settings-blue-border);
+    background: var(--settings-blue-soft);
+    color: var(--settings-blue);
+
+    transform: translateY(-1px);
+}
+
+.settings-danger-button {
+    flex: 0 0 auto;
+
+    border: 1px solid var(--settings-danger-border);
+
+    background: var(--settings-danger-soft);
+    color: var(--settings-danger);
+
+    white-space: nowrap;
+}
+
+.settings-danger-button:hover {
+    background: #ffecee;
+    border-color: #e9c2c7;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   ACTION ROWS
+   ========================================================= */
+
+.settings-action-row {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.settings-action-left {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    flex: 1 1 auto;
+}
+
+.settings-action-icon {
+    flex: 0 0 44px;
+
+    width: 44px;
+    height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--settings-border-soft);
+    border-radius: 13px;
+
+    background: #f5f8fc;
+    color: #667487;
+
+    font-size: 17px;
+    line-height: 1;
+}
+
+.settings-action-icon-danger {
+    border-color: var(--settings-danger-border);
+    background: var(--settings-danger-soft);
+    color: var(--settings-danger);
+}
+
+.settings-action-content {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-action-content strong {
+    display: block;
+
+    color: var(--settings-text);
+
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.settings-action-content span {
+    display: block;
+
+    margin-top: 4px;
+
+    max-width: 680px;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+.settings-soon {
+    flex: 0 0 auto;
+
+    padding: 6px 10px;
+
+    border: 1px solid var(--settings-border-soft);
+    border-radius: 8px;
+
+    background: #f6f8fb;
+    color: var(--settings-text-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   PROGRAM
+   ========================================================= */
+
+.settings-subsection {
+    width: 100%;
+}
+
+.settings-subsection-header {
+    margin-bottom: 16px;
+}
+
+.settings-subsection-header h3 {
+    margin: 0;
+
+    color: var(--settings-text);
+
+    font-size: 15px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.settings-subsection-header p {
+    margin: 5px 0 0;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+.settings-maintenance-row {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 15px 0;
+}
+
+.settings-maintenance-row + .settings-maintenance-row {
+    border-top: 1px solid var(--settings-border-soft);
+}
+
+
+/* =========================================================
+   ABOUT
+   ========================================================= */
+
+.settings-about-panel {
+    text-align: left;
+}
+
+.settings-about-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+
+    padding: 6px 20px 4px;
+}
+
+.settings-about-logo {
+    width: 68px;
+    height: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 15px;
+
+    border: 1px solid var(--settings-blue-border);
+    border-radius: 20px;
+
+    background: var(--settings-blue-soft);
+    color: var(--settings-blue);
+
+    font-size: 27px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.settings-about-hero h2 {
+    margin: 0;
+
+    color: var(--settings-text);
+
+    font-size: 25px;
+    font-weight: 750;
+    line-height: 1.2;
+
+    letter-spacing: -0.035em;
+}
+
+.settings-about-hero > p {
+    max-width: 580px;
+
+    margin: 8px auto 0;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.settings-about-version {
+    margin-top: 12px;
+
+    padding: 5px 10px;
+
+    border: 1px solid var(--settings-blue-border);
+    border-radius: 8px;
+
+    background: var(--settings-blue-soft);
+    color: var(--settings-blue);
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.settings-about-section {
+    width: 100%;
+}
+
+.settings-about-section h3 {
+    margin: 0 0 10px;
+
+    color: var(--settings-text);
+
+    font-size: 15px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.settings-about-section > p {
+    margin: 0;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.65;
+}
+
+.settings-about-section > p + p {
+    margin-top: 10px;
+}
+
+
+/* =========================================================
+   ABOUT FEATURES
+   ========================================================= */
+
+.settings-about-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    width: 100%;
+}
+
+.settings-about-feature {
+    min-width: 0;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 12px;
+
+    padding: 14px;
+
+    border: 1px solid var(--settings-border-soft);
+    border-radius: 15px;
+
+    background: rgba(249, 251, 254, 0.82);
+
+    transition: var(--settings-transition);
+}
+
+.settings-about-feature:hover {
+    border-color: var(--settings-blue-border);
+    background: rgba(247, 250, 255, 0.98);
+
+    transform: translateY(-1px);
+}
+
+.settings-about-feature > span {
+    flex: 0 0 36px;
+
+    width: 36px;
+    height: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--settings-blue-border);
+    border-radius: 10px;
+
+    background: var(--settings-blue-soft);
+    color: var(--settings-blue);
+
+    font-size: 15px;
+}
+
+.settings-about-feature > div {
+    min-width: 0;
+}
+
+.settings-about-feature strong {
+    display: block;
+
+    color: var(--settings-text);
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.settings-about-feature p {
+    margin: 4px 0 0;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   TECHNOLOGIES
+   ========================================================= */
+
+.settings-tech-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.settings-tech-list span {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 32px;
+
+    padding: 0 11px;
+
+    border: 1px solid var(--settings-border-soft);
+    border-radius: 9px;
+
+    background: #f6f8fb;
+    color: #5f6c7d;
+
+    font-size: 11.5px;
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+.settings-modal[hidden] {
+    display: none;
+}
+
+.settings-modal {
+    position: fixed;
+    inset: 0;
+
+    z-index: 2000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.settings-modal-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(24, 35, 50, 0.28);
+
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+.settings-modal-content {
+    position: relative;
+    z-index: 1;
+
+    width: min(460px, 100%);
+
+    padding: 28px;
+
+    border: 1px solid rgba(220, 228, 239, 0.95);
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.99),
+            rgba(247, 250, 255, 0.98)
+        );
+
+    box-shadow:
+        0 24px 60px rgba(25, 45, 70, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98);
+
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+
+    animation: settingsModalIn 0.2s ease both;
+}
+
+@keyframes settingsModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.settings-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--settings-border-soft);
+    border-radius: 10px;
+
+    background: #f7f9fc;
+    color: #788494;
+
+    font-family: inherit;
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition: var(--settings-transition);
+}
+
+.settings-modal-close:hover {
+    color: var(--settings-text);
+    background: #eef2f7;
+}
+
+.settings-modal-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 16px;
+
+    border: 1px solid var(--settings-warning-border);
+    border-radius: 14px;
+
+    background: var(--settings-warning-soft);
+    color: var(--settings-warning);
+
+    font-size: 19px;
+}
+
+.settings-modal-icon-danger {
+    border-color: var(--settings-danger-border);
+    background: var(--settings-danger-soft);
+    color: var(--settings-danger);
+}
+
+.settings-modal-content h2 {
+    margin: 0;
+
+    color: var(--settings-text);
+
+    font-size: 20px;
+    font-weight: 750;
+    line-height: 1.3;
+
+    letter-spacing: -0.025em;
+}
+
+.settings-modal-content > p {
+    margin: 9px 0 0;
+
+    color: var(--settings-text-secondary);
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.55;
+}
+
+.settings-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    margin-top: 24px;
+}
+
+
+/* =========================================================
+   RESPONSIVE — 800
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .settings-page {
+        padding: 24px 18px 50px;
+    }
+
+    .settings-panel {
+        padding: 24px;
+        border-radius: 21px;
+    }
+
+    .settings-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-about-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 600
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .settings-page {
+        padding: 20px 14px 40px;
+    }
+
+    .settings-header {
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .settings-back-button {
+        flex-basis: 40px;
+        width: 40px;
+        height: 40px;
+
+        border-radius: 12px;
+    }
+
+    .settings-header-content h1 {
+        font-size: 1.55rem;
+    }
+
+    .settings-header-content p {
+        font-size: 12.5px;
+    }
+
+
+    .settings-tabs {
+        width: 100%;
+        margin-bottom: 20px;
+        border-radius: 15px;
+    }
+
+    .settings-tab {
+        min-height: 42px;
+        padding: 0 7px;
+
+        gap: 5px;
+
+        font-size: 12px;
+    }
+
+    .settings-tab-icon {
+        font-size: 14px;
+    }
+
+
+    .settings-panel {
+        padding: 20px 17px;
+        border-radius: 20px;
+    }
+
+    .settings-panel-title {
+        gap: 12px;
+    }
+
+    .settings-panel-icon {
+        flex-basis: 44px;
+
+        width: 44px;
+        height: 44px;
+
+        border-radius: 13px;
+        font-size: 17px;
+    }
+
+    .settings-panel-title h2 {
+        font-size: 18px;
+    }
+
+    .settings-panel-title p {
+        font-size: 12px;
+    }
+
+
+    .settings-profile-preview {
+        gap: 12px;
+    }
+
+    .settings-avatar {
+        flex-basis: 58px;
+
+        width: 58px;
+        height: 58px;
+
+        border-radius: 17px;
+
+        font-size: 22px;
+    }
+
+    .settings-profile-info strong {
+        font-size: 15px;
+    }
+
+
+    .settings-action-row,
+    .settings-maintenance-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .settings-action-left {
+        width: 100%;
+    }
+
+    .settings-secondary-button,
+    .settings-danger-button {
+        align-self: flex-start;
+    }
+
+
+    .settings-form-actions {
+        justify-content: stretch;
+    }
+
+    .settings-save-button {
+        width: 100%;
+    }
+
+
+    .settings-about-hero {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .settings-about-logo {
+        width: 60px;
+        height: 60px;
+
+        border-radius: 18px;
+    }
+
+    .settings-about-hero h2 {
+        font-size: 22px;
+    }
+
+    .settings-about-hero > p {
+        font-size: 12.5px;
+    }
+
+
+    .settings-modal {
+        padding: 14px;
+    }
+
+    .settings-modal-content {
+        padding: 23px 18px;
+        border-radius: 19px;
+    }
+
+    .settings-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .settings-modal-actions .settings-secondary-button,
+    .settings-modal-actions .settings-danger-button {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 420
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .settings-page {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .settings-tabs {
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .settings-tab {
+        min-height: 40px;
+
+        padding-left: 5px;
+        padding-right: 5px;
+
+        font-size: 11.5px;
+    }
+
+    .settings-tab-icon {
+        font-size: 13px;
+    }
+
+    .settings-panel {
+        padding: 18px 14px;
+        border-radius: 18px;
+    }
+
+    .settings-divider {
+        margin: 21px 0;
+    }
+
+    .settings-action-icon {
+        flex-basis: 40px;
+
+        width: 40px;
+        height: 40px;
+
+        border-radius: 11px;
+    }
+
+    .settings-action-content strong {
+        font-size: 13px;
+    }
+
+    .settings-action-content span {
+        font-size: 11.5px;
+    }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+.settings-tab:focus-visible,
+.settings-back-button:focus-visible,
+.settings-save-button:focus-visible,
+.settings-secondary-button:focus-visible,
+.settings-danger-button:focus-visible,
+.settings-input:focus-visible,
+.settings-modal-close:focus-visible {
+    outline: 3px solid rgba(52, 120, 220, 0.16);
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .settings-panel,
+    .settings-modal-content {
+        animation: none;
+    }
+
+    .settings-tab,
+    .settings-back-button,
+    .settings-save-button,
+    .settings-secondary-button,
+    .settings-danger-button,
+    .settings-about-feature {
+        transition: none;
+    }
+
+    .settings-back-button:hover,
+    .settings-save-button:hover,
+    .settings-secondary-button:hover,
+    .settings-danger-button:hover,
+    .settings-about-feature:hover {
+        transform: none;
+    }
+
+}

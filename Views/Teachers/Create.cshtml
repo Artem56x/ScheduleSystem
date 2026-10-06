@@ -1,0 +1,190 @@
+@model ScheduleSystem.Models.Teacher
+
+@{
+    ViewData["Title"] = "Добавить преподавателя";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teachers/Create.css" asp-append-version="true" />
+}
+
+<div class="schedule-details-page">
+
+
+    <!-- HEADER -->
+    <div class="details-header">
+
+        <div class="details-header-content">
+
+            <div class="page-badge">
+                ПРЕПОДАВАТЕЛИ
+            </div>
+
+            <h1>Добавить преподавателя</h1>
+
+            <p>
+                Добавьте нового преподавателя в систему
+            </p>
+
+        </div>
+
+        <div class="details-header-actions">
+
+            <a asp-action="Index" class="glass-button secondary-button">
+                ← Назад
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAIN CARD -->
+    <div class="lesson-main-card">
+
+        <form asp-action="Create" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="validation-summary">
+            </div>
+
+
+            <!-- TOP -->
+            <div class="lesson-card-top">
+
+                <div class="lesson-icon teacher-icon">
+                    👨‍🏫
+                </div>
+
+                <div>
+
+                    <div class="lesson-label">
+                        НОВЫЙ ПРЕПОДАВАТЕЛЬ
+                    </div>
+
+                    <h2>
+                        Добавление преподавателя
+                    </h2>
+
+                    <p>
+                        Заполните основные данные преподавателя.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORM -->
+            <div class="lesson-info-grid">
+
+
+                <!-- ФИО -->
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        👤
+                    </div>
+
+                    <div class="info-content">
+
+                        <label asp-for="FullName">
+                            ФИО преподавателя
+                        </label>
+
+                        <input asp-for="FullName" class="form-control" placeholder="Например: Иванов Иван Иванович"
+                               autocomplete="name" />
+
+                        <span asp-validation-for="FullName" class="validation-message">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ПРЕДМЕТ -->
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        📚
+                    </div>
+
+                    <div class="info-content">
+
+                        <label asp-for="SubjectId">
+                            Предмет
+                        </label>
+
+                        <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId">
+
+                            <option value="">
+                                Выберите предмет
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="SubjectId" class="validation-message">
+                        </span>
+
+                        <div class="field-hint">
+                            Предмет, который преподаёт сотрудник
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EMAIL -->
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        ✉️
+                    </div>
+
+                    <div class="info-content">
+
+                        <label asp-for="Email">
+                            Электронная почта
+                        </label>
+
+                        <input asp-for="Email" type="email" class="form-control"
+                               placeholder="Например: teacher@example.com" autocomplete="email" />
+
+                        <span asp-validation-for="Email" class="validation-message">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+            <div class="details-footer">
+
+                <a asp-action="Index" class="glass-button secondary-button">
+                    ← Отмена
+                </a>
+
+                <button type="submit" class="glass-button save-button">
+                    ✓ Добавить преподавателя
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

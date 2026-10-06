@@ -1,0 +1,113 @@
+@model ScheduleSystem.Models.Subject
+
+@{
+    ViewData["Title"] = "Удаление предмета";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Subjects/Delete.css" asp-append-version="true" />
+}
+
+<div class="delete-page">
+
+    <div class="delete-header">
+
+        <div class="delete-icon">
+            ⚠️
+        </div>
+
+        <div>
+
+            <h1>
+                Удаление предмета
+            </h1>
+
+            <p>
+                Вы действительно хотите удалить этот предмет?
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="glass-delete-card">
+
+        <!-- SUBJECT -->
+        <div class="subject-info">
+
+            <div class="subject-avatar">
+
+                @(string.IsNullOrWhiteSpace(Model.Name)
+                    ? "?"
+                    : Model.Name.Substring(0, 1).ToUpper())
+
+            </div>
+
+            <div class="subject-details">
+
+                <h2>
+                    @Model.Name
+                </h2>
+
+                <p>
+                    Учебный предмет
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- WARNING -->
+        <div class="warning-message">
+
+            <span>
+                ⚠
+            </span>
+
+            <div>
+
+                <strong>
+                    Внимание
+                </strong>
+
+                <p>
+                    После удаления восстановить данные предмета
+                    будет невозможно.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+        <form asp-action="Delete" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="delete-actions">
+
+                <button type="submit" class="btn delete-btn">
+
+                    Удалить предмет
+
+                </button>
+
+                <a asp-action="Index" class="btn cancel-btn">
+
+                    Отмена
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+</div>

@@ -1,0 +1,545 @@
+/* =========================================================
+   SUBJECT DETAILS
+   Liquid Glass — Unified Design
+   ========================================================= */
+
+.subject-details-page {
+    width: 100%;
+    max-width: 760px;
+    min-width: 0;
+
+    margin: 0 auto;
+
+    color: #202936;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0 0 5px;
+
+    color: #202936;
+
+    font-size: clamp(1.8rem, 3vw, 2.15rem);
+    font-weight: 750;
+    line-height: 1.2;
+    letter-spacing: -.04em;
+}
+
+.page-header p {
+    margin: 0;
+
+    color: #697689;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   DETAILS CARD
+   ========================================================= */
+
+.glass-details-card {
+    width: 100%;
+    min-width: 0;
+
+    padding: 30px;
+
+    border: 1px solid rgba(220, 228, 239, .9);
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .98),
+            rgba(246, 249, 255, .94)
+        );
+
+    box-shadow:
+        0 12px 34px rgba(30, 55, 90, .055),
+        inset 0 1px 0 rgba(255, 255, 255, .96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.subject-profile {
+    display: flex;
+    align-items: center;
+
+    gap: 17px;
+
+    min-width: 0;
+
+    padding-bottom: 24px;
+
+    border-bottom: 1px solid rgba(214, 222, 233, .78);
+}
+
+.subject-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 62px;
+
+    width: 62px;
+    height: 62px;
+
+    border: 1px solid #d2e4fc;
+    border-radius: 18px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 24px;
+    font-weight: 750;
+    line-height: 1;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .96),
+        0 7px 18px rgba(52, 120, 220, .07);
+}
+
+.subject-profile > div:last-child {
+    min-width: 0;
+}
+
+.subject-profile h2 {
+    margin: 0 0 5px;
+
+    color: #202936;
+
+    font-size: 1.35rem;
+    font-weight: 750;
+    line-height: 1.3;
+    letter-spacing: -.025em;
+
+    overflow-wrap: anywhere;
+}
+
+.subject-profile p {
+    margin: 0;
+
+    color: #697689;
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   DETAILS
+   ========================================================= */
+
+.details-list {
+    padding: 5px 0;
+}
+
+.detail-row {
+    display: grid;
+
+    grid-template-columns: 180px minmax(0, 1fr);
+
+    gap: 20px;
+
+    padding: 17px 0;
+
+    border-bottom: 1px solid rgba(214, 222, 233, .68);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: #7a8798;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+
+    text-transform: uppercase;
+    letter-spacing: .045em;
+}
+
+.detail-value {
+    min-width: 0;
+
+    color: #27313e;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+
+    word-break: break-word;
+}
+
+/* =========================================================
+   COMPUTER STATUS
+   ========================================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 6px;
+
+    min-height: 28px;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+.status-yes {
+    border: 1px solid rgba(52, 168, 99, .16);
+
+    background: rgba(52, 168, 99, .08);
+    color: #28794c;
+}
+
+.status-no {
+    border: 1px solid rgba(140, 151, 168, .16);
+
+    background: #f2f4f7;
+    color: #697689;
+}
+
+/* =========================================================
+   CLASSROOM REQUIREMENTS
+   ========================================================= */
+
+.requirements-row {
+    align-items: flex-start;
+}
+
+.requirements-details {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.requirement-badge {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 29px;
+
+    padding: 5px 10px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 10px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.35;
+
+    overflow-wrap: anywhere;
+}
+
+.no-requirements {
+    color: #7a8798;
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.details-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    padding-top: 21px;
+
+    border-top: 1px solid rgba(214, 222, 233, .78);
+}
+
+.details-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 9px 17px;
+
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        box-shadow .2s ease;
+}
+
+/* =========================================================
+   EDIT
+   ========================================================= */
+
+.edit-btn {
+    border: 1px solid #d2e4fc;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    box-shadow:
+        0 7px 18px rgba(52, 120, 220, .07),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.edit-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: #c3daf7;
+
+    background: #e5f0ff;
+    color: #286dcc;
+
+    box-shadow:
+        0 9px 21px rgba(52, 120, 220, .10),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* =========================================================
+   DELETE
+   ========================================================= */
+
+.delete-btn {
+    border: 1px solid rgba(220, 83, 96, .16);
+
+    background: #fff3f4;
+    color: #c7434f;
+
+    box-shadow:
+        0 5px 15px rgba(220, 83, 96, .045),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.delete-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: rgba(220, 83, 96, .25);
+
+    background: #ffecee;
+    color: #b93442;
+
+    box-shadow:
+        0 8px 20px rgba(220, 83, 96, .08),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* =========================================================
+   CANCEL
+   ========================================================= */
+
+.cancel-btn {
+    border: 1px solid rgba(220, 228, 239, .95);
+
+    background: rgba(255, 255, 255, .9);
+    color: #596678;
+
+    box-shadow:
+        0 5px 16px rgba(30, 55, 90, .045),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.cancel-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: #ccd9ea;
+
+    background: #fff;
+    color: #27313e;
+
+    box-shadow:
+        0 8px 20px rgba(30, 55, 90, .07),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.details-actions .btn:focus-visible {
+    outline: 3px solid rgba(52, 120, 220, .12);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .subject-details-page {
+        width: 100%;
+        max-width: none;
+    }
+
+    .page-header h1 {
+        font-size: 1.65rem;
+    }
+
+    .glass-details-card {
+        padding: 21px 18px;
+
+        border-radius: 20px;
+    }
+
+    .subject-profile {
+        align-items: flex-start;
+
+        gap: 13px;
+    }
+
+    .subject-avatar {
+        flex-basis: 54px;
+
+        width: 54px;
+        height: 54px;
+
+        border-radius: 16px;
+
+        font-size: 21px;
+    }
+
+    .subject-profile h2 {
+        font-size: 1.2rem;
+    }
+
+    .subject-profile p {
+        font-size: 11px;
+    }
+
+    .detail-row {
+        grid-template-columns: 1fr;
+
+        gap: 6px;
+
+        padding: 15px 0;
+    }
+
+    .detail-label {
+        font-size: 10px;
+    }
+
+    .detail-value {
+        font-size: 12px;
+    }
+
+    .requirements-details {
+        gap: 6px;
+    }
+
+    .requirement-badge {
+        font-size: 11px;
+
+        padding: 5px 9px;
+    }
+
+    .status-badge {
+        font-size: 11px;
+    }
+
+    .details-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .details-actions .btn {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .glass-details-card {
+        padding: 18px 15px;
+
+        border-radius: 18px;
+    }
+
+    .subject-profile {
+        gap: 11px;
+    }
+
+    .subject-avatar {
+        flex-basis: 50px;
+
+        width: 50px;
+        height: 50px;
+
+        border-radius: 15px;
+
+        font-size: 19px;
+    }
+
+    .subject-profile h2 {
+        font-size: 1.1rem;
+    }
+
+    .detail-row {
+        padding: 14px 0;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .details-actions .btn {
+        transition: none;
+    }
+
+    .details-actions .btn:hover {
+        transform: none;
+    }
+}

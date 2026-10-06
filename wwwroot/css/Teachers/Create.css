@@ -1,0 +1,767 @@
+/* =========================================================
+   SCHEDULE EDIT
+   Liquid Glass — Unified Design
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.schedule-details-page {
+    width: 100%;
+    max-width: 1100px;
+    min-width: 0;
+
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+
+    color: #202936;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.details-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    margin-bottom: 24px;
+}
+
+.details-header-content {
+    min-width: 0;
+}
+
+.page-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 28px;
+
+    padding: 5px 11px;
+    margin-bottom: 10px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 999px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1;
+
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.details-header h1 {
+    margin: 0;
+
+    color: #202936;
+
+    font-size: clamp(1.8rem, 3vw, 2.25rem);
+    font-weight: 750;
+    line-height: 1.2;
+
+    letter-spacing: -.04em;
+}
+
+.details-header p {
+    margin: 8px 0 0;
+
+    color: #697689;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+.details-header-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.glass-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    min-height: 42px;
+
+    padding: 9px 16px;
+
+    border: 1px solid transparent;
+    border-radius: 12px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        background-color .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        color .2s ease;
+}
+
+.glass-button:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.glass-button:focus-visible {
+    outline: 3px solid rgba(52, 120, 220, .16);
+    outline-offset: 2px;
+}
+
+
+/* Secondary */
+
+.secondary-button {
+    border-color: rgba(220, 228, 239, .95);
+
+    background: rgba(255, 255, 255, .9);
+
+    color: #596678;
+
+    box-shadow:
+        0 5px 16px rgba(30, 55, 90, .045),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.secondary-button:hover {
+    border-color: #ccd9ea;
+
+    background: #ffffff;
+    color: #27313e;
+
+    box-shadow:
+        0 8px 20px rgba(30, 55, 90, .07),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.lesson-main-card {
+    width: 100%;
+    min-width: 0;
+
+    padding: 30px;
+
+    border: 1px solid rgba(220, 228, 239, .9);
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .98),
+            rgba(246, 249, 255, .94)
+        );
+
+    box-shadow:
+        0 12px 34px rgba(30, 55, 90, .055),
+        inset 0 1px 0 rgba(255, 255, 255, .96);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+
+/* =========================================================
+   CARD TOP
+   ========================================================= */
+
+.lesson-card-top {
+    display: flex;
+    align-items: center;
+
+    gap: 17px;
+
+    min-width: 0;
+
+    padding-bottom: 25px;
+    margin-bottom: 24px;
+
+    border-bottom: 1px solid rgba(214, 222, 233, .78);
+}
+
+.lesson-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 62px;
+
+    width: 62px;
+    height: 62px;
+
+    border: 1px solid #d2e4fc;
+    border-radius: 18px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 26px;
+    line-height: 1;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .96),
+        0 7px 18px rgba(52, 120, 220, .07);
+}
+
+.teacher-icon {
+    border-color: #d2e4fc;
+    background: #edf5ff;
+    color: #3478dc;
+}
+
+.lesson-card-top > div:last-child {
+    min-width: 0;
+}
+
+.lesson-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #3478dc;
+
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1.3;
+
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.lesson-card-top h2 {
+    margin: 0;
+
+    color: #202936;
+
+    font-size: 1.45rem;
+    font-weight: 750;
+    line-height: 1.25;
+
+    letter-spacing: -.03em;
+
+    overflow-wrap: anywhere;
+}
+
+.lesson-card-top p {
+    margin: 6px 0 0;
+
+    color: #697689;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.lesson-info-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 13px;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.info-card {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 13px;
+
+    min-width: 0;
+    min-height: 118px;
+
+    padding: 16px;
+
+    border: 1px solid rgba(220, 228, 239, .82);
+    border-radius: 17px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .95),
+            rgba(248, 250, 253, .9)
+        );
+
+    box-shadow:
+        0 5px 16px rgba(30, 55, 90, .025),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
+}
+
+.info-card:focus-within {
+    border-color: rgba(180, 205, 238, .95);
+
+    box-shadow:
+        0 8px 22px rgba(30, 55, 90, .05),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.info-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 40px;
+
+    width: 40px;
+    height: 40px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 12px;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    font-size: 17px;
+    line-height: 1;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.info-content {
+    flex: 1 1 auto;
+
+    min-width: 0;
+}
+
+.info-content label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #7a8798;
+
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+
+    text-transform: uppercase;
+    letter-spacing: .055em;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.form-control,
+.form-select {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+
+    padding: 9px 12px;
+
+    border: 1px solid rgba(210, 219, 231, .95);
+    border-radius: 11px;
+
+    background: #ffffff;
+
+    color: #27313e;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+
+    box-shadow:
+        inset 0 1px 2px rgba(30, 55, 90, .025),
+        0 1px 0 rgba(255, 255, 255, .8);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background-color .2s ease;
+}
+
+.form-control:hover,
+.form-select:hover {
+    border-color: #c6d4e6;
+}
+
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+
+    border-color: #8db5e9;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(52, 120, 220, .10),
+        0 6px 16px rgba(30, 55, 90, .035);
+}
+
+.form-control::placeholder {
+    color: #9aa5b3;
+}
+
+.form-select {
+    cursor: pointer;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+    cursor: not-allowed;
+
+    background: #f3f5f8;
+    color: #929cab;
+
+    opacity: .8;
+}
+
+
+/* =========================================================
+   HINT
+   ========================================================= */
+
+.field-hint {
+    margin-top: 6px;
+
+    color: #8a95a3;
+
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   VALIDATION
+   ========================================================= */
+
+.validation-summary {
+    margin-bottom: 19px;
+
+    padding: 13px 15px;
+
+    border: 1px solid rgba(220, 53, 69, .16);
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 246, 247, .98),
+            rgba(255, 241, 243, .94)
+        );
+
+    color: #bd3e4b;
+
+    font-size: 13px;
+    font-weight: 550;
+    line-height: 1.45;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .85);
+}
+
+.validation-message {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #c7434f;
+
+    font-size: 11px;
+    font-weight: 550;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.details-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 23px;
+    padding-top: 21px;
+
+    border-top: 1px solid rgba(214, 222, 233, .78);
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+   ========================================================= */
+
+.save-button {
+    border-color: #d2e4fc;
+
+    background: #edf5ff;
+    color: #3478dc;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 7px 18px rgba(52, 120, 220, .08),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.save-button:hover {
+    border-color: #c3daf7;
+
+    background: #e5f0ff;
+    color: #286dcc;
+
+    box-shadow:
+        0 10px 24px rgba(52, 120, 220, .12),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.save-button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .schedule-details-page {
+        padding: 28px 18px 50px;
+    }
+
+    .lesson-main-card {
+        padding: 26px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 800
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .details-header {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 17px;
+    }
+
+    .details-header-actions {
+        width: 100%;
+    }
+
+    .details-header-actions .glass-button {
+        flex: 1 1 auto;
+    }
+
+    .lesson-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .schedule-details-page {
+        padding: 22px 14px 45px;
+    }
+
+    .details-header {
+        margin-bottom: 19px;
+    }
+
+    .details-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .details-header p {
+        font-size: 13px;
+    }
+
+    .details-header-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        gap: 8px;
+    }
+
+    .details-header-actions .glass-button {
+        width: 100%;
+    }
+
+    .lesson-main-card {
+        padding: 21px 18px;
+
+        border-radius: 20px;
+    }
+
+    .lesson-card-top {
+        align-items: flex-start;
+
+        gap: 13px;
+    }
+
+    .lesson-icon {
+        flex-basis: 56px;
+
+        width: 56px;
+        height: 56px;
+
+        border-radius: 16px;
+
+        font-size: 23px;
+    }
+
+    .lesson-card-top h2 {
+        font-size: 1.25rem;
+    }
+
+    .lesson-card-top p {
+        font-size: 12px;
+    }
+
+    .info-card {
+        padding: 14px;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 43px;
+    }
+
+    .details-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .details-footer .glass-button {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — VERY SMALL
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .schedule-details-page {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .lesson-main-card {
+        padding: 17px;
+
+        border-radius: 18px;
+    }
+
+    .details-header-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .lesson-card-top {
+        gap: 11px;
+    }
+
+    .lesson-icon {
+        flex-basis: 52px;
+
+        width: 52px;
+        height: 52px;
+
+        border-radius: 15px;
+
+        font-size: 21px;
+    }
+
+    .lesson-card-top h2 {
+        font-size: 1.1rem;
+    }
+
+    .info-card {
+        padding: 13px;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .glass-button,
+    .info-card,
+    .form-control,
+    .form-select {
+        transition: none;
+    }
+
+    .glass-button:hover,
+    .info-card:hover {
+        transform: none;
+    }
+
+}

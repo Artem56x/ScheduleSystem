@@ -1,0 +1,248 @@
+@model ScheduleSystem.Models.Classroom
+
+@{
+    ViewData["Title"] = "Добавить аудиторию";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/Classrooms/Create.css"
+          asp-append-version="true" />
+}
+
+<div class="classroom-form-page">
+
+    <div class="page-header">
+
+        <div>
+            <h1>Добавить аудиторию</h1>
+
+            <p>
+                Создание новой учебной аудитории
+            </p>
+        </div>
+
+    </div>
+
+    <div class="glass-form-card">
+
+        <div class="form-icon">
+            🏫
+        </div>
+
+        <div class="form-title">
+
+            <h2>
+                Информация об аудитории
+            </h2>
+
+            <p>
+                Укажите номер, категорию и количество мест.
+            </p>
+
+        </div>
+
+        <form asp-action="Create"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly"
+                 class="glass-validation">
+            </div>
+
+
+            <!-- НОМЕР АУДИТОРИИ -->
+
+            <div class="form-group">
+
+                <label asp-for="Name"
+                       class="form-label">
+                    Номер аудитории
+                </label>
+
+                <input asp-for="Name"
+                       class="form-control glass-input"
+                       placeholder="Например: 305"
+                       autocomplete="off" />
+
+                <span asp-validation-for="Name"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- КАТЕГОРИЯ -->
+
+            <div class="form-group">
+
+                <label asp-for="ClassroomCategoryId"
+                       class="form-label">
+                    Категория
+                </label>
+
+                <div class="category-row">
+
+                    <select asp-for="ClassroomCategoryId"
+                            asp-items="ViewBag.ClassroomCategories"
+                            class="form-control glass-input"
+                            id="classroomCategorySelect">
+
+                        <option value="">
+                            Выберите категорию
+                        </option>
+
+                    </select>
+
+                    <button type="button"
+                            class="add-category-btn"
+                            id="openCategoryModal">
+
+                        <span>＋</span>
+
+                        Добавить
+
+                    </button>
+
+                </div>
+
+                <span asp-validation-for="ClassroomCategoryId"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- КОЛИЧЕСТВО МЕСТ -->
+
+            <div class="form-group">
+
+                <label asp-for="Capacity"
+                       class="form-label">
+                    Количество мест
+                </label>
+
+                <input asp-for="Capacity"
+                       type="number"
+                       min="1"
+                       max="500"
+                       class="form-control glass-input"
+                       placeholder="Например: 30" />
+
+                <span asp-validation-for="Capacity"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <!-- КНОПКИ -->
+
+            <div class="form-actions">
+
+                <button type="submit"
+                        class="btn save-btn">
+
+                    Добавить аудиторию
+
+                </button>
+
+                <a asp-action="Index"
+                   class="btn cancel-btn">
+
+                    Отмена
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ КАТЕГОРИИ -->
+
+<div class="category-modal-overlay"
+     id="categoryModal"
+     data-create-category-url="@Url.Action("CreateCategory", "Classrooms")">
+
+    <div class="category-modal">
+
+        <button type="button"
+                class="category-modal-close"
+                id="closeCategoryModal">
+
+            ×
+
+        </button>
+
+        <div class="modal-icon">
+            🏷️
+        </div>
+
+        <h3>
+            Новая категория
+        </h3>
+
+        <p>
+            Добавьте новую категорию аудитории.
+        </p>
+
+        <div class="modal-form-group">
+
+            <label for="newCategoryName">
+                Название категории
+            </label>
+
+            <input type="text"
+                   id="newCategoryName"
+                   class="form-control glass-input"
+                   placeholder="Например: Лаборатория"
+                   maxlength="100"
+                   autocomplete="off" />
+
+            <div class="category-error"
+                 id="categoryError">
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button type="button"
+                    class="modal-cancel-btn"
+                    id="cancelCategory">
+
+                Отмена
+
+            </button>
+
+            <button type="button"
+                    class="modal-save-btn"
+                    id="saveCategory">
+
+                Добавить категорию
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="~/js/Classrooms/Create.js"
+            asp-append-version="true"></script>
+}
+

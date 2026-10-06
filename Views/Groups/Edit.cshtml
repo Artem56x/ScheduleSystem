@@ -1,0 +1,160 @@
+@model ScheduleSystem.Models.Group
+
+@{
+    ViewData["Title"] = "Редактировать группу";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Groups/Edit.css" asp-append-version="true" />
+}
+
+<div class="form-page">
+
+    <!-- Заголовок -->
+    <div class="form-header">
+
+        <div class="form-icon">
+            👥
+        </div>
+
+        <div>
+            <h1>Редактировать группу</h1>
+            <p>Измените данные учебной группы</p>
+        </div>
+
+    </div>
+
+    <!-- Форма -->
+    <div class="glass-form-card">
+
+        <form asp-action="Edit" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3">
+            </div>
+
+            <!-- Название группы -->
+            <div class="form-field">
+
+                <label asp-for="Name">
+                    Название группы
+                </label>
+
+                <input asp-for="Name" class="form-control" placeholder="Например: 24ИС-1" />
+
+                <span asp-validation-for="Name" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- Специальность -->
+            <div class="form-field">
+
+                <label asp-for="Specialty">
+                    Специальность
+                </label>
+
+                <input asp-for="Specialty" class="form-control"
+                       placeholder="Например: Информационные системы и программирование" />
+
+                <span asp-validation-for="Specialty" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- Курс -->
+            <div class="form-field">
+
+                <label asp-for="Course">
+                    Курс
+                </label>
+
+                <div class="number-wrapper">
+
+                    <input asp-for="Course" type="number" min="1" max="5" class="form-control"
+                           placeholder="Например: 3" />
+
+                    <span class="number-suffix">
+                        курс
+                    </span>
+
+                </div>
+
+                <span asp-validation-for="Course" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- Количество человек -->
+            <div class="form-field">
+
+                <label asp-for="StudentCount">
+                    Количество человек
+                </label>
+
+                <div class="number-wrapper">
+
+                    <input asp-for="StudentCount" type="number" min="1" max="100" class="form-control"
+                           placeholder="Например: 25" />
+
+                    <span class="number-suffix">
+                        чел.
+                    </span>
+
+                </div>
+
+                <span asp-validation-for="StudentCount" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- Описание -->
+            <div class="form-field">
+
+                <label asp-for="Description">
+                    Описание
+
+                    <span class="optional">
+                        необязательно
+                    </span>
+                </label>
+
+                <textarea asp-for="Description" class="form-control" rows="4"
+                          placeholder="Дополнительная информация о группе..."></textarea>
+
+                <span asp-validation-for="Description" class="text-danger">
+                </span>
+
+            </div>
+
+            <!-- Кнопки -->
+            <div class="form-actions">
+
+                <button type="submit" class="btn glass-primary-btn">
+
+                    ✓
+                    Сохранить изменения
+
+                </button>
+
+                <a asp-action="Index" class="btn glass-secondary-btn">
+                    Отмена
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

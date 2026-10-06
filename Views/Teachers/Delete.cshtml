@@ -1,0 +1,227 @@
+@model ScheduleSystem.Models.Teacher
+
+@{
+    ViewData["Title"] = "Удаление преподавателя";
+
+
+    var firstLetter = !string.IsNullOrWhiteSpace(Model.FullName)
+        ? Model.FullName.Substring(0, 1).ToUpper()
+        : "?";
+
+
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teachers/Delete.css" asp-append-version="true" />
+}
+
+<div class="schedule-details-page">
+
+
+    <!-- HEADER -->
+    <div class="details-header">
+
+        <div class="details-header-content">
+
+            <div class="page-badge">
+                ПРЕПОДАВАТЕЛИ
+            </div>
+
+            <h1>Удаление преподавателя</h1>
+
+            <p>
+                Подтверждение удаления преподавателя из системы
+            </p>
+
+        </div>
+
+        <div class="details-header-actions">
+
+            <a asp-action="Index" class="glass-button secondary-button">
+                ← Назад
+            </a>
+
+            <a asp-action="Details" asp-route-id="@Model.Id" class="glass-button primary-button">
+                Подробнее
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAIN CARD -->
+    <div class="lesson-main-card">
+
+        <!-- TOP -->
+        <div class="lesson-card-top">
+
+            <div class="lesson-icon delete-icon">
+                🗑️
+            </div>
+
+            <div>
+
+                <div class="lesson-label">
+                    ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ
+                </div>
+
+                <h2>Вы уверены?</h2>
+
+                <p>
+                    Вы действительно хотите удалить этого преподавателя?
+                    Это действие нельзя отменить.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- TEACHER PROFILE -->
+        <div class="teacher-profile">
+
+            <div class="teacher-avatar">
+                @firstLetter
+            </div>
+
+            <div class="teacher-main-info">
+
+                <h3>@Model.FullName</h3>
+
+                @if (Model.Subject != null)
+                {
+                    <span>
+                        @Model.Subject.Name
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        Преподаватель
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- INFORMATION -->
+        <div class="lesson-info-grid">
+
+            <!-- ФИО -->
+            <div class="info-card">
+
+                <div class="info-icon">
+                    👤
+                </div>
+
+                <div>
+                    <span>ФИО</span>
+                    <strong>@Model.FullName</strong>
+                </div>
+
+            </div>
+
+
+            <!-- ПРЕДМЕТ -->
+            <div class="info-card">
+
+                <div class="info-icon">
+                    📚
+                </div>
+
+                <div>
+                    <span>Предмет</span>
+
+                    <strong>
+                        @if (Model.Subject != null)
+                        {
+                            @Model.Subject.Name
+                        }
+                        else
+                        {
+                            <span>Не указан</span>
+                        }
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- EMAIL -->
+            <div class="info-card">
+
+                <div class="info-icon">
+                    ✉️
+                </div>
+
+                <div>
+                    <span>Email</span>
+
+                    <strong>
+                        @if (!string.IsNullOrWhiteSpace(Model.Email))
+                        {
+                            @Model.Email
+                        }
+                        else
+                        {
+                            <span>Не указан</span>
+                        }
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- WARNING -->
+        <div class="warning-section">
+
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+            <div>
+
+                <strong>Внимание</strong>
+
+                <p>
+                    После удаления преподавателя восстановить его данные
+                    будет невозможно.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+        <div class="details-footer">
+
+            <a asp-action="Index" class="glass-button secondary-button">
+                ← Отмена
+            </a>
+
+            <form asp-action="Delete" method="post" class="delete-form">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                <button type="submit" class="glass-button delete-button">
+                    🗑 Удалить преподавателя
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+</div>

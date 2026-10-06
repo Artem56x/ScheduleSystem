@@ -1,0 +1,318 @@
+@model ScheduleSystem.Models.Schedule
+
+@{
+    ViewData["Title"] = "Удаление занятия";
+
+    var russianDays = new Dictionary<DayOfWeek, string>
+    {
+        [DayOfWeek.Monday] = "Понедельник",
+        [DayOfWeek.Tuesday] = "Вторник",
+        [DayOfWeek.Wednesday] = "Среда",
+        [DayOfWeek.Thursday] = "Четверг",
+        [DayOfWeek.Friday] = "Пятница",
+        [DayOfWeek.Saturday] = "Суббота",
+        [DayOfWeek.Sunday] = "Воскресенье"
+    };
+
+    string dayName = Model.DayOfWeek.HasValue &&
+                     russianDays.TryGetValue(Model.DayOfWeek.Value, out var russianDay)
+        ? russianDay
+        : "День не указан";
+
+    string startTime = Model.StartTime.HasValue
+        ? Model.StartTime.Value.ToString(@"hh\:mm")
+        : "--:--";
+
+    string endTime = Model.EndTime.HasValue
+        ? Model.EndTime.Value.ToString(@"hh\:mm")
+        : "--:--";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Schedules/Delete.css" asp-append-version="true" />
+}
+
+<div class="schedule-details-page">
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="details-header">
+
+        <div>
+
+            <div class="details-badge">
+                РАСПИСАНИЕ
+            </div>
+
+            <h1>
+                Удаление занятия
+            </h1>
+
+            <p>
+                Удаление занятия из расписания
+            </p>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <a asp-action="Index" class="glass-button secondary-button">
+                ← Назад
+            </a>
+
+            <a asp-action="Details" asp-route-id="@Model.Id" class="glass-button secondary-button">
+                Подробнее
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN CARD
+         ===================================================== -->
+
+    <div class="lesson-main-card">
+
+
+        <!-- =================================================
+             CARD TOP
+             ================================================= -->
+
+        <div class="lesson-card-top">
+
+            <div class="lesson-icon delete-icon">
+                ⚠️
+            </div>
+
+            <div class="lesson-title-block">
+
+                <span class="lesson-label delete-label">
+                    ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ
+                </span>
+
+                <h2>
+                    Вы уверены?
+                </h2>
+
+                <p>
+                    Это действие нельзя отменить. Занятие будет удалено
+                    из расписания.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             LESSON INFORMATION
+             ================================================= -->
+
+        <div class="lesson-info-grid">
+
+
+            <!-- SUBJECT -->
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    📚
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        Предмет
+                    </span>
+
+                    <strong>
+                        @(Model.Subject?.Name ?? "Не указан")
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- TEACHER -->
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    👨‍🏫
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        Преподаватель
+                    </span>
+
+                    <strong>
+                        @(Model.Teacher?.FullName ?? "Не указан")
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- GROUP -->
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    👥
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        Группа
+                    </span>
+
+                    <strong>
+                        @(Model.Group?.Name ?? "Не указана")
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- CLASSROOM -->
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    🏫
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        Аудитория
+                    </span>
+
+                    <strong>
+                        @(Model.Classroom?.Name ?? "Не указана")
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- DAY -->
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    📅
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        День недели
+                    </span>
+
+                    <strong>
+                        @dayName
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- TIME -->
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    🕐
+                </div>
+
+                <div class="info-content">
+
+                    <span class="info-label">
+                        Время
+                    </span>
+
+                    <strong>
+                        @startTime — @endTime
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             WARNING
+             ================================================= -->
+
+        <div class="warning-section">
+
+            <div class="warning-icon">
+                ⚠
+            </div>
+
+            <div class="warning-content">
+
+                <strong>
+                    Внимание
+                </strong>
+
+                <p>
+                    После удаления это занятие исчезнет из расписания.
+                    Восстановить его будет невозможно.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FOOTER
+             ================================================= -->
+
+        <form asp-action="Delete" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+
+            <div class="details-footer">
+
+
+                <a asp-action="Details" asp-route-id="@Model.Id" class="footer-button secondary-button">
+
+                    ← Отмена
+
+                </a>
+
+
+                <button type="submit" class="footer-button delete-button">
+
+                    🗑 Удалить занятие
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

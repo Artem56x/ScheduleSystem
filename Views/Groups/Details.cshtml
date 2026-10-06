@@ -1,0 +1,179 @@
+@model ScheduleSystem.Models.Group
+
+@{
+    ViewData["Title"] = "Информация о группе";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Groups/Details.css" asp-append-version="true" />
+}
+
+<div class="details-page">
+
+    <!-- Заголовок -->
+    <div class="details-header">
+
+        <div class="details-icon">
+            👥
+        </div>
+
+        <div>
+            <h1>Информация о группе</h1>
+            <p>Подробная информация об учебной группе</p>
+        </div>
+
+    </div>
+
+    <!-- Основная карточка -->
+    <div class="glass-details-card">
+
+        <!-- Профиль группы -->
+        <div class="group-profile">
+
+            <div class="group-avatar">
+                @(string.IsNullOrWhiteSpace(Model.Name)
+                    ? "?"
+                    : Model.Name.Substring(0, 1).ToUpper())
+            </div>
+
+            <div class="group-main-info">
+
+                <h2>
+                    @Model.Name
+                </h2>
+
+                <span>
+                    Учебная группа
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- Информация -->
+        <div class="info-list">
+
+            <!-- Название -->
+            <div class="info-row">
+
+                <div class="info-label">
+                    <span class="info-icon">👥</span>
+                    <span>Название группы</span>
+                </div>
+
+                <div class="info-value">
+                    @Model.Name
+                </div>
+
+            </div>
+
+            <!-- Специальность -->
+            <div class="info-row">
+
+                <div class="info-label">
+                    <span class="info-icon">🎓</span>
+                    <span>Специальность</span>
+                </div>
+
+                <div class="info-value">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Specialty))
+                    {
+                        @Model.Specialty
+                    }
+                    else
+                    {
+                        <span class="empty-value">
+                            Не указана
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+            <!-- Курс -->
+            <div class="info-row">
+
+                <div class="info-label">
+                    <span class="info-icon">📚</span>
+                    <span>Курс</span>
+                </div>
+
+                <div class="info-value">
+
+                    <span class="course-count">
+                        @Model.Course курс
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- Количество человек -->
+            <div class="info-row">
+
+                <div class="info-label">
+                    <span class="info-icon">👤</span>
+                    <span>Количество человек</span>
+                </div>
+
+                <div class="info-value">
+                    <span class="student-count">
+                        @Model.StudentCount чел.
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- Описание -->
+            <div class="info-row">
+
+                <div class="info-label">
+                    <span class="info-icon">📝</span>
+                    <span>Описание</span>
+                </div>
+
+                <div class="info-value">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        @Model.Description
+                    }
+                    else
+                    {
+                        <span class="empty-value">
+                            Не указано
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Кнопки -->
+        <div class="details-actions">
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn glass-primary-btn">
+                    Изменить
+                </a>
+
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn glass-danger-btn">
+                    Удалить
+                </a>
+            }
+
+            <a asp-action="Index" class="btn glass-secondary-btn">
+                Назад к списку
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+

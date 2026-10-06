@@ -1,0 +1,634 @@
+@model ScheduleSystem.Models.Schedule
+
+@{
+    ViewData["Title"] = "Добавить занятие";
+
+    bool showTeacherWarning =
+        ViewBag.TeacherSubjectWarning == true;
+
+    var recommendedClassrooms =
+        ViewBag.RecommendedClassrooms
+        as List<ScheduleSystem.Models.Classroom>;
+
+    bool showClassroomRecommendations =
+        recommendedClassrooms != null &&
+        recommendedClassrooms.Any();
+
+    bool showNoClassroomRecommendations =
+        recommendedClassrooms != null &&
+        !recommendedClassrooms.Any();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Schedules/Create.css" asp-append-version="true" />
+}
+
+<div class="schedule-create-page">
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="create-header">
+
+        <div>
+
+            <div class="create-badge">
+                РАСПИСАНИЕ
+            </div>
+
+            <h1>
+                Добавить занятие
+            </h1>
+
+            <p>
+                Создание нового занятия в расписании
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <a asp-action="Index" class="glass-button secondary-button">
+                ← Назад
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN CARD -->
+    <!-- ================================================= -->
+
+    <div class="create-main-card">
+
+        <!-- CARD TOP -->
+
+        <div class="create-card-top">
+
+            <div class="create-icon">
+                📅
+            </div>
+
+            <div class="create-title-block">
+
+                <span class="create-label">
+                    НОВОЕ ЗАНЯТИЕ
+                </span>
+
+                <h2>
+                    Информация о занятии
+                </h2>
+
+                <p>
+                    Заполните основные данные расписания.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- FORM -->
+        <!-- ================================================= -->
+
+        <form asp-action="Create" method="post" id="scheduleForm">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="confirmTeacherSubject"
+                   id="confirmTeacherSubject"
+                   value="false" />
+
+
+            <div asp-validation-summary="ModelOnly"
+                 class="glass-validation">
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
+            <!-- ================================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Основная информация
+                </div>
+
+
+                <div class="form-grid">
+
+                    <!-- ПРЕПОДАВАТЕЛЬ -->
+
+                    <div class="form-group">
+
+                        <label asp-for="TeacherId"
+                               class="form-label">
+
+                            Преподаватель
+
+                        </label>
+
+                        <select asp-for="TeacherId"
+                                class="form-control glass-input"
+                                asp-items="ViewBag.TeacherId">
+
+                            <option value="">
+                                Выберите преподавателя
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="TeacherId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ПРЕДМЕТ -->
+
+                    <div class="form-group">
+
+                        <label asp-for="SubjectId"
+                               class="form-label">
+
+                            Предмет
+
+                        </label>
+
+                        <select asp-for="SubjectId"
+                                class="form-control glass-input"
+                                asp-items="ViewBag.SubjectId">
+
+                            <option value="">
+                                Выберите предмет
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="SubjectId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ГРУППА -->
+
+                    <div class="form-group">
+
+                        <label asp-for="GroupId"
+                               class="form-label">
+
+                            Группа
+
+                        </label>
+
+                        <select asp-for="GroupId"
+                                class="form-control glass-input"
+                                asp-items="ViewBag.GroupId">
+
+                            <option value="">
+                                Выберите группу
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="GroupId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- АУДИТОРИЯ -->
+
+                    <div class="form-group">
+
+                        <label asp-for="ClassroomId"
+                               class="form-label">
+
+                            Аудитория
+
+                        </label>
+
+                        <select asp-for="ClassroomId"
+                                class="form-control glass-input"
+                                asp-items="ViewBag.ClassroomId">
+
+                            <option value="">
+                                Выберите аудиторию
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="ClassroomId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ВРЕМЯ -->
+            <!-- ================================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Время занятия
+                </div>
+
+
+                <!-- ДЕНЬ НЕДЕЛИ -->
+
+                <div class="form-group">
+
+                    <label asp-for="DayOfWeek"
+                           class="form-label">
+
+                        День недели
+
+                    </label>
+
+                    <select asp-for="DayOfWeek"
+                            class="form-control glass-input"
+                            asp-items="ViewBag.DayOfWeek">
+
+                        <option value="">
+                            Выберите день недели
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="DayOfWeek"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- ВРЕМЯ -->
+
+                <div class="time-row">
+
+                    <!-- НАЧАЛО -->
+
+                    <div class="form-group">
+
+                        <label asp-for="StartTime"
+                               class="form-label">
+
+                            Время начала
+
+                        </label>
+
+                        <div class="time-input-wrapper">
+
+                            <span class="time-input-icon">
+                                🕐
+                            </span>
+
+                            <input asp-for="StartTime"
+                                   type="time"
+                                   class="form-control glass-input" />
+
+                        </div>
+
+                        <span asp-validation-for="StartTime"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ОКОНЧАНИЕ -->
+
+                    <div class="form-group">
+
+                        <label asp-for="EndTime"
+                               class="form-label">
+
+                            Время окончания
+
+                        </label>
+
+                        <div class="time-input-wrapper">
+
+                            <span class="time-input-icon">
+                                🕐
+                            </span>
+
+                            <input asp-for="EndTime"
+                                   type="time"
+                                   class="form-control glass-input" />
+
+                        </div>
+
+                        <span asp-validation-for="EndTime"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ACTIONS -->
+            <!-- ================================================= -->
+
+            <div class="form-actions">
+
+                <a asp-action="Index"
+                   class="footer-button secondary-button">
+
+                    Отмена
+
+                </a>
+
+
+                <button type="submit"
+                        class="footer-button primary-button">
+
+                    <span>✓</span>
+
+                    Добавить занятие
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- ПРЕДУПРЕЖДЕНИЕ ПРЕПОДАВАТЕЛЯ -->
+<!-- ===================================================== -->
+
+@if (showTeacherWarning)
+{
+    <div class="warning-overlay"
+         id="teacherWarning">
+
+        <div class="warning-modal">
+
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+            <h2>
+                Проверьте преподавателя
+            </h2>
+
+            <p>
+
+                Преподаватель
+
+                <strong>
+                    @ViewBag.TeacherName
+                </strong>
+
+                обычно ведёт предмет
+
+                <strong>
+                    «@ViewBag.TeacherSubjectName»
+                </strong>.
+
+            </p>
+
+            <p>
+
+                Вы выбрали предмет
+
+                <strong>
+                    «@ViewBag.SelectedSubjectName»
+                </strong>.
+
+            </p>
+
+            <p class="warning-question">
+                Продолжить создание занятия?
+            </p>
+
+
+            <div class="warning-actions">
+
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeTeacherWarning()">
+
+                    Вернуться
+
+                </button>
+
+
+                <button type="button"
+                        class="warning-confirm"
+                        onclick="confirmTeacher()">
+
+                    Да, оставить
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- РЕКОМЕНДАЦИИ АУДИТОРИЙ -->
+<!-- ===================================================== -->
+
+@if (showClassroomRecommendations)
+{
+    <div class="warning-overlay"
+         id="classroomRecommendationModal">
+
+        <div class="classroom-recommendation-modal">
+
+            <div class="classroom-recommendation-icon">
+                💡
+            </div>
+
+
+            <h2>
+                Рекомендуем другую аудиторию
+            </h2>
+
+
+            <p class="classroom-recommendation-description">
+
+                Аудитория
+
+                <strong>
+                    «@ViewBag.SelectedClassroomName»
+                </strong>
+
+                не подходит для этого занятия.
+
+            </p>
+
+
+            <p class="classroom-recommendation-subtitle">
+
+                Подходящие свободные аудитории:
+
+            </p>
+
+
+            <div class="recommended-classroom-list">
+
+                @for (int i = 0;
+                      i < recommendedClassrooms!.Count;
+                      i++)
+                {
+                    var classroom =
+                        recommendedClassrooms[i];
+
+                    bool isOptimal = i == 0;
+
+
+                    <div class="recommended-classroom @(isOptimal ? "recommended-optimal" : "")">
+
+                        <div class="recommended-classroom-info">
+
+                            <div class="recommended-classroom-name-row">
+
+                                <span class="recommended-classroom-name">
+                                    @classroom.Name
+                                </span>
+
+
+                                @if (isOptimal)
+                                {
+                                    <span class="optimal-badge">
+                                        Оптимальный
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <div class="recommended-classroom-details">
+
+                                <span>
+                                    🪑 @classroom.Capacity мест
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="select-classroom-button"
+                                onclick="selectClassroom(@classroom.Id)">
+
+                            Выбрать
+
+                        </button>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <div class="classroom-recommendation-actions">
+
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeClassroomRecommendations()">
+
+                    Оставить выбранную
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+<!-- ===================================================== -->
+<!-- НЕТ РЕКОМЕНДАЦИЙ -->
+<!-- ===================================================== -->
+
+@if (showNoClassroomRecommendations)
+{
+    <div class="warning-overlay"
+         id="classroomNoRecommendationModal">
+
+        <div class="warning-modal">
+
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+
+            <h2>
+                Подходящих аудиторий нет
+            </h2>
+
+
+            <p>
+
+                Сейчас нет свободной аудитории,
+                которая подходит по вместимости
+                и требованиям предмета.
+
+            </p>
+
+
+            <div class="warning-actions">
+
+                <button type="button"
+                        class="warning-cancel"
+                        onclick="closeNoClassroomRecommendations()">
+
+                    Вернуться
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial"
+        );
+    }
+
+    <script src="~/js/Schedules/Create.js"
+            asp-append-version="true"></script>
+}
+
