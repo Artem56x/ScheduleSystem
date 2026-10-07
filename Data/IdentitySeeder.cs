@@ -21,12 +21,22 @@ namespace ScheduleSystem.Data
             }
 
             const string adminEmail = "admin@schedulesystem.local";
-            const string adminPassword = "Admin123!";
 
             var admin = await userManager.FindByEmailAsync(adminEmail);
 
             if (admin == null)
             {
+                var configuration = serviceProvider
+                    .GetRequiredService<IConfiguration>();
+                var adminPassword = configuration["Admin:Password"];
+
+                if (string.IsNullOrWhiteSpace(adminPassword))
+                {
+                    throw new InvalidOperationException(
+                        "Set the admin password using the Admin:Password configuration key " +
+                        "or the Admin__Password environment variable.");
+                }
+
                 admin = new ApplicationUser
                 {
                     UserName = adminEmail,
