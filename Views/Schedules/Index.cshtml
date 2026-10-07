@@ -1,10 +1,12 @@
+
 @model IEnumerable<ScheduleSystem.Models.Schedule>
 
 @{
     ViewData["Title"] = "Расписание";
 
     var schedules = Model
-        .OrderBy(s => s.DayOfWeek == DayOfWeek.Sunday ? 7 : (int?)s.DayOfWeek)
+        .OrderBy(s => s.Group?.Name)
+        .ThenBy(s => s.DayOfWeek == DayOfWeek.Sunday ? 7 : (int?)s.DayOfWeek)
         .ThenBy(s => s.StartTime)
         .ToList();
 
@@ -82,14 +84,16 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/Schedules/Index.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="~/css/Schedules/Index.css"
+          asp-append-version="true" />
 }
 
 <div class="schedule-page">
 
-    <!-- =========================================================
+    <!-- =================================================
          HEADER
-         ========================================================= -->
+         ================================================= -->
 
     <div class="schedule-header">
 
@@ -97,56 +101,60 @@
             <div class="schedule-kicker">
                 <h1>Система расписания</h1>
             </div>
-
         </div>
-
 
         <div class="schedule-header-actions">
 
-            <button type="button" class="print-header-button no-print" id="printScheduleButton">
+            <button type="button"
+                    class="print-header-button no-print"
+                    id="printScheduleButton">
                 🖨 Распечатать
             </button>
 
-            <a asp-action="Export" class="export-header-button no-print">
+            <a asp-action="Export"
+               class="export-header-button no-print">
                 ↓ Экспорт
             </a>
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-action="Create" class="add-lesson-button no-print">
+                <a asp-action="Create"
+                   class="add-lesson-button no-print">
 
-                    <span class="button-icon">
-                        +
-                    </span>
+                    <span class="button-icon">+</span>
 
                     <span>
                         Добавить занятие
                     </span>
 
                 </a>
-            
 
-                <a asp-controller="ScheduleGenerator" asp-action="Index" class="auto-generate-button"
+                <a asp-controller="ScheduleGenerator"
+                   asp-action="Index"
+                   class="auto-generate-button no-print"
                    title="Автоматически создать расписание">
+
                     <span class="button-icon">✦</span>
+
                     Автогенерация
+
                 </a>
             }
-         
+
         </div>
 
     </div>
 
 
-    <!-- =====================================================
-             COMPACT FILTERS
-             ===================================================== -->
+    <!-- =================================================
+         FILTERS
+         ================================================= -->
 
     <div class="schedule-filters no-print">
 
         <div class="filters-main-row">
 
-            <!-- SEARCH -->
+            <!-- Search -->
 
             <div class="filter-search">
 
@@ -154,14 +162,18 @@
                     ⌕
                 </span>
 
-                <input type="text" id="scheduleSearch" placeholder="Поиск по расписанию..." autocomplete="off" />
+                <input type="text"
+                       id="scheduleSearch"
+                       placeholder="Поиск по расписанию..."
+                       autocomplete="off" />
 
             </div>
 
 
-            <!-- GROUP -->
+            <!-- Group -->
 
-            <select id="filterGroup" class="schedule-filter-select">
+            <select id="filterGroup"
+                    class="schedule-filter-select">
 
                 <option value="">
                     Группа
@@ -177,9 +189,10 @@
             </select>
 
 
-            <!-- TEACHER -->
+            <!-- Teacher -->
 
-            <select id="filterTeacher" class="schedule-filter-select">
+            <select id="filterTeacher"
+                    class="schedule-filter-select">
 
                 <option value="">
                     Преподаватель
@@ -195,9 +208,10 @@
             </select>
 
 
-            <!-- SUBJECT -->
+            <!-- Subject -->
 
-            <select id="filterSubject" class="schedule-filter-select">
+            <select id="filterSubject"
+                    class="schedule-filter-select">
 
                 <option value="">
                     Предмет
@@ -213,9 +227,10 @@
             </select>
 
 
-            <!-- CLASSROOM -->
+            <!-- Classroom -->
 
-            <select id="filterClassroom" class="schedule-filter-select">
+            <select id="filterClassroom"
+                    class="schedule-filter-select">
 
                 <option value="">
                     Аудитория
@@ -231,9 +246,10 @@
             </select>
 
 
-            <!-- DAY -->
+            <!-- Day -->
 
-            <select id="filterDay" class="schedule-filter-select">
+            <select id="filterDay"
+                    class="schedule-filter-select">
 
                 <option value="">
                     День
@@ -251,9 +267,7 @@
         </div>
 
 
-        <!-- =================================================
-                 SECONDARY FILTERS
-                 ================================================= -->
+        <!-- SECONDARY FILTER ROW -->
 
         <div class="filters-secondary-row">
 
@@ -263,13 +277,17 @@
                     Время
                 </span>
 
-                <input type="time" id="filterTimeFrom" aria-label="Время от" />
+                <input type="time"
+                       id="filterTimeFrom"
+                       aria-label="Время от" />
 
                 <span class="time-dash">
                     —
                 </span>
 
-                <input type="time" id="filterTimeTo" aria-label="Время до" />
+                <input type="time"
+                       id="filterTimeTo"
+                       aria-label="Время до" />
 
             </div>
 
@@ -291,7 +309,9 @@
             </div>
 
 
-            <button type="button" id="resetFilters" class="reset-filters">
+            <button type="button"
+                    id="resetFilters"
+                    class="reset-filters">
 
                 Сбросить
 
@@ -301,9 +321,10 @@
 
     </div>
 
-    <!-- =====================================================
-             EMPTY STATE
-             ===================================================== -->
+
+    <!-- =================================================
+         EMPTY DATABASE
+         ================================================= -->
 
     @if (!schedules.Any())
     {
@@ -323,7 +344,8 @@
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-action="Create" class="empty-button">
+                <a asp-action="Create"
+                   class="empty-button">
 
                     Добавить занятие
 
@@ -334,89 +356,105 @@
     }
     else
     {
+
+        <!-- =================================================
+             SCHEDULE
+             GROUP → DAY → LESSON
+             ================================================= -->
+
         <div id="scheduleDays">
 
-            @foreach (var dayGroup in schedules.GroupBy(s => s.DayOfWeek))
+            @foreach (var group in schedules
+                .Where(s => s.Group != null)
+                .GroupBy(s => new
+                {
+                    s.GroupId,
+                    GroupName = s.Group!.Name
+                })
+                .OrderBy(g => g.Key.GroupName))
             {
-                var daySchedules = dayGroup
-                    .OrderBy(s => s.StartTime)
-                    .ToList();
 
-                <div class="day-card" data-day-card="@((int?)dayGroup.Key ?? -1)">
-
-                    <div class="day-header">
-
-                        <div class="day-title">
-
-                            <span class="day-dot"></span>
-
-                            <h3>
-                                @GetDayName(dayGroup.Key)
-                            </h3>
-
-                        </div>
+                <section class="group-card"
+                         data-group-section="@group.Key.GroupId">
 
 
-                        <div class="day-count">
+                    <!-- =================================================
+                         GROUP HEADER
+                         ================================================= -->
 
-                            <span class="js-day-count">
-                                @daySchedules.Count
-                            </span>
+                    <div class="group-header">
 
-                            <span class="js-day-word">
-                                @GetLessonWord(daySchedules.Count)
-                            </span>
+                        <div class="group-title">
+
+                            <div class="group-icon">
+                                👥
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    @group.Key.GroupName
+                                </h3>
+
+                                <span>
+                                    @group.Count()
+                                    @GetLessonWord(group.Count())
+                                </span>
+
+                            </div>
 
                         </div>
 
                     </div>
 
 
-                    <div class="lessons-list">
+                    <!-- =================================================
+                         DAYS
+                         ================================================= -->
 
-                        @foreach (var item in daySchedules)
+                    <div class="group-days">
+
+                        @foreach (var dayGroup in group
+                            .GroupBy(s => s.DayOfWeek)
+                            .OrderBy(g =>
+                                g.Key == DayOfWeek.Sunday
+                                    ? 7
+                                    : (int?)g.Key))
                         {
-                            <article class="lesson-card" data-schedule="true" data-group-id="@item.GroupId"
-                                     data-teacher-id="@item.TeacherId" data-subject-id="@item.SubjectId"
-                                     data-classroom-id="@item.ClassroomId" data-day="@((int?)item.DayOfWeek ?? -1)"
-                                     data-start="@GetStartTime(item)" data-end="@GetEndTime(item)"
-                                     data-search="@($"{item.Subject?.Name} {item.Teacher?.FullName} {item.Group?.Name} {item.Classroom?.Name}")">
 
-                                <div class="lesson-time">
-
-                                    <strong>
-                                        @GetStartTime(item)
-                                    </strong>
-
-                                    <span>
-                                        @GetEndTime(item)
-                                    </span>
-
-                                </div>
+                            var daySchedules = dayGroup
+                                .OrderBy(s => s.StartTime)
+                                .ToList();
 
 
-                                <div class="lesson-info">
+                            <div class="group-day-card"
+                                 data-day-card="@((int?)dayGroup.Key ?? -1)"
+                                 data-group-id="@group.Key.GroupId">
 
-                                    <div class="lesson-subject">
-                                        @(item.Subject?.Name ?? "Предмет не указан")
+
+                                <!-- DAY HEADER -->
+
+                                <div class="day-header">
+
+                                    <div class="day-title">
+
+                                        <span class="day-dot"></span>
+
+                                        <h4>
+                                            @GetDayName(dayGroup.Key)
+                                        </h4>
+
                                     </div>
 
 
-                                    <div class="lesson-meta">
+                                    <div class="day-count">
 
-                                        <span>
-                                            👨‍🏫
-                                            @(item.Teacher?.FullName ?? "Не указан")
+                                        <span class="js-day-count">
+                                            @daySchedules.Count
                                         </span>
 
-                                        <span>
-                                            👥
-                                            @(item.Group?.Name ?? "Не указана")
-                                        </span>
-
-                                        <span>
-                                            🏫
-                                            @(item.Classroom?.Name ?? "Не указана")
+                                        <span class="js-day-word">
+                                            @GetLessonWord(daySchedules.Count)
                                         </span>
 
                                     </div>
@@ -424,47 +462,132 @@
                                 </div>
 
 
-                                <div class="lesson-actions no-print">
+                                <!-- LESSONS -->
 
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="lesson-action details">
+                                <div class="lessons-list">
 
-                                        Подробнее
-
-                                    </a>
-
-                                    @if (User.IsInRole("Admin"))
+                                    @foreach (var item in daySchedules)
                                     {
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="lesson-action edit">
 
-                                            Изменить
+                                        <article class="lesson-card"
+                                                 data-schedule="true"
+                                                 data-group-id="@item.GroupId"
+                                                 data-teacher-id="@item.TeacherId"
+                                                 data-subject-id="@item.SubjectId"
+                                                 data-classroom-id="@item.ClassroomId"
+                                                 data-day="@((int?)item.DayOfWeek ?? -1)"
+                                                 data-start="@GetStartTime(item)"
+                                                 data-end="@GetEndTime(item)"
+                                                 data-search="@($"{item.Subject?.Name} {item.Teacher?.FullName} {item.Group?.Name} {item.Classroom?.Name}")">
 
-                                        </a>
 
-                                        <a asp-action="Delete" asp-route-id="@item.Id" class="lesson-action delete">
+                                            <!-- TIME -->
 
-                                            Удалить
+                                            <div class="lesson-time">
 
-                                        </a>
+                                                <strong>
+                                                    @GetStartTime(item)
+                                                </strong>
+
+                                                <span>
+                                                    @GetEndTime(item)
+                                                </span>
+
+                                            </div>
+
+
+                                            <!-- INFORMATION -->
+
+                                            <div class="lesson-info">
+
+                                                <div class="lesson-subject">
+
+                                                    @(item.Subject?.Name
+                                                        ?? "Предмет не указан")
+
+                                                </div>
+
+
+                                                <div class="lesson-meta">
+
+                                                    <span>
+                                                        👨‍🏫
+                                                        @(item.Teacher?.FullName
+                                                            ?? "Не указан")
+                                                    </span>
+
+                                                    <span>
+                                                        🏫
+                                                        @(item.Classroom?.Name
+                                                            ?? "Не указана")
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <!-- ACTIONS -->
+
+                                            <div class="lesson-actions no-print">
+
+                                                <a asp-action="Details"
+                                                   asp-route-id="@item.Id"
+                                                   class="lesson-action details">
+
+                                                    Подробнее
+
+                                                </a>
+
+                                                @if (User.IsInRole("Admin"))
+                                                {
+
+                                                    <a asp-action="Edit"
+                                                       asp-route-id="@item.Id"
+                                                       class="lesson-action edit">
+
+                                                        Изменить
+
+                                                    </a>
+
+                                                    <a asp-action="Delete"
+                                                       asp-route-id="@item.Id"
+                                                       class="lesson-action delete">
+
+                                                        Удалить
+
+                                                    </a>
+
+                                                }
+
+                                            </div>
+
+                                        </article>
+
                                     }
 
                                 </div>
 
-                            </article>
+                            </div>
+
                         }
 
                     </div>
 
-                </div>
+                </section>
+
             }
 
         </div>
 
 
         <!-- =================================================
-                 NO FILTER RESULTS
-                 ================================================= -->
+             NO FILTER RESULTS
+             ================================================= -->
 
-        <div id="filterNoResults" class="filter-no-results" style="display:none;">
+        <div id="filterNoResults"
+             class="filter-no-results"
+             style="display:none;">
 
             <div class="filter-no-results-icon">
                 ⌕
@@ -478,7 +601,8 @@
                 Попробуйте изменить параметры поиска.
             </span>
 
-            <button type="button" id="resetFiltersEmpty">
+            <button type="button"
+                    id="resetFiltersEmpty">
 
                 Сбросить фильтры
 
@@ -488,8 +612,9 @@
 
     }
 
-</section>
-
 </div>
 
-<script src="~/js/Schedules/Index.js" asp-append-version="true"></script>
+
+<script src="~/js/Schedules/Index.js"
+        asp-append-version="true"></script>
+

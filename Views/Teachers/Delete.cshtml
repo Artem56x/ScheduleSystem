@@ -3,12 +3,9 @@
 @{
     ViewData["Title"] = "Удаление преподавателя";
 
-
     var firstLetter = !string.IsNullOrWhiteSpace(Model.FullName)
         ? Model.FullName.Substring(0, 1).ToUpper()
         : "?";
-
-
 }
 
 @section Styles {
@@ -16,7 +13,6 @@
 }
 
 <div class="schedule-details-page">
-
 
     <!-- HEADER -->
     <div class="details-header">
@@ -27,7 +23,9 @@
                 ПРЕПОДАВАТЕЛИ
             </div>
 
-            <h1>Удаление преподавателя</h1>
+            <h1>
+                Удаление преподавателя
+            </h1>
 
             <p>
                 Подтверждение удаления преподавателя из системы
@@ -66,7 +64,9 @@
                     ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ
                 </div>
 
-                <h2>Вы уверены?</h2>
+                <h2>
+                    Вы уверены?
+                </h2>
 
                 <p>
                     Вы действительно хотите удалить этого преподавателя?
@@ -87,7 +87,9 @@
 
             <div class="teacher-main-info">
 
-                <h3>@Model.FullName</h3>
+                <h3>
+                    @Model.FullName
+                </h3>
 
                 @if (Model.Subject != null)
                 {
@@ -118,8 +120,13 @@
                 </div>
 
                 <div>
-                    <span>ФИО</span>
-                    <strong>@Model.FullName</strong>
+                    <span>
+                        ФИО
+                    </span>
+
+                    <strong>
+                        @Model.FullName
+                    </strong>
                 </div>
 
             </div>
@@ -133,7 +140,9 @@
                 </div>
 
                 <div>
-                    <span>Предмет</span>
+                    <span>
+                        Предмет
+                    </span>
 
                     <strong>
                         @if (Model.Subject != null)
@@ -142,33 +151,9 @@
                         }
                         else
                         {
-                            <span>Не указан</span>
-                        }
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <!-- EMAIL -->
-            <div class="info-card">
-
-                <div class="info-icon">
-                    ✉️
-                </div>
-
-                <div>
-                    <span>Email</span>
-
-                    <strong>
-                        @if (!string.IsNullOrWhiteSpace(Model.Email))
-                        {
-                            @Model.Email
-                        }
-                        else
-                        {
-                            <span>Не указан</span>
+                            <span>
+                                Не указан
+                            </span>
                         }
                     </strong>
 
@@ -188,7 +173,9 @@
 
             <div>
 
-                <strong>Внимание</strong>
+                <strong>
+                    Внимание
+                </strong>
 
                 <p>
                     После удаления преподавателя восстановить его данные
@@ -222,6 +209,5 @@
         </div>
 
     </div>
-
 
 </div>

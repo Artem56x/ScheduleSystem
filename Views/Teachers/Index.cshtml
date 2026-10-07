@@ -43,7 +43,7 @@
             <span class="search-icon">⌕</span>
 
             <input type="text" name="search" value="@search" class="search-input"
-                   placeholder="Поиск по ФИО, предмету или Email..." autocomplete="off" />
+                   placeholder="Поиск по ФИО или предмету..." autocomplete="off" />
 
             @if (!string.IsNullOrWhiteSpace(search))
             {
@@ -81,10 +81,6 @@
 
                 <div>
                     Предмет
-                </div>
-
-                <div>
-                    Email
                 </div>
 
                 <div>
@@ -131,25 +127,6 @@
                             <span class="subject-badge">
                                 <span class="subject-icon">📚</span>
                                 @item.Subject.Name
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="empty-value">
-                                Не указан
-                            </span>
-                        }
-
-                    </div>
-
-
-                    <!-- EMAIL -->
-                    <div class="teacher-email">
-
-                        @if (!string.IsNullOrWhiteSpace(item.Email))
-                        {
-                            <span>
-                                @item.Email
                             </span>
                         }
                         else
@@ -244,5 +221,4 @@
         </div>
     }
 
- 
 </div>

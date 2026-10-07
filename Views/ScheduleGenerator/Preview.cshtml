@@ -226,74 +226,101 @@
         </div>
 
 
-        @foreach (var dayGroup in Model.Items
-            .GroupBy(x => x.DayOfWeek)
-            .OrderBy(x => GetDayOrder(x.Key)))
+        @foreach (var group in Model.Items
+          .GroupBy(x => new { x.GroupId, x.GroupName })
+          .OrderBy(x => x.Key.GroupName))
         {
-            <section class="day-section">
+            <section class="group-section">
 
-                <div class="day-title">
-                    <span class="day-dot"></span>
+                <div class="group-title">
 
-                    <h3>
-                        @GetDayName(dayGroup.Key)
-                    </h3>
+                    <div class="group-title-main">
+                        <div class="group-icon">
+                            👥
+                        </div>
 
-                    <span class="day-count">
-                        @dayGroup.Count()
-                    </span>
+                        <div>
+                            <h3>
+                                @group.Key.GroupName
+                            </h3>
+
+                            <span>
+                                @group.Count() занятий
+                            </span>
+                        </div>
+                    </div>
+
                 </div>
 
 
-                <div class="lesson-list">
+                <div class="group-days">
 
-                    @foreach (var lesson in dayGroup
-                        .OrderBy(x => x.StartTime)
-                        .ThenBy(x => x.GroupName))
+                    @foreach (var dayGroup in group
+                        .GroupBy(x => x.DayOfWeek)
+                        .OrderBy(x => GetDayOrder(x.Key)))
                     {
-                        <div class="lesson-row">
+                        <section class="group-day-section">
 
-                            <div class="lesson-time">
-                                <strong>
-                                    @lesson.StartTime.ToString(@"hh\:mm")
-                                </strong>
+                            <div class="group-day-title">
 
-                                <span>
-                                    @lesson.EndTime.ToString(@"hh\:mm")
+                                <span class="day-dot"></span>
+
+                                <h4>
+                                    @GetDayName(dayGroup.Key)
+                                </h4>
+
+                                <span class="day-count">
+                                    @dayGroup.Count()
                                 </span>
-                            </div>
-
-
-                            <div class="lesson-main">
-
-                                <div class="lesson-subject">
-                                    @lesson.SubjectName
-                                </div>
-
-                                <div class="lesson-meta">
-
-                                    <span>
-                                        👥 @lesson.GroupName
-                                    </span>
-
-                                    <span>
-                                        👨‍🏫 @lesson.TeacherName
-                                    </span>
-
-                                    <span>
-                                        🏫 @lesson.ClassroomName
-                                    </span>
-
-                                </div>
 
                             </div>
 
 
-                            <div class="lesson-number">
-                                №@lesson.LessonNumber
+                            <div class="lesson-list">
+
+                                @foreach (var lesson in dayGroup
+                                    .OrderBy(x => x.StartTime)
+                                    .ThenBy(x => x.LessonNumber))
+                                {
+                                    <div class="lesson-row">
+
+                                        <div class="lesson-time">
+                                            <strong>
+                                                @lesson.StartTime.ToString(@"hh\:mm")
+                                            </strong>
+
+                                            <span>
+                                                @lesson.EndTime.ToString(@"hh\:mm")
+                                            </span>
+                                        </div>
+
+
+                                        <div class="lesson-main">
+
+                                            <div class="lesson-subject">
+                                                @lesson.SubjectName
+                                            </div>
+
+                                            <div class="lesson-meta">
+
+                                                <span>
+                                                    👨‍🏫 @lesson.TeacherName
+                                                </span>
+
+                                                <span>
+                                                    🏫 @lesson.ClassroomName
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                }
+
                             </div>
 
-                        </div>
+                        </section>
                     }
 
                 </div>

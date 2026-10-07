@@ -313,6 +313,7 @@
 
 .search-btn:hover {
     background: #e4efff;
+
     border-color: rgba(57, 126, 231, 0.24);
 
     transform: translateY(-1px);
@@ -376,14 +377,13 @@
     display: grid;
 
     grid-template-columns:
-        minmax(190px, 1.1fr)
-        minmax(150px, 1.2fr)
-        minmax(180px, 1.2fr)
-        minmax(220px, 1.45fr);
+        minmax(250px, 1.15fr)
+        minmax(220px, 1.4fr)
+        minmax(220px, 1fr);
 
     align-items: center;
 
-    gap: 20px;
+    gap: 24px;
 
     padding: 16px 22px;
 
@@ -530,6 +530,8 @@
     font-weight: 600;
 
     overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 .subject-icon {
@@ -538,28 +540,6 @@
     margin-right: 5px;
 
     font-size: 12px;
-}
-
-
-/* =========================================================
-   EMAIL
-   ========================================================= */
-
-.teacher-email {
-    min-width: 0;
-
-    color: #596575;
-
-    font-size: 13px;
-    line-height: 1.4;
-
-    overflow-wrap: anywhere;
-}
-
-.empty-value {
-    color: #9aa4b1;
-
-    font-style: normal;
 }
 
 
@@ -608,7 +588,9 @@
 }
 
 
-/* DETAILS */
+/* =========================================================
+   DETAILS
+   ========================================================= */
 
 .details-btn {
     border: 1px solid rgba(85, 105, 135, 0.12);
@@ -627,7 +609,9 @@
 }
 
 
-/* EDIT */
+/* =========================================================
+   EDIT
+   ========================================================= */
 
 .edit-btn {
     border: 1px solid rgba(57, 126, 231, 0.12);
@@ -646,7 +630,9 @@
 }
 
 
-/* DELETE */
+/* =========================================================
+   DELETE
+   ========================================================= */
 
 .delete-btn {
     border: 1px solid rgba(205, 72, 72, 0.12);
@@ -806,12 +792,11 @@
     .table-header,
     .teacher-row {
         grid-template-columns:
-            minmax(170px, 1fr)
-            minmax(140px, 1fr)
-            minmax(160px, 1fr)
-            minmax(190px, 1.2fr);
+            minmax(210px, 1fr)
+            minmax(180px, 1fr)
+            minmax(200px, 1fr);
 
-        gap: 14px;
+        gap: 16px;
 
         padding-left: 18px;
         padding-right: 18px;
@@ -844,13 +829,13 @@
         padding: 20px;
     }
 
-    .teacher-subject,
-    .teacher-email {
+    .teacher-subject {
         padding-left: 59px;
     }
 
     .teacher-actions {
         justify-content: flex-start;
+
         padding-left: 59px;
     }
 
@@ -897,8 +882,7 @@
         padding: 18px;
     }
 
-    .teacher-subject,
-    .teacher-email {
+    .teacher-subject {
         padding-left: 0;
     }
 
@@ -917,6 +901,7 @@
 
     .empty-state {
         padding: 50px 20px;
+
         border-radius: 18px;
     }
 

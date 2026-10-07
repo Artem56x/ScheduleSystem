@@ -245,38 +245,145 @@
 }
 
 /* ============================================================
-   DAY
+   GROUPS
    ============================================================ */
 
-.day-section + .day-section {
-    margin-top: 30px;
+.group-section {
+    position: relative;
 }
 
-.day-title {
+.group-section + .group-section {
+    margin-top: 38px;
+    padding-top: 34px;
+    border-top: 1px solid rgba(15,23,42,.08);
+}
+
+
+/* ============================================================
+   GROUP HEADER
+   ============================================================ */
+
+.group-title {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
+    justify-content: space-between;
+
+    margin-bottom: 22px;
+    padding: 18px 20px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(37,99,235,.08),
+            rgba(255,255,255,.52)
+        );
+
+    border: 1px solid rgba(37,99,235,.10);
+
+    box-shadow:
+        0 8px 30px rgba(15,23,42,.04);
 }
 
-.day-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: currentColor;
+.group-title-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
-.day-title h3 {
+.group-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: rgba(37,99,235,.10);
+
+    font-size: 19px;
+
+    flex-shrink: 0;
+}
+
+.group-title h3 {
     margin: 0;
-    font-size: 17px;
+
+    font-size: 20px;
+    font-weight: 750;
+    letter-spacing: -.02em;
 }
 
-.day-count {
-    padding: 3px 9px;
-    border-radius: 999px;
-    background: rgba(0,0,0,.05);
+.group-title span {
+    display: block;
+
+    margin-top: 3px;
+
     font-size: 12px;
-    opacity: .65;
+    opacity: .52;
+}
+
+
+/* ============================================================
+   GROUP DAYS
+   ============================================================ */
+
+.group-days {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.group-day-section {
+    padding-left: 8px;
+}
+
+
+/* ============================================================
+   DAY INSIDE GROUP
+   ============================================================ */
+
+.group-day-title {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    margin-bottom: 10px;
+    padding-left: 4px;
+}
+
+.group-day-title .day-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+
+    opacity: .55;
+}
+
+.group-day-title h4 {
+    margin: 0;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.group-day-title .day-count {
+    padding: 3px 8px;
+
+    border-radius: 999px;
+
+    background: rgba(15,23,42,.05);
+
+    font-size: 11px;
+
+    opacity: .58;
 }
 
 /* ============================================================
@@ -292,20 +399,32 @@
 .lesson-row {
     display: grid;
     grid-template-columns: 110px 1fr auto;
+
     align-items: center;
+
     gap: 18px;
+
     padding: 15px 18px;
+
     border-radius: 18px;
+
     background: rgba(248,250,252,.72);
+
     border: 1px solid rgba(15,23,42,.05);
+
     transition:
         transform .18s ease,
-        box-shadow .18s ease;
+        box-shadow .18s ease,
+        background .18s ease;
 }
 
 .lesson-row:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(15,23,42,.06);
+
+    background: rgba(255,255,255,.82);
+
+    box-shadow:
+        0 8px 25px rgba(15,23,42,.06);
 }
 
 .lesson-time {
@@ -316,6 +435,7 @@
 
 .lesson-time strong {
     font-size: 15px;
+    font-weight: 700;
 }
 
 .lesson-time span {
@@ -323,22 +443,29 @@
     opacity: .48;
 }
 
+.lesson-main {
+    min-width: 0;
+}
+
 .lesson-subject {
-    font-weight: 700;
     margin-bottom: 5px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .lesson-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    font-size: 12px;
-    opacity: .62;
-}
 
-.lesson-number {
+    gap: 12px;
+
     font-size: 12px;
-    opacity: .45;
+
+    opacity: .62;
 }
 
 /* ============================================================
