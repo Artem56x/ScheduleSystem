@@ -11,11 +11,13 @@
 
 <div class="subjects-page">
 
+
     <!-- HEADER -->
     <div class="page-header">
 
         <div>
             <h1>Предметы</h1>
+            <p>Учебные предметы и их требования к аудиториям</p>
         </div>
 
         @if (User.IsInRole("Admin"))
@@ -51,7 +53,7 @@
 
             @if (!string.IsNullOrWhiteSpace(search))
             {
-                <a asp-action="Index" class="clear-search" title="Очистить поиск">
+                <a asp-action="Index" class="clear-search" title="Очистить поиск" aria-label="Очистить поиск">
                     ×
                 </a>
             }
@@ -67,6 +69,7 @@
 
     @if (Model.Any())
     {
+        <!-- COUNT -->
         <div class="subjects-count">
             Найдено предметов:
             <strong>@Model.Count()</strong>
@@ -89,7 +92,7 @@
             {
                 <div class="subject-row">
 
-                    <!-- ПРЕДМЕТ -->
+                    <!-- SUBJECT -->
                     <div class="subject-info">
 
                         <div class="subject-avatar">
@@ -105,7 +108,20 @@
                             </div>
 
                             <div class="subject-label">
-                                Учебный предмет
+
+                                <span class="course-badge">
+                                    @item.Course курс
+                                </span>
+
+                                <span class="subject-type">
+                                    @(item.Type switch
+                                    {
+                                        ScheduleSystem.Models.SubjectType.General => "Общий",
+                                        ScheduleSystem.Models.SubjectType.Special => "Специальный",
+                                        _ => item.Type.ToString()
+                                    })
+                                </span>
+
                             </div>
 
                         </div>
@@ -113,7 +129,7 @@
                     </div>
 
 
-                    <!-- ДЕЙСТВИЯ -->
+                    <!-- ACTIONS -->
                     <div class="subject-actions">
 
                         <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
@@ -155,7 +171,7 @@
             @if (!string.IsNullOrWhiteSpace(search))
             {
                 <div class="empty-icon">
-                    🔍
+                    ⌕
                 </div>
 
                 <h2>Предметы не найдены</h2>
@@ -173,7 +189,7 @@
             else
             {
                 <div class="empty-icon">
-                    📚
+                    ◫
                 </div>
 
                 <h2>Предметов пока нет</h2>
@@ -194,5 +210,6 @@
 
         </div>
     }
+
 
 </div>

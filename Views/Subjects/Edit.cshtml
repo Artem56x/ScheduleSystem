@@ -20,10 +20,11 @@
 
 <div class="subject-form-page">
 
+    <!-- Заголовок -->
     <div class="page-header">
         <div>
             <h1>Редактировать предмет</h1>
-            <p>Изменение информации о предмете</p>
+            <p>Измените основные данные и требования к аудитории</p>
         </div>
     </div>
 
@@ -39,11 +40,18 @@
         <!-- Основная информация -->
         <div class="form-card">
 
+            <div class="section-heading">
+                <div>
+                    <h2>Основная информация</h2>
+                    <p>Название, курс и тип учебного предмета</p>
+                </div>
+            </div>
+
             <div class="form-group">
 
                 <label asp-for="Name"></label>
 
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control" autocomplete="off" />
 
                 <span asp-validation-for="Name" class="field-validation">
                 </span>
@@ -89,75 +97,148 @@
         </div>
 
         <!-- Требования к аудитории -->
-        <div class="requirements-list">
+        <div class="form-card classroom-requirements">
 
-            @foreach (var category in classroomCategories)
+            <div class="section-heading requirements-heading">
+
+                <div>
+                    <h2>Требования к аудитории</h2>
+
+                    <p>
+                        Выберите категории аудиторий,
+                        которые подходят для проведения предмета
+                    </p>
+                </div>
+
+                <div class="selected-count">
+                    Выбрано:
+                    <strong id="selectedCount">0</strong>
+                </div>
+
+            </div>
+
+            @if (classroomCategories.Any())
             {
-                var isSelected =
-                    selectedCategoryIds.Contains(category.Id);
+                <div class="classroom-options">
 
-                <label class="requirement-card">
+                    @foreach (var category in classroomCategories)
+                    {
+                        var isSelected =
+                            selectedCategoryIds.Contains(category.Id);
 
-                    <div class="requirement-info">
+                        var icon = category.Name switch
+                        {
+                            "Компьютерный класс" => "⌨",
+                            "Лаборатория" => "⚗",
+                            "Лекционная аудитория" => "▤",
+                            "Мастерская" => "⚒",
+                            "Спортивный зал" => "◉",
+                            "Учебный кабинет" => "▦",
+                            "Кабинет дизайна" => "✦",
+                            "Актовый зал" => "◫",
+                            _ => "⌂"
+                        };
 
-                        <div class="requirement-icon">
-                            🏫
-                        </div>
+                        <label class="classroom-option">
 
-                        <div class="requirement-text">
+                            <div class="classroom-option-content">
 
-                            <div class="requirement-title">
-                                Требуется @category.Name
+                                <div class="classroom-option-icon">
+                                    @icon
+                                </div>
+
+                                <div class="classroom-option-text">
+
+                                    <div class="classroom-option-title">
+                                        @category.Name
+                                    </div>
+
+                                    <div class="classroom-option-description">
+
+                                        @switch (category.Name)
+                                        {
+                                            case "Компьютерный класс":
+                                                @:Программирование, информатика, компьютерная графика.
+                                                break;
+
+                                            case "Лаборатория":
+                                                @:Физика, химия, электротехника, практические лабораторные работы.
+                                                break;
+
+                                            case "Лекционная аудитория":
+                                                @:Лекции, большие группы.
+                                                break;
+
+                                            case "Мастерская":
+                                                @:Практические работы с оборудованием и инструментами.
+                                                break;
+
+                                            case "Спортивный зал":
+                                                @:Физическая культура.
+                                                break;
+
+                                            case "Учебный кабинет":
+                                                @:Обычные учебные занятия.
+                                                break;
+
+                                            case "Кабинет дизайна":
+                                                @:Дизайн, компьютерная графика, Web-дизайн.
+                                                break;
+
+                                            case "Актовый зал":
+                                                @:Мероприятия, собрания, презентации и защиты проектов.
+                                                break;
+
+                                            default:
+                                                @:Аудитории этой категории будут учитываться при составлении расписания.
+                                                break;
+                                        }
+
+                                    </div>
+
+                                </div>
+
                             </div>
 
-                            <div class="requirement-description">
-                                Занятие должно проводиться
-                                в помещении категории
-                                «@category.Name».
-                            </div>
+                            <span class="switch">
 
-                        </div>
+                                <input type="checkbox" name="selectedClassroomCategoryIds" value="@category.Id"
+                                       class="category-checkbox" checked="@isSelected" />
 
+                                <span class="slider"></span>
+
+                            </span>
+
+                        </label>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-requirements">
+
+                    <div class="empty-requirements-icon">
+                        🏫
                     </div>
 
-                    <span class="switch">
+                    <div>
+                        <strong>
+                            Категории аудиторий пока не созданы
+                        </strong>
 
-                        <input type="checkbox" name="selectedClassroomCategoryIds" value="@category.Id"
-                               checked="@isSelected" />
+                        <p>
+                            Добавьте категории аудиторий,
+                            чтобы использовать их как требования предметов.
+                        </p>
+                    </div>
 
-                        <span class="slider"></span>
-
-                    </span>
-
-                </label>
+                </div>
             }
 
         </div>
 
-        @if (!classroomCategories.Any())
-        {
-            <div class="empty-requirements">
-
-                <div class="empty-requirements-icon">
-                    🏫
-                </div>
-
-                <div>
-
-                    <strong>
-                        Категории аудиторий пока не созданы
-                    </strong>
-
-                    <p>
-                        Добавьте категории аудиторий,
-                        чтобы использовать их как требования предметов.
-                    </p>
-
-                </div>
-
-            </div>
-        }
-
+        <!-- Кнопки -->
         <div class="form-actions">
 
             <a asp-action="Index" class="btn btn-secondary">
@@ -180,4 +261,40 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const checkboxes =
+                document.querySelectorAll(".category-checkbox");
+
+            const counter =
+                document.getElementById("selectedCount");
+
+            function updateSelectedCount() {
+
+                if (!counter) {
+                    return;
+                }
+
+                const selected =
+                    document.querySelectorAll(
+                        ".category-checkbox:checked"
+                    ).length;
+
+                counter.textContent = selected;
+            }
+
+            checkboxes.forEach(function (checkbox) {
+
+                checkbox.addEventListener(
+                    "change",
+                    updateSelectedCount
+                );
+
+            });
+
+            updateSelectedCount();
+
+        });
+    </script>
 }

@@ -13,43 +13,74 @@
     <link rel="stylesheet" href="~/css/Subjects/Create.css" asp-append-version="true" />
 }
 
-<div class="subject-form-page">
+<div class="subject-create-page">
 
-    <div class="page-header">
+    <!-- HEADER -->
+    <header class="subject-create-header">
+
         <div>
             <h1>Добавить предмет</h1>
-            <p>Создание нового учебного предмета</p>
-        </div>
-    </div>
 
-    <form asp-action="Create" method="post" class="subject-form">
+            <p>
+                Заполните основные данные и укажите требования к аудитории
+            </p>
+        </div>
+
+    </header>
+
+
+    <form asp-action="Create" method="post" class="subject-create-form">
 
         @Html.AntiForgeryToken()
 
+
+        <!-- VALIDATION -->
         <div asp-validation-summary="ModelOnly" class="validation-summary">
         </div>
 
-        <!-- Основная информация -->
-        <div class="form-card">
 
-            <div class="form-group">
+        <!-- MAIN INFORMATION -->
+        <section class="create-section">
 
-                <label asp-for="Name"></label>
+            <div class="section-heading">
 
-                <input asp-for="Name" class="form-control" placeholder="Например: Математика" />
+                <div>
+                    <h2>Основная информация</h2>
 
-                <span asp-validation-for="Name" class="field-validation">
+                    <p>
+                        Название, курс и тип учебного предмета
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- NAME -->
+            <div class="field field-name">
+
+                <label asp-for="Name">
+                    Название предмета
+                </label>
+
+                <input asp-for="Name" class="field-input" placeholder="Например, Математика" autocomplete="off"
+                       autofocus />
+
+                <span asp-validation-for="Name" class="field-error">
                 </span>
 
             </div>
 
-            <div class="form-row">
 
-                <div class="form-group">
+            <!-- COURSE / TYPE -->
+            <div class="fields-row">
 
-                    <label asp-for="Course"></label>
+                <div class="field">
 
-                    <select asp-for="Course" class="form-control">
+                    <label asp-for="Course">
+                        Курс
+                    </label>
+
+                    <select asp-for="Course" class="field-input">
 
                         <option value="1">1 курс</option>
                         <option value="2">2 курс</option>
@@ -59,101 +90,220 @@
 
                     </select>
 
-                    <span asp-validation-for="Course" class="field-validation">
+                    <span asp-validation-for="Course" class="field-error">
                     </span>
 
                 </div>
 
-                <div class="form-group">
 
-                    <label asp-for="Type"></label>
+                <div class="field">
+
+                    <label asp-for="Type">
+                        Тип предмета
+                    </label>
 
                     <select asp-for="Type" asp-items="Html.GetEnumSelectList<ScheduleSystem.Models.SubjectType>()"
-                            class="form-control">
+                            class="field-input">
                     </select>
 
-                    <span asp-validation-for="Type" class="field-validation">
+                    <span asp-validation-for="Type" class="field-error">
                     </span>
 
                 </div>
 
             </div>
 
-        </div>
+        </section>
 
-        <!-- Требования к аудитории -->
-        <div class="requirements-list">
 
-            @foreach (var category in classroomCategories)
-            {
-                <label class="requirement-card">
+        <!-- CLASSROOM REQUIREMENTS -->
+        <section class="create-section classroom-section">
 
-                    <div class="requirement-info">
-
-                        <div class="requirement-icon">
-                            🏫
-                        </div>
-
-                        <div class="requirement-text">
-
-                            <div class="requirement-title">
-                                Требуется @category.Name
-                            </div>
-
-                            <div class="requirement-description">
-                                Занятие должно проводиться
-                                в помещении категории
-                                «@category.Name».
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <span class="switch">
-
-                        <input type="checkbox" name="selectedClassroomCategoryIds" value="@category.Id" />
-
-                        <span class="slider"></span>
-
-                    </span>
-
-                </label>
-            }
-
-        </div>
-
-        @if (!classroomCategories.Any())
-        {
-            <div class="empty-requirements">
-
-                <div class="empty-requirements-icon">
-                    🏫
-                </div>
+            <div class="section-heading classroom-heading">
 
                 <div>
 
-                    <strong>
-                        Категории аудиторий пока не созданы
-                    </strong>
+                    <h2>Требования к аудитории</h2>
 
                     <p>
-                        Вы сможете добавить категории аудиторий
-                        в разделе управления аудиториями.
+                        Выберите категории аудиторий,
+                        которые подходят для проведения предмета
                     </p>
 
                 </div>
 
+                @if (classroomCategories.Any())
+                {
+                    <span class="selection-counter">
+                        <span id="selectedCount">0</span>
+                        выбрано
+                    </span>
+                }
+
             </div>
-        }
 
-        <div class="form-actions">
 
-            <a asp-action="Index" class="btn btn-secondary">
+            @if (classroomCategories.Any())
+            {
+                <div class="classroom-options">
+
+                    @foreach (var category in classroomCategories)
+                    {
+                        <label class="classroom-option">
+
+                            <div class="classroom-option-content">
+
+                                <div class="classroom-option-icon">
+
+                                    @switch (category.Name)
+                                    {
+                                        case "Компьютерный класс":
+                                            <span>⌨</span>
+                                            break;
+
+                                        case "Лаборатория":
+                                            <span>⚗</span>
+                                            break;
+
+                                        case "Лекционная аудитория":
+                                            <span>▤</span>
+                                            break;
+
+                                        case "Мастерская":
+                                            <span>⚒</span>
+                                            break;
+
+                                        case "Спортивный зал":
+                                            <span>◉</span>
+                                            break;
+
+                                        case "Учебный кабинет":
+                                            <span>▦</span>
+                                            break;
+
+                                        case "Кабинет дизайна":
+                                            <span>✦</span>
+                                            break;
+
+                                        case "Актовый зал":
+                                            <span>◫</span>
+                                            break;
+
+                                        default:
+                                            <span>⌂</span>
+                                            break;
+                                    }
+
+                                </div>
+
+
+                                <div class="classroom-option-text">
+
+                                    <span class="classroom-option-title">
+                                        @category.Name
+                                    </span>
+
+
+                                    <span class="classroom-option-description">
+
+                                        @switch (category.Name)
+                                        {
+                                            case "Компьютерный класс":
+                                                @:Программирование, информатика, компьютерная графика.
+                                                break;
+
+                                            case "Лаборатория":
+                                                @:Физика, химия, электротехника, практические лабораторные работы.
+                                                break;
+
+                                            case "Лекционная аудитория":
+                                                @:Лекции, большие группы.
+                                                break;
+
+                                            case "Мастерская":
+                                                @:Практические работы с оборудованием и инструментами.
+                                                break;
+
+                                            case "Спортивный зал":
+                                                @:Физическая культура.
+                                                break;
+
+                                            case "Учебный кабинет":
+                                                @:Обычные учебные занятия.
+                                                break;
+
+                                            case "Кабинет дизайна":
+                                                @:Дизайн, компьютерная графика, Web-дизайн.
+                                                break;
+
+                                            case "Актовый зал":
+                                                @:Мероприятия, собрания, презентации и защиты проектов.
+                                                break;
+
+                                            default:
+                                                @:Аудитории этой категории будут учитываться при составлении расписания.
+                                                break;
+                                        }
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- TOGGLE -->
+                            <div class="toggle">
+
+                                <input type="checkbox" name="selectedClassroomCategoryIds" value="@category.Id"
+                                       class="category-checkbox" />
+
+                                <span class="toggle-track">
+                                    <span class="toggle-thumb"></span>
+                                </span>
+
+                            </div>
+
+                        </label>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="classroom-empty">
+
+                    <div class="classroom-empty-icon">
+                        ⌂
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Категории аудиторий не созданы
+                        </strong>
+
+                        <p>
+                            Предмет можно создать без требований
+                            к определённой категории аудитории.
+                        </p>
+
+                    </div>
+
+                </div>
+            }
+
+        </section>
+
+
+        <!-- ACTIONS -->
+        <div class="create-actions">
+
+            <a asp-action="Index" class="action-secondary">
                 Отмена
             </a>
 
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="action-primary">
                 Добавить предмет
             </button>
 
@@ -163,10 +313,56 @@
 
 </div>
 
+
 @section Scripts {
 
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const checkboxes =
+                document.querySelectorAll(".category-checkbox");
+
+            const counter =
+                document.getElementById("selectedCount");
+
+
+            if (!counter) {
+                return;
+            }
+
+
+            function updateSelectedCount() {
+
+                const selected =
+                    document.querySelectorAll(
+                        ".category-checkbox:checked"
+                    ).length;
+
+                counter.textContent = selected;
+
+            }
+
+
+            checkboxes.forEach(function (checkbox) {
+
+                checkbox.addEventListener(
+                    "change",
+                    updateSelectedCount
+                );
+
+            });
+
+
+            updateSelectedCount();
+
+        });
+
+    </script>
 
 }
