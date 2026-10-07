@@ -70,16 +70,26 @@
                     @Model.FullName
                 </h2>
 
-                @if (Model.Subject != null)
+                @if (Model.TeacherSubjects != null &&
+                     Model.TeacherSubjects.Any())
                 {
-                    <span class="subject-badge">
-                        📚 @Model.Subject.Name
-                    </span>
+                    <div class="teacher-subjects-list">
+
+                        @foreach (var teacherSubject in Model.TeacherSubjects
+                            .Where(ts => ts.Subject != null)
+                            .OrderBy(ts => ts.Subject!.Name))
+                        {
+                            <span class="subject-badge">
+                                📚 @teacherSubject.Subject!.Name
+                            </span>
+                        }
+
+                    </div>
                 }
                 else
                 {
                     <span class="subject-badge">
-                        Преподаватель
+                        Предметы не указаны
                     </span>
                 }
 
@@ -117,7 +127,7 @@
             </div>
 
 
-            <!-- SUBJECT -->
+            <!-- SUBJECTS -->
             <div class="info-card">
 
                 <div class="info-icon">
@@ -127,24 +137,34 @@
                 <div class="info-content">
 
                     <span class="info-label">
-                        Предмет
+                        Предметы
                     </span>
 
-                    @if (Model.Subject != null)
+                    @if (Model.TeacherSubjects != null &&
+                         Model.TeacherSubjects.Any())
                     {
-                        <strong>
-                            @Model.Subject.Name
-                        </strong>
+                        <div class="teacher-subjects-list">
+
+                            @foreach (var teacherSubject in Model.TeacherSubjects
+                                .Where(ts => ts.Subject != null)
+                                .OrderBy(ts => ts.Subject!.Name))
+                            {
+                                <strong class="subject-value">
+                                    @teacherSubject.Subject!.Name
+                                </strong>
+                            }
+
+                        </div>
                     }
                     else
                     {
                         <strong class="empty-value">
-                            Не указан
+                            Не указаны
                         </strong>
                     }
 
                     <small>
-                        Основной предмет
+                        Предметы, которые преподаёт сотрудник
                     </small>
 
                 </div>
@@ -177,3 +197,4 @@
     </div>
 
 </div>
+

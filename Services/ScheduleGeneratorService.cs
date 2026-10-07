@@ -96,9 +96,14 @@ public class ScheduleGeneratorService
         // --------------------------------------------------------
         // LOAD TEACHERS
         // --------------------------------------------------------
+        //
+        // Один преподаватель может вести несколько предметов.
+        // Связь хранится через TeacherSubjects.
+        // --------------------------------------------------------
 
         var teachers = await _context.Teachers
             .AsNoTracking()
+            .Include(t => t.TeacherSubjects)
             .ToListAsync();
 
         // --------------------------------------------------------
@@ -455,6 +460,7 @@ public class ScheduleGeneratorService
 
         var teachers = await _context.Teachers
             .AsNoTracking()
+            .Include(t => t.TeacherSubjects)
             .ToListAsync();
 
         var teacherById = teachers.ToDictionary(
@@ -576,7 +582,8 @@ public class ScheduleGeneratorService
                 errors.Add(
                     $"Преподаватель «{item.TeacherName}» больше не существует.");
             }
-            else if (teacher.SubjectId != item.SubjectId)
+            else if (!teacher.TeacherSubjects.Any(
+                         ts => ts.SubjectId == item.SubjectId))
             {
                 errors.Add(
                     $"Преподаватель «{teacher.FullName}» больше не может " +
@@ -1241,7 +1248,9 @@ public class ScheduleGeneratorService
         List<Teacher> teachers)
     {
         return teachers
-            .Where(t => t.SubjectId == task.SubjectId)
+            .Where(t =>
+                t.TeacherSubjects.Any(
+                    ts => ts.SubjectId == task.SubjectId))
             .OrderBy(t => t.FullName)
             .ToList();
     }
@@ -1851,20 +1860,28 @@ public class ScheduleGeneratorService
         // --------------------------------------------------------
         // TEACHER VALIDITY
         // --------------------------------------------------------
-
-        var teacherIdsBySubject = teachers
-            .Where(t => t.SubjectId.HasValue)
-            .GroupBy(t => t.SubjectId!.Value)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(t => t.Id).ToHashSet());
+        //
+        // Один преподаватель может вести несколько предметов.
+        // Проверяем наличие конкретной пары TeacherId + SubjectId.
+        // --------------------------------------------------------
 
         foreach (var item in generated)
         {
-            if (!teacherIdsBySubject.TryGetValue(
-                    item.SubjectId,
-                    out var teacherIds) ||
-                !teacherIds.Contains(item.TeacherId))
+            var teacher = teachers.FirstOrDefault(
+                t => t.Id == item.TeacherId);
+
+            if (teacher == null)
+            {
+                errors.Add(
+                    $"Преподаватель «{item.TeacherName}» не найден.");
+
+                continue;
+            }
+
+            var canTeachSubject = teacher.TeacherSubjects.Any(
+                ts => ts.SubjectId == item.SubjectId);
+
+            if (!canTeachSubject)
             {
                 errors.Add(
                     $"Преподаватель «{item.TeacherName}» " +

@@ -340,7 +340,9 @@ public class SubjectsController : Controller
         // Проверяем использование преподавателями
         var isUsedByTeacher = await _context.Teachers
             .AsNoTracking()
-            .AnyAsync(teacher => teacher.SubjectId == id);
+            .AnyAsync(teacher =>
+                teacher.TeacherSubjects.Any(ts =>
+                    ts.SubjectId == id));
 
         if (isUsedByTeacher)
         {
@@ -385,3 +387,4 @@ public class SubjectsController : Controller
             .Any(e => e.Id == id);
     }
 }
+

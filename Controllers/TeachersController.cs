@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
+using ScheduleSystem.ViewModels;
 namespace ScheduleSystem.Controllers;
+
+
 
 public class TeachersController : Controller
 {
@@ -20,7 +22,8 @@ public class TeachersController : Controller
     {
         var teachers = _context.Teachers
             .AsNoTracking()
-            .Include(t => t.Subject)
+            .Include(t => t.TeacherSubjects)
+                .ThenInclude(ts => ts.Subject)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -29,8 +32,8 @@ public class TeachersController : Controller
 
             teachers = teachers.Where(t =>
                 t.FullName.Contains(search) ||
-                (t.Email != null && t.Email.Contains(search)) ||
-                (t.Subject != null && t.Subject.Name.Contains(search)));
+                t.TeacherSubjects.Any(ts =>
+                    ts.Subject.Name.Contains(search)));
         }
 
         var result = await teachers
@@ -52,7 +55,8 @@ public class TeachersController : Controller
 
         var teacher = await _context.Teachers
             .AsNoTracking()
-            .Include(t => t.Subject)
+            .Include(t => t.TeacherSubjects)
+                .ThenInclude(ts => ts.Subject)
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (teacher == null)
@@ -78,14 +82,43 @@ public class TeachersController : Controller
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-            [Bind("Id,FullName,SubjectId,Email")]
-        Teacher teacher)
+        [Bind("Id,FullName,Email")]
+        Teacher teacher,
+        int[]? subjectIds)
     {
+        subjectIds ??= Array.Empty<int>();
+
+        // Убираем дубликаты
+        subjectIds = subjectIds
+            .Distinct()
+            .ToArray();
+
+        // Проверяем, что выбранные предметы существуют
+        var validSubjectIds = await _context.Subjects
+            .Where(s => subjectIds.Contains(s.Id))
+            .Select(s => s.Id)
+            .ToListAsync();
+
+        if (validSubjectIds.Count != subjectIds.Length)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Один или несколько выбранных предметов не существуют.");
+        }
+
         if (!ModelState.IsValid)
         {
-            await PopulateSubjectsAsync(teacher.SubjectId);
+            await PopulateSubjectsAsync(subjectIds);
 
             return View(teacher);
+        }
+
+        foreach (var subjectId in subjectIds)
+        {
+            teacher.TeacherSubjects.Add(new TeacherSubject
+            {
+                SubjectId = subjectId
+            });
         }
 
         _context.Teachers.Add(teacher);
@@ -100,7 +133,7 @@ public class TeachersController : Controller
                 string.Empty,
                 "Не удалось создать преподавателя. Проверьте введённые данные.");
 
-            await PopulateSubjectsAsync(teacher.SubjectId);
+            await PopulateSubjectsAsync(subjectIds);
 
             return View(teacher);
         }
@@ -120,6 +153,7 @@ public class TeachersController : Controller
 
         var teacher = await _context.Teachers
             .AsNoTracking()
+            .Include(t => t.TeacherSubjects)
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (teacher == null)
@@ -127,7 +161,11 @@ public class TeachersController : Controller
             return NotFound();
         }
 
-        await PopulateSubjectsAsync(teacher.SubjectId);
+        var subjectIds = teacher.TeacherSubjects
+            .Select(ts => ts.SubjectId)
+            .ToArray();
+
+        await PopulateSubjectsAsync(subjectIds);
 
         return View(teacher);
     }
@@ -137,23 +175,44 @@ public class TeachersController : Controller
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-          int id,
-          [Bind("Id,FullName,SubjectId,Email")]
-        Teacher teacher)
+        int id,
+        [Bind("Id,FullName,Email")]
+        Teacher teacher,
+        int[]? subjectIds)
     {
         if (id != teacher.Id)
         {
             return NotFound();
         }
 
+        subjectIds ??= Array.Empty<int>();
+
+        subjectIds = subjectIds
+            .Distinct()
+            .ToArray();
+
+        // Проверяем существование выбранных предметов
+        var validSubjectIds = await _context.Subjects
+            .Where(s => subjectIds.Contains(s.Id))
+            .Select(s => s.Id)
+            .ToListAsync();
+
+        if (validSubjectIds.Count != subjectIds.Length)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Один или несколько выбранных предметов не существуют.");
+        }
+
         if (!ModelState.IsValid)
         {
-            await PopulateSubjectsAsync(teacher.SubjectId);
+            await PopulateSubjectsAsync(subjectIds);
 
             return View(teacher);
         }
 
         var existingTeacher = await _context.Teachers
+            .Include(t => t.TeacherSubjects)
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (existingTeacher == null)
@@ -162,8 +221,20 @@ public class TeachersController : Controller
         }
 
         existingTeacher.FullName = teacher.FullName;
-        existingTeacher.SubjectId = teacher.SubjectId;
         existingTeacher.Email = teacher.Email;
+
+        // Удаляем старые связи
+        existingTeacher.TeacherSubjects.Clear();
+
+        // Добавляем новые связи
+        foreach (var subjectId in subjectIds)
+        {
+            existingTeacher.TeacherSubjects.Add(new TeacherSubject
+            {
+                TeacherId = existingTeacher.Id,
+                SubjectId = subjectId
+            });
+        }
 
         try
         {
@@ -184,7 +255,7 @@ public class TeachersController : Controller
                 string.Empty,
                 "Не удалось сохранить изменения преподавателя.");
 
-            await PopulateSubjectsAsync(teacher.SubjectId);
+            await PopulateSubjectsAsync(subjectIds);
 
             return View(teacher);
         }
@@ -204,7 +275,8 @@ public class TeachersController : Controller
 
         var teacher = await _context.Teachers
             .AsNoTracking()
-            .Include(t => t.Subject)
+            .Include(t => t.TeacherSubjects)
+                .ThenInclude(ts => ts.Subject)
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (teacher == null)
@@ -260,21 +332,34 @@ public class TeachersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // Список предметов для Create/Edit
     private async Task PopulateSubjectsAsync(
-        int? selectedSubjectId = null)
+        IEnumerable<int>? selectedSubjectIds = null)
     {
-        ViewData["SubjectId"] = new SelectList(
-            await _context.Subjects
-                .AsNoTracking()
-                .OrderBy(s => s.Name)
-                .ToListAsync(),
-            "Id",
-            "Name",
-            selectedSubjectId);
+        var selectedIds = selectedSubjectIds?
+            .ToHashSet()
+            ?? new HashSet<int>();
+
+        var subjects = await _context.Subjects
+            .AsNoTracking()
+            .OrderBy(s => s.Course)
+            .ThenBy(s => s.Name)
+            .ToListAsync();
+
+        ViewBag.Subjects = subjects
+            .Select(subject => new SubjectSelectionViewModel
+            {
+                Id = subject.Id,
+                Name = subject.Name,
+                Course = subject.Course,
+                IsSelected = selectedIds.Contains(subject.Id)
+            })
+            .ToList();
     }
 
     private bool TeacherExists(int id)
     {
-        return _context.Teachers.Any(e => e.Id == id);
+        return _context.Teachers
+            .Any(e => e.Id == id);
     }
 }

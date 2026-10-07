@@ -55,6 +55,8 @@ public class ScheduleValidationService
 
         var teacher = await _context.Teachers
             .AsNoTracking()
+            .Include(t => t.TeacherSubjects)
+                .ThenInclude(ts => ts.Subject)
             .FirstOrDefaultAsync(
                 t => t.Id == schedule.TeacherId);
 
@@ -128,19 +130,25 @@ public class ScheduleValidationService
         // TEACHER / SUBJECT WARNING
         // =========================================================
 
-        if (teacher!.SubjectId.HasValue &&
-            teacher.SubjectId.Value != subject!.Id)
-        {
-            var teacherSubject = await _context.Subjects
-                .AsNoTracking()
-                .FirstOrDefaultAsync(
-                    s => s.Id == teacher.SubjectId.Value);
+        var teachesSelectedSubject = teacher!.TeacherSubjects
+            .Any(ts => ts.SubjectId == subject!.Id);
 
+        if (!teachesSelectedSubject)
+        {
             result.TeacherSubjectWarning = true;
             result.TeacherName = teacher.FullName;
 
             result.TeacherSubjectName =
-                teacherSubject?.Name ?? "неизвестный предмет";
+                teacher.TeacherSubjects
+                    .Select(ts => ts.Subject?.Name)
+                    .Where(name =>
+                        !string.IsNullOrWhiteSpace(name))
+                    .Distinct()
+                    .OrderBy(name => name)
+                    .ToList() is var teacherSubjectNames &&
+                teacherSubjectNames.Count > 0
+                    ? string.Join(", ", teacherSubjectNames)
+                    : "не назначены";
 
             result.SelectedSubjectName =
                 subject.Name;
@@ -149,8 +157,8 @@ public class ScheduleValidationService
             {
                 result.AddError(
                     "",
-                    $"Преподаватель «{teacher.FullName}» обычно ведёт " +
-                    $"другой предмет. Проверьте выбор.");
+                    $"Преподаватель «{teacher.FullName}» не закреплён " +
+                    $"за предметом «{subject.Name}». Проверьте выбор.");
             }
         }
 
@@ -158,7 +166,7 @@ public class ScheduleValidationService
         // CAPACITY
         // =========================================================
 
-        if (group!.StudentCount > classroom!.Capacity)
+        if (group.StudentCount > classroom!.Capacity)
         {
             result.AddError(
                 "ClassroomId",
@@ -231,7 +239,9 @@ public class ScheduleValidationService
                 $"Аудитория «{classroom!.Name}» уже занята: " +
                 $"«{classroomConflict.Subject?.Name ?? "Неизвестный предмет"}» — " +
                 $"группа «{classroomConflict.Group?.Name ?? "Неизвестная группа"}» — " +
-                $"{FormatTimeRange(classroomConflict.StartTime, classroomConflict.EndTime)}.");
+                $"{FormatTimeRange(
+                    classroomConflict.StartTime,
+                    classroomConflict.EndTime)}.");
 
             result.ClassroomRecommendationNeeded = true;
         }
@@ -250,7 +260,9 @@ public class ScheduleValidationService
                 $"У группы «{group!.Name}» уже есть занятие: " +
                 $"«{groupConflict.Subject?.Name ?? "Неизвестный предмет"}» — " +
                 $"преподаватель «{groupConflict.Teacher?.FullName ?? "Неизвестный преподаватель"}» — " +
-                $"{FormatTimeRange(groupConflict.StartTime, groupConflict.EndTime)}.");
+                $"{FormatTimeRange(
+                    groupConflict.StartTime,
+                    groupConflict.EndTime)}.");
         }
 
         // =========================================================
@@ -401,3 +413,4 @@ public class ScheduleValidationError
         Message = message;
     }
 }
+

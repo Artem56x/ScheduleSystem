@@ -720,3 +720,50 @@
     }
 
 }
+
+/* =========================================================
+   MULTIPLE SUBJECTS
+   ========================================================= */
+
+.teacher-subjects-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 6px;
+
+    min-width: 0;
+    max-width: 100%;
+}
+
+.teacher-subjects-list .subject-badge {
+    max-width: 100%;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.info-content .teacher-subjects-list {
+    align-items: flex-start;
+}
+
+.info-content .teacher-subjects-list .subject-value {
+    display: inline-flex;
+
+    width: fit-content;
+    max-width: 100%;
+
+    padding: 6px 9px;
+
+    border: 1px solid #dce9fb;
+    border-radius: 9px;
+
+    background: #f1f7ff;
+
+    color: #3478dc;
+
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+}

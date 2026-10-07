@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Изменить преподавателя";
+
+    var subjects = ViewBag.Subjects
+        as IEnumerable<ScheduleSystem.ViewModels.SubjectSelectionViewModel>
+        ?? Enumerable.Empty<ScheduleSystem.ViewModels.SubjectSelectionViewModel>();
 }
 
 @section Styles {
@@ -33,7 +37,9 @@
                 ← Назад
             </a>
 
-            <a asp-action="Details" asp-route-id="@Model.Id" class="glass-button primary-button">
+            <a asp-action="Details"
+               asp-route-id="@Model.Id"
+               class="glass-button primary-button">
                 Просмотр
             </a>
 
@@ -51,7 +57,8 @@
 
             <input type="hidden" asp-for="Id" />
 
-            <div asp-validation-summary="ModelOnly" class="validation-summary">
+            <div asp-validation-summary="ModelOnly"
+                 class="validation-summary">
             </div>
 
 
@@ -98,10 +105,13 @@
                             ФИО преподавателя
                         </label>
 
-                        <input asp-for="FullName" class="form-control" placeholder="Например: Иванов Иван Иванович"
+                        <input asp-for="FullName"
+                               class="form-control"
+                               placeholder="Например: Иванов Иван Иванович"
                                autocomplete="name" />
 
-                        <span asp-validation-for="FullName" class="validation-message">
+                        <span asp-validation-for="FullName"
+                              class="validation-message">
                         </span>
 
                     </div>
@@ -109,7 +119,7 @@
                 </div>
 
 
-                <!-- ПРЕДМЕТ -->
+                <!-- ПРЕДМЕТЫ -->
                 <div class="info-card">
 
                     <div class="info-icon">
@@ -118,20 +128,51 @@
 
                     <div class="info-content">
 
-                        <label asp-for="SubjectId">
-                            Предмет
+                        <label>
+                            Предметы
                         </label>
 
-                        <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId">
+                        <div class="subjects-selection">
 
-                            <option value="">
-                                Выберите предмет
-                            </option>
+                            @if (subjects.Any())
+                            {
+                                @foreach (var subject in subjects)
+                                {
+                                    <label class="subject-option">
 
-                        </select>
+                                        <input type="checkbox"
+                                               name="subjectIds"
+                                               value="@subject.Id"
+                                               @(subject.IsSelected ? "checked" : null) />
 
-                        <span asp-validation-for="SubjectId" class="validation-message">
-                        </span>
+                                        <span class="subject-option-content">
+
+                                            <span class="subject-option-name">
+                                                @subject.Name
+                                            </span>
+
+                                            <span class="subject-option-course">
+                                                @subject.Course курс
+                                            </span>
+
+                                        </span>
+
+                                    </label>
+                                }
+                            }
+                            else
+                            {
+                                <div class="field-hint">
+                                    Предметы пока не добавлены.
+                                    Сначала добавьте предметы в разделе «Предметы».
+                                </div>
+                            }
+
+                        </div>
+
+                        <div class="field-hint">
+                            Выберите все предметы, которые преподаёт сотрудник.
+                        </div>
 
                     </div>
 
@@ -143,11 +184,13 @@
             <!-- FOOTER -->
             <div class="details-footer">
 
-                <a asp-action="Index" class="glass-button secondary-button">
+                <a asp-action="Index"
+                   class="glass-button secondary-button">
                     ← Отмена
                 </a>
 
-                <button type="submit" class="glass-button save-button">
+                <button type="submit"
+                        class="glass-button save-button">
                     ✓ Сохранить изменения
                 </button>
 

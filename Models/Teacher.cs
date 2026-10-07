@@ -11,10 +11,8 @@ public class Teacher
     [Display(Name = "ФИО")]
     public string FullName { get; set; } = string.Empty;
 
-    [Display(Name = "Предмет")]
-    public int? SubjectId { get; set; }
-
-    public Subject? Subject { get; set; }
+    public ICollection<TeacherSubject> TeacherSubjects { get; set; }
+        = new List<TeacherSubject>();
 
     [EmailAddress(ErrorMessage = "Введите корректный Email.")]
     [StringLength(254)]

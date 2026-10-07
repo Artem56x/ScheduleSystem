@@ -29,10 +29,12 @@ public class TeacherRecommendationService
 
         var teachers = await _context.Teachers
             .AsNoTracking()
-            .Include(t => t.Subject)
+            .Include(t => t.TeacherSubjects)
+                .ThenInclude(ts => ts.Subject)
             .Where(t =>
                 t.Id != schedule.TeacherId &&
-                t.SubjectId == subject.Id)
+                t.TeacherSubjects.Any(ts =>
+                    ts.SubjectId == subject.Id))
             .OrderBy(t => t.FullName)
             .ToListAsync();
 
@@ -61,8 +63,7 @@ public class TeacherRecommendationService
             .Distinct()
             .ToListAsync();
 
-        var busyIds =
-            busyTeacherIds.ToHashSet();
+        var busyIds = busyTeacherIds.ToHashSet();
 
         // =====================================================
         // RETURN FREE TEACHERS
@@ -87,7 +88,8 @@ public class TeacherRecommendationService
 
         return await _context.Teachers
             .AsNoTracking()
-            .Include(t => t.Subject)
+            .Include(t => t.TeacherSubjects)
+                .ThenInclude(ts => ts.Subject)
             .FirstOrDefaultAsync(
                 t => t.Id == teacherId);
     }
@@ -106,6 +108,8 @@ public class TeacherRecommendationService
 
         var teacher = await _context.Teachers
             .AsNoTracking()
+            .Include(t => t.TeacherSubjects)
+                .ThenInclude(ts => ts.Subject)
             .FirstOrDefaultAsync(
                 t => t.Id == schedule.TeacherId);
 
@@ -167,3 +171,4 @@ public class TeacherRecommendationService
         return $"{start}–{end}";
     }
 }
+

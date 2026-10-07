@@ -22,8 +22,8 @@ public class Subject
     public SubjectType Type { get; set; } = SubjectType.General;
 
     public ICollection<SubjectClassroomCategory> ClassroomCategoryRequirements { get; set; }
-    = new List<SubjectClassroomCategory>();
+        = new List<SubjectClassroomCategory>();
 
-
+    public ICollection<TeacherSubject> TeacherSubjects { get; set; }
+        = new List<TeacherSubject>();
 }
-

@@ -956,3 +956,19 @@
     }
 
 }
+
+/* =========================================================
+   MULTIPLE SUBJECTS
+   ========================================================= */
+
+.teacher-subjects-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.teacher-subjects-list .subject-badge {
+    max-width: 100%;
+}

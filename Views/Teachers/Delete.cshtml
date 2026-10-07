@@ -91,16 +91,26 @@
                     @Model.FullName
                 </h3>
 
-                @if (Model.Subject != null)
+                @if (Model.TeacherSubjects != null &&
+                     Model.TeacherSubjects.Any())
                 {
-                    <span>
-                        @Model.Subject.Name
-                    </span>
+                    <div class="teacher-subjects-list">
+
+                        @foreach (var teacherSubject in Model.TeacherSubjects
+                            .Where(ts => ts.Subject != null)
+                            .OrderBy(ts => ts.Subject!.Name))
+                        {
+                            <span>
+                                @teacherSubject.Subject!.Name
+                            </span>
+                        }
+
+                    </div>
                 }
                 else
                 {
                     <span>
-                        Преподаватель
+                        Предметы не указаны
                     </span>
                 }
 
@@ -132,7 +142,7 @@
             </div>
 
 
-            <!-- ПРЕДМЕТ -->
+            <!-- ПРЕДМЕТЫ -->
             <div class="info-card">
 
                 <div class="info-icon">
@@ -141,21 +151,31 @@
 
                 <div>
                     <span>
-                        Предмет
+                        Предметы
                     </span>
 
-                    <strong>
-                        @if (Model.Subject != null)
-                        {
-                            @Model.Subject.Name
-                        }
-                        else
-                        {
-                            <span>
-                                Не указан
-                            </span>
-                        }
-                    </strong>
+                    @if (Model.TeacherSubjects != null &&
+                         Model.TeacherSubjects.Any())
+                    {
+                        <div class="teacher-subjects-list">
+
+                            @foreach (var teacherSubject in Model.TeacherSubjects
+                                .Where(ts => ts.Subject != null)
+                                .OrderBy(ts => ts.Subject!.Name))
+                            {
+                                <strong>
+                                    @teacherSubject.Subject!.Name
+                                </strong>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <strong>
+                            Не указаны
+                        </strong>
+                    }
 
                 </div>
 
@@ -211,3 +231,4 @@
     </div>
 
 </div>
+

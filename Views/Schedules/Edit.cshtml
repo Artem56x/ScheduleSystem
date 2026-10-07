@@ -565,11 +565,24 @@
 
                             <div class="recommended-teacher-details">
 
-                                <span>
-                                    📚
-                                    @(teacher.Subject?.Name
-                                      ?? "Предмет не указан")
-                                </span>
+<span>
+    📚
+    @if (teacher.TeacherSubjects != null &&
+         teacher.TeacherSubjects.Any())
+    {
+        @string.Join(
+            ", ",
+            teacher.TeacherSubjects
+                .Where(ts => ts.Subject != null)
+                .OrderBy(ts => ts.Subject!.Name)
+                .Select(ts => ts.Subject!.Name)
+        )
+    }
+    else
+    {
+        <text>Предметы не указаны</text>
+    }
+</span>
 
                                 <span>
                                     ✓ Свободен

@@ -15,6 +15,9 @@ namespace ScheduleSystem.Data
         // Преподаватели
         public DbSet<Teacher> Teachers { get; set; }
 
+        // Связь Преподаватель ↔ Предмет
+        public DbSet<TeacherSubject> TeacherSubjects { get; set; }
+
         // Группы
         public DbSet<Group> Groups { get; set; }
 
@@ -34,7 +37,7 @@ namespace ScheduleSystem.Data
         // Категории аудиторий
         public DbSet<ClassroomCategory> ClassroomCategories { get; set; }
 
-        /// Уведомления
+        // Уведомления
         public DbSet<Notification> Notifications { get; set; }
 
         // Журнал
@@ -47,6 +50,33 @@ namespace ScheduleSystem.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // ==============================
+            // Teacher ↔ Subject
+            // ==============================
+
+            modelBuilder.Entity<TeacherSubject>()
+                .HasKey(x => new
+                {
+                    x.TeacherId,
+                    x.SubjectId
+                });
+
+            modelBuilder.Entity<TeacherSubject>()
+                .HasOne(x => x.Teacher)
+                .WithMany(x => x.TeacherSubjects)
+                .HasForeignKey(x => x.TeacherId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TeacherSubject>()
+                .HasOne(x => x.Subject)
+                .WithMany(x => x.TeacherSubjects)
+                .HasForeignKey(x => x.SubjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ==============================
+            // Subject ↔ ClassroomCategory
+            // ==============================
 
             modelBuilder.Entity<SubjectClassroomCategory>()
                 .HasKey(x => new
@@ -70,6 +100,7 @@ namespace ScheduleSystem.Data
             // ==============================
             // Schedule → Teacher
             // ==============================
+
             modelBuilder.Entity<Schedule>()
                 .HasOne(schedule => schedule.Teacher)
                 .WithMany()
@@ -78,6 +109,7 @@ namespace ScheduleSystem.Data
             // ==============================
             // Schedule → Group
             // ==============================
+
             modelBuilder.Entity<Schedule>()
                 .HasOne(schedule => schedule.Group)
                 .WithMany()
@@ -86,6 +118,7 @@ namespace ScheduleSystem.Data
             // ==============================
             // Schedule → Subject
             // ==============================
+
             modelBuilder.Entity<Schedule>()
                 .HasOne(schedule => schedule.Subject)
                 .WithMany()
@@ -94,6 +127,7 @@ namespace ScheduleSystem.Data
             // ==============================
             // Schedule → Classroom
             // ==============================
+
             modelBuilder.Entity<Schedule>()
                 .HasOne(schedule => schedule.Classroom)
                 .WithMany()
@@ -102,6 +136,7 @@ namespace ScheduleSystem.Data
             // ==============================
             // Classroom → ClassroomCategory
             // ==============================
+
             modelBuilder.Entity<Classroom>()
                 .HasOne(classroom => classroom.ClassroomCategory)
                 .WithMany(category => category.Classrooms)
