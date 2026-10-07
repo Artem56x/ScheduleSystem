@@ -1,111 +1,306 @@
-# ScheduleSystem
+<div align="center">
 
-<p align="center">
-  <img src="https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8">
-  <img src="https://img.shields.io/badge/ASP.NET_Core-MVC-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="ASP.NET Core">
-  <img src="https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
-  <img src="https://img.shields.io/badge/Entity_Framework_Core-8.0-512BD4?style=for-the-badge" alt="Entity Framework Core">
-</p>
+<img src="https://capsule-render.vercel.app/api?type=blur&color=0:0A84FF,50:5E5CE6,100:AF52DE&height=220&section=header&text=ScheduleSystem&fontSize=58&fontColor=FFFFFF&animation=fadeIn&fontAlignY=38&desc=Smart%20College%20Schedule%20Management%20System&descAlignY=62&descSize=18&descColor=FFFFFF" width="100%"/>
 
-<p align="center">
-  <strong>A modern web-based college timetable management system.</strong>
-</p>
+<br>
 
-<p align="center">
-  Create • Manage • Validate • Generate • Export
-</p>
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=20&duration=2800&pause=900&color=0A84FF&center=true&vCenter=true&width=750&lines=Smart+Schedule+Management;ASP.NET+Core+MVC+%2B+PostgreSQL;Conflict+Detection+%2B+Schedule+Validation;Automatic+Schedule+Generation;Modern+Liquid+Glass+UI;Built+with+C%23+%F0%9F%92%99" alt="Typing SVG"/>
 
-<p align="center">
-  <a href="https://github.com/Artem56x/ScheduleSystem">
-    <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github" alt="GitHub">
-  </a>
-  <img src="https://img.shields.io/badge/Status-Completed-success?style=flat-square" alt="Status">
-  <img src="https://img.shields.io/badge/License-Educational-blue?style=flat-square" alt="License">
-</p>
+<br><br>
 
----
+<img src="https://img.shields.io/badge/C%23-512BD4?style=for-the-badge&logo=csharp&logoColor=white" alt="C#"/>
+<img src="https://img.shields.io/badge/ASP.NET%20Core-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="ASP.NET Core"/>
+<img src="https://img.shields.io/badge/.NET%208-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8"/>
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+<img src="https://img.shields.io/badge/Entity%20Framework%20Core-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="Entity Framework Core"/>
 
-## Overview
+<br>
 
-**ScheduleSystem** is a web application for creating, managing, validating, automatically generating, and exporting college class schedules.
+<img src="https://img.shields.io/badge/MVC-0A84FF?style=for-the-badge" alt="MVC"/>
+<img src="https://img.shields.io/badge/Razor-0A84FF?style=for-the-badge" alt="Razor"/>
+<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5"/>
+<img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3"/>
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript"/>
 
-The project was developed as a college practice project using **ASP.NET Core MVC, .NET 8, Entity Framework Core, and PostgreSQL**.
+<br><br>
 
-The main goal of the system is to replace manual timetable management with a centralized application that can handle teachers, subjects, student groups, classrooms, scheduling rules, conflicts, and exports.
+<a href="https://github.com/Artem56x/ScheduleSystem">
+<img src="https://img.shields.io/github/stars/Artem56x/ScheduleSystem?style=flat-square&logo=github&label=Stars" alt="Stars"/>
+</a>
 
----
+<a href="https://github.com/Artem56x/ScheduleSystem/network/members">
+<img src="https://img.shields.io/github/forks/Artem56x/ScheduleSystem?style=flat-square&logo=github&label=Forks" alt="Forks"/>
+</a>
 
-## Features
+<a href="https://github.com/Artem56x/ScheduleSystem">
+<img src="https://img.shields.io/github/repo-size/Artem56x/ScheduleSystem?style=flat-square&label=Repository%20Size" alt="Repository Size"/>
+</a>
 
-### Schedule Management
+<img src="https://img.shields.io/badge/Status-Completed-34C759?style=flat-square" alt="Status"/>
 
-* Create and edit schedules
-* View the complete timetable
-* Filter schedules by:
-
-  * Group
-  * Teacher
-  * Subject
-  * Classroom
-  * Day
-  * Time
-* Detect schedule conflicts
-* Validate timetable rules
-* Prevent invalid schedule combinations
-
-### Automatic Schedule Generation
-
-The system includes an automatic timetable generator that considers:
-
-* Teacher availability
-* Teacher-subject assignments
-* Group-subject assignments
-* Classroom capacity
-* Classroom categories
-* Subject requirements
-* Course compatibility
-* Existing schedule conflicts
-* Daily lesson limits
-* Weekly lesson requirements
-* Allowed gaps
-
-### Academic Management
-
-The application provides complete management of:
-
-* 👨‍🏫 Teachers
-* 📚 Subjects
-* 👥 Student groups
-* 🏫 Classrooms
-* 📅 Schedules
-
-Teachers can be assigned to multiple subjects using a dedicated many-to-many relationship.
+</div>
 
 ---
 
-## Dashboard
+# 🗓️ ScheduleSystem
 
-The main dashboard provides a quick overview of the system and its current data.
+**ScheduleSystem** is a modern web application for creating, managing, validating, automatically generating, and exporting college schedules.
+
+The project was developed with **ASP.NET Core MVC, .NET 8, Entity Framework Core, and PostgreSQL**.
+
+The main idea is not simply to store a timetable, but to help create a **consistent schedule without conflicts and invalid combinations**.
+
+---
+
+## ✨ Features
+
+### 📅 Schedule Management
+
+* Create lessons
+* Edit lessons
+* Delete lessons
+* View the complete schedule
+* Filter schedules
+* View schedules by group
+* View schedules by teacher
+* View schedules by classroom
+* View schedules by subject
+* Filter by day and time
+* Validate schedule conflicts
+* Export schedules
+
+---
+
+### 🔎 Smart Search & Filtering
+
+The schedule can be filtered by:
 
 ```text
-┌─────────────────────────────────────────────────────────┐
-│                    ScheduleSystem                       │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│   👨‍🏫 Teachers     👥 Groups     📚 Subjects             │
-│                                                         │
-│   🏫 Classrooms    📅 Schedules                         │
-│                                                         │
-│                 Schedule Overview                       │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+👥 Group
+👨‍🏫 Teacher
+📚 Subject
+🏫 Classroom
+📆 Day
+⏰ Time
+```
+
+This makes it possible to quickly find the required lessons without navigating through the entire timetable.
+
+---
+
+# 🧠 Smart Schedule Validation
+
+One of the core parts of ScheduleSystem is its **schedule validation system**.
+
+Before a lesson is saved, the system checks whether the selected combination is logically valid.
+
+### ⏱️ Time Conflicts
+
+For example:
+
+```text
+10:00 ───────────── 11:30
+              11:00 ───────────── 12:30
+                    ▲
+                    │
+               CONFLICT
+```
+
+The system checks several resources simultaneously:
+
+```text
+👨‍🏫 Teacher
+👥 Group
+🏫 Classroom
+```
+
+This prevents situations where the same teacher, group, or classroom is assigned to multiple lessons at the same time.
+
+---
+
+## 🏫 Smart Classroom Recommendations
+
+The classroom recommendation system considers more than simple availability.
+
+It can take into account:
+
+* Classroom capacity
+* Number of students
+* Classroom category
+* Subject requirements
+* Existing classroom schedule
+* Group requirements
+
+For example:
+
+```text
+Group: 25БД-1
+Students: 12
+
+Classroom 404
+Capacity: 10
+
+❌ Not suitable
+```
+
+The system can recommend classrooms that satisfy the required conditions.
+
+```text
+Available suitable classrooms:
+
+102   → +8 seats
+105   → +15 seats
+107   → +23 seats
 ```
 
 ---
 
-## Schedule Generator
+# 💻 Classroom Categories
 
-The generator uses configurable scheduling parameters.
+Different subjects can require different types of classrooms.
+
+For example:
+
+```text
+💻 Computer Science
+        ↓
+Computer Classroom
+
+🔬 Laboratory Work
+        ↓
+Laboratory
+
+📖 Lecture
+        ↓
+Lecture Room
+```
+
+Classroom categories are stored in the database and can be extended without changing the fundamental application structure.
+
+---
+
+# 👨‍🏫 Teachers
+
+The teacher management system supports:
+
+* Creating teachers
+* Editing teachers
+* Deleting teachers
+* Viewing teacher information
+* Assigning multiple subjects
+* Viewing individual teacher schedules
+
+### Teacher ↔ Subject
+
+Teachers and subjects use a **many-to-many relationship**.
+
+```text
+┌──────────────┐
+│    Teacher   │
+└──────┬───────┘
+       │
+       │
+       ▼
+┌────────────────┐
+│ TeacherSubject │
+└───────┬────────┘
+        │
+        ▼
+┌──────────────┐
+│    Subject   │
+└──────────────┘
+```
+
+This allows:
+
+```text
+Teacher A
+ ├── Mathematics
+ ├── Programming
+ └── Computer Science
+```
+
+while a subject can also have multiple teachers.
+
+---
+
+# 👥 Student Groups
+
+Groups contain information used by the scheduling system, including:
+
+* Group name
+* Course
+* Number of students
+* Group-subject relationships
+
+The number of students is especially important when selecting a suitable classroom.
+
+```text
+Group
+   │
+   ├── Course
+   ├── Student Count
+   └── Subjects
+```
+
+---
+
+# 📚 Subjects
+
+Subjects are independent database entities.
+
+They can be associated with:
+
+* Teachers
+* Student groups
+* Classroom requirements
+* Course
+* Subject type
+
+This allows the same subject to be consistently used throughout the scheduling system.
+
+---
+
+# 🏫 Classrooms
+
+Each classroom contains information such as:
+
+```text
+Name
+Category
+Capacity
+```
+
+Classroom categories are used by the recommendation and validation systems to determine whether a room is suitable for a particular lesson.
+
+---
+
+# 🤖 Automatic Schedule Generation
+
+ScheduleSystem includes an automatic timetable generation system.
+
+The generator considers:
+
+```text
+┌──────────────────────────────────┐
+│      Schedule Generator          │
+├──────────────────────────────────┤
+│                                  │
+│  Teacher availability            │
+│  Group requirements              │
+│  Subject assignments             │
+│  Classroom capacity              │
+│  Classroom categories            │
+│  Course compatibility            │
+│  Existing conflicts              │
+│  Daily lesson limits             │
+│  Weekly lesson requirements      │
+│  Allowed schedule gaps           │
+│                                  │
+└──────────────────────────────────┘
+```
+
+### Default Generation Settings
 
 | Setting                 | Default |
 | ----------------------- | ------: |
@@ -115,212 +310,115 @@ The generator uses configurable scheduling parameters.
 | Maximum gaps per day    |       2 |
 | Allow gaps              |     Yes |
 
-The generator attempts to create a valid timetable while respecting the configured constraints.
-
 ---
 
-## Validation
+# 🔔 Notifications
 
-Schedule validation checks multiple constraints before data is saved.
+The application includes a notification system for important schedule events.
 
-### Teacher conflicts
-
-A teacher cannot be assigned to two lessons at the same time.
-
-### Group conflicts
-
-A student group cannot have multiple lessons at the same time.
-
-### Classroom conflicts
-
-A classroom cannot be occupied by multiple lessons simultaneously.
-
-### Classroom capacity
-
-The classroom capacity must be sufficient for the selected group.
-
-### Classroom requirements
-
-Subjects can require specific classroom categories.
-
-For example:
+Example:
 
 ```text
-Computer Graphics
-        ↓
-Computer Classroom
+┌──────────────────────────────────────┐
+│ 🔔 Notification                      │
+├──────────────────────────────────────┤
+│                                      │
+│ Computer Graphics                    │
+│ Group: 25БД-1                        │
+│                                      │
+│ Time: 08:30–09:30                    │
+│                                      │
+└──────────────────────────────────────┘
 ```
 
-### Teacher compatibility
-
-The system checks whether the selected teacher is assigned to the selected subject.
-
-The administrator can also explicitly confirm a teacher-subject combination when necessary.
+Users can access notifications through the notification interface integrated into the application layout.
 
 ---
 
-## Data Model
+# 📝 Audit Logs
 
-The main relationships can be represented as:
+ScheduleSystem includes an audit logging system for tracking important application events.
+
+This provides additional visibility into administrative actions and changes made within the system.
+
+---
+
+# 🔐 Authentication & Authorization
+
+Authentication is implemented using **ASP.NET Core Identity**.
+
+Supported roles:
 
 ```text
-                         ┌──────────────┐
-                         │    Teacher   │
-                         └──────┬───────┘
-                                │
-                                │ many-to-many
-                                │
-                         ┌──────▼───────┐
-                         │TeacherSubject│
-                         └──────┬───────┘
-                                │
-                                │
-                         ┌──────▼───────┐
-                         │    Subject   │
-                         └──────────────┘
-
-
-┌──────────────┐       ┌──────────────┐
-│    Group     │──────▶│ GroupSubject │
-└──────────────┘       └──────┬───────┘
-                              │
-                              ▼
-                       ┌──────────────┐
-                       │    Subject   │
-                       └──────────────┘
-
-
-┌──────────────┐
-│   Schedule   │
-├──────────────┤
-│ Group        │
-│ Teacher      │
-│ Subject      │
-│ Classroom    │
-│ Date / Time  │
-└──────────────┘
+Admin
+User
 ```
 
----
-
-## Authentication & Authorization
-
-ScheduleSystem uses **ASP.NET Core Identity**.
-
-### Roles
-
-* `Admin`
-* `User`
-
-Administrators have access to system management and configuration functionality.
+Administrators have access to management and administrative functionality.
 
 Regular users have access to standard timetable functionality according to their permissions.
 
-### Secure Administrator Password
+### Secure Administrator Configuration
 
-The administrator password is **not hardcoded in the source code**.
+The administrator password is **not stored in source code**.
 
-It can be supplied through configuration:
+It can be provided through:
 
 ```text
 Admin:Password
 ```
 
-or through an environment variable:
+or:
 
 ```text
 Admin__Password
 ```
 
-Never commit real passwords or other secrets to the repository.
+Environment variables and secure configuration should be used for production credentials.
 
 ---
 
-## Notifications
+# 📤 Schedule Export
 
-The application includes a notification system for important timetable events.
+Schedules can be exported into several formats:
 
-Notifications can contain information such as:
+| Format | Support |
+| ------ | :-----: |
+| PDF    |    ✅    |
+| Excel  |    ✅    |
+| CSV    |    ✅    |
+
+The system supports exporting:
+
+* Complete schedules
+* Group schedules
+* Teacher schedules
+
+---
+
+# 🏗️ Architecture
+
+ScheduleSystem is built using the **ASP.NET Core MVC architecture**.
 
 ```text
-Computer Graphics
-Group: 25БД-1
-
-Time:
-08:30–09:30
-
-Classroom:
-Computer Classroom
+                         ScheduleSystem
+                               │
+              ┌────────────────┼────────────────┐
+              │                │                │
+              ▼                ▼                ▼
+        Controllers          Models           Views
+              │                │                │
+              │                │                │
+              └────────────────┼────────────────┘
+                               │
+                               ▼
+                         ApplicationDbContext
+                               │
+                               ▼
+                           PostgreSQL
 ```
 
-The interface includes a notification bell for quick access to user notifications.
-
----
-
-## Audit Logs
-
-Administrative actions and important system events can be recorded through the audit logging system.
-
-This provides additional visibility into changes made within the application.
-
----
-
-## Export
-
-Schedules can be exported in multiple formats.
-
-| Format | Supported |
-| ------ | :-------: |
-| PDF    |     ✅     |
-| Excel  |     ✅     |
-| CSV    |     ✅     |
-
-The system supports exporting both the general timetable and schedules filtered by specific teachers or groups.
-
----
-
-## User Interface
-
-ScheduleSystem uses a modern **Liquid Glass-inspired** interface.
-
-### Design principles
-
-* Clean white background
-* Blue accent colors
-* Glass-style cards
-* Rounded interfaces
-* Responsive layouts
-* Modern forms
-* Clear navigation
-* Consistent spacing
-* Smooth interactive elements
-
-The interface is designed to feel closer to a modern desktop or mobile application than a traditional college administration system.
-
----
-
-## Technology Stack
-
-<p align="center">
-
-| Layer             | Technology                    |
-| ----------------- | ----------------------------- |
-| Language          | **C#**                        |
-| Framework         | **ASP.NET Core MVC**          |
-| Runtime           | **.NET 8**                    |
-| ORM               | **Entity Framework Core**     |
-| Database          | **PostgreSQL**                |
-| Authentication    | **ASP.NET Core Identity**     |
-| Database Provider | **Npgsql**                    |
-| Frontend          | **HTML5 / CSS3 / JavaScript** |
-| Views             | **Razor**                     |
-| Version Control   | **Git / GitHub**              |
-
-</p>
-
----
-
-## Project Structure
+### Project Structure
 
 ```text
 ScheduleSystem/
@@ -352,8 +450,8 @@ ScheduleSystem/
 │   ├── GroupSubject.cs
 │   ├── Notification.cs
 │   ├── Schedule.cs
-│   ├── ScheduleGenerationSettings.cs
 │   ├── ScheduleGenerationResult.cs
+│   ├── ScheduleGenerationSettings.cs
 │   ├── ScheduleTimeSlot.cs
 │   ├── Subject.cs
 │   ├── SubjectClassroomCategory.cs
@@ -371,24 +469,12 @@ ScheduleSystem/
 │   └── NotificationBellViewComponent.cs
 │
 ├── Views/
-│   ├── Account/
-│   ├── Analytics/
-│   ├── AuditLogs/
-│   ├── Classrooms/
-│   ├── Groups/
-│   ├── Home/
-│   ├── Notifications/
-│   ├── Schedules/
-│   ├── Shared/
-│   ├── Subjects/
-│   └── Teachers/
+│
+├── Migrations/
 │
 ├── wwwroot/
 │   ├── css/
-│   ├── js/
-│   └── ...
-│
-├── Migrations/
+│   └── js/
 │
 ├── Program.cs
 ├── appsettings.json
@@ -397,9 +483,72 @@ ScheduleSystem/
 
 ---
 
-## Database
+# 🛠️ Tech Stack
 
-ScheduleSystem uses **PostgreSQL**.
+<div align="center">
+
+| Technology                | Purpose                        |
+| ------------------------- | ------------------------------ |
+| **C#**                    | Main programming language      |
+| **ASP.NET Core MVC**      | Web framework                  |
+| **.NET 8**                | Application platform           |
+| **Entity Framework Core** | ORM                            |
+| **PostgreSQL**            | Database                       |
+| **Npgsql**                | PostgreSQL provider            |
+| **ASP.NET Core Identity** | Authentication & authorization |
+| **Razor**                 | Server-side views              |
+| **HTML5**                 | Application markup             |
+| **CSS3**                  | UI styling                     |
+| **JavaScript**            | Client-side logic              |
+| **Git / GitHub**          | Version control                |
+
+</div>
+
+---
+
+# 🎨 UI / Design
+
+The interface follows a modern **Liquid Glass / Glassmorphism-inspired** design.
+
+```text
+┌──────────────────────────────────────────┐
+│                                          │
+│          ScheduleSystem                  │
+│                                          │
+│   ┌──────────────┐   ┌──────────────┐   │
+│   │   Teachers   │   │    Groups    │   │
+│   └──────────────┘   └──────────────┘   │
+│                                          │
+│   ┌──────────────┐   ┌──────────────┐   │
+│   │   Subjects   │   │  Classrooms  │   │
+│   └──────────────┘   └──────────────┘   │
+│                                          │
+│             Schedule                     │
+│                                          │
+└──────────────────────────────────────────┘
+```
+
+### Design principles
+
+* Clean white interface
+* Blue accent colors
+* Glass-style cards
+* Rounded components
+* Soft shadows
+* Responsive layouts
+* Consistent spacing
+* Clear navigation
+* Modern forms
+* Interactive filters
+* Minimal visual noise
+
+The goal is to make a complex scheduling system feel simple and intuitive.
+
+---
+
+# 🗄️ Database
+
+ScheduleSystem uses **PostgreSQL** with **Entity Framework Core**.
 
 Database:
 
@@ -407,39 +556,83 @@ Database:
 schedulesystem
 ```
 
-Entity Framework Core migrations are included in the repository.
-
-The main database entities include:
+### Main entities
 
 ```text
-Users
-Teachers
-Subjects
-TeacherSubjects
-Groups
-GroupSubjects
-Classrooms
-ClassroomCategories
-SubjectClassroomCategories
-Schedules
-ScheduleTimeSlots
-ScheduleGenerationSettings
-Notifications
-AuditLogs
+┌───────────────────────────┐
+│          Users            │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│         Teachers          │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│      TeacherSubjects      │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│         Subjects          │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│     GroupSubjects         │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│          Groups           │
+└───────────────────────────┘
+
+
+┌───────────────────────────┐
+│         Schedules         │
+├───────────────────────────┤
+│ Teacher                   │
+│ Group                     │
+│ Subject                   │
+│ Classroom                 │
+│ Time                      │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│        Classrooms         │
+└─────────────┬─────────────┘
+              │
+              ▼
+┌───────────────────────────┐
+│    ClassroomCategories    │
+└───────────────────────────┘
 ```
+
+Entity Framework Core migrations are included in the repository.
 
 ---
 
-## Requirements
+# ⚙️ Installation
 
-Before running the project, install:
+## 1. Clone the repository
 
-* [.NET 8 SDK](https://dotnet.microsoft.com/)
-* [PostgreSQL](https://www.postgresql.org/)
+```bash
+git clone https://github.com/Artem56x/ScheduleSystem.git
+cd ScheduleSystem
+```
+
+## 2. Install dependencies
+
+Make sure you have:
+
+* .NET 8 SDK
+* PostgreSQL
 * Git
 * Entity Framework Core CLI
 
-Verify .NET:
+Check the .NET version:
 
 ```bash
 dotnet --version
@@ -447,40 +640,35 @@ dotnet --version
 
 ---
 
-## Installation
+## 3. Create PostgreSQL database
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/Artem56x/ScheduleSystem.git
-cd ScheduleSystem
-```
-
-### 2. Create the database
-
-Create a PostgreSQL database:
+Create a database named:
 
 ```text
 schedulesystem
 ```
 
-### 3. Configure the connection
+Configure the PostgreSQL connection string using your local configuration.
 
-Configure the PostgreSQL connection string.
+---
 
-Example:
+## 4. Restore dependencies
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=schedulesystem;Username=postgres;Password=YOUR_PASSWORD"
-  }
-}
+```bash
+dotnet restore
 ```
 
-For production, use environment variables or a secure secret-management solution.
+---
 
-### 4. Configure administrator password
+## 5. Apply migrations
+
+```bash
+dotnet ef database update
+```
+
+---
+
+## 6. Configure administrator password
 
 PowerShell:
 
@@ -488,49 +676,37 @@ PowerShell:
 $env:Admin__Password="YOUR_ADMIN_PASSWORD"
 ```
 
-Command Prompt:
+Windows Command Prompt:
 
 ```cmd
 set Admin__Password=YOUR_ADMIN_PASSWORD
 ```
 
-### 5. Restore dependencies
+The password is intentionally not stored in the source code.
 
-```bash
-dotnet restore
-```
+---
 
-### 6. Apply migrations
-
-```bash
-dotnet ef database update
-```
-
-### 7. Build
+## 7. Build
 
 ```bash
 dotnet build
 ```
 
-### 8. Run
+---
+
+## 8. Run
 
 ```bash
 dotnet run
 ```
 
-The terminal will display the local application URL.
+ASP.NET Core will display the local application URL in the terminal.
 
 ---
 
-## Development
+# 🧰 Entity Framework Core
 
-Run with automatic recompilation:
-
-```bash
-dotnet watch
-```
-
-Create a new migration:
+Create a migration:
 
 ```bash
 dotnet ef migrations add MigrationName
@@ -550,123 +726,189 @@ dotnet ef migrations has-pending-model-changes
 
 ---
 
-## Git Workflow
+# 🔒 Security
 
-The project uses the `main` branch.
+The project follows several basic security practices:
 
-```bash
-git pull origin main
-git add .
-git commit -m "Describe your changes"
-git push origin main
+* ASP.NET Core Identity authentication
+* Role-based authorization
+* Password hashing through Identity
+* No hardcoded administrator password
+* Server-side validation
+* Entity Framework Core database access
+* Protected administrative functionality
+* Secrets excluded from source control
+
+For production deployment, additional security measures should be configured, including:
+
+* HTTPS
+* Secure cookies
+* Production secret management
+* Database access restrictions
+* Production logging
+* Environment-specific configuration
+
+---
+
+# 📊 Project Status
+
+<div align="center">
+
+## 🟢 Completed
+
+</div>
+
+```text
+Authentication             ████████████████████ 100%
+Authorization              ████████████████████ 100%
+Database                   ████████████████████ 100%
+CRUD                       ████████████████████ 100%
+Schedule Management        ████████████████████ 100%
+Validation                 ████████████████████ 100%
+Generation                 ████████████████████ 100%
+Recommendations            ████████████████████ 100%
+Notifications              ████████████████████ 100%
+Audit Logs                 ████████████████████ 100%
+Export                     ████████████████████ 100%
+UI / UX                    ████████████████████ 100%
+```
+
+### Implemented
+
+* [x] ASP.NET Core MVC architecture
+* [x] .NET 8
+* [x] PostgreSQL database
+* [x] Entity Framework Core
+* [x] ASP.NET Core Identity
+* [x] Role-based authorization
+* [x] Teacher management
+* [x] Multiple subjects per teacher
+* [x] Group management
+* [x] Subject management
+* [x] Classroom management
+* [x] Classroom categories
+* [x] Group-subject relationships
+* [x] Schedule management
+* [x] Schedule validation
+* [x] Conflict detection
+* [x] Automatic schedule generation
+* [x] Classroom recommendations
+* [x] Notifications
+* [x] Audit logs
+* [x] Schedule filtering
+* [x] PDF export
+* [x] Excel export
+* [x] CSV export
+* [x] User profile
+* [x] User settings
+* [x] Responsive Liquid Glass interface
+* [x] Entity Framework Core migrations
+
+---
+
+# 🚀 Possible Future Improvements
+
+The current version is complete for its intended college practice scope.
+
+Possible future extensions include:
+
+* [ ] Advanced schedule optimization algorithms
+* [ ] More detailed analytics
+* [ ] Calendar integrations
+* [ ] Email notifications
+* [ ] Mobile application
+* [ ] REST API
+* [ ] Docker deployment
+* [ ] Cloud deployment
+* [ ] Advanced timetable visualization
+
+---
+
+# 📌 Project Information
+
+```text
+Project:       ScheduleSystem
+Version:       1.0
+Platform:      Web
+Framework:     ASP.NET Core MVC
+Runtime:       .NET 8
+Language:      C#
+Database:      PostgreSQL
+ORM:           Entity Framework Core
+Architecture:  MVC
+Status:        Completed
 ```
 
 ---
 
-## Project Status
+# 🎓 Academic Project
 
-<p align="center">
-
-### ✅ Project Completed
-
-</p>
-
-Current functionality includes:
-
-* ✅ Authentication
-* ✅ Authorization
-* ✅ Teacher management
-* ✅ Multiple subjects per teacher
-* ✅ Group management
-* ✅ Subject management
-* ✅ Classroom management
-* ✅ Classroom categories
-* ✅ Group-subject relationships
-* ✅ Schedule management
-* ✅ Automatic schedule generation
-* ✅ Schedule validation
-* ✅ Conflict detection
-* ✅ Notifications
-* ✅ Audit logs
-* ✅ Filtering
-* ✅ PDF export
-* ✅ Excel export
-* ✅ CSV export
-* ✅ User profile
-* ✅ Settings
-* ✅ PostgreSQL persistence
-* ✅ Entity Framework Core migrations
-* ✅ Responsive Liquid Glass interface
-
----
-
-## Roadmap
-
-Possible future improvements:
-
-* [ ] Advanced schedule optimization
-* [ ] More detailed analytics
-* [ ] Calendar integration
-* [ ] Email notifications
-* [ ] Mobile application
-* [ ] Deployment to a cloud platform
-* [ ] Additional scheduling algorithms
-* [ ] Improved timetable visualization
-
----
-
-## Author
-
-<p align="center">
-  <strong>Artem Dudnik</strong>
-</p>
-
-<p align="center">
-  Software Development Student · Kazakhstan
-</p>
-
-<p align="center">
-  <a href="https://github.com/Artem56x">
-    <img src="https://img.shields.io/badge/GitHub-Artem56x-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-  </a>
-</p>
-
----
-
-## Academic Project
-
-ScheduleSystem was developed as a **college practice project** focused on applying software development skills to a real-world timetable management problem.
+ScheduleSystem was developed as a **college practice project** focused on applying software development skills to a real-world educational scheduling problem.
 
 The project combines:
 
 ```text
-Software Development
-        +
-Database Design
-        +
-Web Development
-        +
-Business Logic
-        +
-Scheduling Algorithms
-        +
-User Interface Design
+                 ScheduleSystem
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+        ▼              ▼              ▼
+   Web Development  Database Design  UI / UX
+        │              │              │
+        └──────────────┼──────────────┘
+                       │
+                       ▼
+              Business Logic
+                       │
+                       ▼
+             Schedule Generation
+                       │
+                       ▼
+              Conflict Validation
 ```
 
+The project demonstrates practical experience with:
+
+* Backend development
+* Database design
+* MVC architecture
+* Entity relationships
+* Authentication
+* Authorization
+* Business logic
+* Validation
+* Scheduling algorithms
+* UI/UX design
+* Git and GitHub
+
 ---
 
-## License
+# 👨‍💻 Author
 
-This project was developed for educational and demonstration purposes as part of college practice.
+<div align="center">
 
-Unless otherwise specified, the source code is intended for educational use.
+### Artem Dudnik
+
+**Software Development Student · Kazakhstan**
+
+<br>
+
+<a href="https://github.com/Artem56x">
+<img src="https://img.shields.io/badge/GitHub-Artem56x-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+</a>
+
+<br><br>
+
+⭐ If you like the project, consider giving it a star.
+
+</div>
 
 ---
 
-<p align="center">
+# 💙 Built with C# & ASP.NET Core
 
-**ScheduleSystem**
+<div align="center">
 
-*Modern timetable management for educational institutions.*
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0A84FF,50:5E5CE6,100:AF52DE&height=120&section=footer" width="100%"/>
 
-</p>
+</div>
