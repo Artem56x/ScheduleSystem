@@ -38,7 +38,16 @@
 
 <img src="https://img.shields.io/badge/Status-Completed-34C759?style=flat-square" alt="Status"/>
 
+<br><br>
+
+<a href="docs/">
+<img src="https://img.shields.io/badge/📚%20Documentation-0A84FF?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Documentation"/>
+</a>
+
 </div>
+
+---
+
 
 ---
 
