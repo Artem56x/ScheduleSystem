@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using ClosedXML.Excel;
 using QuestPDF.Fluent;
@@ -11,34 +10,265 @@ namespace ScheduleSystem.Services;
 public class ScheduleExportService
 {
     // ============================================================
-    // EXCEL
+    // EXCEL — ALL SCHEDULE
     // ============================================================
 
     public byte[] CreateAllExcel(List<Schedule> schedules)
     {
-        return CreateExcel(
-            "Расписание всех занятий",
-            "Полное расписание",
-            new[]
+        using var workbook = new XLWorkbook();
+
+        var worksheet = workbook.Worksheets.Add("Все расписание");
+
+        ConfigureWorksheet(worksheet);
+
+        var groups = schedules
+            .Where(s => s.Group != null)
+            .GroupBy(s => s.Group!.Name)
+            .OrderBy(g => g.Key)
+            .ToList();
+
+        int currentRow = 1;
+
+        // ========================================================
+        // MAIN TITLE
+        // ========================================================
+
+        worksheet.Cell(currentRow, 1).Value =
+            "Расписание всех занятий";
+
+        worksheet.Range(currentRow, 1, currentRow, 6).Merge();
+
+        worksheet.Cell(currentRow, 1).Style.Font.Bold = true;
+        worksheet.Cell(currentRow, 1).Style.Font.FontSize = 18;
+        worksheet.Cell(currentRow, 1).Style.Alignment.Horizontal =
+            XLAlignmentHorizontalValues.Center;
+        worksheet.Cell(currentRow, 1).Style.Alignment.Vertical =
+            XLAlignmentVerticalValues.Center;
+
+        worksheet.Row(currentRow).Height = 30;
+
+        currentRow++;
+
+        worksheet.Cell(currentRow, 1).Value =
+            $"Групп: {groups.Count} • Занятий: {schedules.Count}";
+
+        worksheet.Range(currentRow, 1, currentRow, 6).Merge();
+
+        worksheet.Cell(currentRow, 1).Style.Font.FontSize = 11;
+        worksheet.Cell(currentRow, 1).Style.Font.Italic = true;
+        worksheet.Cell(currentRow, 1).Style.Alignment.Horizontal =
+            XLAlignmentHorizontalValues.Center;
+
+        currentRow += 2;
+
+        // ========================================================
+        // GROUPS
+        // ========================================================
+
+        foreach (var group in groups)
+        {
+            var groupSchedules = group
+                .OrderBy(s => GetDayOrder(s.DayOfWeek))
+                .ThenBy(s => s.StartTime)
+                .ThenBy(s => s.EndTime)
+                .ToList();
+
+            // ----------------------------------------------------
+            // GROUP HEADER
+            // ----------------------------------------------------
+
+            worksheet.Cell(currentRow, 1).Value =
+                $"Группа: {group.Key}";
+
+            worksheet.Range(currentRow, 1, currentRow, 6).Merge();
+
+            worksheet.Cell(currentRow, 1).Style.Font.Bold = true;
+            worksheet.Cell(currentRow, 1).Style.Font.FontSize = 15;
+            worksheet.Cell(currentRow, 1).Style.Alignment.Horizontal =
+                XLAlignmentHorizontalValues.Left;
+            worksheet.Cell(currentRow, 1).Style.Alignment.Vertical =
+                XLAlignmentVerticalValues.Center;
+
+            worksheet.Row(currentRow).Height = 28;
+
+            currentRow += 1;
+
+            // ----------------------------------------------------
+            // DAYS
+            // ----------------------------------------------------
+
+            var days = groupSchedules
+                .GroupBy(s => s.DayOfWeek)
+                .OrderBy(g => GetDayOrder(g.Key))
+                .ToList();
+
+            foreach (var day in days)
             {
-                "День",
-                "Время",
-                "Предмет",
-                "Преподаватель",
-                "Группа",
-                "Аудитория"
-            },
-            schedules,
-            schedule => new[]
+                // =================================================
+                // DAY HEADER
+                // =================================================
+
+                worksheet.Cell(currentRow, 1).Value =
+                    GetDayName(day.Key).ToUpperInvariant();
+
+                worksheet.Range(currentRow, 1, currentRow, 6).Merge();
+
+                worksheet.Cell(currentRow, 1).Style.Font.Bold = true;
+                worksheet.Cell(currentRow, 1).Style.Font.FontSize = 12;
+                worksheet.Cell(currentRow, 1).Style.Alignment.Horizontal =
+                    XLAlignmentHorizontalValues.Left;
+                worksheet.Cell(currentRow, 1).Style.Alignment.Vertical =
+                    XLAlignmentVerticalValues.Center;
+
+                worksheet.Row(currentRow).Height = 24;
+
+                currentRow++;
+
+                // =================================================
+                // TABLE HEADER
+                // =================================================
+
+                var headers = new[]
+                {
+                    "№",
+                    "Время",
+                    "Предмет",
+                    "Преподаватель",
+                    "Аудитория",
+                    "Группа"
+                };
+
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    var cell = worksheet.Cell(currentRow, i + 1);
+
+                    cell.Value = headers[i];
+
+                    cell.Style.Font.Bold = true;
+                    cell.Style.Alignment.Horizontal =
+                        XLAlignmentHorizontalValues.Center;
+                    cell.Style.Alignment.Vertical =
+                        XLAlignmentVerticalValues.Center;
+
+                    cell.Style.Border.OutsideBorder =
+                        XLBorderStyleValues.Thin;
+                }
+
+                worksheet.Row(currentRow).Height = 24;
+
+                int headerRow = currentRow;
+
+                currentRow++;
+
+                // =================================================
+                // LESSONS
+                // =================================================
+
+                var lessons = day
+                    .OrderBy(s => s.StartTime)
+                    .ThenBy(s => s.EndTime)
+                    .ThenBy(s => s.Classroom?.Name)
+                    .ToList();
+
+                for (int i = 0; i < lessons.Count; i++)
+                {
+                    var schedule = lessons[i];
+
+                    var values = new[]
+                    {
+                        (i + 1).ToString(),
+                        GetTimeRange(schedule),
+                        schedule.Subject?.Name ?? "—",
+                        schedule.Teacher?.FullName ?? "—",
+                        schedule.Classroom?.Name ?? "—",
+                        schedule.Group?.Name ?? "—"
+                    };
+
+                    for (int column = 0;
+                         column < values.Length;
+                         column++)
+                    {
+                        var cell =
+                            worksheet.Cell(currentRow, column + 1);
+
+                        cell.Value = values[column];
+
+                        cell.Style.Alignment.Vertical =
+                            XLAlignmentVerticalValues.Center;
+
+                        cell.Style.Alignment.Horizontal =
+                            column == 0
+                                ? XLAlignmentHorizontalValues.Center
+                                : XLAlignmentHorizontalValues.Left;
+
+                        cell.Style.Border.OutsideBorder =
+                            XLBorderStyleValues.Thin;
+                    }
+
+                    worksheet.Row(currentRow).Height = 22;
+
+                    currentRow++;
+                }
+
+                // Пустая строка между днями
+                currentRow++;
+            }
+
+            // Разделитель между группами
+            currentRow++;
+        }
+
+        // ========================================================
+        // EMPTY STATE
+        // ========================================================
+
+        if (groups.Count == 0)
+        {
+            worksheet.Cell(currentRow, 1).Value =
+                "Расписание отсутствует.";
+
+            worksheet.Range(currentRow, 1, currentRow, 6).Merge();
+
+            worksheet.Cell(currentRow, 1).Style.Alignment.Horizontal =
+                XLAlignmentHorizontalValues.Center;
+        }
+
+        // ========================================================
+        // WIDTH
+        // ========================================================
+
+        worksheet.Columns().AdjustToContents();
+
+        foreach (var column in worksheet.ColumnsUsed())
+        {
+            if (column.Width > 40)
             {
-                GetDayName(schedule.DayOfWeek),
-                GetTimeRange(schedule),
-                schedule.Subject?.Name ?? "—",
-                schedule.Teacher?.FullName ?? "—",
-                schedule.Group?.Name ?? "—",
-                schedule.Classroom?.Name ?? "—"
-            });
+                column.Width = 40;
+            }
+
+            if (column.Width < 10)
+            {
+                column.Width = 10;
+            }
+        }
+
+        worksheet.Column(1).Width = 8;
+        worksheet.Column(2).Width = 16;
+        worksheet.Column(3).Width = 30;
+        worksheet.Column(4).Width = 28;
+        worksheet.Column(5).Width = 16;
+        worksheet.Column(6).Width = 16;
+
+        using var stream = new MemoryStream();
+
+        workbook.SaveAs(stream);
+
+        return stream.ToArray();
     }
+
+    // ============================================================
+    // EXCEL — GROUP
+    // ============================================================
 
     public byte[] CreateGroupExcel(
         string groupName,
@@ -67,6 +297,10 @@ public class ScheduleExportService
                 schedule.Group?.Name ?? "—"
             });
     }
+
+    // ============================================================
+    // EXCEL — TEACHER
+    // ============================================================
 
     public byte[] CreateTeacherExcel(
         string teacherName,
@@ -111,8 +345,8 @@ public class ScheduleExportService
 
         int currentRow = 1;
 
-        // Заголовок
         worksheet.Cell(currentRow, 1).Value = title;
+
         worksheet.Range(
             currentRow,
             1,
@@ -124,14 +358,11 @@ public class ScheduleExportService
         worksheet.Cell(currentRow, 1).Style.Font.FontSize = 18;
         worksheet.Cell(currentRow, 1).Style.Alignment.Horizontal =
             XLAlignmentHorizontalValues.Center;
-        worksheet.Cell(currentRow, 1).Style.Alignment.Vertical =
-            XLAlignmentVerticalValues.Center;
 
         worksheet.Row(currentRow).Height = 30;
 
         currentRow++;
 
-        // Подзаголовок
         worksheet.Cell(currentRow, 1).Value =
             $"{subtitle} • Занятий: {sortedSchedules.Count}";
 
@@ -147,11 +378,8 @@ public class ScheduleExportService
         worksheet.Cell(currentRow, 1).Style.Alignment.Horizontal =
             XLAlignmentHorizontalValues.Center;
 
-        currentRow++;
+        currentRow += 2;
 
-        currentRow++;
-
-        // Заголовки таблицы
         for (int i = 0; i < headers.Length; i++)
         {
             var cell = worksheet.Cell(currentRow, i + 1);
@@ -163,17 +391,15 @@ public class ScheduleExportService
                 XLAlignmentHorizontalValues.Center;
             cell.Style.Alignment.Vertical =
                 XLAlignmentVerticalValues.Center;
+
             cell.Style.Border.OutsideBorder =
                 XLBorderStyleValues.Thin;
         }
-
-        worksheet.Row(currentRow).Height = 24;
 
         int headerRow = currentRow;
 
         currentRow++;
 
-        // Данные
         foreach (var schedule in sortedSchedules)
         {
             var values = rowSelector(schedule);
@@ -189,17 +415,11 @@ public class ScheduleExportService
 
                 cell.Style.Border.OutsideBorder =
                     XLBorderStyleValues.Thin;
-
-                cell.Style.Border.BottomBorder =
-                    XLBorderStyleValues.Thin;
             }
-
-            worksheet.Row(currentRow).Height = 22;
 
             currentRow++;
         }
 
-        // Если расписание пустое
         if (sortedSchedules.Count == 0)
         {
             worksheet.Cell(currentRow, 1).Value =
@@ -216,10 +436,8 @@ public class ScheduleExportService
                 XLAlignmentHorizontalValues.Center;
         }
 
-        // Автоширина
         worksheet.Columns().AdjustToContents();
 
-        // Ограничиваем слишком широкие столбцы
         foreach (var column in worksheet.ColumnsUsed())
         {
             if (column.Width > 40)
@@ -263,34 +481,205 @@ public class ScheduleExportService
     }
 
     // ============================================================
-    // PDF
+    // PDF — ALL SCHEDULE
     // ============================================================
 
     public byte[] CreateAllPdf(List<Schedule> schedules)
     {
-        return CreatePdf(
-            "Расписание всех занятий",
-            "Полное расписание",
-            new[]
+        var groups = schedules
+            .Where(s => s.Group != null)
+            .GroupBy(s => s.Group!.Name)
+            .OrderBy(g => g.Key)
+            .ToList();
+
+        var document = Document.Create(container =>
+        {
+            container.Page(page =>
             {
-                "День",
-                "Время",
-                "Предмет",
-                "Преподаватель",
-                "Группа",
-                "Аудитория"
-            },
-            schedules,
-            schedule => new[]
-            {
-                GetDayName(schedule.DayOfWeek),
-                GetTimeRange(schedule),
-                schedule.Subject?.Name ?? "—",
-                schedule.Teacher?.FullName ?? "—",
-                schedule.Group?.Name ?? "—",
-                schedule.Classroom?.Name ?? "—"
+                page.Size(PageSizes.A4.Landscape());
+
+                page.Margin(25);
+
+                page.DefaultTextStyle(
+                    TextStyle.Default.FontSize(9));
+
+                page.Header()
+                    .PaddingBottom(10)
+                    .Column(column =>
+                    {
+                        column.Item()
+                            .AlignCenter()
+                            .Text("Расписание всех занятий")
+                            .FontSize(18)
+                            .Bold();
+
+                        column.Item()
+                            .PaddingTop(4)
+                            .AlignCenter()
+                            .Text(
+                                $"Групп: {groups.Count} • Занятий: {schedules.Count}")
+                            .FontSize(10);
+                    });
+
+                page.Content()
+                    .Column(column =>
+                    {
+                        if (groups.Count == 0)
+                        {
+                            column.Item()
+                                .Padding(15)
+                                .AlignCenter()
+                                .Text("Расписание отсутствует.")
+                                .FontSize(10);
+
+                            return;
+                        }
+
+                        foreach (var group in groups)
+                        {
+                            // =================================================
+                            // GROUP
+                            // =================================================
+
+                            column.Item()
+                                .PaddingTop(8)
+                                .PaddingBottom(6)
+                                .Text($"Группа: {group.Key}")
+                                .FontSize(14)
+                                .Bold();
+
+                            var days = group
+                                .GroupBy(s => s.DayOfWeek)
+                                .OrderBy(g => GetDayOrder(g.Key))
+                                .ToList();
+
+                            foreach (var day in days)
+                            {
+                                // =============================================
+                                // DAY
+                                // =============================================
+
+                                column.Item()
+                                    .PaddingTop(5)
+                                    .PaddingBottom(4)
+                                    .Text(
+                                        GetDayName(day.Key).ToUpperInvariant())
+                                    .FontSize(11)
+                                    .Bold();
+
+                                var lessons = day
+                                    .OrderBy(s => s.StartTime)
+                                    .ThenBy(s => s.EndTime)
+                                    .ThenBy(s => s.Classroom?.Name)
+                                    .ToList();
+
+                                column.Item()
+                                    .Table(table =>
+                                    {
+                                        table.ColumnsDefinition(columns =>
+                                        {
+                                            columns.RelativeColumn(0.6f);
+                                            columns.RelativeColumn(1.3f);
+                                            columns.RelativeColumn(2.8f);
+                                            columns.RelativeColumn(2.5f);
+                                            columns.RelativeColumn(1.2f);
+                                        });
+
+                                        var headers = new[]
+                                        {
+                                            "№",
+                                            "Время",
+                                            "Предмет",
+                                            "Преподаватель",
+                                            "Аудитория"
+                                        };
+
+                                        foreach (var header in headers)
+                                        {
+                                            table.Cell()
+                                                .Background("#2563EB")
+                                                .Padding(5)
+                                                .AlignCenter()
+                                                .AlignMiddle()
+                                                .Text(header)
+                                                .FontColor("#FFFFFF")
+                                                .Bold()
+                                                .FontSize(8);
+                                        }
+
+                                        for (int i = 0;
+                                             i < lessons.Count;
+                                             i++)
+                                        {
+                                            var schedule = lessons[i];
+
+                                            var values = new[]
+                                            {
+                                                (i + 1).ToString(),
+
+                                                GetTimeRange(schedule),
+
+                                                schedule.Subject?.Name
+                                                    ?? "—",
+
+                                                schedule.Teacher?.FullName
+                                                    ?? "—",
+
+                                                schedule.Classroom?.Name
+                                                    ?? "—"
+                                            };
+
+                                            foreach (var value in values)
+                                            {
+                                                table.Cell()
+                                                    .BorderBottom(1)
+                                                    .BorderColor("#D1D5DB")
+                                                    .Padding(4)
+                                                    .AlignMiddle()
+                                                    .Text(value)
+                                                    .FontSize(7.5f);
+                                            }
+                                        }
+                                    });
+                            }
+
+                            // Разделитель групп
+                            column.Item()
+                                .PaddingTop(8)
+                                .PaddingBottom(8)
+                                .LineHorizontal(1)
+                                .LineColor("#D1D5DB");
+                        }
+                    });
+
+                page.Footer()
+                    .PaddingTop(8)
+                    .Row(row =>
+                    {
+                        row.RelativeItem()
+                            .Text(
+                                $"Сформировано: {DateTime.Now:dd.MM.yyyy HH:mm}")
+                            .FontSize(8);
+
+                        row.RelativeItem()
+                            .AlignRight()
+                            .Text(text =>
+                            {
+                                text.Span("Страница ");
+                                text.CurrentPageNumber();
+                                text.Span(" из ");
+                                text.TotalPages();
+                            });
+                    });
             });
+        });
+
+        return document.GeneratePdf();
     }
+
+    // ============================================================
+    // PDF — GROUP
+    // ============================================================
 
     public byte[] CreateGroupPdf(
         string groupName,
@@ -317,6 +706,10 @@ public class ScheduleExportService
                 schedule.Classroom?.Name ?? "—"
             });
     }
+
+    // ============================================================
+    // PDF — TEACHER
+    // ============================================================
 
     public byte[] CreateTeacherPdf(
         string teacherName,
@@ -364,10 +757,6 @@ public class ScheduleExportService
                 page.DefaultTextStyle(
                     TextStyle.Default.FontSize(9));
 
-                // ====================================================
-                // HEADER
-                // ====================================================
-
                 page.Header()
                     .PaddingBottom(10)
                     .Column(column =>
@@ -386,14 +775,9 @@ public class ScheduleExportService
                             .FontSize(10);
                     });
 
-                // ====================================================
-                // CONTENT
-                // ====================================================
-
                 page.Content()
                     .Table(table =>
                     {
-                        // Колонки
                         table.ColumnsDefinition(columns =>
                         {
                             for (int i = 0;
@@ -403,10 +787,6 @@ public class ScheduleExportService
                                 columns.RelativeColumn();
                             }
                         });
-
-                        // =================================================
-                        // HEADER ROW
-                        // =================================================
 
                         foreach (var header in headers)
                         {
@@ -420,10 +800,6 @@ public class ScheduleExportService
                                 .Bold()
                                 .FontSize(9);
                         }
-
-                        // =================================================
-                        // DATA ROWS
-                        // =================================================
 
                         foreach (var schedule in sortedSchedules)
                         {
@@ -441,10 +817,6 @@ public class ScheduleExportService
                             }
                         }
 
-                        // =================================================
-                        // EMPTY STATE
-                        // =================================================
-
                         if (sortedSchedules.Count == 0)
                         {
                             table.Cell()
@@ -455,10 +827,6 @@ public class ScheduleExportService
                                 .FontSize(10);
                         }
                     });
-
-                // ====================================================
-                // FOOTER
-                // ====================================================
 
                 page.Footer()
                     .PaddingTop(8)
@@ -486,32 +854,79 @@ public class ScheduleExportService
     }
 
     // ============================================================
-    // CSV
+    // CSV — ALL SCHEDULE
     // ============================================================
 
     public byte[] CreateAllCsv(List<Schedule> schedules)
     {
-        return CreateCsv(
-            new[]
+        var builder = new StringBuilder();
+
+        builder.Append('\uFEFF');
+
+        var headers = new[]
+        {
+            "Группа",
+            "День",
+            "№",
+            "Время",
+            "Предмет",
+            "Преподаватель",
+            "Аудитория"
+        };
+
+        builder.AppendLine(
+            string.Join(
+                ";",
+                headers.Select(EscapeCsv)));
+
+        var groups = schedules
+            .Where(s => s.Group != null)
+            .GroupBy(s => s.Group!.Name)
+            .OrderBy(g => g.Key);
+
+        foreach (var group in groups)
+        {
+            var days = group
+                .GroupBy(s => s.DayOfWeek)
+                .OrderBy(g => GetDayOrder(g.Key));
+
+            foreach (var day in days)
             {
-                "День",
-                "Время",
-                "Предмет",
-                "Преподаватель",
-                "Группа",
-                "Аудитория"
-            },
-            schedules,
-            schedule => new[]
-            {
-                GetDayName(schedule.DayOfWeek),
-                GetTimeRange(schedule),
-                schedule.Subject?.Name ?? "—",
-                schedule.Teacher?.FullName ?? "—",
-                schedule.Group?.Name ?? "—",
-                schedule.Classroom?.Name ?? "—"
-            });
+                var lessons = day
+                    .OrderBy(s => s.StartTime)
+                    .ThenBy(s => s.EndTime)
+                    .ThenBy(s => s.Classroom?.Name)
+                    .ToList();
+
+                for (int i = 0; i < lessons.Count; i++)
+                {
+                    var schedule = lessons[i];
+
+                    var values = new[]
+                    {
+                        group.Key,
+                        GetDayName(schedule.DayOfWeek),
+                        (i + 1).ToString(),
+                        GetTimeRange(schedule),
+                        schedule.Subject?.Name ?? "—",
+                        schedule.Teacher?.FullName ?? "—",
+                        schedule.Classroom?.Name ?? "—"
+                    };
+
+                    builder.AppendLine(
+                        string.Join(
+                            ";",
+                            values.Select(EscapeCsv)));
+                }
+            }
+        }
+
+        return Encoding.UTF8.GetBytes(builder.ToString());
     }
+
+    // ============================================================
+    // CSV — GROUP
+    // ============================================================
 
     public byte[] CreateGroupCsv(
         string groupName,
@@ -536,6 +951,10 @@ public class ScheduleExportService
                 schedule.Classroom?.Name ?? "—"
             });
     }
+
+    // ============================================================
+    // CSV — TEACHER
+    // ============================================================
 
     public byte[] CreateTeacherCsv(
         string teacherName,
@@ -568,16 +987,13 @@ public class ScheduleExportService
     {
         var builder = new StringBuilder();
 
-        // BOM для корректного открытия кириллицы в Excel
         builder.Append('\uFEFF');
 
-        // Заголовок
         builder.AppendLine(
             string.Join(
                 ";",
                 headers.Select(EscapeCsv)));
 
-        // Данные
         foreach (var schedule in SortSchedules(schedules))
         {
             var values = rowSelector(schedule);
