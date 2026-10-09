@@ -12,10 +12,10 @@
     <link rel="stylesheet" href="~/css/Teachers/Edit.css" asp-append-version="true" />
 }
 
-<div class="schedule-details-page">
+<div class="schedule-details-page ui-form-layout">
 
     <!-- HEADER -->
-    <div class="details-header">
+    <div class="details-header ui-page-heading">
 
         <div class="details-header-content">
 
@@ -33,13 +33,13 @@
 
         <div class="details-header-actions">
 
-            <a asp-action="Index" class="glass-button secondary-button">
-                ← Назад
+            <a asp-action="Index" class="glass-button ui-button secondary-button">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Назад
             </a>
 
             <a asp-action="Details"
                asp-route-id="@Model.Id"
-               class="glass-button primary-button">
+               class="glass-button ui-button ui-primary primary-button">
                 Просмотр
             </a>
 
@@ -49,7 +49,7 @@
 
 
     <!-- MAIN CARD -->
-    <div class="lesson-main-card">
+    <div class="lesson-main-card ui-surface ui-panel">
 
         <form asp-action="Edit" method="post">
 
@@ -66,7 +66,7 @@
             <div class="lesson-card-top">
 
                 <div class="lesson-icon edit-icon">
-                    ✏️
+                    <i class="bi bi-pencil" aria-hidden="true"></i>
                 </div>
 
                 <div>
@@ -96,7 +96,7 @@
                 <div class="info-card">
 
                     <div class="info-icon">
-                        👤
+                        <i class="bi bi-person" aria-hidden="true"></i>
                     </div>
 
                     <div class="info-content">
@@ -123,7 +123,7 @@
                 <div class="info-card">
 
                     <div class="info-icon">
-                        📚
+                        <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
                     </div>
 
                     <div class="info-content">
@@ -185,13 +185,13 @@
             <div class="details-footer">
 
                 <a asp-action="Index"
-                   class="glass-button secondary-button">
-                    ← Отмена
+                   class="glass-button ui-button secondary-button">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Отмена
                 </a>
 
                 <button type="submit"
-                        class="glass-button save-button">
-                    ✓ Сохранить изменения
+                        class="glass-button ui-button ui-primary save-button">
+                    <i class="bi bi-check2" aria-hidden="true"></i> Сохранить изменения
                 </button>
 
             </div>

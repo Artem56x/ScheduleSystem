@@ -29,12 +29,12 @@
 
     <header class="study-load-header">
 
-        <div class="study-load-header-top">
+        <div class="study-load-header-top ui-page-heading">
 
             <a asp-controller="Account"
                asp-action="Settings"
                class="study-load-back">
-                <span class="study-load-back-icon">←</span>
+                <span class="study-load-back-icon"><i class="bi bi-arrow-left" aria-hidden="true"></i></span>
                 <span>Настройки</span>
             </a>
 
@@ -43,7 +43,7 @@
         <div class="study-load-title-block">
 
             <div class="study-load-title-icon">
-                📚
+                <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
             </div>
 
             <div>
@@ -66,15 +66,15 @@
 
     @if (!string.IsNullOrWhiteSpace(successMessage))
     {
-        <div class="study-load-alert study-load-alert-success">
-            <span class="study-load-alert-icon">✓</span>
+        <div class="study-load-alert ui-alert study-load-alert-success">
+            <span class="study-load-alert-icon"><i class="bi bi-check2" aria-hidden="true"></i></span>
             <span>@successMessage</span>
         </div>
     }
 
     @if (!string.IsNullOrWhiteSpace(errorMessage))
     {
-        <div class="study-load-alert study-load-alert-error">
+        <div class="study-load-alert ui-alert study-load-alert-error">
             <span class="study-load-alert-icon">!</span>
             <span>@errorMessage</span>
         </div>
@@ -85,7 +85,8 @@
          MAIN CARD
          ========================================================= -->
 
-    <main class="study-load-card">
+    <div class="study-load-card">
+        <div id="studyLoadClientError" class="ui-inline-error" role="alert" tabindex="-1"></div>
 
         <!-- GROUP SELECT -->
 
@@ -147,7 +148,7 @@
             <div class="study-load-placeholder">
 
                 <div class="study-load-placeholder-icon">
-                    📋
+                    <i class="bi bi-clipboard" aria-hidden="true"></i>
                 </div>
 
                 <h3>Группа не выбрана</h3>
@@ -172,9 +173,9 @@
 
             <button type="button"
                     id="addSubjectButton"
-                    class="study-load-add-button">
+                    class="study-load-add-button ui-button">
 
-                <span class="study-load-add-button-icon">＋</span>
+                <span class="study-load-add-button-icon"><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
 
                 <span>
                     Добавить предмет
@@ -198,9 +199,9 @@
                     </div>
 
                     <button type="button"
-                            id="cancelAddSubject"
-                            class="study-load-modal-close">
-                        ×
+                            id="cancelAddSubject" aria-label="Отменить добавление предмета"
+                            class="study-load-modal-close ui-button ui-icon-button">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
                     </button>
 
                 </div>
@@ -248,13 +249,13 @@
 
                     <button type="button"
                             id="cancelAddSubjectSecondary"
-                            class="study-load-secondary-button">
+                            class="study-load-secondary-button ui-button">
                         Отмена
                     </button>
 
                     <button type="button"
                             id="confirmAddSubject"
-                            class="study-load-primary-button">
+                            class="study-load-primary-button ui-button ui-primary">
                         Добавить предмет
                     </button>
 
@@ -287,7 +288,7 @@
                           class="study-load-status-dot">
                     </span>
 
-                    <span id="studyLoadStatusText">
+                    <span id="studyLoadStatusText" role="status" aria-live="polite">
                         Изменения не внесены
                     </span>
 
@@ -296,10 +297,10 @@
 
                 <button type="submit"
                         id="saveStudyLoadButton"
-                        class="study-load-save-button"
+                        class="study-load-save-button ui-button ui-primary"
                         disabled>
 
-                    <span class="study-load-save-icon">✓</span>
+                    <span class="study-load-save-icon"><i class="bi bi-check2" aria-hidden="true"></i></span>
 
                     <span>
                         Сохранить изменения
@@ -311,7 +312,7 @@
 
         </form>
 
-    </main>
+    </div>
 
 </div>
 
@@ -362,4 +363,3 @@
 
 <script src="~/js/Account/StudyLoad.js"
         asp-append-version="true"></script>
-

@@ -8,20 +8,20 @@
     <link rel="stylesheet" href="~/css/Classrooms/Edit.css" asp-append-version="true" />
 }
 
-<div class="classroom-form-page">
+<div class="classroom-form-page ui-form-layout">
 
 
-    <div class="page-header">
+    <div class="page-header ui-page-heading">
         <div>
             <h1>Редактировать аудиторию</h1>
             <p>Изменение информации об учебной аудитории</p>
         </div>
     </div>
 
-    <div class="glass-form-card">
+    <div class="glass-form-card ui-surface ui-panel">
 
         <div class="form-icon">
-            ✏️
+            <i class="bi bi-pencil" aria-hidden="true"></i>
         </div>
 
         <div class="form-title">
@@ -95,11 +95,11 @@
 
             <div class="form-actions">
 
-                <button type="submit" class="btn save-btn">
+                <button type="submit" class="btn ui-button ui-primary save-btn">
                     Сохранить изменения
                 </button>
 
-                <a asp-action="Index" class="btn cancel-btn">
+                <a asp-action="Index" class="btn ui-button cancel-btn">
                     Отмена
                 </a>
 

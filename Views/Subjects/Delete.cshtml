@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="~/css/Subjects/Delete.css" asp-append-version="true" />
 }
 
-<div class="delete-page">
+<div class="delete-page ui-form-layout">
 
-    <div class="delete-header">
+    <div class="delete-header ui-page-heading">
 
         <div class="delete-icon">
-            ⚠️
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
         </div>
 
         <div>
@@ -31,7 +31,7 @@
     </div>
 
 
-    <div class="glass-delete-card">
+    <div class="glass-delete-card ui-surface ui-panel">
 
         <!-- SUBJECT -->
         <div class="subject-info">
@@ -63,7 +63,7 @@
         <div class="warning-message">
 
             <span>
-                ⚠
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
             </span>
 
             <div>
@@ -91,13 +91,13 @@
 
             <div class="delete-actions">
 
-                <button type="submit" class="btn delete-btn">
+                <button type="submit" class="btn ui-button ui-danger delete-btn">
 
                     Удалить предмет
 
                 </button>
 
-                <a asp-action="Index" class="btn cancel-btn">
+                <a asp-action="Index" class="btn ui-button cancel-btn">
 
                     Отмена
 

@@ -47,10 +47,10 @@
     <link rel="stylesheet" href="~/css/Schedules/Details.css" asp-append-version="true" />
 }
 
-<div class="schedule-details-page">
+<div class="schedule-details-page ui-form-layout">
 
 
-    <div class="details-header">
+    <div class="details-header ui-page-heading">
         <div>
             <div class="details-badge">РАСПИСАНИЕ</div>
 
@@ -63,13 +63,13 @@
 
         <div class="header-actions">
 
-            <a asp-action="Index" class="glass-button secondary-button">
-                ← Назад
+            <a asp-action="Index" class="glass-button ui-button secondary-button">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Назад
             </a>
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button primary-button">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button ui-button ui-primary primary-button">
                     ✎ Редактировать
                 </a>
             }
@@ -78,12 +78,12 @@
     </div>
 
 
-    <div class="lesson-main-card">
+    <div class="lesson-main-card ui-surface ui-panel">
 
         <div class="lesson-card-top">
 
             <div class="lesson-icon">
-                📚
+                <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
             </div>
 
             <div class="lesson-title-block">
@@ -110,7 +110,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    👨‍🏫
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -131,7 +131,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    👥
+                    <i class="bi bi-people" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -152,7 +152,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    🏫
+                    <i class="bi bi-door-open" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -173,7 +173,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    📅
+                    <i class="bi bi-calendar-week" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -208,7 +208,7 @@
                 </div>
 
                 <div class="clock-icon">
-                    🕐
+                    <i class="bi bi-clock" aria-hidden="true"></i>
                 </div>
 
             </div>
@@ -254,13 +254,13 @@
 
         <div class="details-footer">
 
-            <a asp-action="Index" class="footer-button secondary-button">
-                ← Вернуться к расписанию
+            <a asp-action="Index" class="footer-button ui-button secondary-button">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Вернуться к расписанию
             </a>
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="footer-button primary-button">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="footer-button ui-button ui-primary primary-button">
                     ✎ Изменить занятие
                 </a>
             }

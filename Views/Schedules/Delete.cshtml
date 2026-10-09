@@ -32,13 +32,13 @@
     <link rel="stylesheet" href="~/css/Schedules/Delete.css" asp-append-version="true" />
 }
 
-<div class="schedule-details-page">
+<div class="schedule-details-page ui-form-layout">
 
     <!-- =====================================================
          HEADER
          ===================================================== -->
 
-    <div class="details-header">
+    <div class="details-header ui-page-heading">
 
         <div>
 
@@ -59,11 +59,11 @@
 
         <div class="header-actions">
 
-            <a asp-action="Index" class="glass-button secondary-button">
-                ← Назад
+            <a asp-action="Index" class="glass-button ui-button secondary-button">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Назад
             </a>
 
-            <a asp-action="Details" asp-route-id="@Model.Id" class="glass-button secondary-button">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="glass-button ui-button secondary-button">
                 Подробнее
             </a>
 
@@ -76,7 +76,7 @@
          MAIN CARD
          ===================================================== -->
 
-    <div class="lesson-main-card">
+    <div class="lesson-main-card ui-surface ui-panel">
 
 
         <!-- =================================================
@@ -86,7 +86,7 @@
         <div class="lesson-card-top">
 
             <div class="lesson-icon delete-icon">
-                ⚠️
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
             </div>
 
             <div class="lesson-title-block">
@@ -121,7 +121,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    📚
+                    <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -144,7 +144,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    👨‍🏫
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -167,7 +167,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    👥
+                    <i class="bi bi-people" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -190,7 +190,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    🏫
+                    <i class="bi bi-door-open" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -213,7 +213,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    📅
+                    <i class="bi bi-calendar-week" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -236,7 +236,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    🕐
+                    <i class="bi bi-clock" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -263,7 +263,7 @@
         <div class="warning-section">
 
             <div class="warning-icon">
-                ⚠
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
             </div>
 
             <div class="warning-content">
@@ -296,16 +296,16 @@
             <div class="details-footer">
 
 
-                <a asp-action="Details" asp-route-id="@Model.Id" class="footer-button secondary-button">
+                <a asp-action="Details" asp-route-id="@Model.Id" class="footer-button ui-button secondary-button">
 
-                    ← Отмена
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Отмена
 
                 </a>
 
 
-                <button type="submit" class="footer-button delete-button">
+                <button type="submit" class="footer-button ui-button ui-danger delete-button">
 
-                    🗑 Удалить занятие
+                    <i class="bi bi-trash" aria-hidden="true"></i> Удалить занятие
 
                 </button>
 

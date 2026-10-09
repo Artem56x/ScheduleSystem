@@ -10,7 +10,7 @@
 
 <div class="generator-preview-page">
 
-    <div class="preview-header">
+    <div class="preview-header ui-page-heading">
 
         <div>
             <div class="preview-eyebrow">
@@ -33,8 +33,8 @@
 
                 @Html.AntiForgeryToken()
 
-                <button type="submit" class="glass-button secondary">
-                    ← Вернуться к настройкам
+                <button type="submit" class="glass-button ui-button secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Вернуться к настройкам
                 </button>
 
             </form>
@@ -46,7 +46,7 @@
 
     @if (TempData["GenerationValidationErrors"] is string validationErrors)
     {
-        <div class="preview-alert error">
+        <div class="preview-alert ui-alert error">
             <strong>
                 Расписание больше нельзя сохранить.
             </strong>
@@ -119,7 +119,7 @@
     <div class="replacement-card">
 
         <div class="replacement-icon">
-            ⚠️
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
         </div>
 
         <div class="replacement-content">
@@ -236,7 +236,7 @@
 
                     <div class="group-title-main">
                         <div class="group-icon">
-                            👥
+                            <i class="bi bi-people" aria-hidden="true"></i>
                         </div>
 
                         <div>
@@ -304,11 +304,11 @@
                                             <div class="lesson-meta">
 
                                                 <span>
-                                                    👨‍🏫 @lesson.TeacherName
+                                                    <i class="bi bi-person-badge" aria-hidden="true"></i> @lesson.TeacherName
                                                 </span>
 
                                                 <span>
-                                                    🏫 @lesson.ClassroomName
+                                                    <i class="bi bi-door-open" aria-hidden="true"></i> @lesson.ClassroomName
                                                 </span>
 
                                             </div>
@@ -337,14 +337,14 @@
 
             @Html.AntiForgeryToken()
 
-            <button type="submit" class="glass-button secondary large">
+            <button type="submit" class="glass-button ui-button secondary large">
                 Отменить
             </button>
 
         </form>
 
 
-        <button type="button" class="glass-button primary large" id="openSaveModal">
+        <button type="button" class="glass-button ui-button ui-primary primary large" id="openSaveModal">
 
             Подтвердить и сохранить
 
@@ -359,13 +359,13 @@
 
     <div class="confirm-overlay" id="closeSaveModal"></div>
 
-    <div class="confirm-dialog">
+    <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="saveDialogTitle">
 
         <div class="confirm-icon">
-            ⚠️
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
         </div>
 
-        <h2>
+        <h2 id="saveDialogTitle">
             Расписание будет заменено
         </h2>
 
@@ -395,7 +395,7 @@
 
         <div class="confirm-actions">
 
-            <button type="button" class="glass-button secondary" id="cancelSaveModal">
+            <button type="button" class="glass-button ui-button secondary" id="cancelSaveModal">
                 Отменить
             </button>
 
@@ -404,7 +404,7 @@
 
                 @Html.AntiForgeryToken()
 
-                <button type="submit" class="glass-button danger">
+                <button type="submit" class="glass-button ui-button ui-danger danger">
                     Удалить и записать новое
                 </button>
 
@@ -446,6 +446,7 @@
             document.body.classList.add(
                 "modal-open"
             );
+            window.scheduleUi?.focusDialog(modal, { initialFocus: cancelButton, returnFocus: openButton });
         }
 
 
@@ -461,6 +462,7 @@
             document.body.classList.remove(
                 "modal-open"
             );
+            window.scheduleUi?.releaseDialog(modal);
         }
 
 
@@ -484,7 +486,7 @@
             "keydown",
             function (event) {
 
-                if (event.key === "Escape") {
+                if (event.key === "Escape" && modal.classList.contains("is-open")) {
                     closeModal();
                 }
 

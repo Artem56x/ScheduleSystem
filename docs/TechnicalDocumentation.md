@@ -516,3 +516,53 @@ ScheduleSystem provides a complete web-based solution for managing college sched
 The project combines ASP.NET Core MVC, Entity Framework Core, PostgreSQL, ASP.NET Core Identity, business services, schedule validation, automatic generation, classroom recommendations, notifications, audit logging, and export functionality in a single application.
 
 The architecture separates presentation, application logic, and data access, making the project suitable for further development and maintenance.
+
+
+## 29. Interface Refresh Validation (2026-10-09)
+
+The refresh changes presentation in existing Razor, CSS and JavaScript files. Controllers, models, services, migrations, configuration, roles, generation, conflict checks and server export remain unchanged. No new product screen, partial, module, frontend build process or dependency was introduced.
+
+### Styling and interaction responsibilities
+
+`site.css` defines shared tokens and components; `liquid-glass.css` owns the application shell, existing modal presentation and shared print rules; page styles own section-specific layouts. Common screen styles use normal cascade and scoped selectors. `!important` is limited to explicit hiding, reduced-motion and print rules.
+
+Base text uses a Cyrillic-capable system font at 16px. Controls have a 44px minimum height, visible focus and explicit labels. Dense CRUD tables retain all fields and actions in a keyboard-focusable local scroll region with semantic column headers. Long names wrap. Native checkboxes remain native controls.
+
+`site.js` provides background isolation and focus containment/restoration to existing modal handlers; page handlers retain ownership of opening, closing, Escape and submission. Danger confirmations focus cancellation. Mobile navigation uses `aria-expanded`, `aria-modal` and `inert`, restores the opening control on Escape, and traps Tab. Settings tabs support arrow keys, Home and End. Inline generator/study-load errors preserve the original conditions and prevention of invalid submission. Schedule filtering/export scripts are byte-identical to the baseline.
+
+Browser print styles request A4 portrait with 12mm margins, remove the shell and administrative actions, reset the sidebar offset, retain filtered hidden state and avoid splitting individual lessons. Large groups may span pages. Native pagination must still be checked in a real browser print preview.
+
+### Validation performed
+
+All comparisons used baseline commit `9a09ffb4d9a66095bc50c9cf2e2dc0aa590bf16b` and the same disposable local PostgreSQL database. Fixtures, database backup, review scripts and screenshots are outside the repository.
+
+| Check | Result |
+| --- | --- |
+| .NET 8 SDK 8.0.425 restore/build | Passed; final build: 0 warnings, 0 errors |
+| Before/after HTTP regression | 108 matching GET/POST records; guest/User/Admin, CRUD, validation, AJAX, generation cancel/save, load, notifications, password flow and nine PDF/Excel/CSV downloads |
+| Final rendered form comparison | 42 screens and 45 requests matched baseline; existing IDs retained and unique |
+| JavaScript syntax | All 8 external files and 10 rendered inline blocks passed Node syntax checks |
+| Resources | 53 linked CSS/JS resources returned HTTP 200; icon names exist in Bootstrap Icons 1.11.3 |
+| Source boundaries | Existing Razor conditions, calculations, business attributes and antiforgery controls retained; forbidden backend files unchanged; `git diff --check` passed |
+| Responsive layout | Main six pages at 1920×1080, 1440×900, 1366×768, 1024×768, 768×1024, 390×844 and 360×800; 41 reachable pages also checked at 360×800; no page overflow or unlabelled fields found |
+| Browser interactions | Individual/combined/time filters, reset/no-results, dynamic intervals, study-load draft changes and hidden-field creation, menu, tab keys, category validation, stacked lesson warnings, danger dialog and preview confirmation |
+| Short modal viewport | Preview confirmation fits 844×390; cancel receives initial focus; Tab wraps; Escape restores trigger |
+| Print CSS preview | Full: 30 lessons/3 groups; filtered: 1 lesson/1 group; shell/actions hidden and no sidebar offset |
+| Palette contrast | Main text/background 15.53:1; muted text/page background 5.32:1; primary/white 5.93:1; warning/error/success text on respective surfaces >5.9:1; input outline/white 3.46:1 |
+
+These are point-in-time checks, not a claim of complete automated test coverage. The repository has no existing automated test project. The review harness remains outside the source tree and is not part of the normal build.
+
+### Remaining manual acceptance
+
+* Native print preview/PDF pagination for full and filtered schedules, long groups and page breaks. The captured CSS preview promotes print rules into a static review page; it does not exercise browser pagination.
+* Actual 200% browser zoom and a physical mobile on-screen keyboard. A 720×450 reflow check passed; the in-app browser did not apply the requested browser zoom.
+* Full screen-reader and reduced-motion device acceptance; relevant markup and media rules were inspected, but these modes were not exercised with assistive hardware/software.
+* A small fixture covers three groups and long names, not a large institution with hundreds of groups. Additional scale/content checks remain.
+* Study-load submission created the expected indexed hidden fields in the browser. The in-app browser remained on its loading state; the independent HTTP regression verified the server save and redirect. Native browser submission and its original `beforeunload` interaction still need manual confirmation.
+
+### Existing issues outside the redesign
+
+* `Views/Account/AccessDenied.cshtml` exists, but `AccountController` has no corresponding action. Forbidden admin actions redirect to `/Account/AccessDenied`, which returns 404 in both versions.
+* `HomeController.Index` fetches the latest notifications globally without a user filter. A notification belonging to the test administrator was visible on the anonymous home page in the baseline. Notification visibility must be reviewed as a separate backend/security change.
+
+The refresh does not repair these server behaviors. They require a separate scoped change and regression checks. No publication or merge is included.

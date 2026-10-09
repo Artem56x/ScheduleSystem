@@ -8,13 +8,13 @@
     <link rel="stylesheet" href="~/css/Groups/Edit.css" asp-append-version="true" />
 }
 
-<div class="form-page">
+<div class="form-page ui-form-layout">
 
     <!-- Заголовок -->
-    <div class="form-header">
+    <div class="form-header ui-page-heading">
 
         <div class="form-icon">
-            👥
+            <i class="bi bi-people" aria-hidden="true"></i>
         </div>
 
         <div>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Форма -->
-    <div class="glass-form-card">
+    <div class="glass-form-card ui-surface ui-panel">
 
         <form asp-action="Edit" method="post">
 
@@ -133,14 +133,14 @@
             <!-- Кнопки -->
             <div class="form-actions">
 
-                <button type="submit" class="btn glass-primary-btn">
+                <button type="submit" class="btn ui-button ui-primary glass-primary-btn">
 
-                    ✓
+                    <i class="bi bi-check2" aria-hidden="true"></i>
                     Сохранить изменения
 
                 </button>
 
-                <a asp-action="Index" class="btn glass-secondary-btn">
+                <a asp-action="Index" class="btn ui-button glass-secondary-btn">
                     Отмена
                 </a>
 
@@ -157,4 +157,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-

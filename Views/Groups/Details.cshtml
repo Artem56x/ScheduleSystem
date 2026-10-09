@@ -8,13 +8,13 @@
     <link rel="stylesheet" href="~/css/Groups/Details.css" asp-append-version="true" />
 }
 
-<div class="details-page">
+<div class="details-page ui-form-layout">
 
     <!-- Заголовок -->
-    <div class="details-header">
+    <div class="details-header ui-page-heading">
 
         <div class="details-icon">
-            👥
+            <i class="bi bi-people" aria-hidden="true"></i>
         </div>
 
         <div>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Основная карточка -->
-    <div class="glass-details-card">
+    <div class="glass-details-card ui-surface ui-panel">
 
         <!-- Профиль группы -->
         <div class="group-profile">
@@ -57,7 +57,7 @@
             <div class="info-row">
 
                 <div class="info-label">
-                    <span class="info-icon">👥</span>
+                    <span class="info-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
                     <span>Название группы</span>
                 </div>
 
@@ -71,7 +71,7 @@
             <div class="info-row">
 
                 <div class="info-label">
-                    <span class="info-icon">🎓</span>
+                    <span class="info-icon"><i class="bi bi-mortarboard" aria-hidden="true"></i></span>
                     <span>Специальность</span>
                 </div>
 
@@ -96,7 +96,7 @@
             <div class="info-row">
 
                 <div class="info-label">
-                    <span class="info-icon">📚</span>
+                    <span class="info-icon"><i class="bi bi-journal-bookmark" aria-hidden="true"></i></span>
                     <span>Курс</span>
                 </div>
 
@@ -114,7 +114,7 @@
             <div class="info-row">
 
                 <div class="info-label">
-                    <span class="info-icon">👤</span>
+                    <span class="info-icon"><i class="bi bi-person" aria-hidden="true"></i></span>
                     <span>Количество человек</span>
                 </div>
 
@@ -158,16 +158,16 @@
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn glass-primary-btn">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn ui-button ui-primary glass-primary-btn">
                     Изменить
                 </a>
 
-                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn glass-danger-btn">
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn ui-button ui-danger-outline glass-danger-btn">
                     Удалить
                 </a>
             }
 
-            <a asp-action="Index" class="btn glass-secondary-btn">
+            <a asp-action="Index" class="btn ui-button glass-secondary-btn">
                 Назад к списку
             </a>
 
@@ -176,4 +176,3 @@
     </div>
 
 </div>
-

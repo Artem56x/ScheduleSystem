@@ -12,14 +12,14 @@
     <link rel="stylesheet" href="~/css/Schedules/Export.css" asp-append-version="true" />
 }
 
-<div class="form-page">
+<div class="form-page ui-form-layout">
 
     <!-- HEADER -->
 
-    <div class="form-header">
+    <div class="form-header ui-page-heading">
 
         <div class="form-icon">
-            ↓
+            <i class="bi bi-download" aria-hidden="true"></i>
         </div>
 
         <div>
@@ -35,7 +35,7 @@
 
     <!-- GLASS CARD -->
 
-    <div class="glass-form-card">
+    <div class="glass-form-card ui-surface ui-panel">
 
 
         <!-- DESCRIPTION -->
@@ -96,7 +96,7 @@
 
                 <div class="format-buttons">
 
-                    <a asp-action="ExportAllExcel" class="format-button excel">
+                    <a asp-action="ExportAllExcel" class="format-button ui-button excel">
 
                         <span class="format-icon">
                             XLS
@@ -107,13 +107,13 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </a>
 
 
-                    <a asp-action="ExportAllPdf" class="format-button pdf">
+                    <a asp-action="ExportAllPdf" class="format-button ui-button pdf">
 
                         <span class="format-icon">
                             PDF
@@ -124,13 +124,13 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </a>
 
 
-                    <a asp-action="ExportAllCsv" class="format-button csv">
+                    <a asp-action="ExportAllCsv" class="format-button ui-button csv">
 
                         <span class="format-icon">
                             CSV
@@ -141,7 +141,7 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </a>
@@ -160,7 +160,7 @@
             <div class="export-block-header">
 
                 <div class="export-block-icon purple">
-                    ◎
+                    <i class="bi bi-bell" aria-hidden="true"></i>
                 </div>
 
                 <div>
@@ -210,7 +210,7 @@
 
                 <div class="format-buttons">
 
-                    <button type="button" class="format-button excel" onclick="submitExport('group', 'excel')">
+                    <button type="button" class="format-button ui-button excel" onclick="submitExport('group', 'excel')">
 
                         <span class="format-icon">
                             XLS
@@ -221,13 +221,13 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </button>
 
 
-                    <button type="button" class="format-button pdf" onclick="submitExport('group', 'pdf')">
+                    <button type="button" class="format-button ui-button pdf" onclick="submitExport('group', 'pdf')">
 
                         <span class="format-icon">
                             PDF
@@ -238,13 +238,13 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </button>
 
 
-                    <button type="button" class="format-button csv" onclick="submitExport('group', 'csv')">
+                    <button type="button" class="format-button ui-button csv" onclick="submitExport('group', 'csv')">
 
                         <span class="format-icon">
                             CSV
@@ -255,7 +255,7 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </button>
@@ -324,7 +324,7 @@
 
                 <div class="format-buttons">
 
-                    <button type="button" class="format-button excel" onclick="submitExport('teacher', 'excel')">
+                    <button type="button" class="format-button ui-button excel" onclick="submitExport('teacher', 'excel')">
 
                         <span class="format-icon">
                             XLS
@@ -335,13 +335,13 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </button>
 
 
-                    <button type="button" class="format-button pdf" onclick="submitExport('teacher', 'pdf')">
+                    <button type="button" class="format-button ui-button pdf" onclick="submitExport('teacher', 'pdf')">
 
                         <span class="format-icon">
                             PDF
@@ -352,13 +352,13 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </button>
 
 
-                    <button type="button" class="format-button csv" onclick="submitExport('teacher', 'csv')">
+                    <button type="button" class="format-button ui-button csv" onclick="submitExport('teacher', 'csv')">
 
                         <span class="format-icon">
                             CSV
@@ -369,7 +369,7 @@
                         </span>
 
                         <span class="format-arrow">
-                            ↓
+                            <i class="bi bi-download" aria-hidden="true"></i>
                         </span>
 
                     </button>
@@ -386,7 +386,7 @@
         <div class="export-hint">
 
             <span class="export-hint-icon">
-                ⓘ
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
             </span>
 
             <span>
@@ -402,9 +402,9 @@
 
         <div class="form-actions">
 
-            <a asp-action="Index" class="glass-secondary-btn">
+            <a asp-action="Index" class="glass-secondary-btn ui-button">
 
-                ← Назад к расписанию
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Назад к расписанию
 
             </a>
 

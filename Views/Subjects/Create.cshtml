@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="~/css/Subjects/Create.css" asp-append-version="true" />
 }
 
-<div class="subject-create-page">
+<div class="subject-create-page ui-form-layout">
 
     <!-- HEADER -->
-    <header class="subject-create-header">
+    <header class="subject-create-header ui-page-heading">
 
         <div>
             <h1>Добавить предмет</h1>
@@ -29,7 +29,7 @@
     </header>
 
 
-    <form asp-action="Create" method="post" class="subject-create-form">
+    <form asp-action="Create" method="post" class="subject-create-form ui-surface ui-panel">
 
         @Html.AntiForgeryToken()
 
@@ -182,7 +182,7 @@
                                             break;
 
                                         case "Кабинет дизайна":
-                                            <span>✦</span>
+                                            <span><i class="bi bi-stars" aria-hidden="true"></i></span>
                                             break;
 
                                         case "Актовый зал":
@@ -299,11 +299,11 @@
         <!-- ACTIONS -->
         <div class="create-actions">
 
-            <a asp-action="Index" class="action-secondary">
+            <a asp-action="Index" class="action-secondary ui-button">
                 Отмена
             </a>
 
-            <button type="submit" class="action-primary">
+            <button type="submit" class="action-primary ui-button ui-primary">
                 Добавить предмет
             </button>
 

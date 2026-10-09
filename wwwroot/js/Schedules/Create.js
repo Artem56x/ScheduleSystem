@@ -39,6 +39,7 @@ function closeTeacherWarning() {
     if (warning) {
 
         warning.remove();
+    window.scheduleUi?.releaseDialog(warning);
 
     }
 
@@ -97,6 +98,7 @@ function closeTeacherRecommendations() {
 
 
     modal.remove();
+    window.scheduleUi?.releaseDialog(modal);
 
 }
 
@@ -116,6 +118,7 @@ function closeTeacherConflict() {
 
 
     modal.remove();
+    window.scheduleUi?.releaseDialog(modal);
 
 }
 
@@ -172,6 +175,7 @@ function closeClassroomRecommendations() {
 
 
     modal.remove();
+    window.scheduleUi?.releaseDialog(modal);
 
 }
 
@@ -191,6 +195,7 @@ function closeNoClassroomRecommendations() {
 
 
     modal.remove();
+    window.scheduleUi?.releaseDialog(modal);
 
 }
 
@@ -214,6 +219,7 @@ function closeValidationError() {
 
 
     modal.remove();
+    window.scheduleUi?.releaseDialog(modal);
 
 }
 

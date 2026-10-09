@@ -21,9 +21,9 @@
     <link rel="stylesheet" href="~/css/Subjects/Details.css" asp-append-version="true" />
 }
 
-<div class="subject-details-page">
+<div class="subject-details-page ui-form-layout">
 
-    <div class="page-header">
+    <div class="page-header ui-page-heading">
 
         <div>
             <h1>Информация о предмете</h1>
@@ -35,7 +35,7 @@
 
     </div>
 
-    <div class="glass-details-card">
+    <div class="glass-details-card ui-surface ui-panel">
 
         <!-- PROFILE -->
         <div class="subject-profile">
@@ -120,7 +120,7 @@
                             @foreach (var requirement in requirements)
                             {
                                 <span class="requirement-badge">
-                                    🏫 @requirement.ClassroomCategory.Name
+                                    <i class="bi bi-door-open" aria-hidden="true"></i> @requirement.ClassroomCategory.Name
                                 </span>
                             }
 
@@ -156,16 +156,16 @@
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn edit-btn">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn ui-button edit-btn">
                     Изменить
                 </a>
 
-                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn delete-btn">
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn ui-button ui-danger-outline delete-btn">
                     Удалить
                 </a>
             }
 
-            <a asp-action="Index" class="btn cancel-btn">
+            <a asp-action="Index" class="btn ui-button cancel-btn">
                 Назад к списку
             </a>
 

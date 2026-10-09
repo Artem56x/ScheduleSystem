@@ -8,17 +8,17 @@
     <link rel="stylesheet" href="~/css/Classrooms/Details.css" asp-append-version="true" />
 }
 
-<div class="classroom-details-page">
+<div class="classroom-details-page ui-form-layout">
 
 
-    <div class="page-header">
+    <div class="page-header ui-page-heading">
         <div>
             <h1>Информация об аудитории</h1>
             <p>Подробная информация об учебной аудитории</p>
         </div>
     </div>
 
-    <div class="glass-details-card">
+    <div class="glass-details-card ui-surface ui-panel">
 
         <div class="classroom-profile">
 
@@ -98,16 +98,16 @@
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn edit-btn">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn ui-button edit-btn">
                     Изменить
                 </a>
 
-                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn delete-btn">
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn ui-button ui-danger-outline delete-btn">
                     Удалить
                 </a>
             }
 
-            <a asp-action="Index" class="btn cancel-btn">
+            <a asp-action="Index" class="btn ui-button cancel-btn">
                 Назад
             </a>
 

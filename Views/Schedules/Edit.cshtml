@@ -69,13 +69,13 @@
 }
 
 
-<div class="schedule-create-page">
+<div class="schedule-create-page ui-form-layout">
 
     <!-- ================================================= -->
     <!-- HEADER -->
     <!-- ================================================= -->
 
-    <div class="create-header">
+    <div class="create-header ui-page-heading">
 
         <div>
 
@@ -96,9 +96,9 @@
         <div class="header-actions">
 
             <a asp-action="Index"
-               class="glass-button secondary-button">
+               class="glass-button ui-button secondary-button">
 
-                ← Назад
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Назад
 
             </a>
 
@@ -111,14 +111,14 @@
     <!-- MAIN CARD -->
     <!-- ================================================= -->
 
-    <div class="create-main-card">
+    <div class="create-main-card ui-surface ui-panel">
 
         <!-- CARD TOP -->
 
         <div class="create-card-top">
 
             <div class="create-icon">
-                ✏️
+                <i class="bi bi-pencil" aria-hidden="true"></i>
             </div>
 
             <div class="create-title-block">
@@ -350,7 +350,7 @@
                         <div class="time-input-wrapper">
 
                             <span class="time-input-icon">
-                                🕐
+                                <i class="bi bi-clock" aria-hidden="true"></i>
                             </span>
 
                             <input asp-for="StartTime"
@@ -380,7 +380,7 @@
                         <div class="time-input-wrapper">
 
                             <span class="time-input-icon">
-                                🕐
+                                <i class="bi bi-clock" aria-hidden="true"></i>
                             </span>
 
                             <input asp-for="EndTime"
@@ -407,7 +407,7 @@
             <div class="form-actions">
 
                 <a asp-action="Index"
-                   class="footer-button secondary-button">
+                   class="footer-button ui-button secondary-button">
 
                     Отмена
 
@@ -415,9 +415,9 @@
 
 
                 <button type="submit"
-                        class="footer-button primary-button">
+                        class="footer-button ui-button ui-primary primary-button">
 
-                    <span>✓</span>
+                    <span><i class="bi bi-check2" aria-hidden="true"></i></span>
 
                     Сохранить изменения
 
@@ -444,7 +444,7 @@
         <div class="warning-modal">
 
             <div class="warning-icon">
-                ⚠️
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
             </div>
 
             <h2>
@@ -481,7 +481,7 @@
             <div class="warning-actions">
 
                 <button type="button"
-                        class="warning-cancel"
+                        class="warning-cancel ui-button"
                         onclick="closeTeacherWarning()">
 
                     Вернуться
@@ -490,7 +490,7 @@
 
 
                 <button type="button"
-                        class="warning-confirm"
+                        class="warning-confirm ui-button ui-primary"
                         onclick="confirmTeacher()">
 
                     Да, оставить
@@ -517,7 +517,7 @@
         <div class="teacher-recommendation-modal">
 
             <div class="teacher-recommendation-icon">
-                👨‍🏫
+                <i class="bi bi-person-badge" aria-hidden="true"></i>
             </div>
 
             <h2>
@@ -566,7 +566,7 @@
                             <div class="recommended-teacher-details">
 
 <span>
-    📚
+    <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
     @if (teacher.TeacherSubjects != null &&
          teacher.TeacherSubjects.Any())
     {
@@ -585,11 +585,11 @@
 </span>
 
                                 <span>
-                                    ✓ Свободен
+                                    <i class="bi bi-check2" aria-hidden="true"></i> Свободен
                                 </span>
 
                                 <span>
-                                    🕐
+                                    <i class="bi bi-clock" aria-hidden="true"></i>
                                     @Model.StartTime?.ToString(@"hh\:mm")
                                     –
                                     @Model.EndTime?.ToString(@"hh\:mm")
@@ -601,7 +601,7 @@
 
 
                         <button type="button"
-                                class="select-teacher-button"
+                                class="select-teacher-button ui-button ui-primary"
                                 onclick="selectTeacher(@teacher.Id)">
 
                             Выбрать
@@ -617,7 +617,7 @@
             <div class="teacher-recommendation-actions">
 
                 <button type="button"
-                        class="warning-cancel"
+                        class="warning-cancel ui-button"
                         onclick="closeTeacherRecommendations()">
 
                     Оставить выбранного
@@ -644,7 +644,7 @@
         <div class="teacher-recommendation-modal">
 
             <div class="teacher-recommendation-icon">
-                👨‍🏫
+                <i class="bi bi-person-badge" aria-hidden="true"></i>
             </div>
 
             <h2>
@@ -685,7 +685,7 @@
             <div class="teacher-recommendation-actions">
 
                 <button type="button"
-                        class="warning-cancel"
+                        class="warning-cancel ui-button"
                         onclick="closeTeacherConflict()">
 
                     Вернуться к редактированию
@@ -712,7 +712,7 @@
         <div class="classroom-recommendation-modal">
 
             <div class="classroom-recommendation-icon">
-                💡
+                <i class="bi bi-lightbulb" aria-hidden="true"></i>
             </div>
 
 
@@ -775,7 +775,7 @@
                             <div class="recommended-classroom-details">
 
                                 <span>
-                                    🪑 @classroom.Capacity мест
+                                    <i class="bi bi-grid" aria-hidden="true"></i> @classroom.Capacity мест
                                 </span>
 
                             </div>
@@ -784,7 +784,7 @@
 
 
                         <button type="button"
-                                class="select-classroom-button"
+                                class="select-classroom-button ui-button ui-primary"
                                 onclick="selectClassroom(@classroom.Id)">
 
                             Выбрать
@@ -800,7 +800,7 @@
             <div class="classroom-recommendation-actions">
 
                 <button type="button"
-                        class="warning-cancel"
+                        class="warning-cancel ui-button"
                         onclick="closeClassroomRecommendations()">
 
                     Вернуться
@@ -827,7 +827,7 @@
         <div class="warning-modal">
 
             <div class="warning-icon">
-                ⚠️
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
             </div>
 
 
@@ -846,7 +846,7 @@
             <div class="warning-actions">
 
                 <button type="button"
-                        class="warning-cancel"
+                        class="warning-cancel ui-button"
                         onclick="closeNoClassroomRecommendations()">
 
                     Вернуться
@@ -873,7 +873,7 @@
         <div class="warning-modal validation-error-modal">
 
             <div class="warning-icon">
-                ⚠️
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
             </div>
 
 
@@ -897,7 +897,7 @@
             <div class="warning-actions">
 
                 <button type="button"
-                        class="warning-cancel"
+                        class="warning-cancel ui-button"
                         onclick="closeValidationError()">
 
                     Вернуться

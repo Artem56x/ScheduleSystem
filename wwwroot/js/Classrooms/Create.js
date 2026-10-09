@@ -35,6 +35,8 @@ const createCategoryUrl =
 function openCategoryModal() {
 
     modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+    window.scheduleUi?.focusDialog(modal, { initialFocus: categoryInput, returnFocus: openModalButton });
 
     categoryInput.value = "";
 
@@ -55,6 +57,8 @@ function openCategoryModal() {
 function closeCategoryModal() {
 
     modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    window.scheduleUi?.releaseDialog(modal);
 
     categoryInput.value = "";
 

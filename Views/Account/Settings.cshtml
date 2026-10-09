@@ -23,7 +23,7 @@
          HEADER
          ===================================================== -->
 
-    <header class="settings-header">
+    <header class="settings-header ui-page-heading">
 
         <div class="settings-header-content">
             <h1>Настройки</h1>
@@ -39,23 +39,23 @@
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="settings-message settings-message-success">
-            <span class="settings-message-icon">✓</span>
+        <div class="settings-message ui-alert settings-message-success">
+            <span class="settings-message-icon"><i class="bi bi-check2" aria-hidden="true"></i></span>
             <span>@TempData["SuccessMessage"]</span>
         </div>
     }
 
     @if (TempData["ProgramMessage"] != null)
     {
-        <div class="settings-message settings-message-success">
-            <span class="settings-message-icon">✓</span>
+        <div class="settings-message ui-alert settings-message-success">
+            <span class="settings-message-icon"><i class="bi bi-check2" aria-hidden="true"></i></span>
             <span>@TempData["ProgramMessage"]</span>
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="settings-message settings-message-error" role="alert">
+        <div class="settings-message ui-alert settings-message-error" role="alert">
             <span class="settings-message-icon">!</span>
             <span>@TempData["ErrorMessage"]</span>
         </div>
@@ -66,11 +66,11 @@
          TABS
          ===================================================== -->
 
-    <nav class="settings-tabs" aria-label="Разделы настроек">
+    <nav class="settings-tabs" role="tablist" aria-label="Разделы настроек">
 
-        <button type="button" class="settings-tab active" data-tab="profile" aria-selected="true">
+        <button type="button" class="settings-tab ui-button active" data-tab="profile" role="tab" id="settingsTabprofile" aria-controls="settingsPanelprofile" aria-selected="true">
 
-            <span class="settings-tab-icon">👤</span>
+            <span class="settings-tab-icon"><i class="bi bi-person" aria-hidden="true"></i></span>
             <span>Профиль</span>
 
         </button>
@@ -78,18 +78,18 @@
 
         @if (isAdmin)
         {
-            <button type="button" class="settings-tab" data-tab="program" aria-selected="false">
+            <button type="button" class="settings-tab ui-button" data-tab="program" role="tab" id="settingsTabprogram" aria-controls="settingsPanelprogram" aria-selected="false">
 
-                <span class="settings-tab-icon">⚙</span>
+                <span class="settings-tab-icon"><i class="bi bi-gear" aria-hidden="true"></i></span>
                 <span>Программа</span>
 
             </button>
         }
 
 
-        <button type="button" class="settings-tab" data-tab="about" aria-selected="false">
+        <button type="button" class="settings-tab ui-button" data-tab="about" role="tab" id="settingsTababout" aria-controls="settingsPanelabout" aria-selected="false">
 
-            <span class="settings-tab-icon">ⓘ</span>
+            <span class="settings-tab-icon"><i class="bi bi-info-circle" aria-hidden="true"></i></span>
             <span>О программе</span>
 
         </button>
@@ -101,7 +101,7 @@
          PROFILE
          ===================================================== -->
 
-    <section class="settings-tab-content active" data-tab-content="profile">
+    <section class="settings-tab-content active" data-tab-content="profile" role="tabpanel" id="settingsPanelprofile" aria-labelledby="settingsTabprofile" tabindex="0">
 
         <div class="settings-panel">
 
@@ -109,7 +109,7 @@
 
                 <div class="settings-panel-title">
                     <div class="settings-panel-icon">
-                        👤
+                        <i class="bi bi-person" aria-hidden="true"></i>
                     </div>
 
                     <div>
@@ -183,7 +183,7 @@
 
                 <div class="settings-form-actions">
 
-                    <button type="submit" class="settings-save-button">
+                    <button type="submit" class="settings-save-button ui-button ui-primary">
 
                         Сохранить изменения
 
@@ -204,7 +204,7 @@
                 <div class="settings-action-left">
 
                     <div class="settings-action-icon">
-                        🔐
+                        <i class="bi bi-lock" aria-hidden="true"></i>
                     </div>
 
                     <div class="settings-action-content">
@@ -219,7 +219,7 @@
 
                 </div>
 
-                <a asp-controller="Account" asp-action="ChangePassword" class="settings-secondary-button">
+                <a asp-controller="Account" asp-action="ChangePassword" class="settings-secondary-button ui-button">
 
                     Изменить
 
@@ -238,7 +238,7 @@
                 <div class="settings-action-left">
 
                     <div class="settings-action-icon">
-                        ✨
+                        <i class="bi bi-stars" aria-hidden="true"></i>
                     </div>
 
                     <div class="settings-action-content">
@@ -270,7 +270,7 @@
 
     @if (isAdmin)
     {
-        <section class="settings-tab-content" data-tab-content="program">
+        <section class="settings-tab-content" data-tab-content="program" role="tabpanel" id="settingsPanelprogram" aria-labelledby="settingsTabprogram" tabindex="0">
 
             <div class="settings-panel">
 
@@ -279,7 +279,7 @@
                     <div class="settings-panel-title">
 
                         <div class="settings-panel-icon">
-                            ⚙
+                            <i class="bi bi-gear" aria-hidden="true"></i>
                         </div>
 
                         <div>
@@ -302,7 +302,7 @@
                     <div class="settings-action-left">
 
                         <div class="settings-action-icon">
-                            📚
+                            <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
                         </div>
 
                         <div class="settings-action-content">
@@ -318,7 +318,7 @@
 
                     </div>
 
-                    <a asp-controller="Account" asp-action="StudyLoad" class="settings-secondary-button">
+                    <a asp-controller="Account" asp-action="StudyLoad" class="settings-secondary-button ui-button">
 
                         Настроить
 
@@ -337,7 +337,7 @@
                     <div class="settings-action-left">
 
                         <div class="settings-action-icon">
-                            🕘
+                            <i class="bi bi-clock-history" aria-hidden="true"></i>
                         </div>
 
                         <div class="settings-action-content">
@@ -352,7 +352,7 @@
 
                     </div>
 
-                    <a asp-controller="AuditLogs" asp-action="Index" class="settings-secondary-button">
+                    <a asp-controller="AuditLogs" asp-action="Index" class="settings-secondary-button ui-button">
 
                         Открыть
 
@@ -384,7 +384,7 @@
                         <div class="settings-action-left">
 
                             <div class="settings-action-icon settings-action-icon-danger">
-                                🗑
+                                <i class="bi bi-trash" aria-hidden="true"></i>
                             </div>
 
                             <div class="settings-action-content">
@@ -400,7 +400,7 @@
 
                         </div>
 
-                        <button type="button" class="settings-danger-button" data-modal-open="clearScheduleModal">
+                        <button type="button" class="settings-danger-button ui-button ui-danger" data-modal-open="clearScheduleModal">
 
                             Очистить
 
@@ -414,7 +414,7 @@
                         <div class="settings-action-left">
 
                             <div class="settings-action-icon settings-action-icon-danger">
-                                ⚠
+                                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
                             </div>
 
                             <div class="settings-action-content">
@@ -430,7 +430,7 @@
 
                         </div>
 
-                        <button type="button" class="settings-danger-button" data-modal-open="clearAllDataModal">
+                        <button type="button" class="settings-danger-button ui-button ui-danger" data-modal-open="clearAllDataModal">
 
                             Очистить всё
 
@@ -450,14 +450,14 @@
          ABOUT
          ===================================================== -->
 
-    <section class="settings-tab-content" data-tab-content="about">
+    <section class="settings-tab-content" data-tab-content="about" role="tabpanel" id="settingsPanelabout" aria-labelledby="settingsTababout" tabindex="0">
 
         <div class="settings-panel settings-about-panel">
 
             <div class="settings-about-hero">
 
                 <div class="settings-about-logo">
-                    📅
+                    <i class="bi bi-calendar-week" aria-hidden="true"></i>
                 </div>
 
                 <h2>
@@ -516,7 +516,7 @@
 
                     <div class="settings-about-feature">
 
-                        <span>📅</span>
+                        <span><i class="bi bi-calendar-week" aria-hidden="true"></i></span>
 
                         <div>
                             <strong>Расписание</strong>
@@ -531,7 +531,7 @@
 
                     <div class="settings-about-feature">
 
-                        <span>👥</span>
+                        <span><i class="bi bi-people" aria-hidden="true"></i></span>
 
                         <div>
                             <strong>Группы</strong>
@@ -546,7 +546,7 @@
 
                     <div class="settings-about-feature">
 
-                        <span>👨‍🏫</span>
+                        <span><i class="bi bi-person-badge" aria-hidden="true"></i></span>
 
                         <div>
                             <strong>Преподаватели</strong>
@@ -561,7 +561,7 @@
 
                     <div class="settings-about-feature">
 
-                        <span>🏫</span>
+                        <span><i class="bi bi-door-open" aria-hidden="true"></i></span>
 
                         <div>
                             <strong>Аудитории</strong>
@@ -575,7 +575,7 @@
 
                     <div class="settings-about-feature">
 
-                        <span>🛡</span>
+                        <span><i class="bi bi-shield-check" aria-hidden="true"></i></span>
 
                         <div>
                             <strong>Проверка конфликтов</strong>
@@ -590,7 +590,7 @@
 
                     <div class="settings-about-feature">
 
-                        <span>📊</span>
+                        <span><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
 
                         <div>
                             <strong>Экспорт</strong>
@@ -649,15 +649,15 @@
 
             <div class="settings-modal-content" role="dialog" aria-modal="true" aria-labelledby="clearScheduleTitle">
 
-                <button type="button" class="settings-modal-close" data-modal-close aria-label="Закрыть">
+                <button type="button" class="settings-modal-close ui-button ui-icon-button" data-modal-close aria-label="Закрыть">
 
-                    ×
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
 
                 </button>
 
 
                 <div class="settings-modal-icon">
-                    ⚠
+                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
                 </div>
 
 
@@ -679,13 +679,13 @@
 
                     <div class="settings-modal-actions">
 
-                        <button type="button" class="settings-secondary-button" data-modal-close>
+                        <button type="button" class="settings-secondary-button ui-button" data-modal-close>
 
                             Отмена
 
                         </button>
 
-                        <button type="submit" class="settings-danger-button">
+                        <button type="submit" class="settings-danger-button ui-button ui-danger">
 
                             Очистить расписание
 
@@ -710,15 +710,15 @@
 
             <div class="settings-modal-content" role="dialog" aria-modal="true" aria-labelledby="clearAllDataTitle">
 
-                <button type="button" class="settings-modal-close" data-modal-close aria-label="Закрыть">
+                <button type="button" class="settings-modal-close ui-button ui-icon-button" data-modal-close aria-label="Закрыть">
 
-                    ×
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
 
                 </button>
 
 
                 <div class="settings-modal-icon settings-modal-icon-danger">
-                    🛑
+                    <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
                 </div>
 
 
@@ -740,13 +740,13 @@
 
                     <div class="settings-modal-actions">
 
-                        <button type="button" class="settings-secondary-button" data-modal-close>
+                        <button type="button" class="settings-secondary-button ui-button" data-modal-close>
 
                             Отмена
 
                         </button>
 
-                        <button type="submit" class="settings-danger-button">
+                        <button type="submit" class="settings-danger-button ui-button ui-danger">
 
                             Удалить всё
 

@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="~/css/Teachers/Details.css" asp-append-version="true" />
 }
 
-<div class="schedule-details-page">
+<div class="schedule-details-page ui-form-layout">
 
     <!-- HEADER -->
-    <div class="details-header">
+    <div class="details-header ui-page-heading">
 
         <div>
 
@@ -31,8 +31,8 @@
 
         <div class="details-actions">
 
-            <a asp-action="Index" class="glass-button secondary-button">
-                ← Назад
+            <a asp-action="Index" class="glass-button ui-button secondary-button">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Назад
             </a>
 
         </div>
@@ -41,7 +41,7 @@
 
 
     <!-- MAIN CARD -->
-    <div class="lesson-main-card">
+    <div class="lesson-main-card ui-surface ui-panel">
 
         <!-- PROFILE -->
         <div class="teacher-profile">
@@ -80,7 +80,7 @@
                             .OrderBy(ts => ts.Subject!.Name))
                         {
                             <span class="subject-badge">
-                                📚 @teacherSubject.Subject!.Name
+                                <i class="bi bi-journal-bookmark" aria-hidden="true"></i> @teacherSubject.Subject!.Name
                             </span>
                         }
 
@@ -105,7 +105,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    👤
+                    <i class="bi bi-person" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -131,7 +131,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    📚
+                    <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
                 </div>
 
                 <div class="info-content">
@@ -179,17 +179,17 @@
 
             @if (User.IsInRole("Admin"))
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button primary-button">
-                    ✏️ Изменить
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-button ui-button ui-primary primary-button">
+                    <i class="bi bi-pencil" aria-hidden="true"></i> Изменить
                 </a>
 
-                <a asp-action="Delete" asp-route-id="@Model.Id" class="glass-button delete-button">
-                    🗑 Удалить
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="glass-button ui-button ui-danger-outline delete-button">
+                    <i class="bi bi-trash" aria-hidden="true"></i> Удалить
                 </a>
             }
 
-            <a asp-action="Index" class="glass-button secondary-button">
-                ← Назад
+            <a asp-action="Index" class="glass-button ui-button secondary-button">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Назад
             </a>
 
         </div>
@@ -197,4 +197,3 @@
     </div>
 
 </div>
-

@@ -1,8 +1,8 @@
 @model int
 
-<a asp-controller="Notifications" asp-action="Index" class="notification-button" aria-label="Уведомления">
+<a asp-controller="Notifications" asp-action="Index" class="notification-button ui-button" aria-label="Уведомления">
 
-    <span class="notification-icon">🔔</span>
+    <span class="notification-icon"><i class="bi bi-bell" aria-hidden="true"></i></span>
 
     @if (Model > 0)
     {

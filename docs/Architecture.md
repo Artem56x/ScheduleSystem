@@ -784,7 +784,7 @@ The frontend is based on:
 * CSS3;
 * JavaScript.
 
-The interface follows a modern white/blue visual style with Liquid Glass-inspired components.
+The interface uses solid white surfaces, blue accents, shared controls and responsive page layouts. The existing site.css, liquid-glass.css and page styles retain their paths; presentation responsibilities and validation limits are documented in TechnicalDocumentation.md, section 29.
 
 Styles are separated into dedicated CSS files where appropriate.
 
