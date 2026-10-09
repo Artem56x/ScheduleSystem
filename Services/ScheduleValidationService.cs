@@ -23,11 +23,24 @@ public class ScheduleValidationService
         // BASIC VALIDATION
         // =========================================================
 
+
+        // =========================================================
+        // BASIC VALIDATION
+        // =========================================================
+
         if (!schedule.DayOfWeek.HasValue)
         {
             result.AddError(
                 "DayOfWeek",
                 "Выберите день недели.");
+        }
+        else if (!Enum.IsDefined(
+                     typeof(DayOfWeek),
+                     schedule.DayOfWeek.Value))
+        {
+            result.AddError(
+                "DayOfWeek",
+                "Выбран некорректный день недели.");
         }
 
         if (!schedule.StartTime.HasValue ||
@@ -40,12 +53,39 @@ public class ScheduleValidationService
             return result;
         }
 
-        if (schedule.StartTime >= schedule.EndTime)
+        var startTime = schedule.StartTime.Value;
+        var endTime = schedule.EndTime.Value;
+        var dayLength = TimeSpan.FromDays(1);
+
+        if (startTime < TimeSpan.Zero ||
+            startTime >= dayLength)
         {
             result.AddError(
-                "",
-                "Время окончания должно быть позже времени начала.");
+                "StartTime",
+                "Время начала должно быть в пределах суток.");
+        }
 
+        if (endTime < TimeSpan.Zero ||
+            endTime >= dayLength)
+        {
+            result.AddError(
+                "EndTime",
+                "Время окончания должно быть в пределах суток.");
+        }
+
+        if (startTime >= TimeSpan.Zero &&
+            startTime < dayLength &&
+            endTime >= TimeSpan.Zero &&
+            endTime < dayLength &&
+            startTime >= endTime)
+        {
+            result.AddError(
+                "EndTime",
+                "Время окончания должно быть позже времени начала.");
+        }
+
+        if (!result.IsValid)
+        {
             return result;
         }
 
