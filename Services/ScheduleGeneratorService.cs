@@ -9,6 +9,8 @@ public class ScheduleGeneratorService
 {
     private readonly ApplicationDbContext _context;
 
+    public const int MaxTimeSlots = 20;
+
     private const int MaxSearchNodes = 150_000;
 
     public ScheduleGeneratorService(ApplicationDbContext context)
@@ -461,6 +463,14 @@ public class ScheduleGeneratorService
                 "В предпросмотре не найдено ни одного временного интервала.");
         }
 
+        if (preview.TimeSlots.Count > MaxTimeSlots)
+        {
+            errors.Add(
+                $"В предпросмотре может быть не более {MaxTimeSlots} временных интервалов.");
+
+            return errors;
+        }
+
         var timeSlots = preview.TimeSlots
             .OrderBy(slot => slot.StartTime)
             .ToList();
@@ -479,18 +489,16 @@ public class ScheduleGeneratorService
                     $"Временной интервал №{i + 1} некорректен.");
             }
 
-            for (var j = i + 1; j < timeSlots.Count; j++)
+            if (i + 1 < timeSlots.Count &&
+                Overlaps(
+                    slot.StartTime,
+                    slot.EndTime,
+                    timeSlots[i + 1].StartTime,
+                    timeSlots[i + 1].EndTime))
             {
-                if (Overlaps(
-                        slot.StartTime,
-                        slot.EndTime,
-                        timeSlots[j].StartTime,
-                        timeSlots[j].EndTime))
-                {
-                    errors.Add(
-                        $"Временные интервалы №{i + 1} и " +
-                        $"№{j + 1} пересекаются.");
-                }
+                errors.Add(
+                    $"Временные интервалы №{i + 1} и " +
+                    $"№{i + 2} пересекаются.");
             }
         }
 
@@ -596,6 +604,15 @@ public class ScheduleGeneratorService
 
         foreach (var item in preview.Items)
         {
+            if (!timeSlots.Any(slot =>
+                    slot.StartTime == item.StartTime &&
+                    slot.EndTime == item.EndTime))
+            {
+                errors.Add(
+                    $"Занятие «{item.SubjectName}» группы «{item.GroupName}» " +
+                    "не совпадает ни с одним выбранным временным интервалом.");
+            }
+
             if (!selectedGroupIds.Contains(item.GroupId))
             {
                 errors.Add(
@@ -982,6 +999,11 @@ public class ScheduleGeneratorService
         {
             errors.Add("Добавьте хотя бы один временной интервал.");
         }
+        else if (request.TimeSlots.Count > MaxTimeSlots)
+        {
+            errors.Add(
+                $"Можно указать не более {MaxTimeSlots} временных интервалов.");
+        }
         else
         {
             var validSlots = new List<(int Index, GenerationTimeSlot Slot)>();
@@ -1018,23 +1040,24 @@ public class ScheduleGeneratorService
                 validSlots.Add((i, slot));
             }
 
-            for (var i = 0; i < validSlots.Count; i++)
-            {
-                for (var j = i + 1; j < validSlots.Count; j++)
-                {
-                    var first = validSlots[i];
-                    var second = validSlots[j];
+            var sortedSlots = validSlots
+                .OrderBy(x => x.Slot.StartTime)
+                .ToList();
 
-                    if (Overlaps(
-                            first.Slot.StartTime,
-                            first.Slot.EndTime,
-                            second.Slot.StartTime,
-                            second.Slot.EndTime))
-                    {
-                        errors.Add(
-                            $"Временные интервалы №{first.Index + 1} и " +
-                            $"№{second.Index + 1} пересекаются.");
-                    }
+            for (var i = 0; i + 1 < sortedSlots.Count; i++)
+            {
+                var first = sortedSlots[i];
+                var second = sortedSlots[i + 1];
+
+                if (Overlaps(
+                        first.Slot.StartTime,
+                        first.Slot.EndTime,
+                        second.Slot.StartTime,
+                        second.Slot.EndTime))
+                {
+                    errors.Add(
+                        $"Временные интервалы №{first.Index + 1} и " +
+                        $"№{second.Index + 1} пересекаются.");
                 }
             }
         }

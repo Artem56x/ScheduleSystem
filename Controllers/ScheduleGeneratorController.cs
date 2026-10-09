@@ -546,6 +546,11 @@ public class ScheduleGeneratorController : Controller
         {
             errors.Add("Добавьте хотя бы один временной интервал.");
         }
+        else if (model.TimeSlots.Count > ScheduleGeneratorService.MaxTimeSlots)
+        {
+            errors.Add(
+                $"Можно указать не более {ScheduleGeneratorService.MaxTimeSlots} временных интервалов.");
+        }
         else
         {
             var dayLength = TimeSpan.FromDays(1);
@@ -573,40 +578,34 @@ public class ScheduleGeneratorController : Controller
                 }
             }
 
-            for (var i = 0; i < model.TimeSlots.Count; i++)
-            {
-                var first = model.TimeSlots[i];
+            var validSlots = model.TimeSlots
+                .Select((slot, index) => new { Slot = slot, Index = index })
+                .Where(x =>
+                    x.Slot != null &&
+                    x.Slot.StartTime >= TimeSpan.Zero &&
+                    x.Slot.StartTime < dayLength &&
+                    x.Slot.EndTime > TimeSpan.Zero &&
+                    x.Slot.EndTime <= dayLength &&
+                    x.Slot.StartTime < x.Slot.EndTime)
+                .OrderBy(x => x.Slot!.StartTime)
+                .ToList();
 
-                if (first == null ||
-                    first.StartTime < TimeSpan.Zero ||
-                    first.StartTime >= dayLength ||
-                    first.EndTime <= TimeSpan.Zero ||
-                    first.EndTime > dayLength ||
-                    first.StartTime >= first.EndTime)
+            for (var i = 0; i < validSlots.Count; i++)
+            {
+                if (i + 1 >= validSlots.Count)
                 {
-                    continue;
+                    break;
                 }
 
-                for (var j = i + 1; j < model.TimeSlots.Count; j++)
+                var first = validSlots[i];
+                var second = validSlots[i + 1];
+
+                if (first.Slot!.StartTime < second.Slot!.EndTime &&
+                    first.Slot.EndTime > second.Slot.StartTime)
                 {
-                    var second = model.TimeSlots[j];
-
-                    if (second == null ||
-                        second.StartTime < TimeSpan.Zero ||
-                        second.StartTime >= dayLength ||
-                        second.EndTime <= TimeSpan.Zero ||
-                        second.EndTime > dayLength ||
-                        second.StartTime >= second.EndTime)
-                    {
-                        continue;
-                    }
-
-                    if (first.StartTime < second.EndTime &&
-                        first.EndTime > second.StartTime)
-                    {
-                        errors.Add(
-                            $"Интервалы №{i + 1} и №{j + 1} пересекаются.");
-                    }
+                    errors.Add(
+                        $"Интервалы №{first.Index + 1} и " +
+                        $"№{second.Index + 1} пересекаются.");
                 }
             }
         }
