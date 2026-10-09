@@ -12,11 +12,11 @@
 
     <div class="audit-container">
 
-        <div class="audit-header">
+        <div class="audit-header ui-page-heading">
 
             <div class="audit-header-left">
-                <a asp-controller="Account" asp-action="Settings" class="audit-back-button">
-                    ←
+                <a asp-controller="Account" asp-action="Settings" class="audit-back-button ui-button">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
                 </a>
 
                 <div>
@@ -28,7 +28,7 @@
             </div>
 
             <div class="audit-header-icon">
-                🕘
+                <i class="bi bi-clock-history" aria-hidden="true"></i>
             </div>
 
         </div>
@@ -38,7 +38,7 @@
             <div class="audit-empty glass-card">
 
                 <div class="audit-empty-icon">
-                    📋
+                    <i class="bi bi-clipboard" aria-hidden="true"></i>
                 </div>
 
                 <h2>История пока пуста</h2>
@@ -61,11 +61,11 @@
                         <div class="audit-card-icon">
                             @if (log.Action.Contains("Добав"))
                             {
-                                <span>＋</span>
+                                <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
                             }
                             else if (log.Action.Contains("Удал"))
                             {
-                                <span>×</span>
+                                <span><i class="bi bi-x-lg" aria-hidden="true"></i></span>
                             }
                             else
                             {
@@ -82,14 +82,14 @@
                                 </div>
 
                                 <div class="audit-date">
-                                    <span>◷</span>
+                                    <span><i class="bi bi-clock" aria-hidden="true"></i></span>
                                     @(log.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm"))
                                 </div>
 
                             </div>
 
                             <div class="audit-user">
-                                👤
+                                <i class="bi bi-person" aria-hidden="true"></i>
                                 @(log.User?.DisplayName
                                     ?? log.User?.UserName
                                     ?? "Неизвестный пользователь")

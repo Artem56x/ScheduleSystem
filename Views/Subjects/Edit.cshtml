@@ -18,10 +18,10 @@
     <link rel="stylesheet" href="~/css/Subjects/Edit.css" asp-append-version="true" />
 }
 
-<div class="subject-form-page">
+<div class="subject-form-page ui-form-layout">
 
     <!-- Заголовок -->
-    <div class="page-header">
+    <div class="page-header ui-page-heading">
         <div>
             <h1>Редактировать предмет</h1>
             <p>Измените основные данные и требования к аудитории</p>
@@ -38,7 +38,7 @@
         </div>
 
         <!-- Основная информация -->
-        <div class="form-card">
+        <div class="form-card ui-surface ui-panel">
 
             <div class="section-heading">
                 <div>
@@ -97,7 +97,7 @@
         </div>
 
         <!-- Требования к аудитории -->
-        <div class="form-card classroom-requirements">
+        <div class="form-card ui-surface ui-panel classroom-requirements">
 
             <div class="section-heading requirements-heading">
 
@@ -219,7 +219,7 @@
                 <div class="empty-requirements">
 
                     <div class="empty-requirements-icon">
-                        🏫
+                        <i class="bi bi-door-open" aria-hidden="true"></i>
                     </div>
 
                     <div>
@@ -241,11 +241,11 @@
         <!-- Кнопки -->
         <div class="form-actions">
 
-            <a asp-action="Index" class="btn btn-secondary">
+            <a asp-action="Index" class="btn ui-button btn-secondary">
                 Отмена
             </a>
 
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn ui-button ui-primary btn-primary">
                 Сохранить изменения
             </button>
 

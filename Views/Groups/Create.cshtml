@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="~/css/Groups/Create.css" asp-append-version="true" />
 }
 
-<div class="form-page">
+<div class="form-page ui-form-layout">
 
-    <div class="form-header">
+    <div class="form-header ui-page-heading">
 
         <div class="form-icon">
-            👥
+            <i class="bi bi-people" aria-hidden="true"></i>
         </div>
 
         <div>
@@ -23,7 +23,7 @@
 
     </div>
 
-    <div class="glass-form-card">
+    <div class="glass-form-card ui-surface ui-panel">
 
         <form asp-action="Create" method="post">
 
@@ -129,14 +129,14 @@
             <!-- Кнопки -->
             <div class="form-actions">
 
-                <button type="submit" class="btn glass-primary-btn">
+                <button type="submit" class="btn ui-button ui-primary glass-primary-btn">
 
-                    <span>＋</span>
+                    <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
                     Добавить группу
 
                 </button>
 
-                <a asp-action="Index" class="btn glass-secondary-btn">
+                <a asp-action="Index" class="btn ui-button glass-secondary-btn">
                     Отмена
                 </a>
 
@@ -153,4 +153,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-

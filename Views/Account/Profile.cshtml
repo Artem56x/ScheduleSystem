@@ -37,7 +37,7 @@
 
     <!-- HEADER -->
 
-    <header class="profile-page-header">
+    <header class="profile-page-header ui-page-heading">
 
         <div class="profile-page-title">
 
@@ -60,7 +60,7 @@
 
         <!-- LEFT COLUMN -->
 
-        <main class="profile-main-column">
+        <div class="profile-main-column">
 
             <!-- PERSONAL DATA -->
 
@@ -103,7 +103,7 @@
                         <div class="profile-data-row">
 
                             <div class="profile-data-label">
-                                <span class="data-icon">✉</span>
+                                <span class="data-icon"><i class="bi bi-envelope" aria-hidden="true"></i></span>
                                 <span>Email</span>
                             </div>
 
@@ -161,7 +161,7 @@
         <label class="notification-switch">
             <input
                 type="checkbox"
-                id="allNotificationsToggle"
+                id="allNotificationsToggle" aria-label="Все уведомления"
                 @(allNotificationsEnabled ? "checked" : "") />
 
             <span class="notification-switch-slider"></span>
@@ -173,7 +173,7 @@
 
         <div class="notification-setting">
             <div class="notification-setting-icon">
-                ◷
+                <i class="bi bi-clock" aria-hidden="true"></i>
             </div>
 
             <div class="notification-setting-content">
@@ -190,7 +190,7 @@
                 <input
                     type="checkbox"
                     class="notification-toggle"
-                    data-notification="schedule"
+                    data-notification="schedule" aria-label="Изменения расписания"
                     @(scheduleNotificationsEnabled ? "checked" : "") />
 
                 <span class="notification-switch-slider"></span>
@@ -200,7 +200,7 @@
 
         <div class="notification-setting">
             <div class="notification-setting-icon">
-                ◎
+                <i class="bi bi-bell" aria-hidden="true"></i>
             </div>
 
             <div class="notification-setting-content">
@@ -217,7 +217,7 @@
                 <input
                     type="checkbox"
                     class="notification-toggle"
-                    data-notification="system"
+                    data-notification="system" aria-label="Системные уведомления"
                     @(systemNotificationsEnabled ? "checked" : "") />
 
                 <span class="notification-switch-slider"></span>
@@ -234,7 +234,7 @@
 
 </section>
 
-        </main>
+        </div>
 
 
         <!-- RIGHT COLUMN -->
@@ -256,7 +256,7 @@
                 <div class="status-list">
 
                     <div class="status-row">
-                        <span class="status-row-icon">◷</span>
+                        <span class="status-row-icon"><i class="bi bi-clock" aria-hidden="true"></i></span>
 
                         <div class="status-row-content">
                             <span class="status-row-label">Последний вход</span>
@@ -287,7 +287,7 @@
                     </div>
 
                     <div class="status-row">
-                        <span class="status-row-icon">◎</span>
+                        <span class="status-row-icon"><i class="bi bi-bell" aria-hidden="true"></i></span>
 
                         <div class="status-row-content">
                             <span class="status-row-label">Система</span>
@@ -325,7 +325,7 @@
                         </span>
 
                         <span class="quick-action-arrow">
-                            ›
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
                         </span>
 
                     </a>
@@ -342,7 +342,7 @@
                         </span>
 
                         <span class="quick-action-arrow">
-                            ›
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
                         </span>
 
                     </a>
@@ -351,7 +351,7 @@
                     <a asp-controller="Account" asp-action="Settings" class="quick-action">
 
                         <span class="quick-action-icon">
-                            ⚙
+                            <i class="bi bi-gear" aria-hidden="true"></i>
                         </span>
 
                         <span class="quick-action-content">
@@ -359,7 +359,7 @@
                         </span>
 
                         <span class="quick-action-arrow">
-                            ›
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
                         </span>
 
                     </a>
@@ -415,6 +415,7 @@
 
             async function saveNotifications() {
                 const state = getState();
+                saveStatus.classList.remove("error");
 
                 const token =
                     document.querySelector(

@@ -10,9 +10,9 @@
           asp-append-version="true" />
 }
 
-<div class="classroom-form-page">
+<div class="classroom-form-page ui-form-layout">
 
-    <div class="page-header">
+    <div class="page-header ui-page-heading">
 
         <div>
             <h1>Добавить аудиторию</h1>
@@ -24,10 +24,10 @@
 
     </div>
 
-    <div class="glass-form-card">
+    <div class="glass-form-card ui-surface ui-panel">
 
         <div class="form-icon">
-            🏫
+            <i class="bi bi-door-open" aria-hidden="true"></i>
         </div>
 
         <div class="form-title">
@@ -77,7 +77,7 @@
 
             <div class="form-group">
 
-                <label asp-for="ClassroomCategoryId"
+                <label asp-for="ClassroomCategoryId" for="classroomCategorySelect"
                        class="form-label">
                     Категория
                 </label>
@@ -96,10 +96,10 @@
                     </select>
 
                     <button type="button"
-                            class="add-category-btn"
+                            class="add-category-btn ui-button ui-primary"
                             id="openCategoryModal">
 
-                        <span>＋</span>
+                        <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
 
                         Добавить
 
@@ -142,14 +142,14 @@
             <div class="form-actions">
 
                 <button type="submit"
-                        class="btn save-btn">
+                        class="btn ui-button ui-primary save-btn">
 
                     Добавить аудиторию
 
                 </button>
 
                 <a asp-action="Index"
-                   class="btn cancel-btn">
+                   class="btn ui-button cancel-btn">
 
                     Отмена
 
@@ -167,24 +167,24 @@
 <!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ КАТЕГОРИИ -->
 
 <div class="category-modal-overlay"
-     id="categoryModal"
+     id="categoryModal" aria-hidden="true"
      data-create-category-url="@Url.Action("CreateCategory", "Classrooms")">
 
-    <div class="category-modal">
+    <div class="category-modal" role="dialog" aria-modal="true" aria-labelledby="categoryDialogTitle">
 
         <button type="button"
-                class="category-modal-close"
-                id="closeCategoryModal">
+                class="category-modal-close ui-button ui-icon-button"
+                id="closeCategoryModal" aria-label="Закрыть окно категории">
 
-            ×
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
 
         </button>
 
         <div class="modal-icon">
-            🏷️
+            <i class="bi bi-tag" aria-hidden="true"></i>
         </div>
 
-        <h3>
+        <h3 id="categoryDialogTitle">
             Новая категория
         </h3>
 
@@ -206,7 +206,7 @@
                    autocomplete="off" />
 
             <div class="category-error"
-                 id="categoryError">
+                 id="categoryError" role="alert">
             </div>
 
         </div>
@@ -214,7 +214,7 @@
         <div class="modal-actions">
 
             <button type="button"
-                    class="modal-cancel-btn"
+                    class="modal-cancel-btn ui-button"
                     id="cancelCategory">
 
                 Отмена
@@ -222,7 +222,7 @@
             </button>
 
             <button type="button"
-                    class="modal-save-btn"
+                    class="modal-save-btn ui-button ui-primary"
                     id="saveCategory">
 
                 Добавить категорию
@@ -245,4 +245,3 @@
     <script src="~/js/Classrooms/Create.js"
             asp-append-version="true"></script>
 }
-

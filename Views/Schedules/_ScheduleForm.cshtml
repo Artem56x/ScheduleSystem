@@ -1,5 +1,7 @@
 @model ScheduleSystem.Models.Schedule
 
+<div class="schedule-form-fields ui-form-layout">
+
 <div class="form-group mb-3">
     <label asp-for="TeacherId" class="control-label">Преподаватель</label>
     <select asp-for="TeacherId" class="form-select" asp-items="ViewBag.TeacherId">
@@ -45,4 +47,6 @@
     <label asp-for="EndTime" class="control-label">Время окончания</label>
     <input asp-for="EndTime" type="time" step="60" class="form-control" />
     <span asp-validation-for="EndTime" class="text-danger"></span>
+</div>
+
 </div>

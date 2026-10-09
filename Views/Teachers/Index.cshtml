@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="~/css/Teachers/Index.css" asp-append-version="true" />
 }
 
-<div class="teachers-page">
+<div class="teachers-page ui-directory">
 
     <!-- HEADER -->
-    <div class="page-header">
+    <div class="page-header ui-page-heading">
 
         <div>
             <h1>Преподаватели</h1>
@@ -20,8 +20,8 @@
 
         @if (User.IsInRole("Admin"))
         {
-            <a asp-action="Create" class="add-teacher-btn">
-                <span>＋</span>
+            <a asp-action="Create" class="add-teacher-btn ui-button ui-primary">
+                <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
                 Добавить преподавателя
             </a>
         }
@@ -30,7 +30,7 @@
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="error-message-glass">
+        <div class="error-message-glass ui-alert">
             @TempData["ErrorMessage"]
         </div>
     }
@@ -40,21 +40,21 @@
 
         <div class="search-wrapper">
 
-            <span class="search-icon">⌕</span>
+            <span class="search-icon"><i class="bi bi-search" aria-hidden="true"></i></span>
 
-            <input type="text" name="search" value="@search" class="search-input"
+            <input type="text" name="search" aria-label="Поиск в справочнике" value="@search" class="search-input"
                    placeholder="Поиск по ФИО или предмету..." autocomplete="off" />
 
             @if (!string.IsNullOrWhiteSpace(search))
             {
                 <a asp-action="Index" class="clear-search" title="Очистить поиск">
-                    ×
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
                 </a>
             }
 
         </div>
 
-        <button type="submit" class="search-btn">
+        <button type="submit" class="search-btn ui-button">
             Найти
         </button>
 
@@ -68,32 +68,32 @@
         </div>
 
         <!-- TABLE -->
-        <div class="glass-table-card">
+        <p class="table-scroll-hint">На небольшом экране таблицу можно прокручивать по горизонтали.</p><div class="glass-table-card" tabindex="0" role="region" aria-label="Список преподавателей"><table class="entity-table"><caption class="visually-hidden">Список преподавателей</caption>
 
             <!-- TABLE HEADER -->
-            <div class="table-header">
+            <thead><tr class="table-header">
 
-                <div>
+                <th scope="col">
                     Преподаватель
-                </div>
+                </th>
 
-                <div>
+                <th scope="col">
                     Предметы
-                </div>
+                </th>
 
-                <div>
+                <th scope="col">
                     Действия
-                </div>
+                </th>
 
-            </div>
+            </tr></thead><tbody>
 
             <!-- ROWS -->
             @foreach (var item in Model)
             {
-                <div class="teacher-row">
+                <tr class="teacher-row">
 
                     <!-- TEACHER -->
-                    <div class="teacher-info">
+                    <td><div class="teacher-info">
 
                         <div class="teacher-avatar">
                             @(string.IsNullOrWhiteSpace(item.FullName)
@@ -113,10 +113,10 @@
 
                         </div>
 
-                    </div>
+                    </div></td>
 
                     <!-- SUBJECTS -->
-                    <div class="teacher-subject">
+                    <td><div class="teacher-subject">
 
                         @if (item.TeacherSubjects != null &&
                              item.TeacherSubjects.Any())
@@ -128,7 +128,7 @@
                                     .OrderBy(ts => ts.Subject!.Name))
                                 {
                                     <span class="subject-badge">
-                                        <span class="subject-icon">📚</span>
+                                        <span class="subject-icon"><i class="bi bi-journal-bookmark" aria-hidden="true"></i></span>
                                         @teacherSubject.Subject!.Name
                                     </span>
                                 }
@@ -142,32 +142,32 @@
                             </span>
                         }
 
-                    </div>
+                    </div></td>
 
                     <!-- ACTIONS -->
-                    <div class="teacher-actions">
+                    <td><div class="teacher-actions">
 
-                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn ui-button details-btn">
                             Подробнее
                         </a>
 
                         @if (User.IsInRole("Admin"))
                         {
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn ui-button edit-btn">
                                 Изменить
                             </a>
 
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn ui-button ui-danger-outline delete-btn">
                                 Удалить
                             </a>
                         }
 
-                    </div>
+                    </div></td>
 
-                </div>
+                </tr>
             }
 
-        </div>
+        </tbody></table></div>
 
         @if (!string.IsNullOrWhiteSpace(search))
         {
@@ -185,7 +185,7 @@
             @if (!string.IsNullOrWhiteSpace(search))
             {
                 <div class="empty-icon">
-                    🔍
+                    <i class="bi bi-search" aria-hidden="true"></i>
                 </div>
 
                 <h2>Преподаватели не найдены</h2>
@@ -196,14 +196,14 @@
                     ничего не найдено.
                 </p>
 
-                <a asp-action="Index" class="clear-btn">
+                <a asp-action="Index" class="clear-btn ui-button">
                     Сбросить поиск
                 </a>
             }
             else
             {
                 <div class="empty-icon">
-                    👨‍🏫
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
                 </div>
 
                 <h2>Преподавателей пока нет</h2>
@@ -215,8 +215,8 @@
 
                 @if (User.IsInRole("Admin"))
                 {
-                    <a asp-action="Create" class="add-teacher-btn">
-                        <span>＋</span>
+                    <a asp-action="Create" class="add-teacher-btn ui-button ui-primary">
+                        <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
                         Добавить преподавателя
                     </a>
                 }

@@ -36,7 +36,7 @@
 <img src="https://img.shields.io/github/repo-size/Artem56x/ScheduleSystem?style=flat-square&label=Repository%20Size" alt="Repository Size"/>
 </a>
 
-<img src="https://img.shields.io/badge/Status-Completed-34C759?style=flat-square" alt="Status"/>
+<img src="https://img.shields.io/badge/Status-Development-245bd6?style=flat-square" alt="Status"/>
 
 <br><br>
 
@@ -517,41 +517,20 @@ ScheduleSystem/
 
 # 🎨 UI / Design
 
-The interface follows a modern **Liquid Glass / Glassmorphism-inspired** design.
+The interface uses solid light surfaces, a blue accent, a system font with Cyrillic support, and consistent forms and buttons. The refresh covers the existing MVC screens, including schedule warnings, generator preview, study load, all four CRUD modules, account pages, notifications, audit logs, analytics, export, and errors.
 
-```text
-┌──────────────────────────────────────────┐
-│                                          │
-│          ScheduleSystem                  │
-│                                          │
-│   ┌──────────────┐   ┌──────────────┐   │
-│   │   Teachers   │   │    Groups    │   │
-│   └──────────────┘   └──────────────┘   │
-│                                          │
-│   ┌──────────────┐   ┌──────────────┐   │
-│   │   Subjects   │   │  Classrooms  │   │
-│   └──────────────┘   └──────────────┘   │
-│                                          │
-│             Schedule                     │
-│                                          │
-└──────────────────────────────────────────┘
-```
+The existing files have distinct responsibilities:
 
-### Design principles
+* `wwwroot/css/site.css`: tokens, typography, common controls, form and table components, focus, error and disabled states.
+* `wwwroot/css/liquid-glass.css`: application sidebar/header, responsive navigation, existing dialogs and shared print rules. The filename is retained for compatibility.
+* Page styles: section-specific layout, responsive rules and schedule print formatting.
+* Existing JavaScript: presentation, focus, accessibility and dynamic markup. Server routes, payloads and business rules remain unchanged.
 
-* Clean white interface
-* Blue accent colors
-* Glass-style cards
-* Rounded components
-* Soft shadows
-* Responsive layouts
-* Consistent spacing
-* Clear navigation
-* Modern forms
-* Interactive filters
-* Minimal visual noise
+The mobile menu supports keyboard focus, Tab containment, Escape and focus restoration. Dialogs isolate the background; destructive confirmations initially focus cancellation. Settings tabs support arrow keys, Home and End. Generator and study-load validation appears inline under the original validation conditions.
 
-The goal is to make a complex scheduling system feel simple and intuitive.
+No framework, font or icon dependency was added. Bootstrap 5.1.0, Bootstrap Icons 1.11.3 and the existing JavaScript stack are retained.
+
+Validation results and manual acceptance gaps are documented in [TechnicalDocumentation.md](docs/TechnicalDocumentation.md#29-interface-refresh-validation-2026-10-09).
 
 ---
 
@@ -628,7 +607,7 @@ Entity Framework Core migrations are included in the repository.
 ## 1. Clone the repository
 
 ```bash
-git clone https://github.com/Artem56x/ScheduleSystem.git
+git clone https://github.com/temirkhanerbolatovich-coder/ScheduleSystem.git
 cd ScheduleSystem
 ```
 
@@ -761,26 +740,16 @@ For production deployment, additional security measures should be configured, in
 
 # 📊 Project Status
 
-<div align="center">
+Core workflows are implemented. This status does not establish production readiness or full UI acceptance.
 
-## 🟢 Completed
+At the UI refresh checkpoint on 2026-10-09:
 
-</div>
-
-```text
-Authentication             ████████████████████ 100%
-Authorization              ████████████████████ 100%
-Database                   ████████████████████ 100%
-CRUD                       ████████████████████ 100%
-Schedule Management        ████████████████████ 100%
-Validation                 ████████████████████ 100%
-Generation                 ████████████████████ 100%
-Recommendations            ████████████████████ 100%
-Notifications              ████████████████████ 100%
-Audit Logs                 ████████████████████ 100%
-Export                     ████████████████████ 100%
-UI / UX                    ████████████████████ 100%
-```
+* .NET 8 restore and build passed; the final build had no warnings or errors.
+* 108 HTTP request records matched the baseline in an isolated PostgreSQL test database, covering roles, CRUD, scheduling, generation, settings and nine downloads.
+* 42 rendered screens retained form contracts and existing IDs; 8 external and 10 rendered inline JavaScript blocks passed syntax checks.
+* Six main screens passed layout checks at all seven specified viewport sizes; 41 reachable pages passed the narrow-phone check.
+* Native browser print pagination, actual 200% browser zoom and a real on-screen keyboard still require manual acceptance. The print CSS preview and 720px reflow checks do not replace them.
+* Existing access-denied routing and home notification-scope issues are recorded in the technical documentation.
 
 ### Implemented
 
@@ -810,14 +779,14 @@ UI / UX                    █████████████████�
 * [x] CSV export
 * [x] User profile
 * [x] User settings
-* [x] Responsive Liquid Glass interface
+* [x] Consistent responsive MVC interface
 * [x] Entity Framework Core migrations
 
 ---
 
 # 🚀 Possible Future Improvements
 
-The current version is complete for its intended college practice scope.
+The project implements its college practice workflows; the validation limits above remain relevant.
 
 Possible future extensions include:
 
@@ -845,7 +814,7 @@ Language:      C#
 Database:      PostgreSQL
 ORM:           Entity Framework Core
 Architecture:  MVC
-Status:        Completed
+Status:        Implemented; acceptance limits documented
 ```
 
 ---

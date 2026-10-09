@@ -2,11 +2,15 @@
     ViewData["Title"] = "Доступ запрещён";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/Account.css" asp-append-version="true" />
+}
+
 <div class="account-page">
     <div class="account-card access-denied">
 
         <div class="account-icon">
-            🔒
+            <i class="bi bi-lock" aria-hidden="true"></i>
         </div>
 
         <h1>Доступ запрещён</h1>
@@ -15,7 +19,7 @@
             У вас недостаточно прав для просмотра этой страницы.
         </p>
 
-        <a asp-controller="Home" asp-action="Index" class="login-button">
+        <a asp-controller="Home" asp-action="Index" class="login-button ui-button ui-primary">
             Вернуться на главную
         </a>
 

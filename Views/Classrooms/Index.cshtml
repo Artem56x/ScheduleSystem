@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="~/css/Classrooms/Index.css" asp-append-version="true" />
 }
 
-<div class="classrooms-page">
+<div class="classrooms-page ui-directory">
 
     <!-- HEADER -->
-    <div class="page-header">
+    <div class="page-header ui-page-heading">
 
         <div>
             <h1>Аудитории</h1>
@@ -20,9 +20,9 @@
 
         @if (User.IsInRole("Admin"))
         {
-            <a asp-action="Create" class="add-classroom-btn">
+            <a asp-action="Create" class="add-classroom-btn ui-button ui-primary">
 
-                <span>＋</span>
+                <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
                 Добавить аудиторию
 
             </a>
@@ -33,9 +33,9 @@
     <!-- ERROR -->
     @if (TempData["ErrorMessage"] is string errorMessage)
     {
-        <div class="glass-alert">
+        <div class="glass-alert ui-alert">
 
-            <span>⚠</span>
+            <span><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span>
             <span>@errorMessage</span>
 
         </div>
@@ -46,23 +46,23 @@
 
         <div class="search-wrapper">
 
-            <span class="search-icon">⌕</span>
+            <span class="search-icon"><i class="bi bi-search" aria-hidden="true"></i></span>
 
-            <input type="text" name="search" value="@search" class="search-input"
+            <input type="text" name="search" aria-label="Поиск в справочнике" value="@search" class="search-input"
                    placeholder="Поиск по номеру или категории..." autocomplete="off" />
 
             @if (!string.IsNullOrWhiteSpace(search))
             {
                 <a asp-action="Index" class="clear-search" title="Очистить поиск">
 
-                    ×
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
 
                 </a>
             }
 
         </div>
 
-        <button type="submit" class="search-btn">
+        <button type="submit" class="search-btn ui-button">
 
             Найти
 
@@ -80,24 +80,24 @@
         </div>
 
         <!-- TABLE -->
-        <div class="glass-table-card">
+        <p class="table-scroll-hint">На небольшом экране таблицу можно прокручивать по горизонтали.</p><div class="glass-table-card" tabindex="0" role="region" aria-label="Список аудиторий"><table class="entity-table"><caption class="visually-hidden">Список аудиторий</caption>
 
             <!-- TABLE HEADER -->
-            <div class="table-header">
+            <thead><tr class="table-header">
 
-                <div>Аудитория</div>
-                <div>Категория</div>
-                <div>Места</div>
-                <div>Действия</div>
+                <th scope="col">Аудитория</th>
+                <th scope="col">Категория</th>
+                <th scope="col">Места</th>
+                <th scope="col">Действия</th>
 
-            </div>
+            </tr></thead><tbody>
 
             @foreach (var item in Model)
             {
-                <div class="classroom-row">
+                <tr class="classroom-row">
 
                     <!-- АУДИТОРИЯ -->
-                    <div class="classroom-info">
+                    <td><div class="classroom-info">
 
                         <div class="classroom-avatar">
 
@@ -119,10 +119,10 @@
 
                         </div>
 
-                    </div>
+                    </div></td>
 
                     <!-- КАТЕГОРИЯ -->
-                    <div class="category-info">
+                    <td><div class="category-info">
 
                         @if (item.ClassroomCategory != null)
                         {
@@ -139,10 +139,10 @@
                             </span>
                         }
 
-                    </div>
+                    </div></td>
 
                     <!-- ВМЕСТИМОСТЬ -->
-                    <div class="capacity-info">
+                    <td><div class="capacity-info">
 
                         <span class="capacity-number">
                             @item.Capacity
@@ -152,12 +152,12 @@
                             мест
                         </span>
 
-                    </div>
+                    </div></td>
 
                     <!-- ДЕЙСТВИЯ -->
-                    <div class="classroom-actions">
+                    <td><div class="classroom-actions">
 
-                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn ui-button details-btn">
 
                             Подробнее
 
@@ -165,25 +165,25 @@
 
                         @if (User.IsInRole("Admin"))
                         {
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn ui-button edit-btn">
 
                                 Изменить
 
                             </a>
 
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn ui-button ui-danger-outline delete-btn">
 
                                 Удалить
 
                             </a>
                         }
 
-                    </div>
+                    </div></td>
 
-                </div>
+                </tr>
             }
 
-        </div>
+        </tbody></table></div>
 
         @if (!string.IsNullOrWhiteSpace(search))
         {
@@ -203,7 +203,7 @@
             @if (!string.IsNullOrWhiteSpace(search))
             {
                 <div class="empty-icon">
-                    🔍
+                    <i class="bi bi-search" aria-hidden="true"></i>
                 </div>
 
                 <h2>Аудитории не найдены</h2>
@@ -216,7 +216,7 @@
 
                 </p>
 
-                <a asp-action="Index" class="clear-btn">
+                <a asp-action="Index" class="clear-btn ui-button">
 
                     Сбросить поиск
 
@@ -225,7 +225,7 @@
             else
             {
                 <div class="empty-icon">
-                    🏫
+                    <i class="bi bi-door-open" aria-hidden="true"></i>
                 </div>
 
                 <h2>Аудиторий пока нет</h2>
@@ -239,9 +239,9 @@
 
                 @if (User.IsInRole("Admin"))
                 {
-                    <a asp-action="Create" class="add-classroom-btn">
+                    <a asp-action="Create" class="add-classroom-btn ui-button ui-primary">
 
-                        <span>＋</span>
+                        <span><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
                         Добавить аудиторию
 
                     </a>

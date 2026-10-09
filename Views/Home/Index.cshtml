@@ -102,7 +102,7 @@
                 @schedules.Count
             </strong>
 
-            <span class="stat-arrow">›</span>
+            <span class="stat-arrow"><i class="bi bi-chevron-right" aria-hidden="true"></i></span>
 
         </a>
 
@@ -118,7 +118,7 @@
                 @ViewBag.GroupsCount
             </strong>
 
-            <span class="stat-arrow">›</span>
+            <span class="stat-arrow"><i class="bi bi-chevron-right" aria-hidden="true"></i></span>
 
         </a>
 
@@ -134,7 +134,7 @@
                 @ViewBag.TeachersCount
             </strong>
 
-            <span class="stat-arrow">›</span>
+            <span class="stat-arrow"><i class="bi bi-chevron-right" aria-hidden="true"></i></span>
 
         </a>
 
@@ -150,7 +150,7 @@
                 @ViewBag.SubjectsCount
             </strong>
 
-            <span class="stat-arrow">›</span>
+            <span class="stat-arrow"><i class="bi bi-chevron-right" aria-hidden="true"></i></span>
 
         </a>
 
@@ -274,7 +274,7 @@
                     <a class="quick-action" asp-controller="Schedules" asp-action="Create">
 
                         <span class="quick-action-icon">
-                            +
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
                         </span>
 
                         Добавить занятие
@@ -285,7 +285,7 @@
                     <a class="quick-action" asp-controller="ScheduleGenerator" asp-action="Index">
 
                         <span class="quick-action-icon">
-                            ✦
+                            <i class="bi bi-stars" aria-hidden="true"></i>
                         </span>
 
                         Генерация расписания
@@ -297,7 +297,7 @@
                 <a class="quick-action" asp-controller="Schedules" asp-action="Export">
 
                     <span class="quick-action-icon">
-                        ↓
+                        <i class="bi bi-download" aria-hidden="true"></i>
                     </span>
 
                     Экспорт расписания
@@ -308,7 +308,7 @@
                 <a class="quick-action" asp-controller="Account" asp-action="Settings">
 
                     <span class="quick-action-icon">
-                        ⚙
+                        <i class="bi bi-gear" aria-hidden="true"></i>
                     </span>
 
                     Настройки
@@ -360,7 +360,7 @@
                                     @switch (notification.Type)
                                     {
                                         case "success":
-                                            <span>✓</span>
+                                            <span><i class="bi bi-check2" aria-hidden="true"></i></span>
                                             break;
 
                                         case "warning":
@@ -368,7 +368,7 @@
                                             break;
 
                                         case "danger":
-                                            <span>×</span>
+                                            <span><i class="bi bi-x-lg" aria-hidden="true"></i></span>
                                             break;
 
                                         default:
@@ -389,7 +389,7 @@
 
                                         @if (!notification.IsRead)
                                         {
-                                            <span class="dashboard-unread-dot"></span>
+                                            <span class="dashboard-unread-dot"><span class="visually-hidden">Непрочитано</span></span>
                                         }
 
                                     </div>
@@ -415,7 +415,7 @@
                 {
                     <div class="dashboard-notifications-empty">
 
-                        <span>🔔</span>
+                        <span><i class="bi bi-bell" aria-hidden="true"></i></span>
 
                         <p>
                             Новых уведомлений нет
@@ -431,4 +431,3 @@
     </div>
 
 </div>
-

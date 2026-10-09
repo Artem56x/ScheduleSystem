@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 
 <head>
@@ -13,33 +13,34 @@
 </head>
 
 <body>
+    <a href="#mainContent" class="skip-link">Перейти к содержимому</a>
     <div class="app-background" aria-hidden="true">
         <div class="background-orb orb-1"></div>
         <div class="background-orb orb-2"></div>
         <div class="background-orb orb-3"></div>
     </div>
     <div class="app-shell">
-        <aside class="app-sidebar" id="appSidebar">
+        <aside class="app-sidebar" id="appSidebar" aria-label="Меню приложения">
             <div class="sidebar-brand">
                 <a asp-controller="Home" asp-action="Index" class="brand-link"><span class="brand-mark">S</span><span
                     class="brand-copy"><strong>ScheduleSystem</strong><small>Учебное расписание</small></span></a>
-                    <button class="sidebar-close" type="button" aria-label="Закрыть меню" data-sidebar-close>×</button>
+                    <button class="sidebar-close" type="button" aria-label="Закрыть меню" data-sidebar-close><i class="bi bi-x-lg" aria-hidden="true"></i></button>
                 </div>
                 <div class="sidebar-section-label">Навигация</div>
                 <nav class="sidebar-nav" aria-label="Основная навигация">
                     @{
                         var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
                     }
-    
+
                     <a class="sidebar-link @(currentController == "Home" ? "active" : "")" asp-controller="Home"
                        asp-action="Index">
-                        <i class="sidebar-icon bi bi-house-door"></i>
+                        <i class="sidebar-icon bi bi-house-door" aria-hidden="true"></i>
                         <span>Главная</span>
                     </a>
 
                     <a class="sidebar-link @(currentController == "Schedules" ? "active" : "")" asp-controller="Schedules"
                        asp-action="Index">
-                        <i class="sidebar-icon bi bi-calendar-week"></i>
+                        <i class="sidebar-icon bi bi-calendar-week" aria-hidden="true"></i>
                         <span>Расписание</span>
                     </a>
 
@@ -47,32 +48,32 @@
                     {
                         <a class="sidebar-link @(currentController == "Analytics" ? "active" : "")" asp-controller="Analytics"
                            asp-action="Index">
-                            <i class="sidebar-icon bi bi-bar-chart-line"></i>
+                            <i class="sidebar-icon bi bi-bar-chart-line" aria-hidden="true"></i>
                             <span>Аналитика</span>
                         </a>
                     }
 
                     <a class="sidebar-link @(currentController == "Teachers" ? "active" : "")" asp-controller="Teachers"
                        asp-action="Index">
-                        <i class="sidebar-icon bi bi-person-badge"></i>
+                        <i class="sidebar-icon bi bi-person-badge" aria-hidden="true"></i>
                         <span>Преподаватели</span>
                     </a>
 
                     <a class="sidebar-link @(currentController == "Groups" ? "active" : "")" asp-controller="Groups"
                        asp-action="Index">
-                        <i class="sidebar-icon bi bi-people"></i>
+                        <i class="sidebar-icon bi bi-people" aria-hidden="true"></i>
                         <span>Группы</span>
                     </a>
 
                     <a class="sidebar-link @(currentController == "Subjects" ? "active" : "")" asp-controller="Subjects"
                        asp-action="Index">
-                        <i class="sidebar-icon bi bi-journal-bookmark"></i>
+                        <i class="sidebar-icon bi bi-journal-bookmark" aria-hidden="true"></i>
                         <span>Предметы</span>
                     </a>
 
                     <a class="sidebar-link @(currentController == "Classrooms" ? "active" : "")" asp-controller="Classrooms"
                        asp-action="Index">
-                        <i class="sidebar-icon bi bi-door-open"></i>
+                        <i class="sidebar-icon bi bi-door-open" aria-hidden="true"></i>
                         <span>Аудитории</span>
                     </a>
                 </nav>
@@ -82,7 +83,7 @@
                     {
                         <a class="sidebar-link sidebar-settings @(currentController == "Account" ? "active" : "")"
                            asp-controller="Account" asp-action="Settings">
-                            <i class="sidebar-icon bi bi-gear"></i>
+                            <i class="sidebar-icon bi bi-gear" aria-hidden="true"></i>
                             <span>Настройки</span>
                         </a>
                     }
@@ -93,7 +94,7 @@
                 <header class="app-topbar">
                     <div class="topbar-left">
                         <button class="mobile-menu-button" type="button" aria-label="Открыть меню"
-                                data-sidebar-open>☰</button>
+                                data-sidebar-open aria-controls="appSidebar" aria-expanded="false"><i class="bi bi-list" aria-hidden="true"></i></button>
                         <div class="page-context"><strong>@ViewData["Title"]</strong></div>
                     </div>
                     <div class="topbar-right">
@@ -101,21 +102,21 @@
                         {
                             <div class="topbar-notifications">@await Component.InvokeAsync("NotificationBell")</div>
                             <div class="dropdown">
-                                <button class="topbar-profile dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                <button class="topbar-profile dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Меню пользователя"
                                         aria-expanded="false"><span class="profile-avatar">@(User.Identity.Name?.Substring(0,
                                         1).ToUpper() ?? "U")</span><span
                                     class="topbar-profile-copy"><strong>@(User.Identity.Name ??
                                     "Пользователь")</strong><small>@(User.IsInRole("Admin") ? "Администратор" :
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 "Пользователь")</small></span></button>
                                     <ul class="dropdown-menu dropdown-menu-end glass-dropdown">
-                                        <li><a asp-controller="Account" asp-action="Profile" class="dropdown-item">👤 Профиль</a>
+                                        <li><a asp-controller="Account" asp-action="Profile" class="dropdown-item"><i class="bi bi-person" aria-hidden="true"></i> Профиль</a>
                                         </li>
                                         <li>
                                             <hr class="dropdown-divider" />
                                         </li>
                                         <li>
                                             <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                                                @Html.AntiForgeryToken()<button type="submit" class="dropdown-item logout-item">↪
+                                                @Html.AntiForgeryToken()<button type="submit" class="dropdown-item ui-button logout-item"><i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                                                 Выйти</button></form>
                                             </li>
                                         </ul>
@@ -125,11 +126,11 @@
                                 {
 
                                     <a class="topbar-auth-link" asp-controller="Account" asp-action="Login">Войти</a><a
-                                    class="glass-primary-button" asp-controller="Account" asp-action="Register">Регистрация</a>
+                                    class="glass-primary-button ui-button ui-primary" asp-controller="Account" asp-action="Register">Регистрация</a>
                                 }
                             </div>
                         </header>
-                        <main class="main-content">@RenderBody()</main>
+                        <main class="main-content" id="mainContent" tabindex="-1">@RenderBody()</main>
                         <footer class="glass-footer"><span>© 2026 ScheduleSystem</span><span>Система управления учебным
                             расписанием</span></footer>
                         </div>
@@ -137,7 +138,6 @@
                     <script src="~/lib/jquery/dist/jquery.min.js"></script>
                     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
                     <script src="~/js/site.js" asp-append-version="true"></script>
-                    <script>(() => { const shell = document.querySelector('.app-shell'); document.querySelectorAll('[data-sidebar-open]').forEach(b => b.addEventListener('click', () => shell?.classList.add('sidebar-open'))); document.querySelectorAll('[data-sidebar-close]').forEach(b => b.addEventListener('click', () => shell?.classList.remove('sidebar-open'))); })();</script>
                     @await RenderSectionAsync("Scripts", required: false)
                 </body>
 

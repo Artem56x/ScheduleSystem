@@ -72,6 +72,8 @@
                 const active =
                     tab.dataset.tab === tabName;
 
+                tab.tabIndex = active ? 0 : -1;
+
                 tab.classList.toggle(
                     "active",
                     active
@@ -131,7 +133,19 @@
         }
 
 
-        tabs.forEach(tab => {
+        tabs.forEach((tab, index) => {
+            tab.addEventListener("keydown", event => {
+                const tabList = Array.from(tabs);
+                let nextIndex;
+                if (event.key === "ArrowRight") nextIndex = (index + 1) % tabList.length;
+                else if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabList.length) % tabList.length;
+                else if (event.key === "Home") nextIndex = 0;
+                else if (event.key === "End") nextIndex = tabList.length - 1;
+                else return;
+                event.preventDefault();
+                activateTab(tabList[nextIndex].dataset.tab);
+                tabList[nextIndex].focus();
+            });
 
             tab.addEventListener(
                 "click",
@@ -246,6 +260,9 @@
             document.body.classList.add(
                 "settings-modal-open"
             );
+            window.scheduleUi?.focusDialog(modal, {
+                initialFocus: modal.querySelector(".settings-modal-actions [data-modal-close]")
+            });
         }
 
 
@@ -257,6 +274,7 @@
 
 
             modal.hidden = true;
+            window.scheduleUi?.releaseDialog(modal);
 
             modal.classList.remove(
                 "is-open"

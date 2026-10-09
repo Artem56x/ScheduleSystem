@@ -1,4 +1,3 @@
-
 @model IEnumerable<ScheduleSystem.Models.Schedule>
 
 @{
@@ -95,33 +94,34 @@
          HEADER
          ================================================= -->
 
-    <div class="schedule-header">
+    <div class="schedule-header ui-page-heading">
 
         <div>
             <div class="schedule-kicker">
-                <h1>Система расписания</h1>
+                <h1>Расписание</h1>
+                    <p class="schedule-intro">Занятия по группам и дням недели</p>
             </div>
         </div>
 
         <div class="schedule-header-actions">
 
             <button type="button"
-                    class="print-header-button no-print"
+                    class="print-header-button ui-button no-print"
                     id="printScheduleButton">
-                🖨 Распечатать
+                <i class="bi bi-printer" aria-hidden="true"></i> Распечатать
             </button>
 
             <a asp-action="Export"
-               class="export-header-button no-print">
-                ↓ Экспорт
+               class="export-header-button ui-button no-print">
+                <i class="bi bi-download" aria-hidden="true"></i> Экспорт
             </a>
 
             @if (User.IsInRole("Admin"))
             {
                 <a asp-action="Create"
-                   class="add-lesson-button no-print">
+                   class="add-lesson-button ui-button ui-primary no-print">
 
-                    <span class="button-icon">+</span>
+                    <span class="button-icon"><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
 
                     <span>
                         Добавить занятие
@@ -131,10 +131,10 @@
 
                 <a asp-controller="ScheduleGenerator"
                    asp-action="Index"
-                   class="auto-generate-button no-print"
+                   class="auto-generate-button ui-button ui-primary no-print"
                    title="Автоматически создать расписание">
 
-                    <span class="button-icon">✦</span>
+                    <span class="button-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
 
                     Автогенерация
 
@@ -159,11 +159,11 @@
             <div class="filter-search">
 
                 <span class="filter-search-icon">
-                    ⌕
+                    <i class="bi bi-search" aria-hidden="true"></i>
                 </span>
 
                 <input type="text"
-                       id="scheduleSearch"
+                       id="scheduleSearch" aria-label="Поиск по расписанию"
                        placeholder="Поиск по расписанию..."
                        autocomplete="off" />
 
@@ -172,7 +172,7 @@
 
             <!-- Group -->
 
-            <select id="filterGroup"
+            <select id="filterGroup" aria-label="Группа"
                     class="schedule-filter-select">
 
                 <option value="">
@@ -191,7 +191,7 @@
 
             <!-- Teacher -->
 
-            <select id="filterTeacher"
+            <select id="filterTeacher" aria-label="Преподаватель"
                     class="schedule-filter-select">
 
                 <option value="">
@@ -210,7 +210,7 @@
 
             <!-- Subject -->
 
-            <select id="filterSubject"
+            <select id="filterSubject" aria-label="Предмет"
                     class="schedule-filter-select">
 
                 <option value="">
@@ -229,7 +229,7 @@
 
             <!-- Classroom -->
 
-            <select id="filterClassroom"
+            <select id="filterClassroom" aria-label="Аудитория"
                     class="schedule-filter-select">
 
                 <option value="">
@@ -248,7 +248,7 @@
 
             <!-- Day -->
 
-            <select id="filterDay"
+            <select id="filterDay" aria-label="День недели"
                     class="schedule-filter-select">
 
                 <option value="">
@@ -292,7 +292,7 @@
             </div>
 
 
-            <div class="filter-result">
+            <div class="filter-result" role="status" aria-live="polite">
 
                 Найдено
 
@@ -311,7 +311,7 @@
 
             <button type="button"
                     id="resetFilters"
-                    class="reset-filters">
+                    class="reset-filters ui-button">
 
                 Сбросить
 
@@ -331,7 +331,7 @@
         <div class="empty-schedule">
 
             <div class="empty-icon">
-                📅
+                <i class="bi bi-calendar-week" aria-hidden="true"></i>
             </div>
 
             <h3>
@@ -345,7 +345,7 @@
             @if (User.IsInRole("Admin"))
             {
                 <a asp-action="Create"
-                   class="empty-button">
+                   class="empty-button ui-button">
 
                     Добавить занятие
 
@@ -387,7 +387,7 @@
                         <div class="group-title">
 
                             <div class="group-icon">
-                                👥
+                                <i class="bi bi-people" aria-hidden="true"></i>
                             </div>
 
                             <div>
@@ -511,13 +511,13 @@
                                                 <div class="lesson-meta">
 
                                                     <span>
-                                                        👨‍🏫
+                                                        <i class="bi bi-person-badge" aria-hidden="true"></i>
                                                         @(item.Teacher?.FullName
                                                             ?? "Не указан")
                                                     </span>
 
                                                     <span>
-                                                        🏫
+                                                        <i class="bi bi-door-open" aria-hidden="true"></i>
                                                         @(item.Classroom?.Name
                                                             ?? "Не указана")
                                                     </span>
@@ -533,7 +533,7 @@
 
                                                 <a asp-action="Details"
                                                    asp-route-id="@item.Id"
-                                                   class="lesson-action details">
+                                                   class="lesson-action ui-button details">
 
                                                     Подробнее
 
@@ -544,7 +544,7 @@
 
                                                     <a asp-action="Edit"
                                                        asp-route-id="@item.Id"
-                                                       class="lesson-action edit">
+                                                       class="lesson-action ui-button edit">
 
                                                         Изменить
 
@@ -552,7 +552,7 @@
 
                                                     <a asp-action="Delete"
                                                        asp-route-id="@item.Id"
-                                                       class="lesson-action delete">
+                                                       class="lesson-action ui-button delete">
 
                                                         Удалить
 
@@ -590,7 +590,7 @@
              style="display:none;">
 
             <div class="filter-no-results-icon">
-                ⌕
+                <i class="bi bi-search" aria-hidden="true"></i>
             </div>
 
             <strong>
@@ -617,4 +617,3 @@
 
 <script src="~/js/Schedules/Index.js"
         asp-append-version="true"></script>
-

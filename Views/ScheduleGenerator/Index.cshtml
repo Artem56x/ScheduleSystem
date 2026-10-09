@@ -37,17 +37,7 @@
             <div class="hero-main">
 
                 <div class="hero-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 3v4" />
-                        <path d="M12 17v4" />
-                        <path d="M3 12h4" />
-                        <path d="M17 12h4" />
-                        <path d="m5.64 5.64 2.83 2.83" />
-                        <path d="m15.53 15.53 2.83 2.83" />
-                        <path d="m5.64 18.36 2.83-2.83" />
-                        <path d="m15.53 8.47 2.83-2.83" />
-                        <circle cx="12" cy="12" r="3.5" />
-                    </svg>
+                    <i class="bi bi-stars" aria-hidden="true"></i>
                 </div>
 
                 <div class="hero-copy">
@@ -84,7 +74,7 @@
 
         @if (!ViewData.ModelState.IsValid)
         {
-            <div class="generator-alert generator-alert-error">
+            <div class="generator-alert ui-alert generator-alert-error">
 
                 <div class="alert-icon">
                     !
@@ -121,7 +111,7 @@
 
         <div class="generator-layout">
 
-            <main class="generator-main">
+            <div class="generator-main">
 
                 <!-- =================================================
                      STEP NAVIGATION
@@ -205,9 +195,10 @@
                 <form asp-action="Generate"
                       asp-controller="ScheduleGenerator"
                       method="post"
-                      id="generatorForm">
+                      id="generatorForm" aria-describedby="generatorClientError">
 
                     @Html.AntiForgeryToken()
+        <div id="generatorClientError" class="ui-inline-error" role="alert" tabindex="-1"></div>
 
 
                     <!-- =================================================
@@ -241,7 +232,7 @@
                             </div>
 
                             <button type="button"
-                                    class="select-all-button"
+                                    class="select-all-button ui-button"
                                     id="selectAllGroups">
 
                                 Выбрать все
@@ -289,12 +280,7 @@
 
                                         <span class="group-card-check">
 
-                                            <svg viewBox="0 0 24 24"
-                                                 aria-hidden="true">
-
-                                                <path d="m5 12 4 4L19 6" />
-
-                                            </svg>
+                                            <i class="bi bi-check2" aria-hidden="true"></i>
 
                                         </span>
 
@@ -323,7 +309,7 @@
                                                 </span>
 
                                                 <span class="group-card-arrow">
-                                                    →
+                                                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
                                                 </span>
 
                                             </span>
@@ -347,16 +333,7 @@
 
                         <div class="automatic-load-icon">
 
-                            <svg viewBox="0 0 24 24"
-                                 aria-hidden="true">
-
-                                <path d="M4 19V5" />
-                                <path d="M4 19h16" />
-                                <path d="M8 16v-4" />
-                                <path d="M12 16V8" />
-                                <path d="M16 16v-7" />
-
-                            </svg>
+                            <i class="bi bi-bar-chart-line" aria-hidden="true"></i>
 
                         </div>
 
@@ -374,20 +351,14 @@
 
                         </div>
 
-                        <a class="automatic-load-button"
+                        <a class="automatic-load-button ui-button"
                            href="/Account/StudyLoad">
 
                             <span>
                                 Настройки нагрузки
                             </span>
 
-                            <svg viewBox="0 0 24 24"
-                                 aria-hidden="true">
-
-                                <path d="M5 12h14" />
-                                <path d="m13 6 6 6-6 6" />
-
-                            </svg>
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
 
                         </a>
 
@@ -467,12 +438,7 @@
 
                                     <span class="day-check">
 
-                                        <svg viewBox="0 0 24 24"
-                                             aria-hidden="true">
-
-                                            <path d="m5 12 4 4L19 6" />
-
-                                        </svg>
+                                        <i class="bi bi-check2" aria-hidden="true"></i>
 
                                     </span>
 
@@ -515,11 +481,11 @@
                             </div>
 
                             <button type="button"
-                                    class="add-slot-button"
+                                    class="add-slot-button ui-button ui-primary"
                                     id="addTimeSlot">
 
                                 <span class="add-slot-plus">
-                                    +
+                                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
                                 </span>
 
                                 Добавить интервал
@@ -598,20 +564,10 @@
                                     </div>
 
                                     <button type="button"
-                                            class="remove-slot-button"
+                                            class="remove-slot-button ui-button ui-icon-button"
                                             data-remove-slot
                                             aria-label="Удалить интервал"
-                                            disabled>
-
-                                        <svg viewBox="0 0 24 24"
-                                             aria-hidden="true">
-
-                                            <path d="M6 6l12 12" />
-                                            <path d="M18 6 6 18" />
-
-                                        </svg>
-
-                                    </button>
+                                            disabled><i class="bi bi-x-lg" aria-hidden="true"></i></button>
 
                                 </div>
                             }
@@ -663,19 +619,9 @@
                                         </div>
 
                                         <button type="button"
-                                                class="remove-slot-button"
+                                                class="remove-slot-button ui-button ui-icon-button"
                                                 data-remove-slot
-                                                aria-label="Удалить интервал">
-
-                                            <svg viewBox="0 0 24 24"
-                                                 aria-hidden="true">
-
-                                                <path d="M6 6l12 12" />
-                                                <path d="M18 6 6 18" />
-
-                                            </svg>
-
-                                        </button>
+                                                aria-label="Удалить интервал"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
 
                                     </div>
                                 }
@@ -724,7 +670,7 @@
                             <div class="rule-card">
 
                                 <div class="rule-card-icon">
-                                    ≡
+                                    <i class="bi bi-list" aria-hidden="true"></i>
                                 </div>
 
                                 <div class="rule-card-content">
@@ -755,7 +701,7 @@
                             <div class="rule-card">
 
                                 <div class="rule-card-icon">
-                                    ↕
+                                    <i class="bi bi-arrow-down-up" aria-hidden="true"></i>
                                 </div>
 
                                 <div class="rule-card-content">
@@ -853,13 +799,13 @@
                         <div class="submit-info">
 
                             <span class="submit-info-icon">
-                                ✓
+                                <i class="bi bi-check2" aria-hidden="true"></i>
                             </span>
 
                             <div>
 
                                 <strong>
-                                    Всё готово к генерации
+                                    Предпросмотр перед сохранением
                                 </strong>
 
                                 <span>
@@ -872,24 +818,11 @@
                         </div>
 
                         <button type="submit"
-                                class="generate-button">
+                                class="generate-button ui-button ui-primary">
 
                             <span class="generate-button-icon">
 
-                                <svg viewBox="0 0 24 24"
-                                     aria-hidden="true">
-
-                                    <path d="M12 3v4" />
-                                    <path d="M12 17v4" />
-                                    <path d="M3 12h4" />
-                                    <path d="M17 12h4" />
-                                    <path d="m5.64 5.64 2.83 2.83" />
-                                    <path d="m15.53 15.53 2.83 2.83" />
-                                    <path d="m5.64 18.36 2.83-2.83" />
-                                    <path d="m15.53 8.47 2.83-2.83" />
-                                    <circle cx="12" cy="12" r="3.5" />
-
-                                </svg>
+                                <i class="bi bi-stars" aria-hidden="true"></i>
 
                             </span>
 
@@ -898,7 +831,7 @@
                             </span>
 
                             <span class="generate-arrow">
-                                →
+                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
                             </span>
 
                         </button>
@@ -907,7 +840,7 @@
 
                 </form>
 
-            </main>
+            </div>
 
 
             <!-- =========================================================
@@ -933,7 +866,7 @@
                         </div>
 
                         <span class="summary-live">
-                            LIVE
+                            Сводка
                         </span>
 
                     </div>
@@ -1087,14 +1020,7 @@
 
                     <span class="settings-shortcut-icon">
 
-                        <svg viewBox="0 0 24 24"
-                             aria-hidden="true">
-
-                            <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
-
-                            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 1.7-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2.4v-.2a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.7-1.7.06-.06A1.7 1.7 0 0 0 8.46 15a1.7 1.7 0 0 0-1.56-1.03H6.7v-2.4h.2A1.7 1.7 0 0 0 8.46 10a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.7-1.7.06.06A1.7 1.7 0 0 0 13.54 8a1.7 1.7 0 0 0 1.03-1.56V5h2.4v.2a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.7 1.7-.06.06A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.56 1.03h.2v2.4h-.2A1.7 1.7 0 0 0 19.4 15Z" />
-
-                        </svg>
+                        <i class="bi bi-gear" aria-hidden="true"></i>
 
                     </span>
 
@@ -1111,7 +1037,7 @@
                     </span>
 
                     <span class="settings-shortcut-arrow">
-                        →
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
                     </span>
 
                 </a>
@@ -1164,6 +1090,12 @@
         const summaryClassrooms =
             document.getElementById("summaryClassrooms");
 
+
+        function showGeneratorError(message) {
+            const error = document.getElementById("generatorClientError");
+            error.textContent = message;
+            error.focus();
+        }
 
         function getGroupInputs() {
 
@@ -1384,6 +1316,8 @@
 
                 if (start) {
 
+                    start.id = `timeSlotStart${index}`;
+                    start.closest(".time-input-group").querySelector("label").htmlFor = start.id;
                     start.name =
                         `TimeSlots[${index}].StartTime`;
 
@@ -1392,6 +1326,8 @@
 
                 if (end) {
 
+                    end.id = `timeSlotEnd${index}`;
+                    end.closest(".time-input-group").querySelector("label").htmlFor = end.id;
                     end.name =
                         `TimeSlots[${index}].EndTime`;
 
@@ -1405,6 +1341,7 @@
 
                 if (remove) {
 
+                    remove.setAttribute("aria-label", `Удалить интервал ${index + 1}`);
                     remove.disabled =
                         rows.length <= 1;
 
@@ -1481,19 +1418,9 @@
 
                 <button
                     type="button"
-                    class="remove-slot-button"
+                    class="remove-slot-button ui-button ui-icon-button"
                     data-remove-slot
-                    aria-label="Удалить интервал">
-
-                    <svg viewBox="0 0 24 24"
-                         aria-hidden="true">
-
-                        <path d="M6 6l12 12" />
-                        <path d="M18 6 6 18" />
-
-                    </svg>
-
-                </button>
+                    aria-label="Удалить интервал"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
             `;
 
 
@@ -1680,6 +1607,7 @@
             form.addEventListener(
                 "submit",
                 function (event) {
+                    document.getElementById("generatorClientError").textContent = "";
 
                     const selectedGroups =
                         Array.from(
@@ -1693,7 +1621,7 @@
 
                         event.preventDefault();
 
-                        alert(
+                        showGeneratorError(
                             "Выберите хотя бы одну группу."
                         );
 
@@ -1713,7 +1641,7 @@
 
                         event.preventDefault();
 
-                        alert(
+                        showGeneratorError(
                             "Выберите хотя бы один учебный день."
                         );
 
@@ -1725,7 +1653,7 @@
 
                         event.preventDefault();
 
-                        alert(
+                        showGeneratorError(
                             "Не удалось найти список временных интервалов."
                         );
 
@@ -1745,7 +1673,7 @@
 
                         event.preventDefault();
 
-                        alert(
+                        showGeneratorError(
                             "Добавьте хотя бы один временной интервал."
                         );
 
@@ -1778,7 +1706,7 @@
 
                             event.preventDefault();
 
-                            alert(
+                            showGeneratorError(
                                 `Заполните время в интервале №${i + 1}.`
                             );
 
@@ -1790,7 +1718,7 @@
 
                             event.preventDefault();
 
-                            alert(
+                            showGeneratorError(
                                 `В интервале №${i + 1} время окончания должно быть позже времени начала.`
                             );
 
@@ -1815,7 +1743,7 @@
 
                         event.preventDefault();
 
-                        alert(
+                        showGeneratorError(
                             "Максимум занятий в день должен быть от 1 до 10."
                         );
 
@@ -1838,7 +1766,7 @@
 
                         event.preventDefault();
 
-                        alert(
+                        showGeneratorError(
                             "Максимум занятий подряд должен быть от 1 до 10."
                         );
 
@@ -1878,7 +1806,7 @@
                         event.preventDefault();
 
                         target.scrollIntoView({
-                            behavior: "smooth",
+                            behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
                             block: "start"
                         });
 

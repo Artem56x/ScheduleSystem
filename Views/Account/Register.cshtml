@@ -51,8 +51,8 @@
                     <input type="password" id="password" name="password" placeholder="Минимум 6 символов"
                            autocomplete="new-password" required />
 
-                    <button type="button" class="password-toggle" id="passwordToggle" aria-label="Показать пароль">
-                        ◉
+                    <button type="button" class="password-toggle ui-button ui-icon-button" id="passwordToggle" aria-label="Показать пароль" aria-pressed="false">
+                        <i class="bi bi-eye" aria-hidden="true"></i>
                     </button>
 
                 </div>
@@ -72,20 +72,20 @@
                     <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Повторите пароль"
                            autocomplete="new-password" required />
 
-                    <button type="button" class="password-toggle" id="confirmPasswordToggle"
-                            aria-label="Показать пароль">
-                        ◉
+                    <button type="button" class="password-toggle ui-button ui-icon-button" id="confirmPasswordToggle"
+                            aria-label="Показать пароль" aria-pressed="false">
+                        <i class="bi bi-eye" aria-hidden="true"></i>
                     </button>
 
                 </div>
 
             </div>
 
-            <button type="submit" class="login-button">
+            <button type="submit" class="login-button ui-button ui-primary">
 
                 <span>Зарегистрироваться</span>
 
-                <span class="login-button-arrow">→</span>
+                <span class="login-button-arrow"><i class="bi bi-arrow-right" aria-hidden="true"></i></span>
 
             </button>
 
@@ -138,10 +138,10 @@
                             ? "text"
                             : "password";
 
-                    toggle.textContent =
-                        isPassword
-                            ? "○"
-                            : "◉";
+                    toggle.innerHTML = isPassword
+                    ? '<i class="bi bi-eye-slash" aria-hidden="true"></i>'
+                    : '<i class="bi bi-eye" aria-hidden="true"></i>';
+                toggle.setAttribute("aria-pressed", String(isPassword));
 
                     toggle.setAttribute(
                         "aria-label",

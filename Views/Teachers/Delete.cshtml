@@ -12,10 +12,10 @@
     <link rel="stylesheet" href="~/css/Teachers/Delete.css" asp-append-version="true" />
 }
 
-<div class="schedule-details-page">
+<div class="schedule-details-page ui-form-layout">
 
     <!-- HEADER -->
-    <div class="details-header">
+    <div class="details-header ui-page-heading">
 
         <div class="details-header-content">
 
@@ -35,11 +35,11 @@
 
         <div class="details-header-actions">
 
-            <a asp-action="Index" class="glass-button secondary-button">
-                ← Назад
+            <a asp-action="Index" class="glass-button ui-button secondary-button">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Назад
             </a>
 
-            <a asp-action="Details" asp-route-id="@Model.Id" class="glass-button primary-button">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="glass-button ui-button ui-primary primary-button">
                 Подробнее
             </a>
 
@@ -49,13 +49,13 @@
 
 
     <!-- MAIN CARD -->
-    <div class="lesson-main-card">
+    <div class="lesson-main-card ui-surface ui-panel">
 
         <!-- TOP -->
         <div class="lesson-card-top">
 
             <div class="lesson-icon delete-icon">
-                🗑️
+                <i class="bi bi-trash" aria-hidden="true"></i>
             </div>
 
             <div>
@@ -126,7 +126,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    👤
+                    <i class="bi bi-person" aria-hidden="true"></i>
                 </div>
 
                 <div>
@@ -146,7 +146,7 @@
             <div class="info-card">
 
                 <div class="info-icon">
-                    📚
+                    <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
                 </div>
 
                 <div>
@@ -188,7 +188,7 @@
         <div class="warning-section">
 
             <div class="warning-icon">
-                ⚠️
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
             </div>
 
             <div>
@@ -210,8 +210,8 @@
         <!-- FOOTER -->
         <div class="details-footer">
 
-            <a asp-action="Index" class="glass-button secondary-button">
-                ← Отмена
+            <a asp-action="Index" class="glass-button ui-button secondary-button">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Отмена
             </a>
 
             <form asp-action="Delete" method="post" class="delete-form">
@@ -220,8 +220,8 @@
 
                 <input type="hidden" asp-for="Id" />
 
-                <button type="submit" class="glass-button delete-button">
-                    🗑 Удалить преподавателя
+                <button type="submit" class="glass-button ui-button ui-danger delete-button">
+                    <i class="bi bi-trash" aria-hidden="true"></i> Удалить преподавателя
                 </button>
 
             </form>
@@ -231,4 +231,3 @@
     </div>
 
 </div>
-

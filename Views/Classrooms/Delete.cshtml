@@ -8,20 +8,20 @@
     <link rel="stylesheet" href="~/css/Classrooms/Delete.css" asp-append-version="true" />
 }
 
-<div class="classroom-delete-page">
+<div class="classroom-delete-page ui-form-layout">
 
-    ```
-    <div class="page-header">
+
+    <div class="page-header ui-page-heading">
         <div>
             <h1>Удаление аудитории</h1>
             <p>Удаление учебной аудитории из системы</p>
         </div>
     </div>
 
-    <div class="glass-delete-card">
+    <div class="glass-delete-card ui-surface ui-panel">
 
         <div class="delete-icon">
-            ⚠️
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
         </div>
 
         <div class="delete-title">
@@ -88,7 +88,7 @@
         </div>
 
         <div class="warning-message">
-            <span>⚠</span>
+            <span><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span>
             <span>
                 Если аудитория используется в расписании,
                 удалить её будет невозможно.
@@ -103,11 +103,11 @@
 
             <div class="form-actions">
 
-                <button type="submit" class="btn delete-btn">
+                <button type="submit" class="btn ui-button ui-danger delete-btn">
                     Удалить аудиторию
                 </button>
 
-                <a asp-action="Index" class="btn cancel-btn">
+                <a asp-action="Index" class="btn ui-button cancel-btn">
                     Отмена
                 </a>
 

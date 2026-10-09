@@ -93,6 +93,12 @@
         // HELPERS
         // =========================================================
 
+        function showStudyLoadError(message) {
+            const error = document.getElementById("studyLoadClientError");
+            error.textContent = message;
+            error.focus();
+        }
+
         function escapeHtml(value) {
 
             return String(value ?? "")
@@ -235,7 +241,7 @@
                 <div class="study-load-placeholder">
 
                     <div class="study-load-placeholder-icon">
-                        📋
+                        <i class="bi bi-clipboard" aria-hidden="true"></i>
                     </div>
 
                     <h3>Группа не выбрана</h3>
@@ -281,7 +287,7 @@
                     <div class="study-load-empty">
 
                         <div class="study-load-empty-icon">
-                            📚
+                            <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
                         </div>
 
                         <strong>
@@ -315,7 +321,7 @@
                             >
 
                                 <div class="study-load-item-icon">
-                                    📚
+                                    <i class="bi bi-journal-bookmark" aria-hidden="true"></i>
                                 </div>
 
                                 <div class="study-load-item-content">
@@ -339,19 +345,19 @@
                                         max="20"
                                         value="${normalizeLessons(item.weeklyLessons)}"
                                         data-index="${index}"
-                                        aria-label="Количество занятий в неделю"
+                                        aria-label="Количество занятий в неделю: ${escapeHtml(subject.name)}"
                                     />
 
                                 </div>
 
                                 <button
                                     type="button"
-                                    class="study-load-delete-button"
+                                    class="study-load-delete-button ui-button ui-icon-button"
                                     data-index="${index}"
                                     title="Удалить предмет"
-                                    aria-label="Удалить предмет"
+                                    aria-label="Удалить предмет ${escapeHtml(subject.name)}"
                                 >
-                                    ×
+                                    <i class="bi bi-x-lg" aria-hidden="true"></i>
                                 </button>
 
                             </div>
@@ -663,6 +669,7 @@
 
             if (addSubjectForm) {
                 addSubjectForm.hidden = true;
+                addSubjectButton?.focus();
             }
 
             if (addSubjectId) {
@@ -680,6 +687,7 @@
         // =========================================================
 
         function addSubject() {
+            document.getElementById("studyLoadClientError").textContent = "";
 
             if (!currentGroupId) {
                 return;
@@ -698,7 +706,7 @@
 
             if (!subjectId) {
 
-                alert("Выберите предмет.");
+                showStudyLoadError("Выберите предмет.");
 
                 return;
             }
@@ -710,7 +718,7 @@
 
             if (!subject) {
 
-                alert("Выбранный предмет не найден.");
+                showStudyLoadError("Выбранный предмет не найден.");
 
                 return;
             }
@@ -730,7 +738,7 @@
                 Number(group.course)
             ) {
 
-                alert(
+                showStudyLoadError(
                     "Предмет и группа должны быть одного курса."
                 );
 
@@ -748,7 +756,7 @@
 
             if (alreadyExists) {
 
-                alert(
+                showStudyLoadError(
                     "Этот предмет уже добавлен."
                 );
 
@@ -896,7 +904,7 @@
 
                     event.preventDefault();
 
-                    alert(
+                    showStudyLoadError(
                         "Сначала выберите учебную группу."
                     );
 
