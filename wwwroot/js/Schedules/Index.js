@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
 
     /* =====================================================
@@ -48,15 +49,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 ".lesson-card[data-schedule='true']"
             )
         );
-
-
-    /*
-     * НОВАЯ СТРУКТУРА:
-     *
-     * Группа
-     *   └── День
-     *        └── Занятия
-     */
 
     const groupCards =
         Array.from(
@@ -138,32 +130,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function timeToMinutes(value) {
 
-        if (!value)
+        if (!value) {
             return null;
+        }
 
-        const parts =
-            value.split(":");
+        const parts = value.split(":");
 
-        if (parts.length < 2)
+        if (parts.length < 2) {
             return null;
+        }
 
-        const hours =
-            parseInt(parts[0], 10);
-
-        const minutes =
-            parseInt(parts[1], 10);
+        const hours = parseInt(parts[0], 10);
+        const minutes = parseInt(parts[1], 10);
 
         if (
             Number.isNaN(hours) ||
-            Number.isNaN(minutes)
+            Number.isNaN(minutes) ||
+            hours < 0 ||
+            hours > 23 ||
+            minutes < 0 ||
+            minutes > 59
         ) {
             return null;
         }
 
-        return (
-            hours * 60 +
-            minutes
-        );
+        return hours * 60 + minutes;
     }
 
 
@@ -181,23 +172,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================================
+       HTML ESCAPING
+       ===================================================== */
+
+    function escapeHtml(value) {
+
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+
+        return String(value ?? "").replace(
+            /[&<>"']/g,
+            character => entities[character]
+        );
+    }
+
+
+    /* =====================================================
        SEARCH
        ===================================================== */
 
     function matchesSearch(card) {
 
         const query =
-            normalize(
-                searchInput?.value
-            );
+            normalize(searchInput?.value);
 
-        if (!query)
+        if (!query) {
             return true;
+        }
 
         const text =
-            normalize(
-                card.dataset.search
-            );
+            normalize(card.dataset.search);
 
         return text.includes(query);
     }
@@ -210,30 +219,20 @@ document.addEventListener("DOMContentLoaded", function () {
     function matchesTime(card) {
 
         const from =
-            timeToMinutes(
-                timeFromFilter?.value
-            );
+            timeToMinutes(timeFromFilter?.value);
 
         const to =
-            timeToMinutes(
-                timeToFilter?.value
-            );
+            timeToMinutes(timeToFilter?.value);
 
         const start =
-            timeToMinutes(
-                card.dataset.start
-            );
+            timeToMinutes(card.dataset.start);
 
         const end =
-            timeToMinutes(
-                card.dataset.end
-            );
+            timeToMinutes(card.dataset.end);
 
 
-        /*
-         * Если у занятия нет времени,
-         * не скрываем его.
-         */
+        // Если у занятия нет корректного времени,
+        // не скрываем его только по временному фильтру.
 
         if (
             start === null ||
@@ -243,59 +242,37 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        /*
-         * Указаны оба значения.
-         */
+        // Указаны оба значения.
 
         if (
             from !== null &&
             to !== null
         ) {
 
-            /*
-             * Если диапазон введён неправильно,
-             * ничего дополнительно не фильтруем.
-             */
+            // Некорректный диапазон не ограничивает выборку.
 
-            if (to <= from)
+            if (to <= from) {
                 return true;
+            }
 
+            // Проверяем пересечение временных интервалов.
 
-            /*
-             * Проверяем пересечение интервалов.
-             *
-             * Например:
-             *
-             * фильтр 09:00 — 11:00
-             * занятие 10:00 — 11:30
-             *
-             * оно будет найдено.
-             */
-
-            return (
-                start < to &&
-                end > from
-            );
+            return start < to && end > from;
         }
 
 
-        /*
-         * Только "от".
-         */
+        // Только "от".
 
         if (from !== null) {
             return end > from;
         }
 
 
-        /*
-         * Только "до".
-         */
+        // Только "до".
 
         if (to !== null) {
             return start < to;
         }
-
 
         return true;
     }
@@ -307,86 +284,68 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function matchesCard(card) {
 
-        /*
-         * GROUP
-         */
+        // GROUP
 
         if (
             groupFilter?.value &&
-            card.dataset.groupId !==
-            groupFilter.value
+            card.dataset.groupId !== groupFilter.value
         ) {
             return false;
         }
 
 
-        /*
-         * TEACHER
-         */
+        // TEACHER
 
         if (
             teacherFilter?.value &&
-            card.dataset.teacherId !==
-            teacherFilter.value
+            card.dataset.teacherId !== teacherFilter.value
         ) {
             return false;
         }
 
 
-        /*
-         * SUBJECT
-         */
+        // SUBJECT
 
         if (
             subjectFilter?.value &&
-            card.dataset.subjectId !==
-            subjectFilter.value
+            card.dataset.subjectId !== subjectFilter.value
         ) {
             return false;
         }
 
 
-        /*
-         * CLASSROOM
-         */
+        // CLASSROOM
 
         if (
             classroomFilter?.value &&
-            card.dataset.classroomId !==
-            classroomFilter.value
+            card.dataset.classroomId !== classroomFilter.value
         ) {
             return false;
         }
 
 
-        /*
-         * DAY
-         */
+        // DAY
 
         if (
             dayFilter?.value &&
-            card.dataset.day !==
-            dayFilter.value
+            card.dataset.day !== dayFilter.value
         ) {
             return false;
         }
 
 
-        /*
-         * SEARCH
-         */
+        // SEARCH
 
-        if (!matchesSearch(card))
+        if (!matchesSearch(card)) {
             return false;
+        }
 
 
-        /*
-         * TIME
-         */
+        // TIME
 
-        if (!matchesTime(card))
+        if (!matchesTime(card)) {
             return false;
-
+        }
 
         return true;
     }
@@ -407,7 +366,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     )
                 );
 
-
             const visibleLessons =
                 lessons.filter(
                     lesson =>
@@ -416,55 +374,33 @@ document.addEventListener("DOMContentLoaded", function () {
                         )
                 );
 
-
-            const count =
-                visibleLessons.length;
+            const count = visibleLessons.length;
 
 
-            /*
-             * Показываем день только если
-             * в нём осталось хотя бы одно занятие.
-             */
+            // Показываем день, только если есть занятия.
 
             dayCard.style.display =
-                count > 0
-                    ? ""
-                    : "none";
+                count > 0 ? "" : "none";
 
 
-            /*
-             * Счётчик дня.
-             */
+            // Счётчик дня.
 
             const countElement =
-                dayCard.querySelector(
-                    ".js-day-count"
-                );
-
+                dayCard.querySelector(".js-day-count");
 
             if (countElement) {
-
-                countElement.textContent =
-                    count;
-
+                countElement.textContent = count;
             }
 
 
-            /*
-             * Склонение.
-             */
+            // Склонение.
 
             const wordElement =
-                dayCard.querySelector(
-                    ".js-day-word"
-                );
-
+                dayCard.querySelector(".js-day-word");
 
             if (wordElement) {
-
                 wordElement.textContent =
                     getLessonWord(count);
-
             }
 
         });
@@ -490,22 +426,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-            /*
-             * Если после фильтрации
-             * в группе ничего не осталось —
-             * скрываем всю группу.
-             */
+            // Скрываем группу, если нет видимых дней.
 
             groupCard.style.display =
-                visibleDays.length > 0
-                    ? ""
-                    : "none";
+                visibleDays.length > 0 ? "" : "none";
 
 
-            /*
-             * Обновляем общий счётчик
-             * занятий внутри группы.
-             */
+            // Считаем видимые занятия группы.
 
             const visibleLessons =
                 Array.from(
@@ -519,29 +446,19 @@ document.addEventListener("DOMContentLoaded", function () {
                         )
                 );
 
-
-            const groupCount =
-                visibleLessons.length;
+            const groupCount = visibleLessons.length;
 
 
-            /*
-             * Второй элемент внутри заголовка
-             * группы содержит:
-             *
-             * "5 занятий"
-             */
+            // Обновляем подпись количества занятий.
 
             const groupSubtitle =
                 groupCard.querySelector(
                     ".group-title span"
                 );
 
-
             if (groupSubtitle) {
-
                 groupSubtitle.textContent =
                     `${groupCount} ${getLessonWord(groupCount)}`;
-
             }
 
         });
@@ -561,12 +478,8 @@ document.addEventListener("DOMContentLoaded", function () {
             return null;
         }
 
-
         const option =
-            select.options[
-                select.selectedIndex
-            ];
-
+            select.options[select.selectedIndex];
 
         return option
             ? option.textContent.trim()
@@ -578,19 +491,13 @@ document.addEventListener("DOMContentLoaded", function () {
        COUNT BY FILTER
        ===================================================== */
 
-    function countLessonsBy(
-        attribute,
-        value
-    ) {
+    function countLessonsBy(attribute, value) {
 
         return lessonCards.filter(
             card =>
                 card.dataset[attribute] === value &&
-                !card.classList.contains(
-                    "is-filter-hidden"
-                )
+                !card.classList.contains("is-filter-hidden")
         ).length;
-
     }
 
 
@@ -608,59 +515,40 @@ document.addEventListener("DOMContentLoaded", function () {
                     )
             );
 
-
-        const visibleCount =
-            visibleLessons.length;
+        const visibleCount = visibleLessons.length;
 
 
-        /*
-         * Основной счётчик.
-         */
+        // Основной счётчик.
 
         if (filteredLessonsCount) {
-
             filteredLessonsCount.textContent =
                 visibleCount;
-
         }
 
 
-        /*
-         * Дополнительная аналитика,
-         * если она существует в HTML.
-         */
+        // Дополнительная аналитика.
 
         if (analyticsTotal) {
-
             analyticsTotal.textContent =
                 visibleCount;
-
         }
 
 
-        /*
-         * Если блока аналитики нет,
-         * просто заканчиваем функцию.
-         */
+        // Если блока аналитики нет, завершаем функцию.
 
-        if (!analyticsElement)
+        if (!analyticsElement) {
             return;
-
+        }
 
         const analyticsParts = [];
 
 
-        /* =================================================
-           GROUP
-           ================================================= */
+        // GROUP
 
         if (groupFilter?.value) {
 
             const name =
-                getSelectedText(
-                    groupFilter
-                );
-
+                getSelectedText(groupFilter);
 
             const count =
                 countLessonsBy(
@@ -668,29 +556,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     groupFilter.value
                 );
 
-
             analyticsParts.push(
                 `<span class="analytics-item">
-                    Группа «${name}» —
+                    Группа «${escapeHtml(name)}» —
                     <strong>${count}</strong>
                     ${getLessonWord(count)} в неделю
                 </span>`
             );
-
         }
 
 
-        /* =================================================
-           TEACHER
-           ================================================= */
+        // TEACHER
 
         if (teacherFilter?.value) {
 
             const name =
-                getSelectedText(
-                    teacherFilter
-                );
-
+                getSelectedText(teacherFilter);
 
             const count =
                 countLessonsBy(
@@ -698,29 +579,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     teacherFilter.value
                 );
 
-
             analyticsParts.push(
                 `<span class="analytics-item">
-                    ${name} —
+                    ${escapeHtml(name)} —
                     <strong>${count}</strong>
                     ${getLessonWord(count)} в неделю
                 </span>`
             );
-
         }
 
 
-        /* =================================================
-           SUBJECT
-           ================================================= */
+        // SUBJECT
 
         if (subjectFilter?.value) {
 
             const name =
-                getSelectedText(
-                    subjectFilter
-                );
-
+                getSelectedText(subjectFilter);
 
             const count =
                 countLessonsBy(
@@ -728,29 +602,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     subjectFilter.value
                 );
 
-
             analyticsParts.push(
                 `<span class="analytics-item">
-                    «${name}» —
+                    «${escapeHtml(name)}» —
                     <strong>${count}</strong>
                     ${getLessonWord(count)} в неделю
                 </span>`
             );
-
         }
 
 
-        /* =================================================
-           CLASSROOM
-           ================================================= */
+        // CLASSROOM
 
         if (classroomFilter?.value) {
 
             const name =
-                getSelectedText(
-                    classroomFilter
-                );
-
+                getSelectedText(classroomFilter);
 
             const count =
                 countLessonsBy(
@@ -758,21 +625,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     classroomFilter.value
                 );
 
-
             analyticsParts.push(
                 `<span class="analytics-item">
-                    Аудитория «${name}» —
+                    Аудитория «${escapeHtml(name)}» —
                     <strong>${count}</strong>
                     ${getLessonWord(count)} в неделю
                 </span>`
             );
-
         }
 
 
-        /* =================================================
-           OUTPUT
-           ================================================= */
+        // OUTPUT
 
         if (analyticsParts.length > 0) {
 
@@ -781,26 +644,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     '<span class="analytics-muted"> · </span>'
                 );
 
-        }
-        else {
+        } else {
 
             analyticsElement.innerHTML = `
                 <span class="analytics-muted">
                     Общая нагрузка:
                 </span>
 
-                <strong>
-                    ${visibleCount}
-                </strong>
+                <strong>${visibleCount}</strong>
 
                 <span class="analytics-muted">
                     ${getLessonWord(visibleCount)}
                     в неделю
                 </span>
             `;
-
         }
-
     }
 
 
@@ -818,24 +676,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     )
             ).length;
 
-
         if (totalLessonsElement) {
-
             totalLessonsElement.textContent =
                 visibleCount;
-
         }
-
 
         if (totalLessonsWordElement) {
-
             totalLessonsWordElement.textContent =
-                getLessonWord(
-                    visibleCount
-                );
-
+                getLessonWord(visibleCount);
         }
-
     }
 
 
@@ -848,88 +697,47 @@ document.addEventListener("DOMContentLoaded", function () {
         let visibleCount = 0;
 
 
-        /*
-         * Фильтруем каждое занятие.
-         */
+        // Фильтруем каждое занятие.
 
         lessonCards.forEach(card => {
 
-            const match =
-                matchesCard(card);
-
+            const match = matchesCard(card);
 
             card.classList.toggle(
                 "is-filter-hidden",
                 !match
             );
 
-
-            /*
-             * Не используем display:none
-             * непосредственно на карточке.
-             *
-             * Это позволяет CSS нормально
-             * работать с новой структурой.
-             */
-
             if (match) {
 
                 card.style.display = "";
-
                 visibleCount++;
 
-            }
-            else {
+            } else {
 
                 card.style.display = "none";
-
             }
-
         });
 
 
-        /*
-         * Обновляем дни.
-         */
+        // Обновляем дни и группы.
 
         updateDayCards();
-
-
-        /*
-         * Обновляем группы.
-         */
-
         updateGroupCards();
 
 
-        /*
-         * Обновляем общий счётчик.
-         */
+        // Обновляем счётчики и аналитику.
 
         updateTotal();
-
-
-        /*
-         * Обновляем аналитику.
-
-         */
-
         updateAnalytics();
 
 
-        /*
-         * Сообщение "ничего не найдено".
-         */
+        // Сообщение "ничего не найдено".
 
         if (noResults) {
-
             noResults.style.display =
-                visibleCount === 0
-                    ? "flex"
-                    : "none";
-
+                visibleCount === 0 ? "flex" : "none";
         }
-
     }
 
 
@@ -939,44 +747,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function resetFilters() {
 
-        if (searchInput)
+        if (searchInput) {
             searchInput.value = "";
+        }
 
-
-        if (groupFilter)
+        if (groupFilter) {
             groupFilter.value = "";
+        }
 
-
-        if (teacherFilter)
+        if (teacherFilter) {
             teacherFilter.value = "";
+        }
 
-
-        if (subjectFilter)
+        if (subjectFilter) {
             subjectFilter.value = "";
+        }
 
-
-        if (classroomFilter)
+        if (classroomFilter) {
             classroomFilter.value = "";
+        }
 
-
-        if (dayFilter)
+        if (dayFilter) {
             dayFilter.value = "";
+        }
 
-
-        if (timeFromFilter)
+        if (timeFromFilter) {
             timeFromFilter.value = "";
+        }
 
-
-        if (timeToFilter)
+        if (timeToFilter) {
             timeToFilter.value = "";
-
-
-        /*
-         * Повторно применяем фильтры.
-         */
+        }
 
         applyFilters();
-
     }
 
 
@@ -995,30 +798,19 @@ document.addEventListener("DOMContentLoaded", function () {
         timeToFilter
     ].forEach(element => {
 
-        if (!element)
+        if (!element) {
             return;
-
-
-        /*
-         * Для поиска.
-
-         */
+        }
 
         element.addEventListener(
             "input",
             applyFilters
         );
 
-
-        /*
-         * Для select и time input.
-         */
-
         element.addEventListener(
             "change",
             applyFilters
         );
-
     });
 
 
@@ -1030,7 +822,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "click",
         resetFilters
     );
-
 
     resetEmptyButton?.addEventListener(
         "click",
@@ -1045,4 +836,3 @@ document.addEventListener("DOMContentLoaded", function () {
     applyFilters();
 
 });
-
