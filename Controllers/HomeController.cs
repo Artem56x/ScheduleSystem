@@ -47,11 +47,8 @@ public class HomeController : Controller
         // ПОСЛЕДНИЕ УВЕДОМЛЕНИЯ
         // =========================================================
 
-        ViewBag.LatestNotifications = await _context.Notifications
-            .AsNoTracking()
-            .OrderByDescending(n => n.CreatedAt)
-            .Take(3)
-            .ToListAsync();
+        // Персональные уведомления не показываем на публичной главной.
+        ViewBag.LatestNotifications = new List<Notification>();
 
 
         // =========================================================

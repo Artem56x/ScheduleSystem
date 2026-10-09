@@ -23,6 +23,13 @@ public class AccountController : Controller
         _context = context;
     }
 
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
+
 
     // ============================================================
     // CLEAR SCHEDULE
@@ -194,11 +201,10 @@ public class AccountController : Controller
             return View();
         }
         email = email!.Trim();
-        password = password!.Trim();
 
         var result = await _signInManager.PasswordSignInAsync(
-            email,
-            password,
+            email!,
+            password!,
             rememberMe,
             lockoutOnFailure: false);
 
@@ -282,21 +288,20 @@ public class AccountController : Controller
         }
 
         email = email!.Trim();
-        password = password!.Trim();
+
+
+        email = email!.Trim();
 
         var user = new ApplicationUser
         {
             UserName = email,
             Email = email,
-            DisplayName =
-                displayName?.Trim() ??
-                string.Empty
+            DisplayName = displayName?.Trim() ?? string.Empty
         };
 
-        var result =
-            await _userManager.CreateAsync(
-                user,
-                password);
+        var result = await _userManager.CreateAsync(
+            user,
+            password!);
 
         if (result.Succeeded)
         {
@@ -1108,6 +1113,7 @@ public class AccountController : Controller
 
         return "Неизвестное устройство";
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
