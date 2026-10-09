@@ -20,13 +20,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // IDENTITY
 // ============================================================
 
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
+    // Требования к паролю
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 8;
+
+    // Защита от перебора паролей
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
@@ -36,6 +43,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
+
 
 // ============================================================
 // CACHE / SESSION

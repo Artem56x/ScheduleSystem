@@ -206,7 +206,7 @@ public class AccountController : Controller
             email!,
             password!,
             rememberMe,
-            lockoutOnFailure: false);
+            lockoutOnFailure: true);
 
         if (result.Succeeded)
         {
