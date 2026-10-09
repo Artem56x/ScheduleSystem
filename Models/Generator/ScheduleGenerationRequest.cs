@@ -4,33 +4,17 @@ namespace ScheduleSystem.Models.Generator;
 
 public class ScheduleGenerationRequest
 {
-    // ============================================================
-    // ГРУППЫ
-    // ============================================================
-
     public List<int> SelectedGroupIds { get; set; } = new();
-
-    // ============================================================
-    // УЧЕБНАЯ НАГРУЗКА
-    // ============================================================
-
-    public List<GenerationLoadItem> Loads { get; set; } = new();
-
-    // ============================================================
-    // ДНИ
-    // ============================================================
 
     public List<DayOfWeek> Days { get; set; } = new();
 
-    // ============================================================
-    // ВРЕМЕННЫЕ ИНТЕРВАЛЫ
-    // ============================================================
+    public List<GenerationLoadItem> Loads { get; set; } = new();
 
     public List<GenerationTimeSlot> TimeSlots { get; set; } = new();
 
-    // ============================================================
-    // ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ
-    // ============================================================
+    // Ниже оставь существующие настройки генерации:
+    // MaxLessonsPerDay, MaxConsecutiveLessons,
+    // DistributeLessons и UseClassroomRecommendations.
 
     [Range(
         1,
@@ -53,4 +37,6 @@ public class ScheduleGenerationRequest
 
     [Display(Name = "Учитывать рекомендации аудиторий")]
     public bool UseClassroomRecommendations { get; set; } = true;
+
+
 }

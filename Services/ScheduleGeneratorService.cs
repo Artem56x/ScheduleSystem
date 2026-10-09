@@ -355,6 +355,7 @@ public class ScheduleGeneratorService
     // VALIDATE BEFORE SAVE
     // ============================================================
 
+
     public async Task<List<string>> ValidateBeforeSaveAsync(
         ScheduleGenerationPreviewViewModel preview)
     {
@@ -367,11 +368,72 @@ public class ScheduleGeneratorService
         }
 
         if (preview.Items == null ||
-            preview.Items.Count == 0)
+            preview.SelectedGroupIds == null ||
+            preview.SelectedDays == null ||
+            preview.TimeSlots == null)
+        {
+            errors.Add(
+                "Предпросмотр содержит неполные данные. " +
+                "Сформируйте расписание заново.");
+
+            return errors;
+        }
+
+        if (preview.Items.Count == 0)
         {
             errors.Add(
                 "Предпросмотр не содержит ни одного занятия.");
 
+            return errors;
+        }
+
+        if (preview.Items.Any(item => item == null))
+        {
+            errors.Add(
+                "Предпросмотр содержит некорректные занятия.");
+
+            return errors;
+        }
+
+        if (preview.TimeSlots.Any(slot => slot == null))
+        {
+            errors.Add(
+                "Предпросмотр содержит некорректные временные интервалы.");
+
+            return errors;
+        }
+
+        if (preview.MaxLessonsPerDay < 1 ||
+            preview.MaxLessonsPerDay > 10)
+        {
+            errors.Add(
+                "Максимальное количество пар в день " +
+                "должно быть от 1 до 10.");
+        }
+
+        if (preview.MaxConsecutiveLessons < 1 ||
+            preview.MaxConsecutiveLessons > 10)
+        {
+            errors.Add(
+                "Максимальное количество пар подряд " +
+                "должно быть от 1 до 10.");
+        }
+
+        if (preview.SelectedGroupIds.Any(id => id <= 0))
+        {
+            errors.Add(
+                "Список выбранных групп содержит некорректный ID.");
+        }
+
+        if (preview.SelectedDays.Any(day =>
+                !Enum.IsDefined(typeof(DayOfWeek), day)))
+        {
+            errors.Add(
+                "Список выбранных дней содержит некорректный день недели.");
+        }
+
+        if (errors.Count > 0)
+        {
             return errors;
         }
 
@@ -383,10 +445,6 @@ public class ScheduleGeneratorService
             .Distinct()
             .ToHashSet();
 
-        var timeSlots = preview.TimeSlots
-            .OrderBy(x => x.StartTime)
-            .ToList();
-
         if (selectedGroupIds.Count == 0)
         {
             errors.Add("В предпросмотре не выбрана ни одна группа.");
@@ -397,15 +455,48 @@ public class ScheduleGeneratorService
             errors.Add("В предпросмотре не выбран ни один день.");
         }
 
-        if (timeSlots.Count == 0)
+        if (preview.TimeSlots.Count == 0)
         {
             errors.Add(
                 "В предпросмотре не найдено ни одного временного интервала.");
         }
 
+        var timeSlots = preview.TimeSlots
+            .OrderBy(slot => slot.StartTime)
+            .ToList();
+
+        for (var i = 0; i < timeSlots.Count; i++)
+        {
+            var slot = timeSlots[i];
+
+            if (slot.StartTime < TimeSpan.Zero ||
+                slot.StartTime >= TimeSpan.FromDays(1) ||
+                slot.EndTime <= TimeSpan.Zero ||
+                slot.EndTime > TimeSpan.FromDays(1) ||
+                slot.StartTime >= slot.EndTime)
+            {
+                errors.Add(
+                    $"Временной интервал №{i + 1} некорректен.");
+            }
+
+            for (var j = i + 1; j < timeSlots.Count; j++)
+            {
+                if (Overlaps(
+                        slot.StartTime,
+                        slot.EndTime,
+                        timeSlots[j].StartTime,
+                        timeSlots[j].EndTime))
+                {
+                    errors.Add(
+                        $"Временные интервалы №{i + 1} и " +
+                        $"№{j + 1} пересекаются.");
+                }
+            }
+        }
+
         if (errors.Count > 0)
         {
-            return errors;
+            return errors.Distinct().ToList();
         }
 
         // --------------------------------------------------------
@@ -519,11 +610,20 @@ public class ScheduleGeneratorService
                     "находится вне выбранных дней.");
             }
 
-            if (item.StartTime >= item.EndTime)
+
+            if (!Enum.IsDefined(typeof(DayOfWeek), item.DayOfWeek))
             {
                 errors.Add(
-                    $"Некорректное время занятия «{item.SubjectName}» " +
-                    $"для группы «{item.GroupName}».");
+                    $"Занятие группы {item.GroupId} содержит некорректный день недели.");
+            }
+            else if (item.StartTime < TimeSpan.Zero ||
+                     item.StartTime >= TimeSpan.FromDays(1) ||
+                     item.EndTime <= TimeSpan.Zero ||
+                     item.EndTime > TimeSpan.FromDays(1) ||
+                     item.StartTime >= item.EndTime)
+            {
+                errors.Add(
+                    $"Занятие группы {item.GroupId} содержит некорректный временной интервал.");
             }
 
             if (!groupById.TryGetValue(
@@ -846,6 +946,7 @@ public class ScheduleGeneratorService
     // REQUEST VALIDATION
     // ============================================================
 
+
     private static List<string> ValidateRequest(
         ScheduleGenerationRequest request)
     {
@@ -862,50 +963,77 @@ public class ScheduleGeneratorService
         {
             errors.Add("Выберите хотя бы одну группу.");
         }
+        else if (request.SelectedGroupIds.Any(id => id <= 0))
+        {
+            errors.Add("Список групп содержит некорректный ID.");
+        }
 
-        if (request.Days == null ||
-            request.Days.Count == 0)
+        if (request.Days == null || request.Days.Count == 0)
         {
             errors.Add("Выберите хотя бы один день недели.");
         }
-
-        if (request.TimeSlots == null ||
-            request.TimeSlots.Count == 0)
+        else if (request.Days.Any(day =>
+                     !Enum.IsDefined(typeof(DayOfWeek), day)))
         {
-            errors.Add(
-                "Добавьте хотя бы один временной интервал.");
+            errors.Add("Выбран некорректный день недели.");
+        }
+
+        if (request.TimeSlots == null || request.TimeSlots.Count == 0)
+        {
+            errors.Add("Добавьте хотя бы один временной интервал.");
         }
         else
         {
+            var validSlots = new List<(int Index, GenerationTimeSlot Slot)>();
+
             for (var i = 0; i < request.TimeSlots.Count; i++)
             {
                 var slot = request.TimeSlots[i];
 
-                if (slot.StartTime >= slot.EndTime)
+                if (slot == null)
+                {
+                    errors.Add($"Временной интервал №{i + 1} не задан.");
+                    continue;
+                }
+
+                var validStart =
+                    slot.StartTime >= TimeSpan.Zero &&
+                    slot.StartTime < TimeSpan.FromDays(1);
+
+                var validEnd =
+                    slot.EndTime > TimeSpan.Zero &&
+                    slot.EndTime <= TimeSpan.FromDays(1);
+
+                if (!validStart || !validEnd ||
+                    slot.StartTime >= slot.EndTime)
                 {
                     errors.Add(
-                        $"Временной интервал №{i + 1} некорректен.");
+                        $"Временной интервал №{i + 1} некорректен. " +
+                        "Укажите время в пределах суток, " +
+                        "а начало — раньше окончания.");
+
+                    continue;
                 }
+
+                validSlots.Add((i, slot));
             }
 
-            for (var i = 0; i < request.TimeSlots.Count; i++)
+            for (var i = 0; i < validSlots.Count; i++)
             {
-                for (var j = i + 1;
-                     j < request.TimeSlots.Count;
-                     j++)
+                for (var j = i + 1; j < validSlots.Count; j++)
                 {
-                    var first = request.TimeSlots[i];
-                    var second = request.TimeSlots[j];
+                    var first = validSlots[i];
+                    var second = validSlots[j];
 
                     if (Overlaps(
-                            first.StartTime,
-                            first.EndTime,
-                            second.StartTime,
-                            second.EndTime))
+                            first.Slot.StartTime,
+                            first.Slot.EndTime,
+                            second.Slot.StartTime,
+                            second.Slot.EndTime))
                     {
                         errors.Add(
-                            $"Временные интервалы №{i + 1} и " +
-                            $"№{j + 1} пересекаются.");
+                            $"Временные интервалы №{first.Index + 1} и " +
+                            $"№{second.Index + 1} пересекаются.");
                     }
                 }
             }
@@ -925,9 +1053,7 @@ public class ScheduleGeneratorService
                 "Максимальное количество пар подряд должно быть от 1 до 10.");
         }
 
-        return errors
-            .Distinct()
-            .ToList();
+        return errors.Distinct().ToList();
     }
 
     // ============================================================
@@ -2095,6 +2221,7 @@ public class ScheduleGeneratorService
         }
     }
 
+
     private static int CountConsecutivePreviewSlots(
         int groupId,
         DayOfWeek day,
@@ -2103,13 +2230,21 @@ public class ScheduleGeneratorService
         List<Schedule> protectedSchedules,
         List<GenerationTimeSlot> timeSlots)
     {
-        var occupied = new HashSet<int>();
+        if (targetSlotIndex < 0 ||
+            targetSlotIndex >= timeSlots.Count)
+        {
+            return 0;
+        }
+
+        var occupied = new bool[timeSlots.Count];
 
         for (var i = 0; i < timeSlots.Count; i++)
         {
             var slot = timeSlots[i];
 
             var occupiedByPreview = previewItems.Any(item =>
+                item.GroupId == groupId &&
+                item.DayOfWeek == day &&
                 Overlaps(
                     item.StartTime,
                     item.EndTime,
@@ -2127,33 +2262,28 @@ public class ScheduleGeneratorService
                     slot.StartTime,
                     slot.EndTime));
 
-            if (occupiedByPreview || occupiedByExisting)
-            {
-                occupied.Add(i);
-            }
+            occupied[i] = occupiedByPreview || occupiedByExisting;
         }
 
-        if (!occupied.Contains(targetSlotIndex))
+        if (!occupied[targetSlotIndex])
         {
             return 0;
         }
 
         var count = 1;
 
-        var left = targetSlotIndex - 1;
-
-        while (occupied.Contains(left))
+        for (var i = targetSlotIndex - 1;
+             i >= 0 && occupied[i];
+             i--)
         {
             count++;
-            left--;
         }
 
-        var right = targetSlotIndex + 1;
-
-        while (occupied.Contains(right))
+        for (var i = targetSlotIndex + 1;
+             i < occupied.Length && occupied[i];
+             i++)
         {
             count++;
-            right++;
         }
 
         return count;

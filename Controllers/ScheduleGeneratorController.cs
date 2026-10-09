@@ -497,20 +497,21 @@ public class ScheduleGeneratorController : Controller
     private static void NormalizeRequest(
         ScheduleGenerationRequest model)
     {
-        model.SelectedGroupIds =
-            model.SelectedGroupIds
-                .Distinct()
-                .ToList();
+        model.SelectedGroupIds ??= new List<int>();
+        model.Days ??= new List<DayOfWeek>();
+        model.TimeSlots ??= new List<GenerationTimeSlot>();
 
-        model.Days =
-            model.Days
-                .Distinct()
-                .ToList();
+        model.SelectedGroupIds = model.SelectedGroupIds
+            .Distinct()
+            .ToList();
 
-        model.TimeSlots =
-            model.TimeSlots
-                .OrderBy(x => x.StartTime)
-                .ToList();
+        model.Days = model.Days
+            .Distinct()
+            .ToList();
+
+        model.TimeSlots = model.TimeSlots
+            .OrderBy(x => x?.StartTime ?? TimeSpan.MinValue)
+            .ToList();
     }
 
     // ============================================================
@@ -522,56 +523,90 @@ public class ScheduleGeneratorController : Controller
     {
         var errors = new List<string>();
 
-        if (model.SelectedGroupIds.Count == 0)
+        if (model.SelectedGroupIds == null ||
+            model.SelectedGroupIds.Count == 0)
         {
-            errors.Add(
-                "Выберите хотя бы одну группу.");
+            errors.Add("Выберите хотя бы одну группу.");
+        }
+        else if (model.SelectedGroupIds.Any(id => id <= 0))
+        {
+            errors.Add("Выбраны некорректные идентификаторы групп.");
         }
 
-        if (model.Days.Count == 0)
+        if (model.Days == null || model.Days.Count == 0)
         {
-            errors.Add(
-                "Выберите хотя бы один день недели.");
+            errors.Add("Выберите хотя бы один день недели.");
+        }
+        else if (model.Days.Any(day => !Enum.IsDefined(typeof(DayOfWeek), day)))
+        {
+            errors.Add("Выбрано некорректное значение дня недели.");
         }
 
-        if (model.TimeSlots.Count == 0)
+        if (model.TimeSlots == null || model.TimeSlots.Count == 0)
         {
-            errors.Add(
-                "Добавьте хотя бы один временной интервал.");
+            errors.Add("Добавьте хотя бы один временной интервал.");
         }
-
-        for (var i = 0;
-             i < model.TimeSlots.Count;
-             i++)
+        else
         {
-            var slot = model.TimeSlots[i];
+            var dayLength = TimeSpan.FromDays(1);
 
-            if (slot.StartTime >= slot.EndTime)
+            for (var i = 0; i < model.TimeSlots.Count; i++)
             {
-                errors.Add(
-                    $"Интервал №{i + 1} имеет некорректное время.");
-            }
-        }
+                var slot = model.TimeSlots[i];
 
-        for (var i = 0;
-             i < model.TimeSlots.Count;
-             i++)
-        {
-            for (var j = i + 1;
-                 j < model.TimeSlots.Count;
-                 j++)
-            {
-                var first =
-                    model.TimeSlots[i];
+                if (slot == null)
+                {
+                    errors.Add($"Интервал №{i + 1} не заполнен.");
+                    continue;
+                }
 
-                var second =
-                    model.TimeSlots[j];
-
-                if (first.StartTime < second.EndTime &&
-                    first.EndTime > second.StartTime)
+                if (slot.StartTime < TimeSpan.Zero ||
+                    slot.StartTime >= dayLength ||
+                    slot.EndTime <= TimeSpan.Zero ||
+                    slot.EndTime > dayLength ||
+                    slot.StartTime >= slot.EndTime)
                 {
                     errors.Add(
-                        $"Интервалы №{i + 1} и №{j + 1} пересекаются.");
+                        $"Интервал №{i + 1} имеет некорректное время. " +
+                        "Начало должно быть раньше окончания, " +
+                        "а время должно находиться в пределах суток.");
+                }
+            }
+
+            for (var i = 0; i < model.TimeSlots.Count; i++)
+            {
+                var first = model.TimeSlots[i];
+
+                if (first == null ||
+                    first.StartTime < TimeSpan.Zero ||
+                    first.StartTime >= dayLength ||
+                    first.EndTime <= TimeSpan.Zero ||
+                    first.EndTime > dayLength ||
+                    first.StartTime >= first.EndTime)
+                {
+                    continue;
+                }
+
+                for (var j = i + 1; j < model.TimeSlots.Count; j++)
+                {
+                    var second = model.TimeSlots[j];
+
+                    if (second == null ||
+                        second.StartTime < TimeSpan.Zero ||
+                        second.StartTime >= dayLength ||
+                        second.EndTime <= TimeSpan.Zero ||
+                        second.EndTime > dayLength ||
+                        second.StartTime >= second.EndTime)
+                    {
+                        continue;
+                    }
+
+                    if (first.StartTime < second.EndTime &&
+                        first.EndTime > second.StartTime)
+                    {
+                        errors.Add(
+                            $"Интервалы №{i + 1} и №{j + 1} пересекаются.");
+                    }
                 }
             }
         }
