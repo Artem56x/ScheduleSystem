@@ -374,124 +374,156 @@
 
 
     @section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const allToggle =
-                document.getElementById("allNotificationsToggle");
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const allToggle =
+            document.getElementById("allNotificationsToggle");
 
-            const notificationToggles =
-                document.querySelectorAll(".notification-toggle");
+        const notificationToggles =
+            document.querySelectorAll(".notification-toggle");
 
-            const saveStatus =
-                document.getElementById("notificationSaveStatus");
+        const saveStatus =
+            document.getElementById("notificationSaveStatus");
 
-            function getState() {
-                let schedule = false;
-                let system = false;
+        if (!allToggle || !saveStatus || notificationToggles.length === 0) {
+            return;
+        }
 
-                notificationToggles.forEach(toggle => {
-                    if (toggle.dataset.notification === "schedule") {
-                        schedule = toggle.checked;
-                    }
+        function getState() {
+            const scheduleToggle =
+                document.querySelector('[data-notification="schedule"]');
 
-                    if (toggle.dataset.notification === "system") {
-                        system = toggle.checked;
-                    }
-                });
+            const systemToggle =
+                document.querySelector('[data-notification="system"]');
 
-                return {
-                    schedule,
-                    system
-                };
+            return {
+                schedule: scheduleToggle?.checked ?? false,
+                system: systemToggle?.checked ?? false
+            };
+        }
+
+        function applyState(state) {
+            notificationToggles.forEach(toggle => {
+                if (toggle.dataset.notification === "schedule") {
+                    toggle.checked = state.schedule;
+                }
+
+                if (toggle.dataset.notification === "system") {
+                    toggle.checked = state.system;
+                }
+            });
+
+            updateMainToggle();
+        }
+
+        function updateMainToggle() {
+            const state = getState();
+
+            allToggle.checked =
+                state.schedule && state.system;
+        }
+
+        function setControlsDisabled(disabled) {
+            allToggle.disabled = disabled;
+
+            notificationToggles.forEach(toggle => {
+                toggle.disabled = disabled;
+            });
+        }
+
+        let lastSavedState = getState();
+        let saveInProgress = false;
+
+        async function saveNotifications() {
+            if (saveInProgress) {
+                return;
             }
 
-            function updateMainToggle() {
-                const state = getState();
+            const state = getState();
 
-                allToggle.checked =
-                    state.schedule &&
-                    state.system;
-            }
+            saveInProgress = true;
+            setControlsDisabled(true);
 
-            async function saveNotifications() {
-                const state = getState();
-                saveStatus.classList.remove("error");
+            saveStatus.classList.remove("error");
+            saveStatus.classList.add("visible");
+            saveStatus.textContent = "Сохранение...";
 
-                const token =
-                    document.querySelector(
-                        'input[name="__RequestVerificationToken"]'
-                    )?.value;
+            try {
+                const token = document.querySelector(
+                    'input[name="__RequestVerificationToken"]'
+                )?.value;
+
+                if (!token) {
+                    throw new Error("Не найден токен безопасности.");
+                }
 
                 const formData = new FormData();
 
                 formData.append(
                     "scheduleNotificationsEnabled",
-                    state.schedule
+                    String(state.schedule)
                 );
 
                 formData.append(
                     "systemNotificationsEnabled",
-                    state.system
+                    String(state.system)
                 );
 
-                if (token) {
-                    formData.append(
-                        "__RequestVerificationToken",
-                        token
-                    );
-                }
+                formData.append("__RequestVerificationToken", token);
 
-                try {
-                    const response = await fetch(
-                        "/Account/UpdateNotifications",
-                        {
-                            method: "POST",
-                            body: formData
-                        }
-                    );
-
-                    if (!response.ok) {
-                        throw new Error(
-                            "Не удалось сохранить настройки."
-                        );
+                const response = await fetch(
+                    "/Account/UpdateNotifications",
+                    {
+                        method: "POST",
+                        body: formData,
+                        credentials: "same-origin"
                     }
+                );
 
-                    saveStatus.textContent =
-                        "Настройки сохранены";
-
-                    saveStatus.classList.add("visible");
-
-                    setTimeout(() => {
-                        saveStatus.classList.remove("visible");
-                    }, 1800);
-
-                } catch (error) {
-                    saveStatus.textContent =
-                        "Не удалось сохранить настройки.";
-
-                    saveStatus.classList.add("error");
-                    saveStatus.classList.add("visible");
+                if (!response.ok || response.redirected) {
+                    throw new Error("Не удалось сохранить настройки.");
                 }
+
+                lastSavedState = { ...state };
+
+                saveStatus.textContent = "Настройки сохранены";
+                saveStatus.classList.remove("error");
+
+            } catch (error) {
+                applyState(lastSavedState);
+
+                saveStatus.textContent =
+                    "Не удалось сохранить настройки. Проверьте соединение и повторите попытку.";
+
+                saveStatus.classList.add("error");
+
+            } finally {
+                saveInProgress = false;
+                setControlsDisabled(false);
+                updateMainToggle();
             }
+        }
 
-            allToggle.addEventListener("change", function () {
-                const enabled = allToggle.checked;
-
-                notificationToggles.forEach(toggle => {
-                    toggle.checked = enabled;
-                });
-
-                saveNotifications();
-            });
+        allToggle.addEventListener("change", function () {
+            const enabled = allToggle.checked;
 
             notificationToggles.forEach(toggle => {
-                toggle.addEventListener("change", function () {
-                    updateMainToggle();
-                    saveNotifications();
-                });
+                toggle.checked = enabled;
             });
 
-            updateMainToggle();
+            saveNotifications();
         });
-    </script>
+
+        notificationToggles.forEach(toggle => {
+            toggle.addEventListener("change", function () {
+                updateMainToggle();
+                saveNotifications();
+            });
+        });
+
+        updateMainToggle();
+    });
+</script>
+
+
 }

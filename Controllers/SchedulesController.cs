@@ -1220,6 +1220,7 @@ public class SchedulesController : Controller
         await _context.SaveChangesAsync();
     }
 
+
     private async Task CreateScheduleNotificationsAsync(
         string title,
         string message,
@@ -1230,7 +1231,9 @@ public class SchedulesController : Controller
 
         var userIds = await _context.Users
             .AsNoTracking()
-            .Where(u => u.Id != currentUserId)
+            .Where(u =>
+                u.Id != currentUserId &&
+                u.ScheduleNotificationsEnabled)
             .Select(u => u.Id)
             .ToListAsync();
 
@@ -1238,6 +1241,8 @@ public class SchedulesController : Controller
         {
             return;
         }
+
+        var createdAt = DateTime.UtcNow;
 
         var notifications = userIds
             .Select(userId => new Notification
@@ -1247,7 +1252,7 @@ public class SchedulesController : Controller
                 Message = message,
                 Type = type,
                 IsRead = false,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = createdAt
             })
             .ToList();
 

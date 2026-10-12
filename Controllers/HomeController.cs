@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
+using System.Security.Claims;
 
 namespace ScheduleSystem.Controllers;
 
@@ -43,12 +44,29 @@ public class HomeController : Controller
             .CountAsync();
 
 
+
         // =========================================================
         // ПОСЛЕДНИЕ УВЕДОМЛЕНИЯ
         // =========================================================
 
-        // Персональные уведомления не показываем на публичной главной.
-        ViewBag.LatestNotifications = new List<Notification>();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (User.Identity?.IsAuthenticated == true &&
+            !string.IsNullOrEmpty(userId))
+        {
+            ViewBag.LatestNotifications = await _context.Notifications
+                .AsNoTracking()
+                .Where(n => n.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .Take(3)
+                .ToListAsync();
+        }
+        else
+        {
+            ViewBag.LatestNotifications = new List<Notification>();
+        }
+
+
 
 
         // =========================================================

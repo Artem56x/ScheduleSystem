@@ -1007,22 +1007,26 @@ public class ScheduleExportService
         return Encoding.UTF8.GetBytes(builder.ToString());
     }
 
-    private static string EscapeCsv(string value)
+
+    private static string EscapeCsv(string? value)
     {
         if (string.IsNullOrEmpty(value))
         {
             return "";
         }
 
-        if (value.Contains(';') ||
-            value.Contains('"') ||
-            value.Contains('\n') ||
-            value.Contains('\r'))
+        // Защита от CSV-инъекций при открытии файла в Excel.
+        var trimmedValue = value.TrimStart();
+
+        if (value[0] is '\t' or '\r' or '\n' ||
+            (trimmedValue.Length > 0 &&
+             trimmedValue[0] is '=' or '+' or '-' or '@'))
         {
-            return $"\"{value.Replace("\"", "\"\"")}\"";
+            value = "'" + value;
         }
 
-        return value;
+        // Экранируем кавычки и заключаем каждое значение в кавычки.
+        return $"\"{value.Replace("\"", "\"\"")}\"";
     }
 
     // ============================================================

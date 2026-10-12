@@ -2395,7 +2395,7 @@ public class ScheduleGeneratorService
 
                 var left = slotIndex - 1;
 
-                while (occupied.Contains(left))
+                while (left >= 0 && occupied.Contains(left))
                 {
                     consecutive++;
                     left--;
@@ -2403,7 +2403,7 @@ public class ScheduleGeneratorService
 
                 var right = slotIndex + 1;
 
-                while (occupied.Contains(right))
+                while (right < timeSlots.Count && occupied.Contains(right))
                 {
                     consecutive++;
                     right++;

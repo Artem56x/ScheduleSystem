@@ -287,8 +287,6 @@ public class AccountController : Controller
             return View();
         }
 
-        email = email!.Trim();
-
 
         email = email!.Trim();
 
@@ -296,7 +294,9 @@ public class AccountController : Controller
         {
             UserName = email,
             Email = email,
-            DisplayName = displayName?.Trim() ?? string.Empty
+            DisplayName = displayName?.Trim() ?? string.Empty,
+            ScheduleNotificationsEnabled = true,
+            SystemNotificationsEnabled = true
         };
 
         var result = await _userManager.CreateAsync(
@@ -1115,11 +1115,14 @@ public class AccountController : Controller
     }
 
 
+
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateNotifications(
         bool scheduleNotificationsEnabled,
         bool systemNotificationsEnabled)
+
     {
         var user = await _userManager.GetUserAsync(User);
 
