@@ -303,11 +303,33 @@ public class AccountController : Controller
             user,
             password!);
 
+
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(
+            var roleResult = await _userManager.AddToRoleAsync(
                 user,
                 "User");
+
+            if (!roleResult.Succeeded)
+            {
+                foreach (var error in roleResult.Errors)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        $"Не удалось назначить роль пользователя: {error.Description}");
+                }
+
+                var deleteResult = await _userManager.DeleteAsync(user);
+
+                if (!deleteResult.Succeeded)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Не удалось удалить учётную запись после ошибки назначения роли. Обратитесь к администратору.");
+                }
+
+                return View();
+            }
 
             await _signInManager.SignInAsync(
                 user,
