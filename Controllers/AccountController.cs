@@ -471,6 +471,7 @@ public class AccountController : Controller
     // UPDATE PROFILE
     // ============================================================
 
+
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -490,17 +491,13 @@ public class AccountController : Controller
 
         if (string.IsNullOrWhiteSpace(displayName))
         {
-            TempData["ErrorMessage"] =
-                "Введите имя пользователя.";
-
+            TempData["ErrorMessage"] = "Введите имя пользователя.";
             return RedirectToAction(nameof(Settings));
         }
 
         if (string.IsNullOrWhiteSpace(email))
         {
-            TempData["ErrorMessage"] =
-                "Введите адрес электронной почты.";
-
+            TempData["ErrorMessage"] = "Введите адрес электронной почты.";
             return RedirectToAction(nameof(Settings));
         }
 
@@ -509,62 +506,87 @@ public class AccountController : Controller
         {
             TempData["ErrorMessage"] =
                 "Введите корректный адрес электронной почты.";
-
             return RedirectToAction(nameof(Settings));
         }
 
-        var existingUser =
-            await _userManager.FindByEmailAsync(email);
+        var existingUser = await _userManager.FindByEmailAsync(email);
 
         if (existingUser is not null && existingUser.Id != user.Id)
         {
             TempData["ErrorMessage"] =
                 "Этот адрес электронной почты уже используется.";
-
             return RedirectToAction(nameof(Settings));
         }
 
-        user.DisplayName = displayName;
+        await using var transaction =
+            await _context.Database.BeginTransactionAsync();
 
-        var emailResult =
-            await _userManager.SetEmailAsync(user, email);
-
-        if (!emailResult.Succeeded)
+        try
         {
-            TempData["ErrorMessage"] =
-                string.Join(" ", emailResult.Errors.Select(e => e.Description));
+            user.DisplayName = displayName;
 
+            var emailResult = await _userManager.SetEmailAsync(user, email);
+
+            if (!emailResult.Succeeded)
+            {
+                await transaction.RollbackAsync();
+
+                TempData["ErrorMessage"] =
+                    string.Join(" ", emailResult.Errors.Select(e => e.Description));
+
+                return RedirectToAction(nameof(Settings));
+            }
+
+            var userNameResult =
+                await _userManager.SetUserNameAsync(user, email);
+
+            if (!userNameResult.Succeeded)
+            {
+                await transaction.RollbackAsync();
+
+                TempData["ErrorMessage"] =
+                    string.Join(" ", userNameResult.Errors.Select(e => e.Description));
+
+                return RedirectToAction(nameof(Settings));
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+            {
+                await transaction.RollbackAsync();
+
+                TempData["ErrorMessage"] =
+                    string.Join(" ", updateResult.Errors.Select(e => e.Description));
+
+                return RedirectToAction(nameof(Settings));
+            }
+
+            await transaction.CommitAsync();
+
+            await _signInManager.RefreshSignInAsync(user);
+
+            TempData["SuccessMessage"] = "Профиль успешно сохранён.";
             return RedirectToAction(nameof(Settings));
         }
-
-        var userNameResult =
-            await _userManager.SetUserNameAsync(user, email);
-
-        if (!userNameResult.Succeeded)
+        catch (DbUpdateException)
         {
+            await transaction.RollbackAsync();
+
             TempData["ErrorMessage"] =
-                string.Join(" ", userNameResult.Errors.Select(e => e.Description));
+                "Не удалось сохранить профиль. Возможно, этот email уже используется.";
 
             return RedirectToAction(nameof(Settings));
         }
-
-        var updateResult =
-            await _userManager.UpdateAsync(user);
-
-        if (!updateResult.Succeeded)
+        catch
         {
+            await transaction.RollbackAsync();
+
             TempData["ErrorMessage"] =
-                string.Join(" ", updateResult.Errors.Select(e => e.Description));
+                "Произошла ошибка при сохранении профиля.";
 
             return RedirectToAction(nameof(Settings));
         }
-
-        await _signInManager.RefreshSignInAsync(user);
-
-        TempData["SuccessMessage"] =
-            "Профиль успешно сохранён.";
-
-        return RedirectToAction(nameof(Settings));
     }
 
 
