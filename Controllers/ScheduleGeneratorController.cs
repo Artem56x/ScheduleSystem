@@ -494,6 +494,7 @@ public class ScheduleGeneratorController : Controller
     // REQUEST NORMALIZATION
     // ============================================================
 
+
     private static void NormalizeRequest(
         ScheduleGenerationRequest model)
     {
@@ -507,10 +508,6 @@ public class ScheduleGeneratorController : Controller
 
         model.Days = model.Days
             .Distinct()
-            .ToList();
-
-        model.TimeSlots = model.TimeSlots
-            .OrderBy(x => x?.StartTime ?? TimeSpan.MinValue)
             .ToList();
     }
 

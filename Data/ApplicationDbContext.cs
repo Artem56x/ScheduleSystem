@@ -97,41 +97,31 @@ namespace ScheduleSystem.Data
                 .HasForeignKey(x => x.ClassroomCategoryId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ==============================
-            // Schedule → Teacher
-            // ==============================
 
             modelBuilder.Entity<Schedule>()
                 .HasOne(schedule => schedule.Teacher)
                 .WithMany()
-                .HasForeignKey(schedule => schedule.TeacherId);
-
-            // ==============================
-            // Schedule → Group
-            // ==============================
+                .HasForeignKey(schedule => schedule.TeacherId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Schedule>()
                 .HasOne(schedule => schedule.Group)
                 .WithMany()
-                .HasForeignKey(schedule => schedule.GroupId);
-
-            // ==============================
-            // Schedule → Subject
-            // ==============================
+                .HasForeignKey(schedule => schedule.GroupId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Schedule>()
                 .HasOne(schedule => schedule.Subject)
                 .WithMany()
-                .HasForeignKey(schedule => schedule.SubjectId);
-
-            // ==============================
-            // Schedule → Classroom
-            // ==============================
+                .HasForeignKey(schedule => schedule.SubjectId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Schedule>()
                 .HasOne(schedule => schedule.Classroom)
                 .WithMany()
-                .HasForeignKey(schedule => schedule.ClassroomId);
+                .HasForeignKey(schedule => schedule.ClassroomId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             // ==============================
             // Classroom → ClassroomCategory

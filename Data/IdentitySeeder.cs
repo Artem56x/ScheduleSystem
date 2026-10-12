@@ -1,65 +1,95 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using ScheduleSystem.Models;
 
-namespace ScheduleSystem.Data
+namespace ScheduleSystem.Data;
+
+public static class IdentitySeeder
 {
-    public static class IdentitySeeder
+    public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
-        public static async Task SeedAsync(IServiceProvider serviceProvider)
+        var roleManager =
+            serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        var userManager =
+            serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        string[] roles = { "Admin", "User" };
+
+        foreach (var role in roles)
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-            string[] roles = { "Admin", "User" };
-
-            foreach (var role in roles)
+            if (await roleManager.RoleExistsAsync(role))
             {
-                if (!await roleManager.RoleExistsAsync(role))
-                {
-                    await roleManager.CreateAsync(new IdentityRole(role));
-                }
+                continue;
             }
 
-            const string adminEmail = "admin@schedulesystem.local";
+            var roleResult =
+                await roleManager.CreateAsync(new IdentityRole(role));
 
-            var admin = await userManager.FindByEmailAsync(adminEmail);
-
-            if (admin == null)
+            if (!roleResult.Succeeded)
             {
-                var configuration = serviceProvider
-                    .GetRequiredService<IConfiguration>();
-                var adminPassword = configuration["Admin:Password"];
+                var errors = string.Join(
+                    "; ",
+                    roleResult.Errors.Select(error => error.Description));
 
-                if (string.IsNullOrWhiteSpace(adminPassword))
-                {
-                    throw new InvalidOperationException(
-                        "Set the admin password using the Admin:Password configuration key " +
-                        "or the Admin__Password environment variable.");
-                }
+                throw new InvalidOperationException(
+                    $"Не удалось создать роль '{role}': {errors}");
+            }
+        }
 
-                admin = new ApplicationUser
-                {
-                    UserName = adminEmail,
-                    Email = adminEmail,
-                    EmailConfirmed = true
-                };
+        const string adminEmail = "admin@schedulesystem.local";
 
-                var result = await userManager.CreateAsync(admin, adminPassword);
+        var admin = await userManager.FindByEmailAsync(adminEmail);
 
-                if (!result.Succeeded)
-                {
-                    var errors = string.Join(
-                        "; ",
-                        result.Errors.Select(error => error.Description));
+        if (admin == null)
+        {
+            var configuration =
+                serviceProvider.GetRequiredService<IConfiguration>();
 
-                    throw new Exception(
-                        $"Не удалось создать администратора: {errors}");
-                }
+            var adminPassword = configuration["Admin:Password"];
+
+            if (string.IsNullOrWhiteSpace(adminPassword))
+            {
+                throw new InvalidOperationException(
+                    "Set the admin password using the Admin:Password " +
+                    "configuration key or the Admin__Password environment variable.");
             }
 
-            if (!await userManager.IsInRoleAsync(admin, "Admin"))
+            admin = new ApplicationUser
             {
+                UserName = adminEmail,
+                Email = adminEmail,
+                EmailConfirmed = true
+            };
+
+            var createResult =
+                await userManager.CreateAsync(admin, adminPassword);
+
+            if (!createResult.Succeeded)
+            {
+                var errors = string.Join(
+                    "; ",
+                    createResult.Errors.Select(error => error.Description));
+
+                throw new InvalidOperationException(
+                    $"Не удалось создать администратора: {errors}");
+            }
+        }
+
+        if (!await userManager.IsInRoleAsync(admin, "Admin"))
+        {
+            var roleResult =
                 await userManager.AddToRoleAsync(admin, "Admin");
+
+            if (!roleResult.Succeeded)
+            {
+                var errors = string.Join(
+                    "; ",
+                    roleResult.Errors.Select(error => error.Description));
+
+                throw new InvalidOperationException(
+                    $"Не удалось назначить администратору роль Admin: {errors}");
             }
         }
     }

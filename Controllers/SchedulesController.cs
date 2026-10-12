@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ScheduleSystem.Data;
 using ScheduleSystem.Models;
 using ScheduleSystem.Services;
+using Npgsql;
 
 namespace ScheduleSystem.Controllers;
 
@@ -524,6 +525,27 @@ public class SchedulesController : Controller
     }
 
 
+
+    private static bool IsSerializationFailure(Exception exception)
+    {
+        Exception? current = exception;
+
+        while (current is not null)
+        {
+            if (current is PostgresException postgresException &&
+                postgresException.SqlState == "40001")
+            {
+                return true;
+            }
+
+            current = current.InnerException;
+        }
+
+        return false;
+    }
+
+
+
     // ============================================================
     // CREATE
     // ============================================================
@@ -538,6 +560,7 @@ public class SchedulesController : Controller
     }
 
 
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
@@ -547,26 +570,33 @@ public class SchedulesController : Controller
     {
         RemoveDefaultValidationErrors();
 
-        var validationResult =
-            await _validationService.ValidateAsync(
-                schedule,
-                confirmTeacherSubject);
-
-        ApplyValidationResult(validationResult);
-
-        if (!validationResult.IsValid)
-        {
-            await PrepareValidationViewAsync(
-                schedule,
-                validationResult);
-
-            return View(schedule);
-        }
+        ScheduleValidationResult? validationResult = null;
 
         try
         {
-            _context.Schedules.Add(schedule);
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync(
+                    System.Data.IsolationLevel.Serializable);
 
+            validationResult =
+                await _validationService.ValidateAsync(
+                    schedule,
+                    confirmTeacherSubject);
+
+            ApplyValidationResult(validationResult);
+
+            if (!validationResult.IsValid)
+            {
+                await transaction.RollbackAsync();
+
+                await PrepareValidationViewAsync(
+                    schedule,
+                    validationResult);
+
+                return View(schedule);
+            }
+
+            _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();
 
             var createdSchedule =
@@ -583,10 +613,7 @@ public class SchedulesController : Controller
                         createdSchedule.StartTime,
                         createdSchedule.EndTime)}\n" +
                     $"Аудитория: {createdSchedule.Classroom?.Name}");
-            }
 
-            if (createdSchedule != null)
-            {
                 await CreateScheduleNotificationsAsync(
                     "Расписание изменено",
                     $"Добавлено новое занятие:\n\n" +
@@ -597,12 +624,42 @@ public class SchedulesController : Controller
                     $"Аудитория: {createdSchedule.Classroom?.Name}",
                     "success");
             }
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex) when (IsSerializationFailure(ex))
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Расписание было изменено параллельно. " +
+                "Обновите данные и попробуйте ещё раз.");
+
+            validationResult ??=
+                await _validationService.ValidateAsync(
+                    schedule,
+                    confirmTeacherSubject);
+
+            ApplyValidationResult(validationResult);
+
+            await PrepareValidationViewAsync(
+                schedule,
+                validationResult);
+
+            return View(schedule);
         }
         catch (DbUpdateException)
         {
             ModelState.AddModelError(
                 string.Empty,
-                "Не удалось сохранить расписание. Проверьте выбранные данные и попробуйте ещё раз.");
+                "Не удалось сохранить расписание. " +
+                "Проверьте выбранные данные и попробуйте ещё раз.");
+
+            validationResult ??=
+                await _validationService.ValidateAsync(
+                    schedule,
+                    confirmTeacherSubject);
+
+            ApplyValidationResult(validationResult);
 
             await PrepareValidationViewAsync(
                 schedule,
@@ -639,6 +696,7 @@ public class SchedulesController : Controller
     // EDIT
     // ============================================================
 
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
@@ -654,63 +712,62 @@ public class SchedulesController : Controller
 
         RemoveDefaultValidationErrors();
 
-        var validationResult =
-            await _validationService.ValidateAsync(
-                schedule,
-                confirmTeacherSubject);
-
-        ApplyValidationResult(validationResult);
-
-        if (!validationResult.IsValid)
-        {
-            await PrepareValidationViewAsync(
-                schedule,
-                validationResult);
-
-            return View(schedule);
-        }
-
-        var existingSchedule = await _context.Schedules
-            .FirstOrDefaultAsync(s => s.Id == id);
-
-        if (existingSchedule == null)
-        {
-            return NotFound();
-        }
-
-        // --------------------------------------------------------
-        // Сохраняем старое состояние занятия
-        // --------------------------------------------------------
-
-        var oldSchedule = new ScheduleSnapshot
-        {
-            TeacherId = existingSchedule.TeacherId,
-            GroupId = existingSchedule.GroupId,
-            SubjectId = existingSchedule.SubjectId,
-            ClassroomId = existingSchedule.ClassroomId,
-            DayOfWeek = existingSchedule.DayOfWeek,
-            StartTime = existingSchedule.StartTime,
-            EndTime = existingSchedule.EndTime
-        };
-
-        // --------------------------------------------------------
-        // Применяем новые значения
-        // --------------------------------------------------------
-
-        existingSchedule.TeacherId = schedule.TeacherId;
-        existingSchedule.GroupId = schedule.GroupId;
-        existingSchedule.SubjectId = schedule.SubjectId;
-        existingSchedule.ClassroomId = schedule.ClassroomId;
-        existingSchedule.DayOfWeek = schedule.DayOfWeek;
-        existingSchedule.StartTime = schedule.StartTime;
-        existingSchedule.EndTime = schedule.EndTime;
+        ScheduleValidationResult? validationResult = null;
 
         try
         {
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync(
+                    System.Data.IsolationLevel.Serializable);
+
+            var existingSchedule = await _context.Schedules
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (existingSchedule == null)
+            {
+                return NotFound();
+            }
+
+            validationResult =
+                await _validationService.ValidateAsync(
+                    schedule,
+                    confirmTeacherSubject);
+
+            ApplyValidationResult(validationResult);
+
+            if (!validationResult.IsValid)
+            {
+                await transaction.RollbackAsync();
+
+                await PrepareValidationViewAsync(
+                    schedule,
+                    validationResult);
+
+                return View(schedule);
+            }
+
+            var oldSchedule = new ScheduleSnapshot
+            {
+                TeacherId = existingSchedule.TeacherId,
+                GroupId = existingSchedule.GroupId,
+                SubjectId = existingSchedule.SubjectId,
+                ClassroomId = existingSchedule.ClassroomId,
+                DayOfWeek = existingSchedule.DayOfWeek,
+                StartTime = existingSchedule.StartTime,
+                EndTime = existingSchedule.EndTime
+            };
+
+            existingSchedule.TeacherId = schedule.TeacherId;
+            existingSchedule.GroupId = schedule.GroupId;
+            existingSchedule.SubjectId = schedule.SubjectId;
+            existingSchedule.ClassroomId = schedule.ClassroomId;
+            existingSchedule.DayOfWeek = schedule.DayOfWeek;
+            existingSchedule.StartTime = schedule.StartTime;
+            existingSchedule.EndTime = schedule.EndTime;
+
             await _context.SaveChangesAsync();
 
-            var updatedSchedule =
-                await FindScheduleAsync(id);
+            var updatedSchedule = await FindScheduleAsync(id);
 
             if (updatedSchedule != null)
             {
@@ -721,19 +778,11 @@ public class SchedulesController : Controller
 
                 if (!string.IsNullOrWhiteSpace(changes))
                 {
-                    // ------------------------------------------------
-                    // История изменений
-                    // ------------------------------------------------
-
                     await CreateAuditLogAsync(
                         "Изменено занятие",
                         $"{updatedSchedule.Subject?.Name}\n" +
                         $"{updatedSchedule.Group?.Name}\n\n" +
                         $"{changes}");
-
-                    // ------------------------------------------------
-                    // Уведомления пользователей
-                    // ------------------------------------------------
 
                     await CreateScheduleNotificationsAsync(
                         "Расписание изменено",
@@ -743,10 +792,32 @@ public class SchedulesController : Controller
                         "info");
                 }
             }
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex) when (IsSerializationFailure(ex))
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Расписание было изменено параллельно. " +
+                "Обновите данные и попробуйте ещё раз.");
+
+            validationResult ??=
+                await _validationService.ValidateAsync(
+                    schedule,
+                    confirmTeacherSubject);
+
+            ApplyValidationResult(validationResult);
+
+            await PrepareValidationViewAsync(
+                schedule,
+                validationResult);
+
+            return View(schedule);
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!await ScheduleExistsAsync(schedule.Id))
+            if (!await ScheduleExistsAsync(id))
             {
                 return NotFound();
             }
@@ -759,6 +830,13 @@ public class SchedulesController : Controller
                 string.Empty,
                 "Не удалось сохранить изменения расписания.");
 
+            validationResult ??=
+                await _validationService.ValidateAsync(
+                    schedule,
+                    confirmTeacherSubject);
+
+            ApplyValidationResult(validationResult);
+
             await PrepareValidationViewAsync(
                 schedule,
                 validationResult);
@@ -768,7 +846,6 @@ public class SchedulesController : Controller
 
         return RedirectToAction(nameof(Index));
     }
-
 
     // ============================================================
     // DELETE
@@ -794,21 +871,36 @@ public class SchedulesController : Controller
     }
 
 
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var schedule = await FindScheduleAsync(id);
-
-        if (schedule == null)
-        {
-            return RedirectToAction(nameof(Index));
-        }
-
         try
         {
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync(
+                    System.Data.IsolationLevel.Serializable);
+
+            var schedule = await FindScheduleAsync(id);
+
+            if (schedule == null)
+            {
+                await transaction.RollbackAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            var scheduleToDelete = await _context.Schedules
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (scheduleToDelete == null)
+            {
+                await transaction.RollbackAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
             var notificationMessage =
                 $"Удалено занятие:\n\n" +
                 $"{schedule.Subject?.Name}\n" +
@@ -817,31 +909,33 @@ public class SchedulesController : Controller
                 $"{schedule.StartTime:hh\\:mm}\n" +
                 $"Аудитория: {schedule.Classroom?.Name}";
 
-            var scheduleToDelete =
-                await _context.Schedules
-                    .FirstOrDefaultAsync(s => s.Id == id);
+            _context.Schedules.Remove(scheduleToDelete);
+            await _context.SaveChangesAsync();
 
-            if (scheduleToDelete != null)
-            {
-                _context.Schedules.Remove(scheduleToDelete);
+            await CreateAuditLogAsync(
+                "Удалено занятие",
+                $"{schedule.Subject?.Name}\n" +
+                $"{schedule.Group?.Name}\n" +
+                $"{GetRussianDayName(schedule.DayOfWeek)}, " +
+                $"{FormatTimeRange(
+                    schedule.StartTime,
+                    schedule.EndTime)}\n" +
+                $"Аудитория: {schedule.Classroom?.Name}");
 
-                await _context.SaveChangesAsync();
+            await CreateScheduleNotificationsAsync(
+                "Расписание изменено",
+                notificationMessage,
+                "warning");
 
-                await CreateAuditLogAsync(
-                    "Удалено занятие",
-                    $"{schedule.Subject?.Name}\n" +
-                    $"{schedule.Group?.Name}\n" +
-                    $"{GetRussianDayName(schedule.DayOfWeek)}, " +
-                    $"{FormatTimeRange(
-                        schedule.StartTime,
-                        schedule.EndTime)}\n" +
-                    $"Аудитория: {schedule.Classroom?.Name}");
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex) when (IsSerializationFailure(ex))
+        {
+            TempData["ErrorMessage"] =
+                "Расписание было изменено параллельно. " +
+                "Обновите страницу и попробуйте ещё раз.";
 
-                await CreateScheduleNotificationsAsync(
-                    "Расписание изменено",
-                    notificationMessage,
-                    "warning");
-            }
+            return RedirectToAction(nameof(Index));
         }
         catch (DbUpdateException)
         {
