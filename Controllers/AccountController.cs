@@ -9,18 +9,22 @@ namespace ScheduleSystem.Controllers;
 
 public class AccountController : Controller
 {
+
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<AccountController> _logger;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        ApplicationDbContext context)
+        ApplicationDbContext context,
+        ILogger<AccountController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _context = context;
+        _logger = logger;
     }
 
     [AllowAnonymous]
@@ -156,6 +160,39 @@ public class AccountController : Controller
         return RedirectToAction(nameof(Settings));
     }
 
+    private async Task CreateSystemNotificationAsync(
+        ApplicationUser user,
+        string title,
+        string message)
+    {
+        if (!user.SystemNotificationsEnabled)
+        {
+            return;
+        }
+
+        try
+        {
+            _context.Notifications.Add(new Notification
+            {
+                UserId = user.Id,
+                Title = title,
+                Message = message,
+                Type = "system",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(
+                exception,
+                "Не удалось создать системное уведомление для пользователя {UserId}",
+                user.Id);
+        }
+    }
+
 
     // ============================================================
     // LOGIN
@@ -208,19 +245,44 @@ public class AccountController : Controller
             rememberMe,
             lockoutOnFailure: true);
 
+
         if (result.Succeeded)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user != null)
             {
+                var previousDevice = user.LastLoginDevice;
+
+                var currentDevice = GetDeviceName(
+                    Request.Headers.UserAgent.ToString());
+
                 user.LastLoginAt = DateTime.UtcNow;
+                user.LastLoginDevice = currentDevice;
 
-                user.LastLoginDevice = GetDeviceName(
-                    Request.Headers.UserAgent.ToString()
-                );
+                var updateResult = await _userManager.UpdateAsync(user);
 
-                await _userManager.UpdateAsync(user);
+                var hasPreviousDevice =
+                    !string.IsNullOrWhiteSpace(previousDevice) &&
+                    !string.Equals(
+                        previousDevice,
+                        "Неизвестное устройство",
+                        StringComparison.OrdinalIgnoreCase);
+
+                var isNewDevice = hasPreviousDevice &&
+                    !string.Equals(
+                        previousDevice,
+                        currentDevice,
+                        StringComparison.OrdinalIgnoreCase);
+
+                if (updateResult.Succeeded && isNewDevice)
+                {
+                    await CreateSystemNotificationAsync(
+                        user,
+                        "Вход с нового устройства",
+                        $"В вашу учётную запись выполнен вход с устройства: {currentDevice}. " +
+                        "Если это были не вы, рекомендуем сменить пароль.");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(returnUrl) &&
@@ -405,17 +467,22 @@ public class AccountController : Controller
                 currentPassword,
                 newPassword);
 
+
         if (result.Succeeded)
         {
-            await _signInManager.RefreshSignInAsync(
-                user);
+            await CreateSystemNotificationAsync(
+                user,
+                "Пароль изменён",
+                "Пароль вашей учётной записи был успешно изменён.");
+
+            await _signInManager.RefreshSignInAsync(user);
 
             TempData["SuccessMessage"] =
                 "Пароль успешно изменён.";
 
-            return RedirectToAction(
-                nameof(Settings));
+            return RedirectToAction(nameof(Settings));
         }
+
 
         TempData["ErrorMessage"] =
             string.Join(
@@ -488,6 +555,8 @@ public class AccountController : Controller
 
         displayName = displayName?.Trim();
         email = email?.Trim();
+
+        var previousEmail = user.Email;
 
         if (string.IsNullOrWhiteSpace(displayName))
         {
@@ -565,6 +634,17 @@ public class AccountController : Controller
             await transaction.CommitAsync();
 
             await _signInManager.RefreshSignInAsync(user);
+
+            if (!string.Equals(
+                    previousEmail,
+                    email,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                await CreateSystemNotificationAsync(
+                    user,
+                    "Email изменён",
+                    $"Адрес электронной почты вашей учётной записи изменён на {email}.");
+            }
 
             TempData["SuccessMessage"] = "Профиль успешно сохранён.";
             return RedirectToAction(nameof(Settings));
