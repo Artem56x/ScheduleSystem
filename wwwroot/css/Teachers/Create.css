@@ -1,7 +1,90 @@
-.schedule-details-page .subjects-selection { display: grid; gap: 8px; margin-top: 12px; }
-.schedule-details-page .subject-option { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 12px; border: 1px solid var(--ui-border); border-radius: 8px; font-weight: 400; }
-.schedule-details-page .subject-option:has(input:checked) { background: var(--ui-primary-soft); border-color: #a6bde9; }
-.schedule-details-page .subject-option-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.schedule-details-page .subject-option-name { font-weight: 600; overflow-wrap: anywhere; }
-.schedule-details-page .subject-option-course { color: var(--ui-muted); font-size: 13px; }
-.schedule-details-page .info-card:has(.subjects-selection) { grid-column: 1 / -1; }
+/* Выбор предметов преподавателя */
+.schedule-details-page .subjects-selection {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Карточка предмета */
+.schedule-details-page .subjects-selection .subject-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    min-height: 64px;
+    margin: 0;
+    padding: 12px 14px;
+
+    border: 1px solid var(--ui-border, #dce3ed);
+    border-radius: 12px;
+    background: var(--ui-surface, #ffffff);
+
+    font-weight: 400;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+/* Чекбокс */
+.schedule-details-page .subjects-selection .subject-option input[type="checkbox"] {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--ui-primary, #2563eb);
+    cursor: pointer;
+}
+
+/* Название и курс */
+.schedule-details-page .subject-option-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.schedule-details-page .subject-option-name {
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.schedule-details-page .subject-option-course {
+    color: var(--ui-muted, #64748b);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Выбранный предмет */
+.schedule-details-page .subjects-selection .subject-option:has(input:checked) {
+    background: var(--ui-primary-soft, #eff6ff);
+    border-color: var(--ui-primary, #2563eb);
+}
+
+/* Клавиатурный фокус */
+.schedule-details-page .subjects-selection .subject-option:has(input:focus-visible) {
+    outline: 2px solid var(--ui-primary, #2563eb);
+    outline-offset: 2px;
+}
+
+/* Блок предметов занимает всю ширину формы */
+.schedule-details-page .info-card:has(.subjects-selection) {
+    grid-column: 1 / -1;
+    min-width: 0;
+}
+
+/* Адаптация для телефона */
+@media (max-width: 640px) {
+    .schedule-details-page .subjects-selection {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
