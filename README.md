@@ -44,6 +44,21 @@ Beyond basic timetable management, the application includes schedule validation,
 
 The main objective is to make timetable creation and management more structured while reducing scheduling conflicts and unsuitable classroom assignments.
 
+## 📚 Documentation
+
+Detailed project documentation is available in the `docs/` directory.
+
+| Document | Description |
+|---|---|
+| [Architecture](docs/Architecture.md) | Application structure and design |
+| [Architecture Diagram](docs/ArchitectureDiagram.md) | Visual overview of the application architecture |
+| [Database](docs/Database.md) | Database structure and relationships |
+| [Database Diagram](docs/DatabaseDiagram.md) | Database relationship diagram |
+| [User Guide](docs/UserGuide.md) | Instructions for using the application |
+| [Administrator Guide](docs/AdminGuide.md) | Administrative features and workflows |
+| [Deployment Guide](docs/Deployment.md) | Configuration and deployment instructions |
+| [Technical Documentation](docs/TechnicalDocumentation.md) | Technical details, implementation notes, and validation |
+
 ## 🖥️ Application Screenshots
 
 <!-- SCREENSHOT 1: Save a screenshot of the main schedule page as docs/screenshots/schedule.png -->
