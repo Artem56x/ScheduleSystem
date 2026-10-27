@@ -25,12 +25,13 @@
 <img src="https://img.shields.io/badge/Status-Core%20Features%20Implemented-245bd6?style=flat-square" alt="Project status"/>
 
 <br><br>
-**A web application for managing college timetables, validating scheduling constraints, and generating schedules automatically.**
+
+A web application for managing college timetables, validating scheduling constraints, and generating schedules automatically.
 
 [Features](#-features) · [Screenshots](#-application-screenshots) · [Architecture](#-architecture) · [Installation](#-installation) · [Author](#-author)
 
 </div>
----
+
 
 ## 📌 About the Project
 
