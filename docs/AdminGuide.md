@@ -2,120 +2,127 @@
 
 ## 1. Overview
 
-This guide describes the administrative functionality of ScheduleSystem.
+This guide describes the administrative functionality of ScheduleSystem, a web application for managing college timetables.
+
+The application provides tools for managing reference data, creating and validating schedule entries, generating timetables, recommending suitable classrooms, reviewing notifications, and monitoring system activity.
 
 The administrator is responsible for:
 
-* managing system data;
-* configuring teachers and subjects;
-* managing student groups;
-* managing classrooms;
-* generating schedules;
-* reviewing schedule conflicts;
-* managing notifications and system settings;
-* monitoring system activity.
+- Managing teachers, subjects, student groups, and classrooms.
+- Maintaining teacher–subject relationships.
+- Configuring schedule generation.
+- Reviewing generated timetables and validation messages.
+- Managing schedule data and exports.
+- Monitoring notifications and audit information.
+- Maintaining secure application configuration.
+
+The exact functionality available depends on the current application version and the permissions assigned to the authenticated user.
 
 ---
 
-## 2. Administrator Account
+## 2. Administrator Account and Roles
 
 ScheduleSystem uses ASP.NET Core Identity for authentication and authorization.
 
-The application supports two main roles:
+The application defines two main roles:
 
-* `User`
-* `Admin`
+- `Admin` — access to administrative operations.
+- `User` — access to functions permitted for regular users.
 
-The administrator has access to functions that are not available to regular users.
+Administrative operations are protected by role-based authorization.
 
-The default administrator email configured by the application is:
+### Default administrator account
+
+The application uses the following email address when initializing the administrator account:
 
 ```text
 admin@schedulesystem.local
 ```
 
-The administrator password is not stored directly in the source code.
+The application does not store the administrator password directly in the source code.
 
-It must be provided through configuration or an environment variable:
+The password must be supplied through application configuration using:
 
 ```text
 Admin__Password
 ```
 
+This environment variable corresponds to the configuration key `Admin:Password`.
+
+If the administrator account does not exist and the password is not configured, the initialization process reports an error.
+
+**Security recommendation:** configure a strong password before starting the application. Never commit real passwords, connection strings containing credentials, or other secrets to the repository.
+
 ---
 
-## 3. Administrator Responsibilities
+## 3. Recommended Administrative Workflow
 
-Before creating a timetable, the administrator should make sure that all required reference data is correct.
+Before generating a timetable, verify that the required reference data is configured correctly.
 
-The recommended order is:
+Recommended workflow:
 
 ```text
 Classroom Categories
         ↓
 Classrooms
         ↓
-Teachers
+Teachers and Subjects
         ↓
-Subjects
+Teacher–Subject Assignments
         ↓
-Teacher–Subject Relations
+Student Groups
         ↓
-Groups
+Schedule Configuration
         ↓
 Schedule Generation
         ↓
-Schedule Validation
+Validation and Review
         ↓
-Export
+Corrections and Export
 ```
 
-Incorrect reference data can result in an invalid or incomplete timetable.
+The quality of the generated timetable depends on the accuracy and completeness of the source data.
 
 ---
 
 ## 4. Classroom Categories
 
-Classroom categories define the type of classroom.
+Classroom categories describe the type of room and help determine whether a classroom is appropriate for a particular subject.
 
-Categories are used when determining whether a classroom is suitable for a subject.
+Examples include:
 
-For example:
+- Computer Classroom
+- Standard Classroom
+- Specialized Classroom
 
-```text
-Computer Classroom
-Standard Classroom
-Specialized Classroom
-```
-
-The exact categories depend on the institution's requirements.
+The available categories depend on the data configured in the application.
 
 ### Recommendations
 
 Administrators should:
 
-* avoid duplicate categories;
-* use clear names;
-* assign the correct category to each classroom;
-* ensure that subject requirements use existing categories.
+- Use clear and consistent category names.
+- Avoid creating duplicate categories.
+- Assign the appropriate category to each classroom.
+- Verify subject requirements before generating a timetable.
+
+Categories should reflect the actual facilities and requirements of the educational institution.
 
 ---
 
 ## 5. Classroom Management
 
-Open:
+Open **Аудитории** to view the classroom list.
 
-**Аудитории**
+Depending on the user's permissions, the application allows administrative operations such as creating, editing, and deleting classrooms.
 
-Administrators can create, edit and remove classrooms.
+A classroom contains the following important information:
 
-Each classroom contains:
+- Name or room number.
+- Classroom category.
+- Capacity.
 
-* name;
-* category;
-* capacity.
-
-### Example
+Example:
 
 ```text
 Room: 305
@@ -123,97 +130,85 @@ Category: Computer Classroom
 Capacity: 25
 ```
 
-The classroom capacity should represent the actual number of students that can comfortably use the room.
+The capacity should represent the number of students the classroom can accommodate.
+
+Before changing or deleting a classroom, review whether it is used by existing schedule entries.
 
 ---
 
 ## 6. Teacher Management
 
-Open:
+Open **Преподаватели** to manage teacher records.
 
-**Преподаватели**
+Teacher information includes the teacher's name and, where configured, email address.
 
-Administrators can:
+Administrative functionality includes:
 
-* add teachers;
-* edit teachers;
-* view teacher details;
-* delete teachers;
-* assign multiple subjects to teachers.
+- Creating teacher records.
+- Editing teacher information.
+- Viewing teacher details.
+- Managing teacher–subject assignments.
+- Removing records where permitted.
 
-A teacher can teach multiple subjects.
+A teacher can be associated with multiple subjects through the `TeacherSubject` relationship.
 
-The relationship is implemented as a many-to-many relationship:
+Example:
 
 ```text
-Teacher
-   │
-   ├── Subject A
-   ├── Subject B
-   └── Subject C
+Teacher: Ivanov I.I.
+
+Subjects:
+- Programming
+- Databases
+- Web Development
 ```
 
-This allows the system to represent real teaching assignments more accurately.
+Only assign subjects that the teacher is qualified and authorized to teach.
 
 ---
 
-## 7. Assigning Subjects to Teachers
+## 7. Teacher–Subject Assignments
 
-When creating or editing a teacher, select all subjects that the teacher can teach.
+Teacher–subject assignments are used when selecting teachers for schedule entries and when generating timetables.
 
-For example:
+When creating or editing a teacher, select the subjects that the teacher can teach.
 
-```text
-Teacher: Иванов И.И.
+Before schedule generation, verify that:
 
-Subjects:
-[x] Programming
-[x] Databases
-[ ] Mathematics
-[x] Web Development
-```
+- The required subjects exist.
+- Each teacher has the correct subject assignments.
+- Assignments reflect the institution's actual teaching responsibilities.
 
-Only subjects actually taught by the teacher should normally be selected.
-
-The relationship is used by schedule validation and automatic schedule generation.
+Incorrect assignments may prevent the generator from finding a suitable timetable or may require manual correction.
 
 ---
 
 ## 8. Teacher–Subject Confirmation
 
-ScheduleSystem contains an additional confirmation mechanism when a teacher is selected for a subject they are not currently assigned to.
+ScheduleSystem includes a confirmation mechanism for certain situations where a teacher is selected for a subject that is not currently assigned to them.
 
-The system can display a warning before saving the schedule.
+When the application displays a confirmation warning:
 
-This behavior is intentional.
+1. Review the selected teacher and subject.
+2. Verify the teacher's assignment.
+3. Confirm the operation only if the assignment is intentional.
+4. Correct the reference data if the selection is incorrect.
 
-It allows the administrator to:
-
-1. identify a potentially incorrect assignment;
-2. review the warning;
-3. explicitly confirm the assignment when necessary.
-
-The confirmation mechanism should not be bypassed without a valid administrative reason.
+A confirmation warning should not be treated as proof that an assignment is valid. Administrators remain responsible for checking the teaching assignment.
 
 ---
 
 ## 9. Student Group Management
 
-Open:
+Open **Группы** to manage student groups.
 
-**Группы**
+Group information includes:
 
-Administrators can manage student groups.
+- Group name.
+- Course.
+- Number of students.
 
-Each group contains:
-
-* group name;
-* course;
-* number of students.
-
-The number of students is particularly important because it affects classroom recommendations.
-
-### Example
+Example:
 
 ```text
 Group: 25БД-1
@@ -221,117 +216,124 @@ Course: 2
 Students: 24
 ```
 
-A classroom with a capacity below 24 should not be selected for this group.
+The number of students is important when choosing a classroom.
+
+For example, a classroom with a capacity of 20 is not suitable for a group of 24 students.
+
+Keep group information up to date before generating or modifying a timetable.
 
 ---
 
 ## 10. Subject Management
 
-Open:
+Open **Предметы** to manage academic subjects.
 
-**Предметы**
+Depending on the configured model, subject information may include:
 
-Administrators can manage subjects.
+- Subject name.
+- Course.
+- Subject type.
+- Required classroom category.
+- Assigned teachers.
 
-A subject can contain:
+Subject configuration affects the selection of teachers and classrooms.
 
-* name;
-* course;
-* type;
-* classroom category requirements;
-* assigned teachers.
-
-### Classroom Requirements
-
-If a subject requires a special classroom, configure the appropriate classroom category.
-
-For example:
+Example:
 
 ```text
 Subject: Computer Graphics
-Required category:
-Computer Classroom
+Required classroom category: Computer Classroom
 ```
 
-This information is used by the classroom recommendation system.
+Verify subject requirements before creating schedule entries or running automatic generation.
 
 ---
 
 ## 11. Subject Types
 
-Subjects can be classified by their type.
+Subject types help distinguish subjects according to the institution's curriculum.
 
-The type should correspond to the institution's curriculum and help administrators distinguish different kinds of academic subjects.
+Select the appropriate type from the options available in the application.
 
-When creating a subject, select the appropriate type available in the system.
+The available values and their meaning depend on the current implementation and institutional configuration.
+
+Do not assume that a subject type automatically enforces a scheduling restriction unless that behavior is implemented by the application.
 
 ---
 
 ## 12. Schedule Management
 
-Open:
+Open **Расписание** to view and manage timetable entries.
 
-**Расписание**
-
-Administrators can create, edit and review schedule entries.
-
-A schedule entry connects:
+A schedule entry connects the following elements:
 
 ```text
-Group
-   +
+Student Group
+      +
 Teacher
-   +
+      +
 Subject
-   +
+      +
 Classroom
-   +
-Day
-   +
-Time
+      +
+Day of Week
+      +
+Start and End Time
 ```
 
-All of these elements must be compatible.
+These values should be consistent with the institution's requirements.
+
+The schedule page supports filtering by:
+
+- Group.
+- Teacher.
+- Classroom.
+- Subject.
+- Day of the week.
+- Time range.
+
+Filters can be combined to find particular lessons or investigate scheduling issues.
 
 ---
 
-## 13. Creating a Schedule Manually
+## 13. Creating a Schedule Entry Manually
 
-To create a lesson manually:
+To create or modify a lesson:
 
 1. Open **Расписание**.
-2. Select the create option.
-3. Select the group.
-4. Select the teacher.
-5. Select the subject.
+2. Select the appropriate create or edit operation.
+3. Select the student group.
+4. Select the subject.
+5. Select the teacher.
 6. Select the classroom.
-7. Select the day.
-8. Specify the start time.
-9. Specify the end time.
-10. Review validation messages.
-11. Save the lesson.
+7. Specify the day of the week.
+8. Set the start and end times.
+9. Review any validation messages or confirmation warnings.
+10. Save the entry if the application permits the operation.
 
-Manual creation is useful for individual corrections or special cases.
+Manual editing is useful for correcting individual lessons and handling exceptional situations.
+
+Available fields and validation behavior depend on the current application version.
 
 ---
 
 ## 14. Schedule Validation
 
-Before saving a schedule entry, the system validates the available information.
+ScheduleSystem includes schedule validation functionality intended to help identify incompatible timetable entries.
 
-Validation includes:
+The relevant checks may include:
 
 ### Time Validation
 
 The start time must be earlier than the end time.
 
-Invalid:
+Invalid example:
 
 ```text
 10:30 — 09:30
 ```
 
-Valid:
+Valid example:
 
 ```text
 09:30 — 10:30
@@ -339,85 +341,84 @@ Valid:
 
 ### Teacher Conflicts
 
-A teacher cannot normally be assigned to overlapping lessons.
+A teacher should not be assigned to overlapping lessons.
 
 ### Group Conflicts
 
-A group cannot normally attend two lessons at the same time.
+A student group should not have two overlapping lessons.
 
 ### Classroom Conflicts
 
-A classroom cannot normally be occupied by multiple lessons at the same time.
+A classroom should not be assigned to multiple simultaneous lessons.
 
 ### Classroom Capacity
 
-The classroom must have sufficient capacity for the selected group.
+The classroom capacity should be sufficient for the selected group.
 
 ### Classroom Category
 
-The classroom should satisfy the subject's classroom requirements.
+The classroom category should meet the subject's requirements.
+
+**Important:** the presence of a validation rule, recommendation, or warning does not necessarily mean that every operation is blocked automatically. Review the messages displayed by the application and correct any identified issues before publishing the timetable.
 
 ---
 
 ## 15. Schedule Filters
 
-The schedule page provides filtering functionality.
+The schedule page supports filtering by group, teacher, classroom, subject, day of the week, and time range.
 
-Administrators can filter by:
-
-* group;
-* teacher;
-* classroom;
-* subject;
-* day;
-* time.
-
-Combined filters can be used to investigate specific timetable situations.
-
-### Example
-
-To find all lessons for a particular teacher:
+Example: to review the lessons assigned to a particular teacher:
 
 1. Open **Расписание**.
-2. Select the teacher.
+2. Select or enter the teacher.
 3. Apply the filter.
 4. Review the resulting lessons.
+
+Combined filters can help identify conflicts, inspect individual groups, and review classroom usage.
 
 ---
 
 ## 16. Automatic Schedule Generation
 
-ScheduleSystem provides automatic timetable generation.
+ScheduleSystem includes an automatic timetable generator.
 
-The generator uses the available system data and configured restrictions to produce a timetable.
+The generator uses the available application data and the supplied generation settings to search for a timetable.
 
-The generation process considers:
+Relevant inputs include:
 
-* groups;
-* subjects;
-* teachers;
-* classrooms;
-* classroom categories;
-* classroom capacities;
-* teaching days;
-* maximum daily lessons;
-* gaps.
+- Selected student groups.
+- Required teaching loads.
+- Available teaching days.
+- Available time slots.
+- Maximum lessons per day.
+- Maximum consecutive lessons.
+- Lesson distribution preferences.
+- Classroom recommendation settings.
+
+The actual result depends on the available teachers, subjects, classrooms, group requirements, and scheduling constraints.
+
+Automatic generation does not guarantee a complete timetable when the configured requirements cannot all be satisfied.
 
 ---
 
-## 17. Generator Default Settings
+## 17. Schedule Generation Settings
 
-The default generator settings are:
+The generator provides settings for controlling the generation process.
 
-| Parameter               | Value |
-| ----------------------- | ----: |
-| Lessons per week        |     3 |
-| Maximum lessons per day |     4 |
-| Teaching days per week  |     5 |
-| Maximum gaps per day    |     2 |
-| Allow gaps              |   Yes |
+The `ScheduleGenerationRequest` model defines the following default values:
 
-These settings provide a starting point and can be adjusted according to institutional requirements where supported by the application.
+| Parameter | Default value |
+|---|---:|
+| Maximum lessons per day | 4 |
+| Maximum consecutive lessons | 2 |
+| Distribute lessons evenly | Enabled |
+| Use classroom recommendations | Enabled |
+
+The request model also contains collections for selected groups, teaching days, teaching loads, and time slots.
+
+These values describe the defaults defined by the request model. The final settings used during generation may differ if the user changes them in the interface or if the application applies additional configuration.
+
+Do not assume that every default is enforced independently of the supplied generation request.
 
 ---
 
@@ -425,271 +426,248 @@ These settings provide a starting point and can be adjusted according to institu
 
 Before starting automatic generation:
 
-### Step 1
+1. Verify classroom categories and capacities.
+2. Verify classroom records.
+3. Verify teacher records.
+4. Check teacher–subject assignments.
+5. Verify subject requirements.
+6. Check student group names and student counts.
+7. Select the required groups and teaching loads.
+8. Configure teaching days and time slots.
+9. Review the generation settings.
+10. Start generation.
+11. Inspect the generated timetable.
+12. Correct any remaining issues and verify the final schedule.
 
-Verify all classrooms.
-
-### Step 2
-
-Verify classroom categories.
-
-### Step 3
-
-Verify teachers.
-
-### Step 4
-
-Verify teacher-subject assignments.
-
-### Step 5
-
-Verify subjects.
-
-### Step 6
-
-Verify groups and student counts.
-
-### Step 7
-
-Review existing schedule entries.
-
-### Step 8
-
-Start schedule generation.
-
-### Step 9
-
-Review the generated timetable.
-
-### Step 10
-
-Correct individual entries if necessary.
+If generation fails or produces an incomplete result, review the configured requirements and available resources before changing the data.
 
 ---
 
 ## 19. Classroom Recommendations
 
-The classroom recommendation system helps select suitable rooms.
+ScheduleSystem includes a classroom recommendation service.
 
-The recommendation logic considers:
+The purpose of this service is to help identify classrooms that may be appropriate for a lesson.
 
-```text
-Subject requirements
-        +
-Group size
-        +
-Classroom capacity
-        +
-Classroom category
-        +
-Availability
-```
+Relevant factors include:
 
-For example:
+- Subject requirements.
+- Group size.
+- Classroom capacity.
+- Classroom category.
+- Classroom availability.
+
+Example:
 
 ```text
 Group size: 28
 
 Classroom A:
-Capacity = 20
-→ Not suitable
+Capacity: 20
+Result: Insufficient capacity
 
 Classroom B:
-Capacity = 30
-Category = required
-→ Suitable
+Capacity: 30
+Category: Matches the requirement
+Result: Potentially suitable
 ```
+
+A recommendation should be reviewed in the context of the complete timetable and the institution's requirements.
+
+A recommended classroom should not be assumed to be reserved until the corresponding schedule entry has been successfully saved.
 
 ---
 
-## 20. Schedule Conflicts
+## 20. Investigating Schedule Conflicts
 
-If a conflict occurs, administrators should identify which resource is involved.
+When a conflict or validation warning appears, identify the affected resource and review the relevant schedule entries.
 
 ### Teacher conflict
 
-Check whether the teacher has another lesson at the same time.
+Check whether the teacher has another lesson during the same period.
 
 ### Group conflict
 
-Check whether the group has another lesson at the same time.
+Check whether the group has another lesson during the same period.
 
 ### Classroom conflict
 
-Check whether the classroom is already occupied.
+Check whether the classroom is already assigned to another lesson.
 
-### Capacity conflict
+### Capacity issue
 
-Check the number of students and classroom capacity.
+Compare the group size with the classroom capacity.
 
-### Category conflict
+### Category issue
 
-Check the subject's classroom requirements and classroom category.
+Verify the subject's classroom requirements and the classroom category.
+
+### Generation issue
+
+Review teaching loads, teacher–subject assignments, available time slots, selected groups, and generation settings.
+
+After making corrections, review the resulting timetable again.
 
 ---
 
 ## 21. Notifications
 
-ScheduleSystem provides notifications related to important schedule events.
+ScheduleSystem includes a notification system for communicating relevant application events.
 
-Administrators should review notifications after significant schedule changes.
+Users should review their notifications after important timetable changes.
 
-Notifications can contain information about:
+Depending on the event and the current implementation, notifications may provide information about schedule-related activity.
 
-* subject;
-* group;
-* scheduled time;
-* changes to schedule information.
-
-The notification system helps users notice timetable changes without manually checking every schedule entry.
+The notification system is intended to make relevant changes easier to notice without repeatedly reviewing every schedule entry.
 
 ---
 
 ## 22. Audit Logs
 
-ScheduleSystem contains audit logging functionality.
+ScheduleSystem includes audit logging functionality for monitoring important application activity.
 
-Audit logs can be used to monitor important system activity.
+Authorized administrators can use audit information to help:
 
-They are useful for:
+- Investigate unexpected changes.
+- Review recorded administrative activity.
+- Troubleshoot application issues.
+- Improve accountability.
 
-* reviewing administrative actions;
-* investigating changes;
-* troubleshooting;
-* maintaining accountability.
-
-Administrators should use audit information when investigating unexpected changes to system data.
+Audit logs should be treated as a diagnostic resource. Their exact contents depend on which operations are recorded by the current implementation.
 
 ---
 
 ## 23. Schedule Export
 
-Administrators can export schedules into:
+ScheduleSystem includes a schedule export service using the libraries `QuestPDF` and `ClosedXML`.
 
-* PDF;
-* Excel;
-* CSV.
+These libraries support PDF and Excel document generation, respectively.
+
+Use the export options available in the application interface.
 
 ### PDF
 
-Recommended for:
-
-* printing;
-* sharing;
-* final timetable presentation.
+Suitable for printing and distributing a formatted timetable when the PDF export option is available.
 
 ### Excel
 
-Recommended for:
-
-* further analysis;
-* manual processing;
-* spreadsheet workflows.
+Suitable for spreadsheet-based review and further processing when the Excel export option is available.
 
 ### CSV
 
-Recommended for:
+CSV export should only be documented as an available feature if a corresponding export action is implemented and accessible in the current application version.
 
-* data exchange;
-* automated processing;
-* importing data into compatible systems.
+Do not assume that every export format supports the same filters or data scope.
+
+After exporting, open the resulting file and verify that the expected lessons and timetable information are present.
 
 ---
 
 ## 24. Data Management Recommendations
 
-Administrators should periodically verify:
+Periodically verify the accuracy of:
 
-* teacher names;
-* subject names;
-* group names;
-* student counts;
-* classroom capacities;
-* classroom categories;
-* teacher-subject assignments.
+- Teacher names and contact details.
+- Subject names and requirements.
+- Student group names.
+- Student counts.
+- Classroom names.
+- Classroom categories.
+- Classroom capacities.
+- Teacher–subject assignments.
+- Existing schedule entries.
 
-Reference data should be updated when academic information changes.
+Accurate reference data improves the reliability of schedule validation, classroom recommendations, and automatic generation.
 
 ---
 
 ## 25. Deleting Data
 
-Before deleting a teacher, subject, group or classroom, verify whether it is used by existing schedule data.
+Before deleting a teacher, subject, group, or classroom, review whether the record is referenced by existing schedule entries or related records.
 
-Deleting reference information that is still required can affect related records or prevent normal schedule management.
+Depending on the entity and its relationships, the application may reject the operation or require related data to be addressed first.
 
-When possible, review dependent schedule entries before performing destructive operations.
+Recommended procedure:
+
+1. Identify the record to be deleted.
+2. Review its related schedule entries.
+3. Determine whether the dependent data must be reassigned or removed.
+4. Perform the operation only when the resulting data state is acceptable.
+5. Verify the affected timetable after the change.
+
+Do not assume that deleting a reference record automatically removes all related records.
 
 ---
 
 ## 26. Authentication and Security
 
-Administrators should follow basic security practices.
+ScheduleSystem uses ASP.NET Core Identity and role-based authorization.
 
-### Passwords
+Administrators should follow these practices:
 
-Administrator passwords must not be stored in source code.
+- Use a strong, unique administrator password.
+- Configure secrets outside the source code.
+- Do not commit passwords or production credentials to Git.
+- Restrict administrator access to authorized users.
+- Use HTTPS in deployed environments.
+- Protect the PostgreSQL database and its credentials.
+- Keep application dependencies and the hosting environment maintained.
 
-The application uses configuration/environment variables for the administrator password.
-
-### Recommended configuration
-
-Use:
+The environment variable for the initial administrator password is:
 
 ```text
 Admin__Password
 ```
 
-for the administrator password.
-
-### Production
-
-For a production environment:
-
-* use a strong unique password;
-* do not commit secrets to Git;
-* protect configuration files;
-* restrict administrator access;
-* use HTTPS;
-* keep the database protected.
+Production deployments should use an appropriate secrets-management mechanism and environment-specific configuration.
 
 ---
 
 ## 27. Database Migrations
 
-ScheduleSystem uses Entity Framework Core migrations.
+ScheduleSystem uses Entity Framework Core migrations to manage database schema changes.
 
-After receiving a new version of the project, administrators/developers should verify that the database schema matches the application model.
+Before applying migrations to an important environment, back up the database and verify the target connection.
 
-To apply migrations:
+To apply available migrations:
 
 ```powershell
 dotnet ef database update
 ```
 
-To create a new migration during development:
+To create a migration during development:
 
 ```powershell
 dotnet ef migrations add MigrationName
 ```
 
-Before applying structural database changes to an important environment, create a database backup.
+The commands should be executed from the appropriate project directory with the required Entity Framework tooling and database configuration.
+
+Do not create or apply migrations blindly against a production database.
 
 ---
 
 ## 28. Application Configuration
 
-Important application configuration is stored through the ASP.NET Core configuration system.
+The application uses the ASP.NET Core configuration system.
 
-The database connection is configured through the application's connection settings.
+Configuration includes database connection settings and the administrator password.
 
-Sensitive values should be supplied through secure configuration mechanisms rather than committed to the repository.
+The administrator password is read using the configuration key:
 
-The administrator password is provided through:
+```text
+Admin:Password
+```
+
+The corresponding environment variable is:
 
 ```text
 Admin__Password
 ```
+
+The database connection must be configured for the target environment before the application starts.
+
+Never commit real credentials to the repository. Use environment variables, user secrets during development, or an appropriate secrets-management service.
 
 ---
 
@@ -700,18 +678,19 @@ Before deploying or submitting a new version, verify that the project builds suc
 Run:
 
 ```powershell
+dotnet restore
 dotnet build
 ```
 
-The build should complete without errors.
-
-For Entity Framework model verification:
+If the project uses Entity Framework Core tooling, the following command can be used to check for pending model changes:
 
 ```powershell
 dotnet ef migrations has-pending-model-changes
 ```
 
-The application should not have unexpected pending model changes before deployment.
+The last command requires a compatible Entity Framework Core version and the required tooling.
+
+A successful build does not replace runtime testing. Verify the database connection and the main application workflows separately.
 
 ---
 
@@ -719,20 +698,24 @@ The application should not have unexpected pending model changes before deployme
 
 Before deploying a new version:
 
-* [ ] Back up the database.
-* [ ] Pull the latest project version.
-* [ ] Verify configuration.
-* [ ] Verify the database connection.
-* [ ] Apply required migrations.
-* [ ] Build the application.
-* [ ] Start the application.
-* [ ] Test authentication.
-* [ ] Test the dashboard.
-* [ ] Test schedule viewing.
-* [ ] Test schedule creation.
-* [ ] Test schedule validation.
-* [ ] Test exports.
-* [ ] Verify administrator functions.
+- [ ] Back up the database.
+- [ ] Retrieve the intended application version.
+- [ ] Configure the database connection.
+- [ ] Configure the administrator password and other secrets.
+- [ ] Verify database connectivity.
+- [ ] Apply required migrations.
+- [ ] Restore dependencies.
+- [ ] Build the application.
+- [ ] Start the application and inspect logs.
+- [ ] Test authentication and authorization.
+- [ ] Test the dashboard and reference-data pages.
+- [ ] Test schedule viewing and filtering.
+- [ ] Test manual schedule creation and editing.
+- [ ] Test schedule validation.
+- [ ] Test automatic generation.
+- [ ] Test the export formats available in the application.
+- [ ] Verify administrative operations.
+- [ ] Confirm that the deployed environment uses secure configuration.
 
 ---
 
@@ -742,73 +725,92 @@ Before deploying a new version:
 
 Check:
 
-* .NET installation;
-* configuration;
-* database connection;
-* application logs.
+- Installed .NET runtime and SDK requirements.
+- Application configuration.
+- Database availability.
+- Startup and application logs.
+- Required environment variables.
 
 ### Database connection fails
 
 Check:
 
-* PostgreSQL status;
-* database name;
-* server address;
-* port;
-* username;
-* password;
-* connection string.
+- PostgreSQL service status.
+- Server address and port.
+- Database name.
+- Database credentials.
+- Connection string configuration.
+- Network access and database permissions.
 
 ### Migration fails
 
 Check:
 
-* current database state;
-* migration history;
-* database permissions;
-* connection settings.
+- The target database connection.
+- Migration history.
+- Database permissions.
+- The current schema.
+- Compatibility between the application model and existing database.
+
+Back up important data before attempting corrective schema changes.
 
 ### Schedule generation does not produce the expected result
 
 Check:
 
-* teacher-subject assignments;
-* group sizes;
-* classroom capacities;
-* classroom categories;
-* subject requirements;
-* existing schedule entries;
-* generator settings.
+- Selected groups.
+- Teaching loads.
+- Teacher–subject assignments.
+- Classroom capacities.
+- Classroom categories.
+- Subject requirements.
+- Available teaching days and time slots.
+- Maximum lessons per day.
+- Maximum consecutive lessons.
+- Existing schedule entries.
+- Classroom recommendation settings.
+
+The requested timetable may be impossible to generate if there are insufficient teachers, classrooms, or available time slots.
 
 ### A teacher cannot be assigned to a subject
 
-Verify that the subject is assigned to the teacher.
+Verify that the teacher–subject relationship is configured correctly.
 
-If the assignment is intentional, review the confirmation warning provided by the application.
+If the application displays a confirmation warning, review the warning and confirm the operation only when the assignment is intentional.
+
+### A schedule entry cannot be saved
+
+Review validation messages and confirmation prompts.
+
+Check the selected group, teacher, subject, classroom, and time range. Investigate overlapping entries and any unmet classroom requirements.
 
 ---
 
-## 32. Recommended Administrator Workflow
+## 32. Recommended Daily Workflow
 
-The recommended daily workflow is:
+A recommended administrative workflow is:
 
 ```text
 Login
   ↓
-Review notifications
+Review Notifications
   ↓
-Check reference data
+Check Reference Data
   ↓
-Review schedule
+Review the Timetable
   ↓
-Make required corrections
+Make Required Corrections
   ↓
-Validate schedule
+Review Validation Messages
   ↓
-Export final version
+Verify the Final Timetable
   ↓
-Review audit information when necessary
+Export the Required Version
+  ↓
+Review Audit Information When Necessary
 ```
+
+This workflow helps maintain consistent reference data and reduces the risk of publishing an incorrect timetable.
 
 ---
 
@@ -817,14 +819,14 @@ Review audit information when necessary
 Administrators should:
 
 1. Keep reference data accurate.
-2. Maintain correct teacher-subject relationships.
-3. Keep group student counts up to date.
-4. Keep classroom capacities accurate.
-5. Use classroom categories consistently.
-6. Review generated schedules before publishing them.
-7. Maintain database backups.
-8. Protect administrator credentials.
-9. Avoid committing secrets to Git.
+2. Maintain correct teacher–subject assignments.
+3. Update group sizes when necessary.
+4. Keep classroom capacities and categories accurate.
+5. Review generation settings before running the generator.
+6. Inspect generated timetables before publication.
+7. Investigate validation warnings and conflicts.
+8. Back up the database before important changes.
+9. Protect administrator credentials.
 10. Test important changes before deployment.
 
 ---
@@ -833,50 +835,57 @@ Administrators should:
 
 Regular maintenance should include:
 
-* reviewing outdated reference data;
-* checking database backups;
-* verifying application builds;
-* reviewing important audit events;
-* checking schedule consistency;
-* updating dependencies when necessary;
-* keeping the production environment secure.
+- Reviewing outdated reference data.
+- Checking database backups.
+- Verifying application builds.
+- Reviewing relevant audit events.
+- Checking timetable consistency.
+- Updating dependencies when appropriate.
+- Monitoring application logs.
+- Maintaining secure production configuration.
+
+Maintenance procedures should be adapted to the deployment environment and the institution's requirements.
 
 ---
 
-## 35. Final Checklist
+## 35. Final Timetable Checklist
 
 Before publishing a timetable, verify:
 
-* [ ] All teachers are present.
-* [ ] Teacher-subject assignments are correct.
-* [ ] All groups are present.
-* [ ] Student counts are correct.
-* [ ] All subjects are configured.
-* [ ] Classroom categories are correct.
-* [ ] Classroom capacities are correct.
-* [ ] No teacher conflicts exist.
-* [ ] No group conflicts exist.
-* [ ] No classroom conflicts exist.
-* [ ] Classroom requirements are satisfied.
-* [ ] The final timetable has been reviewed.
-* [ ] A final export has been created.
+- [ ] All required teachers are present.
+- [ ] Teacher–subject assignments are correct.
+- [ ] All required student groups are present.
+- [ ] Student counts are up to date.
+- [ ] Subjects are configured correctly.
+- [ ] Classroom categories are correct.
+- [ ] Classroom capacities are sufficient.
+- [ ] Teacher conflicts have been investigated.
+- [ ] Group conflicts have been investigated.
+- [ ] Classroom conflicts have been investigated.
+- [ ] Classroom requirements have been reviewed.
+- [ ] Validation messages have been addressed.
+- [ ] The final timetable has been reviewed.
+- [ ] The required export has been opened and checked.
 
 ---
 
 ## 36. Conclusion
 
-The administrator is responsible for maintaining accurate reference data and ensuring that generated schedules comply with the institution's requirements.
+ScheduleSystem provides administrative tools for managing timetable-related data and workflows.
 
-ScheduleSystem provides tools for:
+Its documented functionality includes:
 
-* centralized data management;
-* teacher-subject assignment;
-* classroom management;
-* automatic schedule generation;
-* schedule validation;
-* classroom recommendations;
-* notifications;
-* audit logging;
-* schedule export.
+- Teacher and subject management.
+- Student group management.
+- Classroom and category management.
+- Teacher–subject assignments.
+- Manual schedule management.
+- Schedule filtering and validation.
+- Automatic schedule generation.
+- Classroom recommendations.
+- Notifications and audit logging.
+- Schedule export functionality.
 
-Following the recommended administrative workflow helps maintain a reliable and consistent timetable.
+Administrators should maintain accurate reference data, review validation messages, protect credentials, and verify the final timetable before distributing it.
+
+This guide should be kept synchronized with the application's current source code and the features exposed by the deployed version.
