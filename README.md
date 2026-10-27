@@ -26,9 +26,13 @@
 
 <br><br>
 
-**A web application for managing college timetables, validating scheduling constraints, and generating schedules automatically.**
+<div align="center">
 
-[Features](#-features) · [Screenshots](#-application-screenshots) · [Architecture](#-architecture) · [Installation](#-installation) · [Author](#-author)
+# ScheduleSystem
+
+A web application for managing college timetables, validating scheduling constraints, and generating schedules automatically.
+
+[Features](#features) · [Screenshots](#application-screenshots) · [Architecture](#architecture) · [Installation](#installation) · [Author](#author)
 
 </div>
 
