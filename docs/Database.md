@@ -2,881 +2,685 @@
 
 ## 1. Overview
 
-ScheduleSystem uses PostgreSQL as its relational database management system.
+ScheduleSystem uses PostgreSQL as its relational database management system and Entity Framework Core as its Object-Relational Mapping (ORM) framework.
 
-Entity Framework Core is used as the Object-Relational Mapping (ORM) framework.
-
-The application uses the Code First approach:
+The project follows the Code First approach, where the database schema is managed through C# entity models, Entity Framework Core configuration, and migrations.
 
 ```text
-C# Models
-    ↓
+C# Entity Models
+       |
+       v
 Entity Framework Core
-    ↓
-Migrations
-    ↓
+       |
+       v
+EF Core Migrations
+       |
+       v
 PostgreSQL Database
 ```
 
-The database stores the main educational data, schedule information, user accounts, notifications and audit records.
+The database stores educational data, timetable entries, generation settings, application users, notifications, and audit records.
 
----
+## 2. Database Configuration
 
-## 2. Database
+The application uses PostgreSQL and connects through the Npgsql Entity Framework Core provider.
 
-The main application database is:
+The connection string is configured using the `DefaultConnection` setting.
+
+The database name used by the project is:
 
 ```text
 schedulesystem
 ```
 
-The application connects to PostgreSQL through the Npgsql Entity Framework Core provider.
-
----
+Connection credentials should be supplied through secure configuration and should not be committed to source control.
 
 ## 3. Main Entities
 
-The database contains the following major application entities:
+The application's main entity sets include:
 
-* Teachers
-* Subjects
-* TeacherSubjects
-* Groups
-* Classrooms
-* ClassroomCategories
-* Schedules
-* ScheduleTimeSlots
-* ScheduleGenerationSettings
-* Notifications
-* AuditLogs
-* Identity tables
+- `Teachers`
+- `TeacherSubjects`
+- `Groups`
+- `GroupSubjects`
+- `Subjects`
+- `Classrooms`
+- `ClassroomCategories`
+- `SubjectClassroomCategories`
+- `Schedules`
+- `ScheduleTimeSlots`
+- `ScheduleGenerationSettings`
+- `Notifications`
+- `AuditLogs`
 
-The exact physical schema is managed by Entity Framework Core migrations.
+ASP.NET Core Identity adds its own entities for user accounts, roles, claims, logins, tokens, and related relationships.
 
----
+The exact physical database schema is determined by the entity models, Fluent API configuration, and applied migrations.
 
 ## 4. Entity Relationship Overview
 
-The main application relationships can be represented as:
+The main domain relationships can be represented conceptually as follows:
 
-```text
-                    ┌──────────────────┐
-                    │     Teachers     │
-                    └────────┬─────────┘
-                             │
-                             │ 1:N
-                             ↓
-                    ┌──────────────────┐
-                    │ TeacherSubjects  │
-                    └────────┬─────────┘
-                             │
-                             │ N:1
-                             ↓
-                    ┌──────────────────┐
-                    │     Subjects     │
-                    └──────────────────┘
+```mermaid
+erDiagram
+    TEACHERS ||--o{ TEACHER_SUBJECTS : assigned
+    SUBJECTS ||--o{ TEACHER_SUBJECTS : taught_by
 
+    GROUPS ||--o{ GROUP_SUBJECTS : studies
+    SUBJECTS ||--o{ GROUP_SUBJECTS : assigned_to
 
-┌──────────────┐
-│    Groups    │
-└──────┬───────┘
-       │
-       │
-       ↓
-┌──────────────────┐
-│    Schedules     │
-└───┬────┬────┬────┘
-    │    │    │
-    │    │    └───────────────┐
-    │    │                    │
-    ↓    ↓                    ↓
-Teacher Subject           Classroom
+    SUBJECTS ||--o{ SUBJECT_CLASSROOM_CATEGORIES : requires
+    CLASSROOM_CATEGORIES ||--o{ SUBJECT_CLASSROOM_CATEGORIES : specified_by
 
+    CLASSROOM_CATEGORIES ||--o{ CLASSROOMS : categorizes
 
-┌─────────────────────┐
-│ ClassroomCategories │
-└──────────┬──────────┘
-           │
-           ↓
-     ┌────────────┐
-     │ Classrooms │
-     └────────────┘
+    GROUPS ||--o{ SCHEDULES : attends
+    TEACHERS ||--o{ SCHEDULES : teaches
+    SUBJECTS ||--o{ SCHEDULES : covers
+    CLASSROOMS ||--o{ SCHEDULES : hosts
 ```
 
----
+This diagram illustrates the main conceptual relationships. The exact foreign-key names, optional relationships, and cardinalities should be checked against the current model configuration and migrations.
 
 ## 5. Teachers
 
 The `Teachers` entity stores information about teachers.
 
-A teacher can teach multiple subjects.
+Teachers can be associated with multiple subjects through the `TeacherSubjects` join entity.
 
-The relationship with subjects is implemented through the `TeacherSubjects` junction table.
-
-Conceptually:
-
-```text
-Teacher
-  │
-  ├── Subject 1
-  ├── Subject 2
-  └── Subject 3
-```
-
-This allows the system to represent many-to-many teacher-subject relationships.
-
----
+These assignments are used by schedule validation and automatic generation to identify appropriate teachers for lessons.
 
 ## 6. Subjects
 
-The `Subjects` entity stores information about academic subjects.
+The `Subjects` entity represents academic subjects.
 
-A subject contains information such as:
+Subject information is used when assigning lessons to groups, selecting teachers, validating schedules, and determining classroom requirements.
 
-* name;
-* course;
-* subject type;
-* classroom requirements.
+Subject-to-group assignments are represented by `GroupSubjects`, while teacher assignments are represented by `TeacherSubjects`.
 
-Subjects can be associated with multiple teachers through `TeacherSubjects`.
-
----
+Classroom category requirements are represented through `SubjectClassroomCategories`.
 
 ## 7. TeacherSubjects
 
-`TeacherSubjects` is a junction table between teachers and subjects.
+`TeacherSubjects` represents the many-to-many relationship between teachers and subjects.
 
-Its main fields are:
+The relationship uses the following key fields:
 
 ```text
 TeacherId
 SubjectId
 ```
 
-The table uses a composite primary key:
+The entity is configured with a composite primary key:
 
 ```text
 (TeacherId, SubjectId)
 ```
 
-This prevents the same teacher-subject relationship from being stored more than once.
-
-### Relationship
+Conceptual relationship:
 
 ```text
 Teachers
-   │
-   │ 1:N
-   ↓
+    |
+    | 1:N
+    v
 TeacherSubjects
-   ↑
-   │ N:1
-   │
+    ^
+    | N:1
+    |
 Subjects
 ```
 
-This design is preferable to storing a single `SubjectId` directly in the teacher record because one teacher can teach multiple subjects.
+This design supports:
 
----
+- one teacher teaching multiple subjects;
+- one subject being taught by multiple teachers;
+- validation of teacher-subject assignments;
+- selection of eligible teachers during schedule generation.
+
+The composite key prevents duplicate pairs of teacher and subject identifiers.
 
 ## 8. Groups
 
-The `Groups` entity stores student group information.
+The `Groups` entity stores information about student groups.
 
-Main information includes:
+Relevant information includes the group name, course, and student count, according to the properties defined by the model.
 
-* group name;
-* course;
-* student count.
+The student count is important for classroom selection.
 
-The student count is used by the schedule and classroom recommendation systems.
+For example, if a group has 24 students, a classroom must have sufficient capacity to accommodate the group.
 
-For example:
+## 9. GroupSubjects
 
-```text
-Group: 25БД-1
-Course: 2
-Students: 24
-```
+`GroupSubjects` represents the relationship between student groups and subjects.
 
-The system can use the value `24` when selecting a suitable classroom.
+This relationship provides the application with information about which subjects are assigned to particular groups.
 
----
+The assignments can support timetable generation and validation by identifying the subjects that a group is expected to study.
 
-## 9. Classrooms
+The exact attributes and constraints of this entity are defined by the current model.
+
+## 10. Classrooms
 
 The `Classrooms` entity stores information about available classrooms.
 
-Main fields include:
+Classroom data is used during manual scheduling, automatic generation, and classroom recommendations.
 
-* classroom name;
-* category;
-* capacity.
+Relevant properties include classroom identification, capacity, and category relationships as defined by the model.
 
-A classroom belongs to a classroom category.
+The application can compare group size with classroom capacity when evaluating suitable rooms.
 
-Conceptually:
+## 11. ClassroomCategories
 
-```text
-Classroom
-    │
-    │ N:1
-    ↓
-ClassroomCategory
-```
+`ClassroomCategories` defines categories used to classify classrooms.
 
----
+Examples may include:
 
-## 10. ClassroomCategories
+- standard classroom;
+- computer classroom;
+- specialized classroom.
 
-`ClassroomCategories` defines the type or purpose of a classroom.
+The actual categories depend on the application's configured data.
 
-Examples include:
+Using categories allows the application to represent classroom requirements more flexibly than a single Boolean property.
 
-```text
-Computer Classroom
-Standard Classroom
-Specialized Classroom
-```
+## 12. SubjectClassroomCategories
 
-The exact categories are determined by the institution.
+`SubjectClassroomCategories` connects subjects with classroom categories.
 
-Subjects can define classroom category requirements.
+This relationship allows a subject to specify the types of classrooms that may be appropriate for its lessons.
 
-This allows the system to recommend classrooms based on their purpose rather than relying on a simple boolean property.
-
----
-
-## 11. Classroom Requirements
-
-The application uses classroom categories to determine whether a classroom is appropriate for a subject.
-
-The general logic is:
+The entity uses a composite key consisting of:
 
 ```text
-Subject
-   ↓
-Required Classroom Category
-   ↓
-Available Classrooms
-   ↓
-Capacity Check
-   ↓
-Suitable Classrooms
+SubjectId
+ClassroomCategoryId
 ```
 
-For example:
+The relationship is configured in `ApplicationDbContext`.
 
-```text
-Subject:
-Computer Graphics
+Conceptual relationship:
 
-Requirement:
-Computer Classroom
-
-Group:
-25 students
-
-Classroom:
-Capacity = 30
-Category = Computer Classroom
-
-Result:
-Suitable
+```mermaid
+erDiagram
+    SUBJECTS ||--o{ SUBJECT_CLASSROOM_CATEGORIES : requires
+    CLASSROOM_CATEGORIES ||--o{ SUBJECT_CLASSROOM_CATEGORIES : defines
 ```
 
----
+The relationship supports classroom recommendations and schedule validation.
 
-## 12. Schedules
+## 13. Schedules
 
-The `Schedules` entity stores individual timetable entries.
+The `Schedules` entity stores timetable entries.
 
-A schedule entry connects the main scheduling entities:
+A schedule entry connects relevant educational entities and scheduling information, such as:
 
-```text
-Group
-Teacher
-Subject
-Classroom
-Day
-Time
-```
+- group;
+- teacher;
+- subject;
+- classroom;
+- day and time information.
 
-Conceptually:
-
-```text
-              ┌──────────┐
-              │  Group   │
-              └────┬─────┘
-                   │
-                   ↓
-┌──────────┐  ┌──────────┐  ┌──────────┐
-│ Teacher  │→ │ Schedule │ ←│ Subject  │
-└──────────┘  └─────┬─────┘  └──────────┘
-                    │
-                    ↓
-              ┌───────────┐
-              │ Classroom │
-              └───────────┘
-```
+The precise properties and relationships are defined by the schedule model and EF Core configuration.
 
 Schedule data is used by:
 
-* schedule views;
-* validation;
-* automatic generation;
-* classroom recommendations;
-* notifications;
-* exports.
+- timetable views and filters;
+- schedule validation;
+- automatic generation;
+- teacher recommendations;
+- classroom recommendations;
+- export functionality;
+- related application operations.
 
----
+## 14. ScheduleTimeSlots
 
-## 13. ScheduleTimeSlots
-
-`ScheduleTimeSlots` stores reusable schedule time information.
+`ScheduleTimeSlots` stores reusable lesson time-slot information.
 
 Time slots allow the application to work with standardized lesson periods.
 
-A time slot can represent a period such as:
+Example periods might be:
 
 ```text
-08:30 — 09:30
-09:40 — 10:40
-10:50 — 11:50
+08:30–09:30
+09:40–10:40
+10:50–11:50
 ```
 
-The exact schedule depends on the configured educational timetable.
+These times are illustrative; actual values depend on the application's configured schedule.
 
----
+The generator can use available time slots when constructing a candidate timetable.
 
-## 14. Schedule Generation Settings
+## 15. ScheduleGenerationSettings
 
-`ScheduleGenerationSettings` stores configuration used by the automatic schedule generator.
+`ScheduleGenerationSettings` stores configuration associated with automatic schedule generation.
 
-Important parameters include:
+Relevant scheduling parameters include lesson requirements, teaching days, daily limits, and gap-related constraints, depending on the model properties.
 
-* lessons per week;
-* maximum lessons per day;
-* teaching days per week;
-* maximum gaps per day;
-* whether gaps are allowed.
+The generator also has request-level settings and controller form defaults. These are not necessarily identical to the values stored in the database.
 
-Default values are:
+Therefore, database defaults, model defaults, and user-interface defaults should be documented separately rather than treated as one universal set of defaults.
 
-| Parameter               | Default |
-| ----------------------- | ------: |
-| Lessons per week        |       3 |
-| Maximum lessons per day |       4 |
-| Teaching days per week  |       5 |
-| Maximum gaps per day    |       2 |
-| Allow gaps              |     Yes |
+## 16. Notifications
 
-These values provide the generator with basic scheduling constraints.
+The `Notifications` entity stores notification records for the application.
 
----
+Notifications can be used to display relevant information to users.
 
-## 15. Notifications
+The exact notification fields, including recipient, message, creation time, and read state, are defined by the current model.
 
-The `Notifications` entity stores user notifications.
+The existence of a notification table does not imply that the application uses a real-time messaging broker or push-notification infrastructure.
 
-Notifications can contain information related to schedule changes or other important system events.
+## 17. AuditLogs
 
-A notification can be associated with a user.
+The `AuditLogs` entity stores audit-related records.
 
-Typical information may include:
+Audit data can support administrative review, troubleshooting, and accountability.
 
-```text
-Title
-Message
-Created time
-Read state
-User
-```
+The precise fields are defined by the current audit-log model.
 
-The notification system allows users to see important changes without manually checking every schedule entry.
+The presence of the entity alone does not guarantee that every application action is recorded; audit coverage depends on the code that creates audit entries.
 
----
+## 18. ASP.NET Core Identity
 
-## 16. AuditLogs
+ScheduleSystem integrates ASP.NET Core Identity with its application database context.
 
-The `AuditLogs` entity stores information about important system activity.
+Identity manages account and authentication-related data, including entities for:
 
-Audit logs are useful for:
+- users;
+- roles;
+- user-role relationships;
+- claims;
+- external or application logins;
+- authentication tokens.
 
-* monitoring administrative actions;
-* investigating changes;
-* troubleshooting;
-* maintaining accountability.
+The application uses the `ApplicationUser` type and configures the roles `Admin` and `User`.
 
-An audit record may contain information such as:
+Identity entities and application entities share the `ApplicationDbContext` and use the configured PostgreSQL database.
 
-```text
-User
-Action
-Entity
-Entity identifier
-Timestamp
-Additional information
-```
+## 19. ApplicationDbContext
 
-The exact stored fields are defined by the current application model.
+The application's database context is named:
 
----
-
-## 17. Identity Database
-
-ScheduleSystem uses ASP.NET Core Identity.
-
-Identity manages authentication and user accounts.
-
-The database contains Identity-related tables for functionality such as:
-
-* users;
-* roles;
-* claims;
-* logins;
-* tokens;
-* user-role relationships.
-
-The Identity subsystem is integrated with the application's `ApplicationDbContext`.
-
----
-
-## 18. ApplicationDbContext
-
-The application's database context is:
-
-```text
+```csharp
 ApplicationDbContext
 ```
 
 It inherits from:
 
-```text
+```csharp
 IdentityDbContext<ApplicationUser>
 ```
 
-This allows application entities and ASP.NET Core Identity entities to use the same database context.
+This enables the context to manage application entities and ASP.NET Core Identity data.
 
-The context contains `DbSet` definitions for the application's main entities.
+The context defines entity sets for teachers, groups, subjects, classrooms, schedules, generation settings, notifications, audit logs, and the related join entities.
 
-Examples include:
+The model also configures relationships, composite keys, and delete behaviors using Entity Framework Core.
 
-```text
-Teachers
-Groups
-Subjects
-Classrooms
-Schedules
-ScheduleTimeSlots
-ScheduleGenerationSettings
-ClassroomCategories
-Notifications
-AuditLogs
-TeacherSubjects
-```
+## 20. Primary Keys
 
----
+Primary keys uniquely identify database records.
 
-## 19. Primary Keys
+The exact key type depends on the entity definition. Entities commonly use individual identifiers, while certain join entities use composite keys.
 
-Application entities use primary keys to uniquely identify records.
-
-Most individual entities use an integer identifier:
-
-```text
-Id
-```
-
-The `TeacherSubjects` entity uses a composite primary key:
+For example, `TeacherSubjects` uses:
 
 ```text
 TeacherId + SubjectId
 ```
 
-This is appropriate for a many-to-many junction table.
+The `SubjectClassroomCategories` relationship also uses a composite key:
 
----
+```text
+SubjectId + ClassroomCategoryId
+```
 
-## 20. Foreign Keys
+These composite keys represent the identity of each relationship rather than a separate relationship identifier.
 
-Foreign keys maintain relationships between entities.
+## 21. Foreign Keys and Relationships
 
-Examples:
+Foreign keys maintain relationships between related entities.
+
+Examples include:
 
 ```text
 TeacherSubjects.TeacherId
-        ↓
-Teachers.Id
+        |
+        v
+Teachers
 ```
 
 ```text
 TeacherSubjects.SubjectId
-        ↓
-Subjects.Id
+        |
+        v
+Subjects
 ```
 
 ```text
-Classrooms.CategoryId
-        ↓
-ClassroomCategories.Id
+SubjectClassroomCategories.SubjectId
+        |
+        v
+Subjects
 ```
-
-Schedule records also contain relationships to the entities required to describe a lesson.
-
----
-
-## 21. Referential Integrity
-
-Foreign keys are used to maintain database consistency.
-
-The database and Entity Framework Core configuration prevent invalid relationships from being stored where the configured constraints prohibit them.
-
-This reduces the possibility of orphaned or inconsistent records.
-
----
-
-## 22. Many-to-Many Teacher–Subject Relationship
-
-The teacher-subject relationship is one of the most important database design decisions in ScheduleSystem.
-
-A simple one-to-many design would allow a teacher to have only one subject:
 
 ```text
-Teacher → Subject
+SubjectClassroomCategories.ClassroomCategoryId
+        |
+        v
+ClassroomCategories
 ```
 
-This would not represent real teaching assignments correctly.
+Schedule records also reference the entities needed to represent timetable entries.
 
-The implemented design uses:
+The exact foreign-key property names and delete behaviors should be verified in `ApplicationDbContext` and the migration files.
 
-```text
-Teacher
-   ↓
-TeacherSubjects
-   ↑
-Subject
-```
+## 22. Referential Integrity
 
-Therefore:
+Referential integrity helps keep related data consistent.
 
-```text
-One teacher → many subjects
-One subject → many teachers
-```
+Entity Framework Core relationship configuration and PostgreSQL constraints enforce the relationships defined by the model.
 
-This is a standard relational many-to-many design.
+Delete behaviors are configured for individual relationships. As a result, deletion may be restricted, cascaded, or handled according to the specific configuration.
 
----
+Developers should review the configured delete behavior before removing records that may be referenced by schedules or other entities.
 
-## 23. Schedule Validation and the Database
+## 23. Schedule Validation and Database Data
 
-The database stores the data required to validate schedule entries.
+The database stores the information required by the schedule validation logic.
 
-The validation layer can use:
+Depending on the validation rule, the application may use:
 
-* teacher;
-* group;
-* classroom;
-* date/day;
-* start time;
-* end time;
-* subject;
-* classroom category;
-* group size.
+- teacher assignments;
+- group and subject relationships;
+- classroom capacity;
+- classroom category requirements;
+- schedule day and time;
+- existing timetable entries;
+- related entity identifiers.
 
-The database therefore provides the source data required by the scheduling rules.
+The validation service evaluates scheduling constraints using this data before the application accepts or saves a schedule entry.
 
----
+Application-level validation and database constraints serve different purposes: validation checks business rules, while database constraints protect the integrity of persisted relationships.
 
-## 24. Database Migrations
+## 24. Entity Framework Core Migrations
 
-Entity Framework Core migrations are used to manage schema changes.
+Migrations manage database schema changes over the project's development lifecycle.
 
-The project contains migrations for major database changes, including:
+A migration records a set of schema operations based on changes to the entity model and configuration.
 
-* Identity;
-* initial application entities;
-* notifications;
-* audit logs;
-* schedule time slots;
-* generation settings;
-* user notification settings;
-* teacher-subject many-to-many relationships.
+The repository contains migration files for application schema changes. The exact changes represented by each migration should be reviewed in the migration source files.
 
-A migration represents a controlled change from one database schema version to another.
+Migrations help keep development and deployment database schemas consistent.
 
----
+## 25. Applying Existing Migrations
 
-## 25. Applying Migrations
-
-To apply existing migrations:
+To apply the existing migrations to the configured database, run the following command from the project directory:
 
 ```powershell
 dotnet ef database update
 ```
 
-This updates the configured PostgreSQL database to the latest migration.
+Before running the command, verify that:
 
----
+- the PostgreSQL server is running;
+- the connection string is configured correctly;
+- the target database is available;
+- the environment provides the necessary credentials.
+
+This command changes the database schema and should be used carefully when working with production data.
 
 ## 26. Creating a Migration
 
-When the data model is intentionally changed during development:
+When an intentional change is made to the data model, a new migration can be created with:
 
 ```powershell
 dotnet ef migrations add MigrationName
 ```
 
-After creating the migration, apply it using:
+Replace `MigrationName` with a meaningful name describing the change.
+
+For example:
 
 ```powershell
-dotnet ef database update
+dotnet ef migrations add AddNewScheduleProperty
 ```
 
-A migration should only be created when the model has intentionally changed.
-
----
+Review the generated migration before applying it. A migration should represent an intentional model change, not an unexplained difference.
 
 ## 27. Checking for Pending Model Changes
 
-The project can be checked for unexpected model changes using:
+To check whether the current EF Core model differs from the latest migration snapshot, run:
 
 ```powershell
 dotnet ef migrations has-pending-model-changes
 ```
 
-A clean project should not have unexpected pending model changes before a final build or deployment.
+Run this command from the project directory in an environment where the EF Core tools and project dependencies are available.
 
----
+Unexpected pending changes should be reviewed before release or deployment.
 
-## 28. Database Backup
+## 28. Database Backup and Recovery
 
-Before performing major database changes, administrators should create a PostgreSQL backup.
+Backups help protect data against accidental deletion, migration problems, and infrastructure failures.
 
-Backups are especially recommended before:
+Before significant schema changes or deployments, create a PostgreSQL backup using an appropriate backup procedure.
 
-* applying structural migrations;
-* deleting large amounts of data;
-* deploying a major application version;
-* changing production configuration.
+Backups are particularly important before:
 
----
+- applying structural migrations to a production database;
+- deleting large amounts of data;
+- upgrading a production deployment;
+- changing database configuration.
+
+A backup strategy should also include periodic testing of the restoration process.
 
 ## 29. Data Integrity Recommendations
 
-To maintain database integrity:
+To maintain reliable database data:
 
-1. Use official names for groups and subjects.
-2. Keep student counts accurate.
-3. Keep classroom capacities accurate.
-4. Maintain correct classroom categories.
-5. Keep teacher-subject assignments up to date.
-6. Avoid unnecessary direct database modifications.
-7. Use Entity Framework migrations for schema changes.
-8. Back up important databases before structural changes.
-
----
+1. Keep group names and subject records consistent.
+2. Maintain accurate student counts.
+3. Keep classroom capacities and categories up to date.
+4. Maintain correct teacher-subject assignments.
+5. Verify group-subject assignments.
+6. Avoid unnecessary manual changes to production tables.
+7. Use migrations for schema changes.
+8. Back up important databases before major operations.
+9. Review relationship delete behaviors before removing records.
 
 ## 30. Database Security
 
-The database contains application and user information.
+The database contains application data and user-related information.
 
-The following practices are recommended:
+Recommended security practices include:
 
-* use a strong PostgreSQL password;
-* restrict database network access;
-* do not commit database credentials to Git;
-* use secure configuration;
-* create regular backups;
-* use separate credentials for production environments;
-* limit database permissions where appropriate.
+- using strong database credentials;
+- limiting network access to PostgreSQL;
+- avoiding committed passwords and connection secrets;
+- using secure configuration providers;
+- limiting database permissions according to operational needs;
+- creating regular backups;
+- separating development and production credentials.
 
-Administrator application credentials should also be kept outside the source code.
+The administrator seed password should also be supplied through secure configuration rather than stored as a real password in source code.
 
----
+## 31. Database Architecture Summary
 
-## 31. Database Architecture
-
-The overall database architecture can be summarized as:
+The main data architecture can be summarized as follows:
 
 ```text
                     PostgreSQL
-                         │
-                         │
+                         |
+                         v
                 ApplicationDbContext
-                         │
-          ┌──────────────┴──────────────┐
-          │                             │
-     Application                    Identity
-       Entities                     Entities
-          │                             │
-    ┌─────┼─────┐                 ┌────┴────┐
-    │     │     │                 │         │
- Teachers Groups Subjects       Users      Roles
-    │
- TeacherSubjects
-    │
- Subjects
-    │
- Schedules
-    │
- Classrooms
-    │
- ClassroomCategories
+                         |
+             +-----------+-----------+
+             |                       |
+             v                       v
+     Application Entities      Identity Entities
+             |                       |
+       +-----+------+           +----+----+
+       |     |      |           |         |
+    Teachers Groups Subjects   Users     Roles
+       |     |      |
+       |     |      +---- TeacherSubjects
+       |     |
+       |     +----------- GroupSubjects
+       |
+       +------------------ Schedules
+                              |
+                 +------------+------------+
+                 |                         |
+                 v                         v
+             Classrooms              Time Slots
+                 |
+                 v
+        ClassroomCategories
 ```
 
----
+This diagram is a conceptual overview, not a complete physical ER diagram of every table and foreign key.
 
 ## 32. Data Flow
 
-A typical scheduling operation follows this flow:
+A typical scheduling operation follows this path:
 
 ```text
 User Input
-    ↓
+    |
+    v
 MVC Controller
-    ↓
-Validation / Business Logic
-    ↓
-Entity Framework Core
-    ↓
+    |
+    v
+Validation / Application Logic
+    |
+    v
 ApplicationDbContext
-    ↓
+    |
+    v
+Entity Framework Core
+    |
+    v
+Npgsql Provider
+    |
+    v
 PostgreSQL
 ```
 
-When data is retrieved:
+When data is retrieved, the result travels back through the data access and application layers. A controller can then prepare a ViewModel and return a Razor View to the browser.
 
-```text
-PostgreSQL
-    ↓
-ApplicationDbContext
-    ↓
-Entity Framework Core
-    ↓
-Controller / Service
-    ↓
-ViewModel
-    ↓
-Razor View
-    ↓
-User
-```
-
----
+Not all controller actions use the same sequence: some access the database context directly, while others use application services.
 
 ## 33. Database and Business Logic
 
-The database is responsible for persistent data storage and relationships.
+PostgreSQL provides persistent storage and enforces configured relational constraints.
 
-Business rules are handled by the application layer.
+Business operations such as timetable validation, generation, recommendations, and exporting are implemented in the application layer.
 
 Important services include:
 
-* `ScheduleValidationService`
-* `ScheduleGeneratorService`
-* `ClassroomRecommendationService`
-* `ScheduleExportService`
+- `ScheduleValidationService`;
+- `ScheduleGeneratorService`;
+- `ClassroomRecommendationService`;
+- `TeacherRecommendationService`;
+- `ScheduleExportService`.
 
-This separation prevents complex scheduling logic from being placed directly into database tables.
-
----
+This separation keeps complex scheduling algorithms out of the database schema while allowing the application to use stored data to evaluate scheduling rules.
 
 ## 34. Database and Export
 
-Schedule information stored in PostgreSQL can be retrieved by the application and converted into different formats.
+Schedule information stored in PostgreSQL can be retrieved by the application and converted into export documents.
 
 The general process is:
 
 ```text
 PostgreSQL
-    ↓
+    |
+    v
 Entity Framework Core
-    ↓
-Schedule Services
-    ↓
-Export Service
-    ↓
-PDF / Excel / CSV
+    |
+    v
+ApplicationDbContext / Application Logic
+    |
+    v
+ScheduleExportService
+    |
+    +----> Excel
+    |
+    +----> PDF
 ```
 
-The database remains the primary source of schedule information.
-
----
+The database remains the persistent source of schedule data. Export formats depend on the functionality implemented by the export service and its calling controller.
 
 ## 35. Database Verification
 
-Before releasing a new version, verify:
+Before releasing a new version, build the application:
 
 ```powershell
 dotnet build
 ```
 
-Then check the EF Core model:
+Then check the EF Core model for pending changes:
 
 ```powershell
 dotnet ef migrations has-pending-model-changes
 ```
 
-If the database schema needs to be updated:
+If the database schema must be updated, apply the reviewed migrations:
 
 ```powershell
 dotnet ef database update
 ```
 
----
+A successful build does not by itself prove that the application can connect to PostgreSQL. Database connectivity and migration execution should be tested separately in the target environment.
 
 ## 36. Current Database Design
 
 The current design focuses on:
 
-* normalized relational data;
-* explicit foreign-key relationships;
-* many-to-many teacher-subject assignments;
-* classroom categorization;
-* schedule validation;
-* Identity integration;
-* notification storage;
-* audit logging;
-* migration-based schema management.
+- relational storage using PostgreSQL;
+- Entity Framework Core data access;
+- migration-based schema management;
+- explicit foreign-key relationships;
+- many-to-many teacher-subject assignments;
+- group-subject assignments;
+- classroom categorization and subject requirements;
+- schedule and generation data;
+- ASP.NET Core Identity integration;
+- notification and audit-log storage.
 
-The design is intended to support further expansion of the scheduling system without requiring fundamental restructuring.
+These components provide the data foundation required by the timetable management application.
 
----
+## 37. Possible Future Improvements
 
-## 37. Future Database Improvements
+Depending on future requirements, the database could be extended with:
 
-Possible future improvements include:
+- academic year and semester entities;
+- historical schedule versions;
+- additional curriculum structures;
+- more detailed timetable templates;
+- richer reporting and analytics;
+- additional audit metadata;
+- indexing and query optimization for larger datasets.
 
-* additional schedule constraint entities;
-* more detailed curriculum structures;
-* academic year and semester entities;
-* historical schedule versions;
-* advanced timetable templates;
-* improved reporting tables;
-* additional audit information;
-* database-level performance optimization for larger institutions.
-
-These changes are not required for the current project but may be useful if the application is expanded.
-
----
+These are potential future improvements, not statements about features already implemented.
 
 ## 38. Conclusion
 
-The ScheduleSystem database provides a structured foundation for timetable management.
+The ScheduleSystem database provides a relational foundation for timetable management and related application functionality.
 
-The main design principles are:
+Its principal design elements are:
 
-1. Relational data storage using PostgreSQL.
-2. Entity Framework Core for data access.
+1. PostgreSQL for persistent storage.
+2. Entity Framework Core for object-relational mapping.
 3. Code First migrations for schema management.
-4. Explicit foreign-key relationships.
-5. Many-to-many teacher-subject relationships.
-6. Classroom categories instead of simple hardware flags.
-7. Database-backed schedule information.
-8. Integrated ASP.NET Core Identity.
-9. Notification and audit data storage.
-10. Separation between database storage and business logic.
+4. Explicit relationships and foreign keys.
+5. Composite keys for selected join entities.
+6. Teacher-subject and group-subject relationships.
+7. Classroom categories and subject requirements.
+8. Integration with ASP.NET Core Identity.
+9. Database-backed schedule, notification, and audit data.
+10. Separation between persistent data and application business logic.
 
-This structure allows ScheduleSystem to maintain consistent data while supporting automatic schedule generation, validation, recommendations and export.
+Together, these elements support schedule management, validation, automatic generation, classroom and teacher recommendations, and export functionality while providing a basis for future development.
