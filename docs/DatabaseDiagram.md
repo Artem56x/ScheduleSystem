@@ -2,15 +2,21 @@
 
 ## Overview
 
-ScheduleSystem uses PostgreSQL with Entity Framework Core Code First.
+ScheduleSystem uses PostgreSQL as its relational database and Entity Framework Core with the Code First approach to manage the database schema.
 
-The database contains entities for users, teachers, subjects, groups, classrooms, schedules, notifications, audit logs, and automatic schedule generation.
+The database stores user accounts, teachers, subjects, student groups, classrooms, schedules, notifications, audit logs, and automatic schedule generation data.
+
+The main database components are:
+
+- **ASP.NET Core Identity** — user accounts, authentication, and roles.
+- **Academic entities** — teachers, subjects, groups, and classrooms.
+- **Schedule management** — schedules, time slots, and generation settings.
+- **Supporting entities** — classroom categories, notifications, and audit logs.
 
 ## Entity Relationship Diagram
 
 ```mermaid
 erDiagram
-
     ApplicationUser {
         string Id PK
         string UserName
@@ -42,6 +48,11 @@ erDiagram
         int StudentCount
     }
 
+    GroupSubject {
+        int GroupId PK, FK
+        int SubjectId PK, FK
+    }
+
     ClassroomCategory {
         int Id PK
         string Name
@@ -50,7 +61,7 @@ erDiagram
     Classroom {
         int Id PK
         string Name
-        int CategoryId FK
+        int ClassroomCategoryId FK
         int Capacity
     }
 
@@ -65,8 +76,6 @@ erDiagram
         int TeacherId FK
         int SubjectId FK
         int ClassroomId FK
-        DateTime StartTime
-        DateTime EndTime
     }
 
     ScheduleTimeSlot {
@@ -104,226 +113,255 @@ erDiagram
     }
 
     Teacher ||--o{ TeacherSubject : teaches
-    Subject ||--o{ TeacherSubject : assigned
+    Subject ||--o{ TeacherSubject : assigned_to
+
+    Group ||--o{ GroupSubject : includes
+    Subject ||--o{ GroupSubject : assigned_to
 
     Subject ||--o{ SubjectClassroomCategory : requires
-    ClassroomCategory ||--o{ SubjectClassroomCategory : provides
+    ClassroomCategory ||--o{ SubjectClassroomCategory : supports
 
-    ClassroomCategory ||--o{ Classroom : contains
+    ClassroomCategory ||--o{ Classroom : categorizes
 
     Group ||--o{ Schedule : has
     Teacher ||--o{ Schedule : teaches
-    Subject ||--o{ Schedule : includes
-    Classroom ||--o{ Schedule : assigned
+    Subject ||--o{ Schedule : covers
+    Classroom ||--o{ Schedule : hosts
 
     Schedule ||--o{ ScheduleTimeSlot : contains
 
     ApplicationUser ||--o{ Notification : receives
-    ApplicationUser ||--o{ AuditLog : creates
+    ApplicationUser ||--o{ AuditLog : performs
 ```
+
+> **Note:** The diagram is a conceptual representation of the main entities. For exact column names, nullability, indexes, and delete behaviors, refer to the current entity classes, `ApplicationDbContext`, and EF Core migrations.
 
 ## Main Relationships
 
-### Teacher ↔ Subject
+### 1. Teacher ↔ Subject
 
-Teachers and subjects have a many-to-many relationship through `TeacherSubject`.
+The many-to-many relationship between teachers and subjects is implemented through `TeacherSubject`.
 
-One teacher can teach multiple subjects, and one subject can be taught by multiple teachers.
+A teacher can teach several subjects, and a subject can be assigned to several teachers.
 
 ```text
-Teacher
-   │
-   └── TeacherSubject ── Subject
+Teacher ── TeacherSubject ── Subject
 ```
 
-The composite primary key is:
+The junction entity uses a composite primary key:
 
 ```text
 (TeacherId, SubjectId)
 ```
 
-### Subject ↔ ClassroomCategory
+This relationship supports teacher assignment and schedule validation.
 
-Subjects can require one or more classroom categories.
+### 2. Group ↔ Subject
 
-For example:
-
-```text
-Computer Graphics
-        │
-        └── Computer Classroom
-```
-
-The relationship is implemented through `SubjectClassroomCategory`.
-
-### ClassroomCategory → Classroom
-
-Each classroom belongs to a classroom category.
+The many-to-many relationship between student groups and subjects is implemented through `GroupSubject`.
 
 ```text
-ClassroomCategory
-        │
-        └── Classroom
+Group ── GroupSubject ── Subject
 ```
 
-The category determines the type of room, while `Capacity` determines whether the room can accommodate a group.
+It represents the subjects associated with each group and is used by the scheduling functionality to determine which subjects can be scheduled for a group.
 
-### Group → Schedule
+### 3. Subject ↔ ClassroomCategory
+
+The many-to-many relationship between subjects and classroom categories is implemented through `SubjectClassroomCategory`.
+
+```text
+Subject ── SubjectClassroomCategory ── ClassroomCategory
+```
+
+A subject may require a particular classroom category. For example, a computer graphics lesson may require a computer classroom.
+
+The junction entity uses the composite primary key:
+
+```text
+(SubjectId, ClassroomCategoryId)
+```
+
+### 4. ClassroomCategory → Classroom
+
+Each classroom is associated with a classroom category.
+
+```text
+ClassroomCategory ── Classroom
+```
+
+The category describes the classroom type, while `Capacity` determines the maximum number of students the room can accommodate.
+
+These properties support classroom recommendations and validation.
+
+### 5. Group → Schedule
 
 A group can have multiple schedule entries.
 
 ```text
-Group
-  │
-  └── Schedule
+Group ── Schedule
 ```
 
-Each schedule entry connects a group with a teacher, subject, and classroom.
+Each schedule entry associates a group with a teacher, a subject, and a classroom.
 
-### Teacher → Schedule
+### 6. Teacher → Schedule
 
-A teacher can have multiple schedule entries.
+A teacher can have multiple schedule entries at different times.
 
-The scheduling and validation services use this relationship to detect teacher conflicts.
+The schedule validation functionality checks for conflicting assignments so that a teacher is not scheduled to teach multiple lessons simultaneously.
 
-### Subject → Schedule
+### 7. Subject → Schedule
 
-Each schedule entry represents a particular subject being taught.
+Each schedule entry references the subject being taught.
 
-### Classroom → Schedule
+The group-subject and teacher-subject relationships help determine whether the planned lesson is consistent with the system's academic assignments.
+
+### 8. Classroom → Schedule
 
 A classroom can be assigned to multiple schedule entries at different times.
 
-The schedule validation service prevents conflicting assignments.
+Schedule validation checks for overlapping room assignments and other relevant constraints.
 
-### Schedule → ScheduleTimeSlot
+### 9. Schedule → ScheduleTimeSlot
 
-A schedule can contain one or more time slots.
+A schedule can be associated with time-slot records.
 
-Time slots store the detailed time information used by the scheduling system.
+```text
+Schedule ── ScheduleTimeSlot
+```
 
-### ApplicationUser → Notification
+`ScheduleTimeSlot` stores time intervals used by scheduling functionality. Its exact role should be interpreted alongside the current generator and scheduling models.
 
-Users can receive notifications related to changes or important schedule information.
+### 10. ApplicationUser → Notification
 
-### ApplicationUser → AuditLog
+A user can have multiple notification records.
 
-User actions can be recorded in the audit log.
+Notifications contain information such as a title, message, read status, and creation timestamp.
 
-This provides a history of important operations performed in the system.
+### 11. ApplicationUser → AuditLog
+
+A user can be associated with multiple audit log records.
+
+Audit logs store information about recorded actions, including the action name, affected entity, entity identifier, and timestamp.
+
+The completeness of the audit history depends on which application operations explicitly write audit records.
 
 ## Simplified Database Structure
 
 ```text
-                    ┌─────────────────┐
-                    │ ApplicationUser  │
-                    └───────┬─────────┘
-                            │
-                  ┌─────────┴─────────┐
-                  ▼                   ▼
-           ┌─────────────┐     ┌─────────────┐
-           │ Notification│     │  AuditLog   │
-           └─────────────┘     └─────────────┘
+                 ApplicationUser
+                    /        \
+                   ▼          ▼
+             Notification   AuditLog
 
 
-┌──────────┐       ┌────────────────┐       ┌───────────┐
-│ Teacher  │──────▶│ TeacherSubject │◀──────│  Subject  │
-└────┬─────┘       └────────────────┘       └─────┬─────┘
-     │                                             │
-     │                                             │
-     │                                      ┌──────▼──────────────┐
-     │                                      │SubjectClassroom      │
-     │                                      │Category              │
-     │                                      └──────┬──────────────┘
-     │                                             │
-     ▼                                             ▼
-┌──────────┐                                ┌─────────────────┐
-│ Schedule │───────────────────────────────▶│ClassroomCategory│
-└────┬─────┘                                └────────┬────────┘
-     │                                               │
-     │                                               ▼
-     │                                       ┌─────────────┐
-     │                                       │  Classroom  │
-     │                                       └─────────────┘
-     │
-     ├──────────────▶ Group
-     │
-     ├──────────────▶ Teacher
-     │
-     ├──────────────▶ Subject
-     │
-     └──────────────▶ Classroom
-             │
-             ▼
-      ScheduleTimeSlot
+Teacher ───── TeacherSubject ───── Subject
+                                      │
+                                      ├──── GroupSubject ───── Group
+                                      │
+                                      └──── SubjectClassroomCategory
+                                                      │
+                                                      ▼
+                                              ClassroomCategory
+                                                      │
+                                                      ▼
+                                                  Classroom
+
+
+Group ───────────────┐
+Teacher ─────────────┤
+Subject ─────────────┼──────── Schedule ───── ScheduleTimeSlot
+Classroom ───────────┘
 ```
+
+This diagram illustrates the principal relationships. It does not include every Identity table or every configuration and supporting entity.
 
 ## Schedule Generation
 
-`ScheduleGenerationSettings` contains the configuration used by the automatic schedule generator.
+`ScheduleGenerationSettings` represents stored settings associated with automatic schedule generation.
 
-Default parameters:
+The documented configuration may include:
 
-| Parameter               | Default value |
-| ----------------------- | ------------: |
-| Lessons per week        |             3 |
-| Maximum lessons per day |             4 |
-| Teaching days per week  |             5 |
-| Maximum gaps per day    |             2 |
-| Allow gaps              |           Yes |
+| Parameter | Description |
+|---|---|
+| `DefaultWeeklyLessons` | Default number of lessons per week |
+| `MaxLessonsPerDay` | Maximum lessons per day |
+| `TeachingDaysPerWeek` | Number of teaching days per week |
+| `MaxGapsPerDay` | Maximum gaps allowed per day |
+| `AllowGaps` | Whether gaps are permitted |
 
-The generator uses existing teachers, subjects, groups, classrooms, classroom categories, and their relationships to construct a valid schedule.
+The generator uses academic entities, classroom availability, time slots, and scheduling constraints to construct a timetable.
+
+**Important:** Stored database settings and generator form defaults are not necessarily identical. Actual values depend on the current entity definitions, application configuration, and request parameters. Verify the current model and generator before documenting specific default values.
+
+The generation workflow includes a preview and administrator confirmation before the generated schedule is saved.
 
 ## Data Integrity
 
-The database uses:
+The database structure supports data integrity through:
 
-* Primary keys for entity identification.
-* Foreign keys for relationships.
-* Composite primary keys for many-to-many relationships.
-* Entity Framework Core migrations for schema versioning.
-* PostgreSQL constraints for referential integrity.
+- **Primary keys** — uniquely identify records.
+- **Foreign keys** — connect related entities.
+- **Composite primary keys** — identify records in junction entities such as `TeacherSubject` and `SubjectClassroomCategory`.
+- **Entity Framework Core migrations** — track and apply database schema changes.
+- **PostgreSQL constraints** — enforce configured relational integrity rules.
 
-The most important many-to-many relationship is:
+Application-level validation additionally checks scheduling constraints, including teacher, group, and classroom conflicts, as well as relevant classroom and subject requirements.
 
-```text
-Teacher
-   │
-   ├── TeacherSubject
-   │
-   └── Subject
-```
-
-This allows the system to correctly represent teachers who teach multiple subjects.
+A validation rule enforced by application code should not be assumed to be a database constraint unless it is explicitly configured in the database schema.
 
 ## Database Technology
 
+The database access stack is:
+
 ```text
-Application
-     │
-     ▼
 ASP.NET Core MVC
-     │
-     ▼
+        │
+        ▼
 Entity Framework Core
-     │
-     ▼
-Npgsql
-     │
-     ▼
+        │
+        ▼
+Npgsql Provider
+        │
+        ▼
 PostgreSQL
 ```
 
-Database name:
+| Component | Purpose |
+|---|---|
+| ASP.NET Core MVC | Handles application requests and user interactions |
+| Entity Framework Core | Maps entities to database tables and manages queries |
+| Npgsql | Connects Entity Framework Core to PostgreSQL |
+| PostgreSQL | Stores application data |
+| ASP.NET Core Identity | Manages user accounts, authentication, and roles |
 
-```text
-schedulesystem
+**Database name:** `schedulesystem`
+
+**Connection string setting:** `DefaultConnection`
+
+The connection string should be configured through application configuration or environment variables. Real database passwords and other secrets should not be committed to source control.
+
+## Entity Framework Core Migrations
+
+The following commands are used to manage the database schema from the project directory:
+
+```powershell
+dotnet ef migrations add MigrationName
+dotnet ef database update
+dotnet ef migrations has-pending-model-changes
 ```
+
+- `migrations add` creates a migration from model changes.
+- `database update` applies pending migrations to the configured database.
+- `has-pending-model-changes` checks whether the current model differs from the latest migration snapshot.
+
+Before applying migrations to a production database, back up the database and review the generated migration.
 
 ## Related Documentation
 
-* `TechnicalDocumentation.md` — technical documentation
-* `Architecture.md` — application architecture
-* `Deployment.md` — deployment instructions
-* `AdminGuide.md` — administrator guide
-* `UserGuide.md` — user guide
+- `TechnicalDocumentation.md` — technical implementation details.
+- `Architecture.md` — application architecture.
+- `ArchitectureDiagram.md` — architecture diagrams.
+- `Deployment.md` — deployment instructions.
+- `AdminGuide.md` — administrator guide.
+- `UserGuide.md` — user guide.
