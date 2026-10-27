@@ -61,49 +61,17 @@ Detailed project documentation is available in the `docs/` directory.
 
 ## 🖥️ Application Screenshots
 
-<!-- SCREENSHOT 1: Save a screenshot of the main schedule page as docs/screenshots/schedule.png -->
+### Schedule Management
+![Schedule Management](docs/screenshots/schedule.png)
 
-### 1. Schedule Management
+### Student Groups
+![Student Groups](docs/screenshots/groups.png)
 
-<!-- Replace the placeholder below with: ![Schedule Management](docs/screenshots/schedule.png) -->
+### Automatic Schedule Generation
+![Schedule Generator](docs/screenshots/generator.png)
 
-**Screenshot location:** `docs/screenshots/schedule.png`
-
-_Show the main timetable, schedule entries, and available filters here._
-
-<!-- SCREENSHOT 2: Save a screenshot of the groups page as docs/screenshots/groups.png -->
-
-### 2. Student Groups
-
-<!-- Replace the placeholder below with: ![Student Groups](docs/screenshots/groups.png) -->
-
-**Screenshot location:** `docs/screenshots/groups.png`
-
-_Show the group list, student counts, search, or sorting interface here._
-
-<!-- SCREENSHOT 3: Save a screenshot of the schedule generator as docs/screenshots/generator.png -->
-
-### 3. Automatic Schedule Generation
-
-<!-- Replace the placeholder below with: ![Schedule Generator](docs/screenshots/generator.png) -->
-
-**Screenshot location:** `docs/screenshots/generator.png`
-
-_Show generation settings, preview, or generated timetable results here._
-
-<!-- SCREENSHOT 4: Save a screenshot of classroom recommendations as docs/screenshots/classrooms.png -->
-
-### 4. Classroom Management and Recommendations
-
-<!-- Replace the placeholder below with: ![Classroom Recommendations](docs/screenshots/classrooms.png) -->
-
-**Screenshot location:** `docs/screenshots/classrooms.png`
-
-_Show classroom categories, capacity information, or suitable-room recommendations here._
-
-> **How to add the screenshots:** create the folder `docs/screenshots/`, place the four image files inside it, then uncomment or add the corresponding Markdown image links. Until you add the images, the screenshots will not be displayed.
-
----
+### Classrooms
+![Classrooms](docs/screenshots/classrooms.png)
 
 ## ✨ Features
 
