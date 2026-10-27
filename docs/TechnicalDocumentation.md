@@ -4,106 +4,119 @@
 
 ScheduleSystem is a web-based college timetable management system developed with ASP.NET Core MVC on .NET 8.
 
-The system is designed to manage academic scheduling data and provide tools for creating, validating, generating, filtering, and exporting class schedules.
+The application provides tools for managing academic data, creating and validating schedules, generating timetables, recommending classrooms, and exporting schedules.
 
-The application uses PostgreSQL as the database and Entity Framework Core as the data access layer.
+The system uses PostgreSQL for data storage, Entity Framework Core for data access, and ASP.NET Core Identity for authentication and authorization.
 
 ## 2. Main Objectives
 
-The system provides:
+The main objectives of ScheduleSystem are:
 
-* management of teachers;
-* management of student groups;
-* management of subjects;
-* management of classrooms;
-* creation and editing of schedules;
-* automatic schedule generation;
-* schedule conflict validation;
-* classroom recommendations;
-* classroom category requirements;
-* teacher-subject relationships;
-* group-subject relationships;
-* authentication and role-based authorization;
-* user notifications;
-* audit logging;
-* schedule export to PDF, Excel, and CSV;
-* configurable schedule generation parameters.
+- Managing teachers, student groups, subjects, and classrooms.
+- Managing teacher-subject and group-subject relationships.
+- Creating, editing, deleting, and filtering schedules.
+- Validating timetable constraints and detecting conflicts.
+- Generating schedules automatically.
+- Recommending suitable classrooms.
+- Managing user accounts and access roles.
+- Displaying user notifications.
+- Recording application activity through audit logs.
+- Exporting schedules to PDF and Excel.
+- Providing an interface for administrators and users.
 
 ## 3. Technology Stack
 
-| Technology            | Purpose                            |
-| --------------------- | ---------------------------------- |
-| C#                    | Main programming language          |
-| .NET 8                | Application platform               |
-| ASP.NET Core MVC      | Web application framework          |
-| Entity Framework Core | ORM and database access            |
-| PostgreSQL            | Relational database                |
-| Npgsql                | PostgreSQL provider for EF Core    |
-| ASP.NET Core Identity | Authentication and authorization   |
-| Razor Views           | Server-side UI rendering           |
-| HTML5                 | Page structure                     |
-| CSS3                  | Interface styling                  |
-| JavaScript            | Client-side interactions           |
-| Git / GitHub          | Version control and source hosting |
+| Technology | Purpose |
+|---|---|
+| C# | Main programming language |
+| .NET 8 | Application platform |
+| ASP.NET Core MVC | Web application framework |
+| Entity Framework Core | ORM and database access |
+| PostgreSQL | Relational database |
+| Npgsql | PostgreSQL provider for EF Core |
+| ASP.NET Core Identity | Authentication and authorization |
+| Razor Views | Server-side rendering |
+| HTML5 | Page structure |
+| CSS3 | Interface styling |
+| JavaScript | Client-side interactions |
+| ClosedXML | Excel export |
+| QuestPDF | PDF generation |
+| Git and GitHub | Version control and source hosting |
 
-## 4. Architecture
+## 4. Application Architecture
 
-ScheduleSystem follows an ASP.NET Core MVC architecture with a separate service layer.
+ScheduleSystem follows an ASP.NET Core MVC architecture with supporting services and an Entity Framework Core data layer.
 
 ```text
 User Browser
-    |
-    v
-ASP.NET Core MVC
-    |
-    +-- Controllers
-    |      |
-    |      +-- ViewModels
-    |      +-- Models
-    |
-    +-- Services
-    |      +-- ScheduleGeneratorService
-    |      +-- ScheduleValidationService
-    |      +-- ClassroomRecommendationService
-    |      +-- ScheduleExportService
-    |
-    v
+     |
+     v
+ASP.NET Core Middleware
+     |
+     v
+MVC Controllers and Razor Views
+     |
+     +--------------------+
+     |                    |
+     v                    v
+  ViewModels           Services
+                          |
+                          +-- ScheduleGeneratorService
+                          +-- ScheduleValidationService
+                          +-- ClassroomRecommendationService
+                          +-- ScheduleExportService
+                          +-- TeacherRecommendationService
+     |
+     v
+ApplicationDbContext
+     |
+     v
 Entity Framework Core
-    |
-    v
+     |
+     v
+Npgsql
+     |
+     v
 PostgreSQL
 ```
 
-### Controllers
+### 4.1 Controllers
 
-Controllers handle HTTP requests, application flow, validation, and interaction with services and the database.
+Controllers process HTTP requests, coordinate application workflows, and return views or other HTTP responses.
 
-The project contains controllers for:
+The project includes controllers for major application areas, including:
 
-* account and authentication;
-* home/dashboard;
-* schedules;
-* teachers;
-* groups;
-* subjects;
-* classrooms;
-* schedule generation;
-* notifications;
-* audit logs;
-* analytics.
+- Account and authentication
+- Home and dashboard
+- Schedules
+- Teachers
+- Groups
+- Subjects
+- Classrooms
+- Schedule generation
+- Notifications
+- Audit logs
+- Analytics
 
-### Services
+The exact set of controllers may change as the project evolves.
 
-Business logic is separated from controllers where appropriate.
+### 4.2 Services
 
-Important services include:
+Services encapsulate reusable business logic where appropriate.
 
-* `ScheduleGeneratorService` — automatic schedule generation;
-* `ScheduleValidationService` — schedule conflict and rule validation;
-* `ClassroomRecommendationService` — classroom selection and recommendations;
-* `ScheduleExportService` — export of schedules to supported formats.
+| Service | Responsibility |
+|---|---|
+| `ScheduleGeneratorService` | Generates schedules using available academic data and constraints |
+| `ScheduleValidationService` | Checks timetable rules and scheduling conflicts |
+| `ClassroomRecommendationService` | Recommends suitable classrooms |
+| `TeacherRecommendationService` | Provides teacher-related recommendations |
+| `ScheduleExportService` | Generates supported schedule export files |
+
+The application is not a strictly layered architecture: some controllers also interact directly with `ApplicationDbContext`.
 
 ## 5. Project Structure
+
+The main project structure includes:
 
 ```text
 ScheduleSystem/
@@ -116,6 +129,7 @@ ScheduleSystem/
 ├── Services/
 ├── ViewComponents/
 ├── Views/
+├── ViewModels/
 ├── wwwroot/
 │   ├── css/
 │   ├── js/
@@ -126,283 +140,106 @@ ScheduleSystem/
 └── ScheduleSystem.csproj
 ```
 
+### Main directories
+
+- `Controllers/` — HTTP request handling and application workflows.
+- `Data/` — Entity Framework Core context and identity initialization.
+- `Migrations/` — database schema migrations.
+- `Models/` — domain and application models.
+- `Services/` — business services.
+- `Views/` — Razor views.
+- `ViewModels/` — data prepared for presentation and forms.
+- `ViewComponents/` — reusable view components.
+- `wwwroot/` — static CSS, JavaScript, images, and other assets.
+
 ## 6. Data Model
 
-The main domain entities are:
+The main domain entities include:
 
-* `Teacher`
-* `TeacherSubject`
-* `Subject`
-* `Group`
-* `GroupSubject`
-* `Classroom`
-* `ClassroomCategory`
-* `SubjectClassroomCategory`
-* `Schedule`
-* `ScheduleTimeSlot`
-* `ScheduleGenerationSettings`
-* `Notification`
-* `AuditLog`
-* `ApplicationUser`
+- `ApplicationUser`
+- `Teacher`
+- `TeacherSubject`
+- `Subject`
+- `Group`
+- `GroupSubject`
+- `Classroom`
+- `ClassroomCategory`
+- `SubjectClassroomCategory`
+- `Schedule`
+- `ScheduleTimeSlot`
+- `ScheduleGenerationSettings`
+- `Notification`
+- `AuditLog`
 
-### Teacher and Subject
+ASP.NET Core Identity also maintains its associated identity and role entities.
+
+### 6.1 Teacher–Subject Relationship
 
 A teacher can teach multiple subjects, and a subject can be taught by multiple teachers.
 
-This relationship is implemented through the junction entity `TeacherSubject`.
+The relationship is implemented through `TeacherSubject`.
 
 ```text
 Teacher
    |
-   | 1..*
    v
 TeacherSubject
    ^
-   | *..1
    |
 Subject
 ```
 
-The junction table uses a composite primary key:
+The junction entity uses the composite primary key:
 
 ```text
 (TeacherId, SubjectId)
 ```
 
-### Group and Subject
+This relationship supports teacher assignment and schedule validation.
 
-Groups and subjects are connected through `GroupSubject`.
+### 6.2 Group–Subject Relationship
 
-This allows the system to determine which subjects belong to a particular student group.
+The `GroupSubject` entity represents the many-to-many relationship between student groups and subjects.
 
-### Classroom Requirements
+It allows the application to associate subjects with the groups that study them.
 
-Subjects can define required classroom categories through `SubjectClassroomCategory`.
+### 6.3 Classroom Requirements
 
-Classroom recommendations also consider the group's student count.
+The `SubjectClassroomCategory` entity associates subjects with classroom categories.
 
-## 7. Database
+This enables the system to represent requirements such as computer classrooms or other specialized facilities.
 
-The application uses PostgreSQL with Entity Framework Core.
+Classroom suitability can also depend on capacity and schedule availability.
 
-The PostgreSQL provider is Npgsql.
+## 7. Database Layer
 
-The application's `ApplicationDbContext` inherits from:
+ScheduleSystem uses PostgreSQL and Entity Framework Core with the Npgsql provider.
+
+The primary database context is:
 
 ```csharp
-IdentityDbContext<ApplicationUser>
+ApplicationDbContext : IdentityDbContext<ApplicationUser>
 ```
 
-This allows application data and ASP.NET Core Identity data to use the same EF Core context.
+This context integrates application data with ASP.NET Core Identity.
 
-The project contains migrations for the evolution of the database schema, including Identity, notifications, audit logs, schedule time slots, generation settings, classroom categories, subject requirements, and the teacher-subject relationship.
+The context defines entity sets and relationships for academic data, schedules, classroom requirements, notifications, audit logs, and generation settings.
 
-## 8. Schedule Management
+### Database configuration
 
-The schedule module supports:
+The connection string is read from the `DefaultConnection` configuration setting.
 
-* creating schedules;
-* editing schedules;
-* deleting schedules;
-* filtering schedules;
-* viewing schedules by group;
-* viewing schedules by teacher;
-* viewing schedules by classroom;
-* viewing schedules by subject;
-* filtering by day and time;
-* validation of schedule constraints.
-
-A schedule is associated with the relevant group, teacher, subject, and classroom.
-
-## 9. Schedule Validation
-
-Schedule validation prevents invalid timetable configurations.
-
-The validation layer checks, among other rules:
-
-### Time validity
-
-The lesson start time must be earlier than the lesson end time.
-
-### Overlapping lessons
-
-The system detects conflicting schedule intervals for the same relevant resource.
-
-### Classroom capacity
-
-A classroom must have sufficient capacity for the selected student group.
+The database name used in the standard local setup is:
 
 ```text
-Classroom.Capacity >= Group.StudentCount
+schedulesystem
 ```
 
-### Classroom category
+Sensitive credentials should be provided through protected configuration or environment variables rather than committed to source control.
 
-If a subject requires a particular classroom category, the selected classroom must satisfy that requirement.
+### Database migrations
 
-### Course compatibility
-
-Subjects and groups are checked for compatible course information where applicable.
-
-## 10. Automatic Schedule Generation
-
-The system contains an automatic schedule generation service.
-
-The generation process uses configured parameters and available academic data to create timetable entries while applying scheduling constraints.
-
-Default generation settings include:
-
-| Parameter               | Default |
-| ----------------------- | ------: |
-| Lessons per week        |       3 |
-| Maximum lessons per day |       4 |
-| Teaching days per week  |       5 |
-| Maximum gaps per day    |       2 |
-| Allow gaps              |     Yes |
-
-The generator works together with schedule validation and classroom recommendation logic to reduce invalid combinations.
-
-## 11. Classroom Recommendations
-
-The classroom recommendation service selects suitable classrooms based on available data.
-
-The main constraints include:
-
-1. classroom category requirements;
-2. classroom capacity;
-3. group size;
-4. availability and schedule conflicts.
-
-This allows the system to recommend classrooms instead of requiring the administrator to search through every classroom manually.
-
-## 12. Teachers
-
-The teacher module supports CRUD operations and subject assignment.
-
-A teacher may be associated with multiple subjects.
-
-When creating or editing a schedule, the application can check whether the selected teacher is associated with the selected subject.
-
-The interface contains an explicit confirmation mechanism for cases where an administrator intentionally wants to continue despite a teacher-subject mismatch.
-
-## 13. Groups
-
-Groups contain academic information such as:
-
-* group name;
-* course;
-* student count.
-
-The student count is also used during classroom recommendation and schedule validation.
-
-## 14. Subjects
-
-Subjects contain information such as:
-
-* name;
-* course;
-* subject type;
-* classroom category requirements.
-
-Subjects can be associated with multiple teachers and groups through the corresponding relationship entities.
-
-## 15. Classrooms
-
-Classrooms contain:
-
-* classroom name;
-* classroom category;
-* capacity.
-
-The application uses classroom categories instead of a separate computer-equipment flag.
-
-This allows classroom requirements to be represented through the category system.
-
-## 16. Authentication and Authorization
-
-The project uses ASP.NET Core Identity.
-
-The application supports role-based access, including:
-
-* `Admin`;
-* `User`.
-
-Authentication-related functionality includes:
-
-* registration;
-* login;
-* logout;
-* password management;
-* profile information;
-* account settings.
-
-Administrative functionality is protected by authorization rules.
-
-The administrator password is not stored as a hardcoded value in the source code. Initial administrator provisioning uses configuration or the `Admin__Password` environment variable.
-
-## 17. Notifications
-
-The application contains a notification system for users.
-
-Notifications can contain schedule-related information such as:
-
-* subject;
-* group;
-* lesson time;
-* schedule changes or relevant events.
-
-The interface provides a notification area through the notification bell component.
-
-## 18. Audit Logs
-
-Important application actions can be recorded in the audit log system.
-
-Audit logs provide a trace of administrative or system activity and can be viewed through the corresponding administrative interface.
-
-## 19. Schedule Export
-
-Schedules can be exported to:
-
-* PDF;
-* Excel;
-* CSV.
-
-The export functionality is implemented through `ScheduleExportService`.
-
-The application supports overall schedule exports and schedule exports for specific academic entities where supported by the interface.
-
-## 20. User Interface
-
-The interface uses a modern white and blue visual style inspired by contemporary glass-based UI patterns.
-
-The application includes dedicated styling for major sections and reusable visual components.
-
-The main navigation includes:
-
-* Home;
-* Schedule;
-* Teachers;
-* Groups;
-* Subjects;
-* Classrooms.
-
-The interface is implemented with Razor views, HTML, CSS, and JavaScript.
-
-## 21. Configuration
-
-Application configuration is handled through ASP.NET Core configuration mechanisms.
-
-Sensitive administrator credentials must be supplied through secure configuration, for example:
-
-```text
-Admin__Password
-```
-
-Sensitive values should not be committed to source control.
-
-## 22. Database Migrations
-
-Database schema changes are managed through Entity Framework Core migrations.
+EF Core migrations manage schema changes over time.
 
 Create a migration:
 
@@ -416,17 +253,306 @@ Apply migrations:
 dotnet ef database update
 ```
 
+List migrations:
+
+```powershell
+dotnet ef migrations list
+```
+
 Check for pending model changes:
 
 ```powershell
 dotnet ef migrations has-pending-model-changes
 ```
 
+## 8. Schedule Management
+
+The schedule module supports the creation and management of timetable entries.
+
+The main capabilities include:
+
+- Creating schedule entries.
+- Editing and deleting entries.
+- Filtering schedules by group.
+- Filtering by teacher.
+- Filtering by classroom.
+- Filtering by subject.
+- Filtering by day of the week.
+- Filtering by time range.
+- Viewing and reviewing the resulting timetable.
+
+Each schedule entry connects the relevant academic group, teacher, subject, and classroom.
+
+## 9. Schedule Validation
+
+The schedule validation service checks timetable data against configured rules.
+
+### 9.1 Time Validation
+
+The start time must be earlier than the end time.
+
+### 9.2 Scheduling Conflicts
+
+The application checks for overlapping assignments involving relevant resources, including teachers, groups, and classrooms.
+
+### 9.3 Classroom Capacity
+
+The selected classroom should have sufficient capacity for the student group.
+
+```text
+Classroom.Capacity >= Group.StudentCount
+```
+
+### 9.4 Classroom Category Requirements
+
+If a subject requires a particular classroom category, the selected classroom must satisfy the configured requirement.
+
+### 9.5 Course Compatibility
+
+The application checks course compatibility where applicable.
+
+### 9.6 Teacher–Subject Assignment
+
+The application checks whether the selected teacher is associated with the selected subject. The interface supports an explicit confirmation flow for certain teacher-subject mismatches.
+
+Validation behavior depends on the specific rule; not every warning necessarily prevents an operation from continuing.
+
+## 10. Automatic Schedule Generation
+
+The application contains a schedule generation workflow implemented through `ScheduleGeneratorController` and `ScheduleGeneratorService`.
+
+The generator considers available academic data, time slots, and scheduling constraints.
+
+The workflow is:
+
+```text
+Review Generation Settings
+           |
+           v
+Prepare Generation Request
+           |
+           v
+Run Schedule Generator
+           |
+           v
+Validate Generated Results
+           |
+           v
+Display Preview
+           |
+           v
+Administrator Confirmation
+           |
+           v
+Save Generated Schedule
+```
+
+The preview is cached temporarily before confirmation. The generation controller restricts access to administrators.
+
+### Generation parameters
+
+The generation interface supports parameters such as:
+
+- Teaching days
+- Time slots
+- Maximum lessons per day
+- Maximum consecutive lessons
+- Lesson distribution
+- Classroom recommendations
+
+**Important:** Model defaults, database settings, and values displayed in the generator interface may differ. Actual generation behavior depends on the request parameters and current implementation. Do not assume that one set of default values applies to every generation workflow.
+
+The generator applies search and scheduling constraints to find a suitable timetable. A successful result depends on the availability and compatibility of the input data.
+
+## 11. Classroom Recommendations
+
+`ClassroomRecommendationService` helps identify suitable classrooms.
+
+Relevant criteria include:
+
+1. Classroom category requirements.
+2. Classroom capacity.
+3. Student group size.
+4. Classroom availability.
+5. Scheduling conflicts.
+
+The recommendation functionality reduces the need to check every classroom manually.
+
+Recommendations are based on available application data and do not replace verification of the final timetable.
+
+## 12. Teacher Management
+
+The teacher module supports teacher records and subject assignments.
+
+A teacher may be associated with multiple subjects through `TeacherSubject`.
+
+When creating or editing a schedule, the application can validate the teacher-subject relationship.
+
+## 13. Group Management
+
+The group module stores academic group information, including:
+
+- Group name
+- Course
+- Student count
+
+Groups are associated with subjects through `GroupSubject`.
+
+The student count is used when validating classroom capacity and recommending rooms.
+
+## 14. Subject Management
+
+Subject records contain academic information such as:
+
+- Subject name
+- Course
+- Subject type
+- Required classroom categories
+
+Subjects can be associated with multiple teachers and student groups through the corresponding relationship entities.
+
+## 15. Classroom Management
+
+Classroom records contain information such as:
+
+- Classroom name
+- Classroom category
+- Capacity
+
+The application represents classroom types through `ClassroomCategory` rather than relying on a separate computer-equipment flag.
+
+Subject requirements are represented through `SubjectClassroomCategory`.
+
+## 16. Authentication and Authorization
+
+ScheduleSystem uses ASP.NET Core Identity for authentication and account management.
+
+The application defines the roles:
+
+- `Admin`
+- `User`
+
+Identity functionality includes registration, login, logout, profile information, and password-related operations.
+
+Administrative functionality is protected by role-based authorization.
+
+### Administrator initialization
+
+The application initializes required roles and the administrator account through `IdentitySeeder`.
+
+The configured administrator email is:
+
+```text
+admin@schedulesystem.local
+```
+
+The administrator password is supplied through configuration, including the `Admin__Password` environment variable.
+
+Real passwords must not be stored in source code or public documentation.
+
+## 17. Notifications
+
+The application includes a notification system with a notification interface.
+
+Notification records can contain a title, message, read status, user association, and creation timestamp.
+
+The system provides a place to display relevant application information.
+
+The existence of notification records does not, by itself, imply real-time push delivery.
+
+## 18. Audit Logs
+
+The application contains an audit log system for recording selected application actions.
+
+Audit log records can include:
+
+- User identifier
+- Action name
+- Entity name
+- Entity identifier
+- Timestamp
+
+The administrative interface provides access to audit information.
+
+The completeness of the audit history depends on which operations explicitly record audit entries.
+
+## 19. Schedule Export
+
+Schedule export is implemented through `ScheduleExportService`.
+
+The confirmed export formats are:
+
+| Format | Library | Purpose |
+|---|---|---|
+| Excel | ClosedXML | Spreadsheet export and further analysis |
+| PDF | QuestPDF | Printing and sharing schedules |
+
+CSV should not be documented as a supported export format unless the current implementation has been verified.
+
+Export options depend on the functionality exposed by the relevant interface.
+
+## 20. User Interface
+
+The application uses Razor Views, HTML, CSS, and JavaScript.
+
+The interface follows a modern white-and-blue visual style with glass-inspired elements.
+
+The main application areas include:
+
+- Home and dashboard
+- Schedule
+- Teachers
+- Groups
+- Subjects
+- Classrooms
+
+The interface includes reusable visual components and page-specific styles.
+
+The frontend refresh described below focused on presentation and interaction while preserving the existing backend behavior.
+
+## 21. Application Configuration
+
+Configuration is handled through ASP.NET Core configuration mechanisms.
+
+Important settings include:
+
+- Database connection string
+- Administrator password
+- Identity settings
+- Application behavior and service configuration
+
+Environment variables can override hierarchical configuration values by using double underscores.
+
+For example:
+
+```powershell
+$env:Admin__Password = "YOUR_STRONG_PASSWORD"
+```
+
+The application should be started from an environment where the required settings are available.
+
+Secrets should not be committed to Git.
+
+## 22. Dependency Injection and Middleware
+
+Application services are registered through the ASP.NET Core dependency injection container.
+
+The application configures MVC, database access, Identity, session support, caching, and application services.
+
+The HTTP request pipeline includes middleware for functionality such as:
+
+- HTTPS redirection
+- Static files
+- Routing
+- Authentication
+- Session
+- Authorization
+
+The precise order matters because middleware components depend on earlier stages of the request pipeline.
+
 ## 23. Build and Verification
 
-The project should be verified before deployment or demonstration.
-
-Recommended commands:
+The standard verification workflow includes:
 
 ```powershell
 dotnet restore
@@ -434,34 +560,34 @@ dotnet build
 dotnet ef database update
 ```
 
-The final project audit confirmed:
+The build checks whether the application compiles. Database update applies pending migrations to the configured database.
 
-* successful project build;
-* 0 build errors;
-* 0 build warnings;
-* no pending EF Core model changes;
-* implemented `TeacherSubject` relationship;
-* no active dependency on the previous single `Teacher.Subject` relationship;
-* removal of the hardcoded administrator password;
-* schedule generation and validation functionality;
-* export functionality.
+A successful build does not, by itself, prove that all runtime workflows are correct.
+
+Testing should also cover authentication, authorization, database operations, schedule validation, generation, notifications, and export.
 
 ## 24. Security Considerations
 
-The application uses:
+The application uses ASP.NET Core Identity, role-based authorization, server-side validation, and protected configuration for administrator credentials.
 
-* ASP.NET Core Identity;
-* role-based authorization;
-* secure configuration for administrator credentials;
-* EF Core database access;
-* server-side validation;
-* controlled access to administrative functionality.
+For production deployments, additional measures should include:
 
-Production deployments should additionally use HTTPS, secure PostgreSQL credentials, protected configuration storage, and regular database backups.
+- HTTPS and appropriate certificate management.
+- Secure PostgreSQL credentials.
+- Restricted database network access.
+- Protected environment variables or secret storage.
+- Regular database backups.
+- Controlled administrator access.
+- Dependency updates and vulnerability review.
+- Appropriate logging and monitoring.
+
+Security behavior should be verified against the current application code and deployment configuration.
 
 ## 25. Development Workflow
 
-The project uses Git for version control.
+The source repository is hosted on GitHub:
+
+https://github.com/Artem56x/ScheduleSystem
 
 The main branch is:
 
@@ -469,100 +595,170 @@ The main branch is:
 main
 ```
 
-The source repository is hosted on GitHub:
+A typical development workflow is:
 
-https://github.com/Artem56x/ScheduleSystem
+```text
+Edit
+  |
+  v
+Restore Dependencies
+  |
+  v
+Build
+  |
+  v
+Test
+  |
+  v
+Review Changes
+  |
+  v
+Commit
+  |
+  v
+Push
+```
+
+Database migrations should be reviewed before being applied to a shared or production database.
 
 ## 26. Project Status
 
-The main implementation is complete.
+The documented implementation includes:
 
-Implemented areas include:
+- ASP.NET Core MVC architecture.
+- PostgreSQL database integration.
+- Entity Framework Core migrations.
+- Academic CRUD modules.
+- Teacher-subject and group-subject relationships.
+- Schedule management and filtering.
+- Schedule validation.
+- Automatic schedule generation.
+- Classroom recommendations.
+- Authentication and role-based authorization.
+- Notifications and audit logging.
+- PDF and Excel export.
+- Interface modernization.
+- Administrator password configuration through protected settings.
 
-* core MVC architecture;
-* PostgreSQL database;
-* Entity Framework Core;
-* CRUD modules;
-* teacher-subject many-to-many relationship;
-* group-subject relationships;
-* schedule management;
-* schedule validation;
-* automatic schedule generation;
-* classroom recommendations;
-* authentication and authorization;
-* notifications;
-* audit logs;
-* export;
-* modernized UI;
-* secure administrator password configuration.
+The status of any particular feature should be verified against the current source code before a new release.
 
 ## 27. Future Improvements
 
-Possible future improvements include:
+Potential future improvements include:
 
-* automated integration and UI tests;
-* deployment to a production server;
-* additional reporting and analytics;
-* more advanced schedule generation algorithms;
-* granular permissions beyond the current roles;
-* localization for additional languages.
+- Automated integration and end-to-end tests.
+- Additional reporting and analytics.
+- More advanced scheduling algorithms.
+- More granular authorization policies.
+- Additional localization options.
+- Production deployment automation.
+- Expanded monitoring and operational diagnostics.
 
-These improvements are not required for the current project functionality.
+These items are possible directions for further development, not claims that the functionality is already implemented.
 
 ## 28. Conclusion
 
-ScheduleSystem provides a complete web-based solution for managing college schedules.
+ScheduleSystem is a web-based timetable management application built with ASP.NET Core MVC, .NET 8, Entity Framework Core, PostgreSQL, and ASP.NET Core Identity.
 
-The project combines ASP.NET Core MVC, Entity Framework Core, PostgreSQL, ASP.NET Core Identity, business services, schedule validation, automatic generation, classroom recommendations, notifications, audit logging, and export functionality in a single application.
+It combines academic data management, timetable validation, automatic generation, classroom recommendations, user management, notifications, audit logging, and schedule export.
 
-The architecture separates presentation, application logic, and data access, making the project suitable for further development and maintenance.
+Its service layer, relational data model, and migration-based database management provide a foundation for maintenance and future development.
 
+---
 
-## 29. Interface Refresh Validation (2026-10-09)
+## 29. Interface Refresh Validation — 9 October 2026
 
-The refresh changes presentation in existing Razor, CSS and JavaScript files. Controllers, models, services, migrations, configuration, roles, generation, conflict checks and server export remain unchanged. No new product screen, partial, module, frontend build process or dependency was introduced.
+This section documents the reported interface refresh and its validation results.
 
-### Styling and interaction responsibilities
+The refresh focused on existing Razor views, CSS, and JavaScript. It did not intentionally introduce new product screens, backend modules, database migrations, or a new frontend build system.
 
-`site.css` defines shared tokens and components; `liquid-glass.css` owns the application shell, existing modal presentation and shared print rules; page styles own section-specific layouts. Common screen styles use normal cascade and scoped selectors. `!important` is limited to explicit hiding, reduced-motion and print rules.
+### 29.1 Styling and Interaction Responsibilities
 
-Base text uses a Cyrillic-capable system font at 16px. Controls have a 44px minimum height, visible focus and explicit labels. Dense CRUD tables retain all fields and actions in a keyboard-focusable local scroll region with semantic column headers. Long names wrap. Native checkboxes remain native controls.
+The interface styling was organized around shared and page-specific responsibilities:
 
-`site.js` provides background isolation and focus containment/restoration to existing modal handlers; page handlers retain ownership of opening, closing, Escape and submission. Danger confirmations focus cancellation. Mobile navigation uses `aria-expanded`, `aria-modal` and `inert`, restores the opening control on Escape, and traps Tab. Settings tabs support arrow keys, Home and End. Inline generator/study-load errors preserve the original conditions and prevention of invalid submission. Schedule filtering/export scripts are byte-identical to the baseline.
+- `site.css` defines shared tokens and reusable components.
+- `liquid-glass.css` handles the application shell, modal presentation, and shared print rules.
+- Page-specific styles control section layouts.
+- `site.js` supports shared interaction behavior, including modal focus management and navigation behavior.
 
-Browser print styles request A4 portrait with 12mm margins, remove the shell and administrative actions, reset the sidebar offset, retain filtered hidden state and avoid splitting individual lessons. Large groups may span pages. Native pagination must still be checked in a real browser print preview.
+The design work addressed typography, form controls, focus visibility, responsive layouts, table overflow, dialogs, navigation, keyboard interaction, and print presentation.
 
-### Validation performed
+Schedule filtering and export scripts were reported as unchanged from the baseline.
 
-All comparisons used baseline commit `9a09ffb4d9a66095bc50c9cf2e2dc0aa590bf16b` and the same disposable local PostgreSQL database. Fixtures, database backup, review scripts and screenshots are outside the repository.
+### 29.2 Validation Environment
 
-| Check | Result |
-| --- | --- |
-| .NET 8 SDK 8.0.425 restore/build | Passed; final build: 0 warnings, 0 errors |
-| Before/after HTTP regression | 108 matching GET/POST records; guest/User/Admin, CRUD, validation, AJAX, generation cancel/save, load, notifications, password flow and nine PDF/Excel/CSV downloads |
-| Final rendered form comparison | 42 screens and 45 requests matched baseline; existing IDs retained and unique |
-| JavaScript syntax | All 8 external files and 10 rendered inline blocks passed Node syntax checks |
-| Resources | 53 linked CSS/JS resources returned HTTP 200; icon names exist in Bootstrap Icons 1.11.3 |
-| Source boundaries | Existing Razor conditions, calculations, business attributes and antiforgery controls retained; forbidden backend files unchanged; `git diff --check` passed |
-| Responsive layout | Main six pages at 1920×1080, 1440×900, 1366×768, 1024×768, 768×1024, 390×844 and 360×800; 41 reachable pages also checked at 360×800; no page overflow or unlabelled fields found |
-| Browser interactions | Individual/combined/time filters, reset/no-results, dynamic intervals, study-load draft changes and hidden-field creation, menu, tab keys, category validation, stacked lesson warnings, danger dialog and preview confirmation |
-| Short modal viewport | Preview confirmation fits 844×390; cancel receives initial focus; Tab wraps; Escape restores trigger |
-| Print CSS preview | Full: 30 lessons/3 groups; filtered: 1 lesson/1 group; shell/actions hidden and no sidebar offset |
-| Palette contrast | Main text/background 15.53:1; muted text/page background 5.32:1; primary/white 5.93:1; warning/error/success text on respective surfaces >5.9:1; input outline/white 3.46:1 |
+The reported comparisons used baseline commit:
 
-These are point-in-time checks, not a claim of complete automated test coverage. The repository has no existing automated test project. The review harness remains outside the source tree and is not part of the normal build.
+```text
+9a09ffb4d9a66095bc50c9cf2e2dc0aa590bf16b
+```
 
-### Remaining manual acceptance
+The checks used the same disposable local PostgreSQL database for the before-and-after comparison.
 
-* Native print preview/PDF pagination for full and filtered schedules, long groups and page breaks. The captured CSS preview promotes print rules into a static review page; it does not exercise browser pagination.
-* Actual 200% browser zoom and a physical mobile on-screen keyboard. A 720×450 reflow check passed; the in-app browser did not apply the requested browser zoom.
-* Full screen-reader and reduced-motion device acceptance; relevant markup and media rules were inspected, but these modes were not exercised with assistive hardware/software.
-* A small fixture covers three groups and long names, not a large institution with hundreds of groups. Additional scale/content checks remain.
-* Study-load submission created the expected indexed hidden fields in the browser. The in-app browser remained on its loading state; the independent HTTP regression verified the server save and redirect. Native browser submission and its original `beforeunload` interaction still need manual confirmation.
+Temporary fixtures, review scripts, database backups, and screenshots were kept outside the repository.
 
-### Existing issues outside the redesign
+### 29.3 Reported Validation Results
 
-* `Views/Account/AccessDenied.cshtml` exists, but `AccountController` has no corresponding action. Forbidden admin actions redirect to `/Account/AccessDenied`, which returns 404 in both versions.
-* `HomeController.Index` fetches the latest notifications globally without a user filter. A notification belonging to the test administrator was visible on the anonymous home page in the baseline. Notification visibility must be reviewed as a separate backend/security change.
+| Check | Reported result |
+|---|---|
+| .NET 8 restore and build | Passed; final build had 0 warnings and 0 errors |
+| HTTP regression comparison | 108 matching GET/POST records |
+| Final rendered form comparison | 42 screens and 45 requests matched the baseline |
+| JavaScript syntax | 8 external files and 10 rendered inline blocks passed syntax checks |
+| CSS and JavaScript resources | 53 linked resources returned HTTP 200 |
+| Source boundary review | Existing conditions, business attributes, and antiforgery controls retained |
+| Responsive layout | Six principal pages checked at seven viewport sizes |
+| Reachable-page narrow layout | 41 pages checked at 360 × 800 |
+| Browser interactions | Filters, reset, no-results, navigation, tabs, dialogs, and generator preview flows checked |
+| Short modal viewport | Preview confirmation checked at 844 × 390 |
+| Print styling | Full and filtered schedule scenarios reviewed |
+| Palette contrast | Reported text and surface combinations exceeded the documented thresholds |
 
-The refresh does not repair these server behaviors. They require a separate scoped change and regression checks. No publication or merge is included.
+These figures describe the reported review results at the time of testing. They should not be interpreted as proof of complete automated test coverage.
+
+### 29.4 Responsive and Accessibility Checks
+
+The review covered multiple viewport widths and heights, keyboard navigation, focus restoration, modal cancellation, visible focus indicators, form labels, and reduced-motion rules.
+
+The review also checked schedule tables for local scrolling and semantic column headers.
+
+However, the review did not fully exercise physical mobile keyboards, actual 200% browser zoom, or complete screen-reader acceptance with assistive software and hardware.
+
+### 29.5 Print Validation
+
+The print review used a full schedule containing 30 lessons across three groups and a filtered schedule containing one lesson for one group.
+
+The reviewed styles hide the application shell and administrative actions, reset the sidebar offset, and attempt to avoid splitting individual lessons.
+
+Actual browser pagination, long-group page breaks, and printed PDF output still require manual acceptance testing.
+
+### 29.6 Remaining Manual Acceptance
+
+The following checks were still identified as requiring further validation:
+
+- Native browser print preview and PDF pagination.
+- Actual 200% browser zoom.
+- Physical mobile on-screen keyboard behavior.
+- Full screen-reader and reduced-motion acceptance.
+- Large-institution data sets with substantially more groups.
+- Native browser submission behavior for the study-load workflow and its `beforeunload` interaction.
+
+The study-load workflow was reported to create the expected indexed hidden fields in the browser. Independent HTTP regression checks verified server-side saving and redirection, although the in-app browser remained in a loading state during one interaction test.
+
+### 29.7 Existing Issues Outside the Interface Refresh
+
+Two existing backend issues were identified during the review.
+
+**Access denied route:** `Views/Account/AccessDenied.cshtml` exists, but the reviewed `AccountController` did not contain a corresponding action. Forbidden administrative actions redirected to `/Account/AccessDenied`, which returned HTTP 404 in both the baseline and refreshed versions.
+
+**Notification visibility:** `HomeController.Index` was reported to retrieve the latest notifications without filtering them by user. A notification associated with a test administrator was visible on the anonymous home page in the baseline.
+
+The interface refresh did not resolve these issues. They require separate backend changes and regression testing.
+
+### 29.8 Scope and Limitations
+
+The reported validation is a point-in-time comparison, not a guarantee that all application behavior is correct.
+
+The repository did not contain an existing automated test project at the time of the review. The review harness was kept outside the source tree and was not part of the normal build.
+
+No publication or merge is implied by this documentation section.
