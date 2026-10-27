@@ -62,16 +62,16 @@ Detailed project documentation is available in the `docs/` directory.
 ## 🖥️ Application Screenshots
 
 ### Schedule Management
-![Schedule Management](docs/screenshots/schedule.png)
+![Schedule Management](docs/screenshots/schedule.png.png)
 
 ### Student Groups
-![Student Groups](docs/screenshots/groups.png)
+![Student Groups](docs/screenshots/groups.png.png)
 
 ### Automatic Schedule Generation
-![Schedule Generator](docs/screenshots/generator.png)
+![Schedule Generator](docs/screenshots/generator.png.png)
 
 ### Classrooms
-![Classrooms](docs/screenshots/classrooms.png)
+![Classrooms](docs/screenshots/classrooms.png.png)
 
 ## ✨ Features
 
