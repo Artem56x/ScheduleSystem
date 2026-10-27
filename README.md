@@ -26,12 +26,6 @@
 
 <br><br>
 
-**A web application for managing college timetables, validating scheduling constraints, and generating schedules automatically.**
-
-[Features](#-features) · [Screenshots](#-ApplicationScreenshots) · [Architecture](#-architecture) · [Installation](#-installation) · [Author](#-author)
-
-</div>
-
 ---
 
 ## 📌 About the Project
