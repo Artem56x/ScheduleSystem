@@ -2,89 +2,67 @@
 
 ## 1. Overview
 
-This guide describes how to install and run ScheduleSystem on a Windows computer.
+This guide describes how to install, configure, run, and update ScheduleSystem on a Windows computer.
 
-The deployment requires:
+ScheduleSystem is an ASP.NET Core MVC web application built with .NET 8 and PostgreSQL.
 
-* Windows;
-* .NET 8 SDK;
-* PostgreSQL;
-* Git;
-* ScheduleSystem source code.
+### Technology Stack
 
-The application uses:
+- ASP.NET Core MVC
+- .NET 8
+- Entity Framework Core
+- PostgreSQL
+- Npgsql
+- ASP.NET Core Identity
+- Git
 
-* ASP.NET Core MVC;
-* .NET 8;
-* Entity Framework Core;
-* PostgreSQL;
-* Npgsql;
-* ASP.NET Core Identity.
+### Requirements
 
----
+- Windows 10 or later
+- .NET 8 SDK
+- PostgreSQL
+- Git
+- Internet access for downloading dependencies
+- Sufficient disk space and memory for the application and database
 
-## 2. System Requirements
-
-### Minimum Requirements
-
-The application is designed to run on a modern Windows computer with:
-
-* Windows 10 or later;
-* .NET 8 SDK;
-* PostgreSQL 14 or later;
-* Git;
-* at least 4 GB RAM;
-* available disk space for the project and database.
-
-The exact PostgreSQL version may vary depending on the deployment environment.
+The exact PostgreSQL version should be selected according to the deployment environment and compatibility requirements.
 
 ---
 
-## 3. Required Software
-
-Install the following components before starting deployment.
+## 2. Install Required Software
 
 ### .NET 8 SDK
 
-The .NET SDK is required to build and run the application.
+Install the .NET 8 SDK from the official website:
 
-Verify the installation:
+https://dotnet.microsoft.com/download/dotnet/8.0
+
+Verify the installation in PowerShell:
 
 ```powershell
 dotnet --version
-```
-
-The command should return a version belonging to the .NET 8 SDK family.
-
-Verify installed SDKs:
-
-```powershell
 dotnet --list-sdks
 ```
 
----
+The installed SDK list should contain a version from the .NET 8 family.
 
-## 4. PostgreSQL
+### PostgreSQL
 
-PostgreSQL is the database management system used by ScheduleSystem.
+Install PostgreSQL using the official website:
 
-After installation, verify that the PostgreSQL service is running.
+https://www.postgresql.org/download/
 
-The application requires a PostgreSQL database named:
+Make sure the PostgreSQL service is running and that you know the database username and password.
 
-```text
-schedulesystem
-```
+The default PostgreSQL port is usually `5432`.
 
-The actual connection credentials depend on the deployment environment.
+### Git
 
----
+Install Git from:
 
-## 5. Git
+https://git-scm.com/downloads
 
-Git is recommended for obtaining and updating the project source code.
-
-Verify Git:
+Verify the installation:
 
 ```powershell
 git --version
@@ -92,13 +70,11 @@ git --version
 
 ---
 
-## 6. Obtaining the Project
+## 3. Obtain the Source Code
 
-The project repository is hosted on GitHub.
+The source code is hosted on GitHub.
 
-Repository:
-
-[ScheduleSystem GitHub Repository](https://github.com/Artem56x/ScheduleSystem.git?utm_source=chatgpt.com)
+Repository: https://github.com/Artem56x/ScheduleSystem
 
 Clone the repository:
 
@@ -106,17 +82,13 @@ Clone the repository:
 git clone https://github.com/Artem56x/ScheduleSystem.git
 ```
 
-Enter the project directory:
+Navigate to the project directory:
 
 ```powershell
 cd ScheduleSystem
 ```
 
----
-
-## 7. Checking the Project
-
-After cloning, verify the project files:
+Verify the downloaded files:
 
 ```powershell
 dir
@@ -138,157 +110,181 @@ appsettings.json
 ScheduleSystem.csproj
 ```
 
+The exact directory structure may change between versions.
+
 ---
 
-## 8. Restoring Dependencies
+## 4. Restore Dependencies
 
-Restore the .NET dependencies:
+Restore the NuGet packages required by the project:
 
 ```powershell
 dotnet restore
 ```
 
-This downloads the required NuGet packages defined by the project.
+This command downloads the dependencies defined in the project file.
+
+If the restore operation fails, check the internet connection, NuGet configuration, and any reported package errors.
 
 ---
 
-## 9. Database Configuration
+## 5. Configure the Database
 
-The application uses an ASP.NET Core configuration system for database settings.
+ScheduleSystem uses PostgreSQL through Entity Framework Core and the Npgsql provider.
 
-The PostgreSQL connection string must point to the target database.
+The application reads its connection string from the `DefaultConnection` configuration setting.
 
-A typical connection string has the following structure:
+A typical local connection string is:
 
 ```text
 Host=localhost;Port=5432;Database=schedulesystem;Username=postgres;Password=YOUR_PASSWORD
 ```
 
-The actual credentials must be configured for the local environment.
+Replace `YOUR_PASSWORD` with the password configured for your PostgreSQL account.
 
-Do not commit real production database passwords to Git.
-
----
-
-## 10. Creating the Database
-
-If the database does not already exist, create a PostgreSQL database named:
+The required database name is:
 
 ```text
 schedulesystem
 ```
 
-The database can be created using:
+### Configure the connection string
 
-* pgAdmin;
-* PostgreSQL command-line tools;
-* another PostgreSQL administration application.
+For local development, the connection string can be supplied through ASP.NET Core configuration or an environment variable.
 
-After creating the database, configure the application's connection string.
+To use an environment variable in the current PowerShell session:
+
+```powershell
+$env:ConnectionStrings__DefaultConnection = "Host=localhost;Port=5432;Database=schedulesystem;Username=postgres;Password=YOUR_PASSWORD"
+```
+
+Replace the example credentials before running the application.
+
+ASP.NET Core maps double underscores (`__`) in environment variable names to configuration hierarchy separators. Therefore, `ConnectionStrings__DefaultConnection` corresponds to `ConnectionStrings:DefaultConnection`.
+
+Do not commit real database credentials to Git.
 
 ---
 
-## 11. Entity Framework Core
+## 6. Create the Database
 
-ScheduleSystem uses Entity Framework Core migrations to create and update the database schema.
+Create a PostgreSQL database named `schedulesystem` if it does not already exist.
 
-If the EF Core CLI tool is not installed, install it with:
+You can use pgAdmin or the PostgreSQL command-line tool.
 
-```powershell
-dotnet tool install --global dotnet-ef
+Example using `psql`:
+
+```sql
+CREATE DATABASE schedulesystem;
 ```
 
-If it is already installed, update it when necessary:
+Run this command using a PostgreSQL account with permission to create databases.
 
-```powershell
-dotnet tool update --global dotnet-ef
-```
-
-Verify the installation:
-
-```powershell
-dotnet ef
-```
+If the database already exists, do not create it again.
 
 ---
 
-## 12. Applying Database Migrations
+## 7. Configure the Administrator Password
 
-After configuring the database connection, apply the existing migrations:
+ScheduleSystem uses an environment variable named `Admin__Password` to provide the administrator password to the application's initialization logic.
+
+Set it in the current PowerShell session:
 
 ```powershell
-dotnet ef database update
+$env:Admin__Password = "YOUR_STRONG_PASSWORD"
 ```
 
-Entity Framework Core will apply the migrations in the correct order.
+Verify that the variable is set without printing the password:
 
-The database will be updated to the schema expected by the current version of ScheduleSystem.
+```powershell
+if ($env:Admin__Password) {
+    Write-Host "Administrator password is configured."
+} else {
+    Write-Host "Administrator password is not configured."
+}
+```
+
+Keep the password private. Do not include it in screenshots, Git commits, or documentation.
+
+**Important:** Configure this variable in the same environment from which you start the application. A variable set in one PowerShell session is not automatically available in every other session.
 
 ---
 
-## 13. Verifying Migrations
+## 8. Administrator Account
 
-To check whether the project has unexpected model changes:
+The application initializes the administrator role and account through its Identity seeding logic when required.
 
-```powershell
-dotnet ef migrations has-pending-model-changes
-```
-
-A clean deployment should not have unexpected pending model changes.
-
-To view the available migrations:
-
-```powershell
-dotnet ef migrations list
-```
-
----
-
-## 14. Administrator Password Configuration
-
-The administrator password is intentionally not stored directly in the source code.
-
-ScheduleSystem expects the administrator password through configuration or an environment variable.
-
-The environment variable name is:
-
-```text
-Admin__Password
-```
-
-On Windows PowerShell, it can be configured for the current session:
-
-```powershell
-$env:Admin__Password="YOUR_STRONG_PASSWORD"
-```
-
-Verify that it is available:
-
-```powershell
-$env:Admin__Password
-```
-
-Do not publish the password in documentation, Git commits or screenshots.
-
----
-
-## 15. Administrator Account
-
-The administrator account uses the configured email:
+The configured administrator email is:
 
 ```text
 admin@schedulesystem.local
 ```
 
-The password must be supplied through the secure configuration mechanism described above.
+The password must be supplied through the secure configuration mechanism described in the previous section.
 
-The administrator account is created or initialized by the application's identity seeding logic when required.
+If the application fails during startup, verify that `Admin__Password` is configured and review the terminal output.
+
+The administrator email is a local application account identifier, not a public email service.
 
 ---
 
-## 16. Building the Application
+## 9. Install the Entity Framework Core CLI
 
-Before starting the application, build the project:
+ScheduleSystem uses Entity Framework Core migrations to manage the database schema.
+
+Check whether the EF Core CLI is available:
+
+```powershell
+dotnet ef
+```
+
+If the command is unavailable, install the tool:
+
+```powershell
+dotnet tool install --global dotnet-ef
+```
+
+If it is already installed and needs updating:
+
+```powershell
+dotnet tool update --global dotnet-ef
+```
+
+If PowerShell cannot find `dotnet-ef` after installation, restart the terminal and verify that the .NET global tools directory is included in `PATH`.
+
+---
+
+## 10. Apply Database Migrations
+
+From the directory containing `ScheduleSystem.csproj`, run:
+
+```powershell
+dotnet ef database update
+```
+
+Entity Framework Core applies the existing migrations to the database configured by the application.
+
+List available migrations:
+
+```powershell
+dotnet ef migrations list
+```
+
+Check whether the current model contains changes that have not been added to a migration:
+
+```powershell
+dotnet ef migrations has-pending-model-changes
+```
+
+A model change does not necessarily mean that an existing migration has failed. If changes are reported, review the model and migration history before creating a new migration.
+
+For a production database, back up the data and review migrations before applying schema changes.
+
+---
+
+## 11. Build the Application
+
+Build the project:
 
 ```powershell
 dotnet build
@@ -296,88 +292,66 @@ dotnet build
 
 A successful build should complete without errors.
 
-If the build fails, resolve the reported errors before continuing with deployment.
+If compilation fails, review the reported errors and resolve them before continuing.
+
+For a deployment check, you can also use:
+
+```powershell
+dotnet build --configuration Release
+```
 
 ---
 
-## 17. Running the Application
+## 12. Run the Application
 
-Start the application using:
+Ensure that the database connection and administrator password are configured in the current PowerShell session.
+
+Start the application:
 
 ```powershell
 dotnet run
 ```
 
-ASP.NET Core will start the web server and display the local application address in the terminal.
+The terminal displays the local addresses on which the application is listening.
 
-The address may look similar to:
+Open the address shown in the terminal. It may resemble:
 
 ```text
-https://localhost:xxxx
+https://localhost:7000
 ```
 
 or:
 
 ```text
-http://localhost:xxxx
+http://localhost:5000
 ```
 
-Use the address shown by the application rather than assuming a specific port.
+These are examples only. Use the actual address printed by the application.
+
+If HTTPS displays a local development certificate warning, configure and trust the ASP.NET Core development certificate as appropriate for your environment. Do not disable HTTPS security checks in production.
 
 ---
 
-## 18. Development Environment
-
-For development, the application can be launched directly with:
-
-```powershell
-dotnet run
-```
-
-Changes can then be made to the source code and tested locally.
-
-A typical development workflow is:
-
-```text
-Edit
-  ↓
-Build
-  ↓
-Run
-  ↓
-Test
-  ↓
-Review
-  ↓
-Commit
-```
-
----
-
-## 19. First Login
+## 13. First Login
 
 After the application starts:
 
-1. Open the local application address.
+1. Open the local application address in a browser.
 2. Navigate to the login page.
-3. Enter the administrator email.
-4. Enter the configured administrator password.
+3. Enter `admin@schedulesystem.local`.
+4. Enter the administrator password configured through `Admin__Password`.
 5. Sign in.
 6. Verify that administrator functionality is available.
 
-Administrator email:
-
-```text
-admin@schedulesystem.local
-```
+If login fails, check the password configuration, database connection, Identity initialization, and application logs.
 
 ---
 
-## 20. Initial Data Configuration
+## 14. Initial Data Configuration
 
-After the first successful login, configure the application data.
+Before generating a timetable, configure the reference data required by the application.
 
-Recommended order:
+A recommended sequence is:
 
 ```text
 Classroom Categories
@@ -388,42 +362,38 @@ Teachers
         ↓
 Subjects
         ↓
-Teacher–Subject Relations
+Teacher–Subject Assignments
         ↓
-Groups
+Student Groups
         ↓
-Schedule
+Group–Subject Assignments
+        ↓
+Schedule Configuration
+        ↓
+Schedule Generation
 ```
 
-This order ensures that dependent entities have the required reference data.
+The exact order can vary depending on which records already exist and which relationships the interface requires.
 
----
+### Classroom Categories
 
-## 21. Creating Classroom Categories
+Create the classroom categories required by the institution.
 
-Create the categories required by the institution.
+Examples:
 
-For example:
+- Standard Classroom
+- Computer Classroom
+- Specialized Classroom
 
-```text
-Standard Classroom
-Computer Classroom
-Specialized Classroom
-```
+Use categories that match the actual requirements of the institution.
 
-The names should match the actual organizational requirements.
+### Classrooms
 
----
+For each classroom, configure:
 
-## 22. Creating Classrooms
-
-Add available classrooms.
-
-For each classroom specify:
-
-* name;
-* category;
-* capacity.
+- Name or room number
+- Classroom category
+- Capacity
 
 Example:
 
@@ -433,211 +403,96 @@ Category: Computer Classroom
 Capacity: 25
 ```
 
-Verify that the capacity corresponds to the real classroom.
+Ensure that the capacity reflects the actual number of students the room can accommodate.
 
----
+### Teachers
 
-## 23. Creating Teachers
+Create teacher records and assign the subjects they are qualified to teach.
 
-Add the teachers who participate in the timetable.
+A teacher can be associated with multiple subjects.
 
-For each teacher:
+### Subjects
 
-1. Enter the teacher's information.
-2. Select the subjects they teach.
-3. Save the record.
+Create the subjects used by the institution.
 
-A teacher can have multiple subjects.
+Configure the available subject information, such as name, course, type, and classroom-category requirements, according to the fields provided by the application.
 
----
+### Student Groups
 
-## 24. Creating Subjects
+Create the student groups and configure their names, courses, and student counts.
 
-Add the subjects used by the institution.
+Student counts are important when evaluating classroom capacity and recommendations.
 
-Configure:
-
-* name;
-* course;
-* type;
-* classroom requirements.
-
-If a subject requires a specific classroom category, configure that requirement.
-
----
-
-## 25. Creating Groups
-
-Add the student groups.
-
-Configure:
-
-* group name;
-* course;
-* number of students.
-
-The student count is important because it affects classroom recommendations.
-
----
-
-## 26. Verifying Reference Data
+### Verify Reference Data
 
 Before generating a timetable, verify:
 
-* teacher names;
-* teacher-subject assignments;
-* subject names;
-* subject requirements;
-* group names;
-* student counts;
-* classroom categories;
-* classroom capacities.
+- Teacher and subject assignments
+- Group and subject assignments
+- Classroom categories and capacities
+- Subject classroom requirements
+- Group student counts
+- Schedule days and time slots
 
-Incorrect reference data can result in incorrect schedule generation.
+Incorrect reference data can lead to invalid or unexpected timetable assignments.
 
 ---
 
-## 27. Schedule Generation
+## 15. Generate and Validate a Schedule
 
 Once the reference data is ready:
 
 1. Open the schedule generation functionality.
 2. Review the generation settings.
-3. Start generation.
-4. Wait for the generation process to complete.
-5. Review the generated schedule.
+3. Start the generation process.
+4. Review the generated preview.
+5. Check for conflicts and unexpected assignments.
+6. Confirm and save the generated schedule through the application.
 
-The generator uses available teachers, groups, subjects and classrooms.
+Schedule generation uses the available academic data and configured constraints.
 
----
+The application includes validation functionality for relevant scheduling issues, including teacher, group, and classroom conflicts, time ranges, classroom capacity, and classroom-category requirements.
 
-## 28. Reviewing the Generated Schedule
-
-After generation, review the timetable using the schedule filters.
-
-Check:
-
-* teachers;
-* groups;
-* classrooms;
-* subjects;
-* days;
-* times.
-
-Pay particular attention to conflicts and unexpected assignments.
+Review validation warnings carefully. Not every warning necessarily means that the schedule cannot be saved; the behavior depends on the particular validation rule.
 
 ---
 
-## 29. Manual Schedule Corrections
+## 16. Review and Export the Schedule
 
-Individual schedule entries can be edited when required.
+Use the schedule filters to review the timetable by available criteria, such as group, teacher, classroom, subject, day, and time.
 
-Before saving a correction, the application validates the schedule.
+Before distributing the timetable, verify that:
 
-Possible validation issues include:
+- Teachers are assigned correctly.
+- Groups have the expected lessons.
+- Classrooms meet the requirements.
+- Time slots do not conflict.
+- The generated schedule matches the institution's requirements.
 
-* teacher overlap;
-* group overlap;
-* classroom overlap;
-* invalid time range;
-* insufficient classroom capacity;
-* incompatible classroom category.
+ScheduleSystem supports schedule export in the following formats:
 
----
+| Format | Typical use |
+|---|---|
+| Excel | Further editing and analysis |
+| PDF | Printing and sharing |
 
-## 30. Exporting the Schedule
-
-After reviewing the timetable, export the final schedule.
-
-Available formats include:
-
-```text
-PDF
-Excel
-CSV
-```
-
-Recommended use:
-
-| Format | Recommended purpose  |
-| ------ | -------------------- |
-| PDF    | Printing and sharing |
-| Excel  | Editing and analysis |
-| CSV    | Data processing      |
+Export availability may depend on the current application interface and the data selected for export.
 
 ---
 
-## 31. Production Configuration
+## 17. Update the Application
 
-For production deployment, configuration should be separated from development settings.
+Before updating an existing installation, back up the database.
 
-Production configuration should include:
-
-* production database connection;
-* secure administrator password;
-* appropriate logging;
-* HTTPS;
-* secure PostgreSQL credentials.
-
-Secrets must not be committed to the Git repository.
-
----
-
-## 32. Environment Variables
-
-Environment variables can be used for sensitive configuration.
-
-For example:
-
-```powershell
-$env:Admin__Password="YOUR_STRONG_PASSWORD"
-```
-
-The application can then read the value through the ASP.NET Core configuration system.
-
-For a persistent Windows environment variable, configure it through the operating system rather than storing the secret in the source repository.
-
----
-
-## 33. Database Backup Before Deployment
-
-Before applying major migrations or deploying a new version, create a PostgreSQL backup.
-
-A typical PostgreSQL backup can be created using:
-
-```powershell
-pg_dump -U postgres -d schedulesystem -F c -f schedulesystem_backup.dump
-```
-
-The exact command may need to be adjusted according to the local PostgreSQL installation.
-
-Store backups securely.
-
----
-
-## 34. Database Restore
-
-If a database needs to be restored, use PostgreSQL's restore tools appropriate for the backup format.
-
-For a custom-format backup created with `pg_dump -F c`, a typical restore command is:
-
-```powershell
-pg_restore -U postgres -d schedulesystem schedulesystem_backup.dump
-```
-
-Before restoring a production database, verify the backup and target environment.
-
----
-
-## 35. Updating the Application
-
-When a new version is available:
+Navigate to the project directory and retrieve the latest changes:
 
 ```powershell
 git pull origin main
 ```
 
-Then restore dependencies:
+If you have local source-code changes, commit or back them up before pulling updates.
+
+Restore dependencies:
 
 ```powershell
 dotnet restore
@@ -646,268 +501,211 @@ dotnet restore
 Build the application:
 
 ```powershell
-dotnet build
+dotnet build --configuration Release
 ```
 
-Apply migrations if required:
+Apply migrations if the new version introduces database schema changes:
 
 ```powershell
 dotnet ef database update
 ```
 
-Finally start the application:
+Restart the application and verify the main features.
 
-```powershell
-dotnet run
-```
-
----
-
-## 36. Recommended Update Workflow
-
-The complete update workflow is:
+The update workflow is:
 
 ```text
-Backup Database
-      ↓
-Pull New Version
-      ↓
+Back Up Database
+        ↓
+Retrieve New Version
+        ↓
 Restore Dependencies
-      ↓
-Build
-      ↓
-Apply Migrations
-      ↓
+        ↓
+Build Application
+        ↓
+Apply Required Migrations
+        ↓
 Start Application
-      ↓
-Test
-      ↓
-Verify Data
+        ↓
+Verify Functionality
 ```
 
-Do not skip the database backup before major schema changes.
-
 ---
 
-## 37. Deployment Verification
+## 18. Database Backup and Restore
 
-After deployment, verify the following:
+### Create a Backup
 
-### Application
-
-* [ ] Application starts successfully.
-* [ ] No startup errors occur.
-* [ ] Main page opens.
-
-### Authentication
-
-* [ ] Login works.
-* [ ] Administrator account works.
-* [ ] Authorization works.
-
-### Database
-
-* [ ] PostgreSQL is accessible.
-* [ ] Database connection works.
-* [ ] Migrations are applied.
-
-### Main Features
-
-* [ ] Teachers open correctly.
-* [ ] Groups open correctly.
-* [ ] Subjects open correctly.
-* [ ] Classrooms open correctly.
-* [ ] Schedule opens correctly.
-* [ ] Schedule validation works.
-* [ ] Schedule generation works.
-* [ ] Notifications work.
-* [ ] Export works.
-
----
-
-## 38. Build Verification
-
-Run:
+A PostgreSQL custom-format backup can be created with `pg_dump`:
 
 ```powershell
-dotnet build
+pg_dump -U postgres -d schedulesystem -F c -f schedulesystem_backup.dump
 ```
 
-The expected result is:
+Depending on the installation, you may need to provide the PostgreSQL host, port, or executable path.
 
-```text
-Build succeeded.
+Enter credentials securely when prompted. Avoid putting passwords directly in shell commands or scripts.
+
+### Restore a Backup
+
+A custom-format backup can be restored with `pg_restore`.
+
+For example, to restore into an existing, appropriately prepared database:
+
+```powershell
+pg_restore -U postgres -d schedulesystem schedulesystem_backup.dump
 ```
 
-The deployment should not proceed if the project contains build errors.
+Restoring into a database that already contains application data may cause conflicts or duplicate records. When performing a full recovery, follow a deliberate restore procedure and verify the target database before proceeding.
+
+Store backup files securely and test that backups can actually be restored.
 
 ---
 
-## 39. Troubleshooting
+## 19. Production Configuration
 
-### `dotnet` command is not recognized
+Running the application with `dotnet run` is suitable for development and basic local testing. It is not, by itself, a complete production hosting setup.
 
-Install the .NET 8 SDK and restart the terminal.
+A production deployment should account for:
+
+- A secure database connection and credentials
+- A securely configured administrator password
+- HTTPS and certificate management
+- Appropriate application hosting and process management
+- Logging and error monitoring
+- Database backup and recovery procedures
+- Restricted database and administrator access
+- Protected configuration and secrets
+- Dependency and security updates
+
+Do not expose the PostgreSQL port or development server directly to the public internet without an appropriate network and security configuration.
+
+The exact hosting procedure depends on whether the application is deployed to Windows Server, a virtual machine, a container platform, or another hosting environment.
+
+---
+
+## 20. Troubleshooting
+
+### `dotnet` Is Not Recognized
+
+Install the .NET 8 SDK and restart PowerShell.
 
 Verify:
 
 ```powershell
-dotnet --version
+dotnet --list-sdks
 ```
 
----
+### `dotnet ef` Is Not Recognized
 
-### `dotnet ef` command is not recognized
-
-Install the Entity Framework Core CLI:
+Install or update the global EF Core tool:
 
 ```powershell
 dotnet tool install --global dotnet-ef
 ```
 
-Then restart the terminal if necessary.
+Restart the terminal if necessary.
 
----
-
-### PostgreSQL connection error
+### PostgreSQL Connection Fails
 
 Check:
 
-* PostgreSQL service;
-* host;
-* port;
-* database name;
-* username;
-* password;
-* connection string.
+- Whether the PostgreSQL service is running
+- Host and port
+- Database name
+- Username and password
+- `ConnectionStrings__DefaultConnection`
+- Database access permissions
 
-The default PostgreSQL port is commonly:
+The default PostgreSQL port is usually `5432`.
 
-```text
-5432
-```
+### The Database Does Not Exist
 
----
-
-### Database does not exist
-
-Create:
-
-```text
-schedulesystem
-```
-
-Then run:
+Create the `schedulesystem` database using pgAdmin or `psql`, then apply migrations:
 
 ```powershell
 dotnet ef database update
 ```
 
----
+### Migration Application Fails
 
-### Migration fails
+Check the database connection, permissions, migration history, and application configuration.
 
-Check:
+Before attempting corrective schema changes, back up the database and inspect the error message.
 
-1. Database connection.
-2. PostgreSQL permissions.
-3. Current migration state.
-4. Application configuration.
-5. Database backup.
+### Administrator Initialization Fails
 
-Do not manually modify migration history unless you fully understand the consequences.
+Verify that the application process has access to `Admin__Password`.
 
----
-
-### Administrator account is not initialized
-
-Check that:
-
-```text
-Admin__Password
-```
-
-is available to the application.
-
-For the current PowerShell session:
+In the current PowerShell session:
 
 ```powershell
-$env:Admin__Password="YOUR_STRONG_PASSWORD"
+if (-not $env:Admin__Password) {
+    Write-Host "Admin__Password is missing."
+}
 ```
 
-Then restart the application.
+Configure the variable and restart the application.
+
+### The Application Starts but Pages Fail
+
+Review:
+
+- Terminal output and application logs
+- Database connectivity
+- Migration status
+- Browser developer console
+- Authentication and authorization
+- The specific HTTP status code
+
+Use the error details to identify the problem rather than modifying database tables or migration history blindly.
 
 ---
 
-### Application starts but pages fail
+## 21. Deployment Verification Checklist
 
-Check:
+### Software and Configuration
 
-* database connection;
-* migrations;
-* application logs;
-* browser developer console;
-* server terminal output.
+- [ ] .NET 8 SDK is installed.
+- [ ] PostgreSQL is running.
+- [ ] Git is installed.
+- [ ] Source code has been retrieved.
+- [ ] Dependencies have been restored.
+- [ ] Database connection is configured.
+- [ ] `Admin__Password` is configured securely.
 
----
+### Database
 
-## 40. Security Checklist
+- [ ] The `schedulesystem` database exists.
+- [ ] EF Core migrations have been applied.
+- [ ] The application can connect to PostgreSQL.
+- [ ] A database backup has been created.
 
-Before exposing the application to other users:
+### Application
 
-* [ ] Use a strong administrator password.
-* [ ] Do not store passwords in source code.
-* [ ] Do not commit secrets to Git.
-* [ ] Protect PostgreSQL credentials.
-* [ ] Use HTTPS.
-* [ ] Restrict database access.
-* [ ] Back up the database.
-* [ ] Limit administrator access.
-* [ ] Keep dependencies updated.
-
----
-
-## 41. Development vs Production
-
-### Development
-
-Typical command:
-
-```powershell
-dotnet run
-```
-
-Development commonly uses:
-
-* local PostgreSQL;
-* local configuration;
-* developer tools;
-* local testing.
-
-### Production
-
-Production should use:
-
-* secure database credentials;
-* protected configuration;
-* HTTPS;
-* database backups;
-* controlled access;
-* monitoring and logging.
-
-The exact production hosting configuration depends on the target environment.
+- [ ] The project builds successfully.
+- [ ] The application starts without startup errors.
+- [ ] The login page opens.
+- [ ] The administrator can sign in.
+- [ ] Authorization behaves as expected.
+- [ ] Teachers, groups, subjects, and classrooms can be managed.
+- [ ] Schedule filtering works.
+- [ ] Schedule validation works.
+- [ ] Schedule generation and confirmation work.
+- [ ] Notifications and audit logging work as expected.
+- [ ] Excel and PDF export work where available.
 
 ---
 
-## 42. Deployment Architecture
+## 22. Deployment Architecture
 
-A basic deployment can be represented as:
+A basic deployment consists of a browser, the ASP.NET Core application, and the PostgreSQL database.
 
 ```text
 ┌───────────────────────────────┐
 │          Client PC            │
 │                               │
-│       Web Browser             │
+│         Web Browser           │
 └───────────────┬───────────────┘
                 │
                 │ HTTP / HTTPS
@@ -915,7 +713,7 @@ A basic deployment can be represented as:
 ┌───────────────────────────────┐
 │       ASP.NET Core App        │
 │                               │
-│       ScheduleSystem          │
+│         ScheduleSystem        │
 └───────────────┬───────────────┘
                 │
                 │ Npgsql
@@ -923,124 +721,39 @@ A basic deployment can be represented as:
 ┌───────────────────────────────┐
 │          PostgreSQL           │
 │                               │
-│        schedulesystem         │
+│         schedulesystem        │
 └───────────────────────────────┘
 ```
 
----
-
-## 43. Recommended Deployment Sequence
-
-The complete installation sequence is:
-
-```text
-Install Windows
-      ↓
-Install .NET 8 SDK
-      ↓
-Install PostgreSQL
-      ↓
-Install Git
-      ↓
-Clone ScheduleSystem
-      ↓
-Configure Database
-      ↓
-Configure Admin__Password
-      ↓
-Restore Dependencies
-      ↓
-Apply EF Core Migrations
-      ↓
-Build Application
-      ↓
-Run Application
-      ↓
-Login
-      ↓
-Configure Initial Data
-      ↓
-Generate Schedule
-      ↓
-Verify
-```
+The application communicates with PostgreSQL through Entity Framework Core and Npgsql.
 
 ---
 
-## 44. Maintenance
+## 23. Conclusion
 
-Regular maintenance should include:
+ScheduleSystem can be installed locally on Windows using the .NET 8 SDK, PostgreSQL, and Git.
 
-* database backups;
-* dependency updates;
-* application updates;
-* migration checks;
-* build verification;
-* review of audit logs;
-* verification of schedule data.
+The essential deployment steps are:
 
-Before major updates, create a database backup.
+1. Install the required software.
+2. Retrieve the source code.
+3. Configure the PostgreSQL connection.
+4. Create the database.
+5. Configure `Admin__Password`.
+6. Apply Entity Framework Core migrations.
+7. Build and run the application.
+8. Sign in and configure reference data.
+9. Generate, validate, and export the schedule.
+10. Verify the installation and establish a backup procedure.
 
----
+For production use, additional hosting, security, monitoring, and recovery configuration is required.
 
-## 45. Final Deployment Checklist
+## Related Documentation
 
-### Software
-
-* [ ] Windows installed.
-* [ ] .NET 8 SDK installed.
-* [ ] PostgreSQL installed.
-* [ ] Git installed.
-
-### Application
-
-* [ ] Repository cloned.
-* [ ] Dependencies restored.
-* [ ] Configuration completed.
-* [ ] Administrator password configured.
-* [ ] Application builds successfully.
-
-### Database
-
-* [ ] `schedulesystem` database created.
-* [ ] Connection configured.
-* [ ] EF Core migrations applied.
-* [ ] Database backup created.
-
-### Verification
-
-* [ ] Application starts.
-* [ ] Administrator can log in.
-* [ ] Dashboard works.
-* [ ] Reference data can be managed.
-* [ ] Schedule works.
-* [ ] Validation works.
-* [ ] Generation works.
-* [ ] Notifications work.
-* [ ] Export works.
-
----
-
-## 46. Conclusion
-
-ScheduleSystem can be deployed on a Windows computer using a standard ASP.NET Core and PostgreSQL setup.
-
-The essential deployment process is:
-
-```text
-.NET 8
-  +
-PostgreSQL
-  +
-ScheduleSystem
-  +
-EF Core Migrations
-  +
-Secure Configuration
-      ↓
-Working ScheduleSystem Installation
-```
-
-The application uses Entity Framework Core migrations for database management and ASP.NET Core Identity for authentication and authorization.
-
-Following this guide provides a repeatable deployment process while keeping application credentials and database information outside the source code.
+- `Architecture.md` — application architecture.
+- `ArchitectureDiagram.md` — architecture diagrams.
+- `Database.md` — database documentation.
+- `DatabaseDiagram.md` — database ER diagram.
+- `TechnicalDocumentation.md` — technical implementation.
+- `AdminGuide.md` — administrator instructions.
+- `UserGuide.md` — user instructions.
