@@ -4,178 +4,244 @@
 
 ScheduleSystem is a web application for managing and generating college class schedules.
 
-The system allows users to work with:
+The application provides functionality for working with:
 
-* schedules;
-* teachers;
-* student groups;
-* subjects;
-* classrooms;
-* notifications;
-* schedule exports;
-* personal account settings.
+- Class schedules
+- Teachers and their subjects
+- Student groups
+- Subjects and classroom requirements
+- Classrooms and classroom categories
+- Schedule validation
+- Automatic schedule generation
+- Notifications and account management
+- Schedule exports
 
-The application is designed for educational institutions where schedule management needs to be centralized and partially automated.
+The system is designed to centralize timetable management, reduce manual scheduling work, and help identify scheduling conflicts.
+
+Some functions are available only to users with the appropriate permissions.
 
 ---
 
 ## 2. Getting Started
 
-After launching the application, the user is presented with the main page.
+Start the application and open it in a web browser.
 
-The main navigation contains:
+After opening the application, use the main navigation to access the available sections:
 
-* **Главная** — dashboard and system overview;
-* **Расписание** — schedule management;
-* **Преподаватели** — teacher management;
-* **Группы** — student group management;
-* **Предметы** — subject management;
-* **Аудитории** — classroom management.
+- **Главная** — dashboard and system overview.
+- **Расписание** — view, filter, and manage schedule entries.
+- **Преподаватели** — manage teacher records and subject assignments.
+- **Группы** — manage student groups.
+- **Предметы** — manage subjects and their requirements.
+- **Аудитории** — manage classrooms, categories, and capacities.
 
-Additional account and settings functions are available through the user profile.
+Additional account functions are available through the account or profile interface.
+
+The exact actions available on each page depend on the user's permissions and the application's current configuration.
 
 ---
 
 ## 3. Dashboard
 
-The **Главная** page provides an overview of the system.
+The **Главная** page provides an overview of the application.
 
-The dashboard contains information about the current amount of:
+Depending on the current implementation and available data, the dashboard may display summary information about:
 
-* teachers;
-* groups;
-* subjects;
-* classrooms;
-* scheduled lessons.
+- Teachers
+- Student groups
+- Subjects
+- Classrooms
+- Scheduled lessons
 
-The dashboard is intended to provide a quick overview without opening individual sections.
+Use the dashboard to get a quick overview before opening a specific management section.
+
+If expected information is missing, check that the application is connected to the correct database and that the required records have been created.
 
 ---
 
 ## 4. Working with the Schedule
 
-Open **Расписание** from the main navigation.
+Open **Расписание** to view the timetable.
 
-The schedule page contains the available lessons and filtering tools.
+The schedule page provides a list of schedule entries and filtering options.
 
 ### 4.1 Schedule Filters
 
-The schedule can be filtered by:
+Available filters include:
 
-* group;
-* teacher;
-* classroom;
-* subject;
-* day of the week;
-* time.
+- Student group
+- Teacher
+- Classroom
+- Subject
+- Day of the week
+- Start and end time
 
-Filters can be combined to find a specific lesson or subset of the timetable.
+Filters can be combined to narrow the results.
 
-For example, a user can select a group and a day to display only the lessons for that group on the selected day.
+For example, selecting a group and a day of the week helps display the lessons scheduled for that group on that day.
+
+To review the complete timetable, clear any filters that are no longer needed.
+
+### 4.2 Reviewing Schedule Entries
+
+When reviewing a lesson, check the following information:
+
+- Group
+- Teacher
+- Subject
+- Classroom
+- Day of the week
+- Start time
+- End time
+
+Verify the selected values before saving changes or exporting the timetable.
 
 ---
 
 ## 5. Creating a Schedule Entry
 
-To create a new lesson:
+If your account has permission to manage schedule entries, follow these steps:
 
 1. Open **Расписание**.
-2. Select the option to add a schedule entry.
-3. Select a group.
+2. Select the action for adding a schedule entry.
+3. Select a student group.
 4. Select a teacher.
 5. Select a subject.
 6. Select a classroom.
-7. Select the day of the week.
-8. Specify the start time.
-9. Specify the end time.
-10. Save the entry.
+7. Choose the day of the week.
+8. Enter the start time.
+9. Enter the end time.
+10. Review the information and save the entry.
 
-The system validates the entered data before saving.
+The application validates schedule data and checks for relevant conflicts.
+
+If a validation message appears, read it before proceeding. Correct the invalid information or follow the application's confirmation process when an explicitly confirmable warning is shown.
+
+The exact behavior depends on the validation result and the operation being performed.
 
 ---
 
 ## 6. Schedule Validation
 
-ScheduleSystem checks schedule entries for conflicts.
+ScheduleSystem includes a schedule validation service that checks schedule entries for common problems.
 
-The system validates:
+Validation may cover:
 
-* start and end time;
-* teacher conflicts;
-* group conflicts;
-* classroom conflicts;
-* overlapping lessons;
-* compatibility of classroom requirements;
-* classroom capacity.
+- Valid day and time values
+- Start and end time consistency
+- Teacher scheduling conflicts
+- Group scheduling conflicts
+- Classroom scheduling conflicts
+- Overlapping lessons
+- Teacher-subject assignments
+- Classroom capacity
+- Classroom category requirements
+- Related group, teacher, subject, and classroom records
 
-A lesson cannot be saved when it creates an invalid schedule conflict unless the corresponding business logic explicitly allows the operation.
+### Example: Teacher Conflict
 
-### Example
+Suppose a teacher already has a lesson from `08:30` to `09:30`.
 
-If a teacher already has a lesson from `08:30` to `09:30`, assigning the same teacher to another lesson during the same period creates a conflict.
+Assigning the same teacher to another lesson during an overlapping period can create a scheduling conflict.
 
-The system detects the conflict and informs the user.
+The validation service checks relevant constraints and reports problems according to the implemented validation rules.
+
+Some warnings may allow an authorized user to confirm an operation. Do not assume that every warning can be ignored or that every invalid entry can be saved.
 
 ---
 
 ## 7. Automatic Schedule Generation
 
-ScheduleSystem contains an automatic schedule generation system.
+ScheduleSystem includes an automatic schedule generator.
 
-The generator can create a timetable based on the available:
+The generator attempts to build a timetable using available data and configured restrictions, including:
 
-* groups;
-* subjects;
-* teachers;
-* classrooms;
-* teaching days;
-* schedule restrictions.
+- Student groups
+- Subjects and required lesson counts
+- Teacher-subject assignments
+- Classrooms and their categories
+- Teaching days and time slots
+- Scheduling constraints
+- Classroom recommendations, when enabled
 
-The default generation settings include:
+### 7.1 Preparing for Generation
 
-| Setting                 | Default value |
-| ----------------------- | ------------: |
-| Lessons per week        |             3 |
-| Maximum lessons per day |             4 |
-| Teaching days per week  |             5 |
-| Maximum gaps per day    |             2 |
-| Allow gaps              |           Yes |
+Before starting generation:
 
-The generator attempts to create a valid timetable while respecting the configured restrictions.
+1. Add the required classrooms and classroom categories.
+2. Create teacher records.
+3. Assign subjects to teachers.
+4. Create the required subjects and their relationships with groups.
+5. Add student groups and enter their student counts.
+6. Review the available scheduling settings.
+7. Open the schedule generation interface.
 
-Automatic generation is useful when a large number of groups and subjects need to be scheduled.
+The generator may fail to produce a complete timetable when the source data is incomplete or the constraints cannot be satisfied.
+
+### 7.2 Generation Settings
+
+Generation settings depend on the values configured in the generation interface.
+
+They may include:
+
+- Teaching days
+- Available time slots
+- Maximum lessons per day
+- Maximum consecutive lessons
+- Lesson distribution preferences
+- Classroom recommendation options
+
+Do not assume that every setting has the same default value across all parts of the application. Review the values displayed by the generation form before starting the process.
+
+### 7.3 Preview and Confirmation
+
+The generation workflow supports previewing the proposed timetable before saving it.
+
+Recommended procedure:
+
+1. Configure the generation settings.
+2. Start generation.
+3. Review the generated timetable.
+4. Check the proposed entries for conflicts and unsuitable assignments.
+5. Confirm and save the result if it meets the requirements.
+6. Open **Расписание** to review the saved timetable.
+
+Generating a preview does not necessarily mean that the entries have already been saved. Complete the confirmation step when it is available.
+
+If generation fails, review the input data, available time slots, teacher-subject assignments, classroom requirements, and scheduling restrictions.
 
 ---
 
 ## 8. Teachers
 
-Open **Преподаватели** to manage teachers.
+Open **Преподаватели** to manage teacher records.
 
-A teacher can be associated with multiple subjects.
+Teachers can be associated with multiple subjects. These relationships help the application determine whether a teacher is suitable for a particular lesson.
 
 ### 8.1 Adding a Teacher
 
-To add a teacher:
-
 1. Open **Преподаватели**.
-2. Select **Добавить**.
-3. Enter the teacher information.
-4. Select the subjects taught by the teacher.
-5. Save the teacher.
+2. Select the action for adding a teacher.
+3. Enter the required teacher information.
+4. Assign the subjects taught by the teacher, if the form provides this option.
+5. Review the information.
+6. Save the record.
 
 ### 8.2 Editing a Teacher
 
-Open the required teacher and select the edit option.
+1. Find the required teacher.
+2. Open the edit action.
+3. Update the relevant information.
+4. Review the subject assignments.
+5. Save the changes.
 
-The assigned subjects can be changed at any time.
+### 8.3 Teacher-Subject Validation
 
-### 8.3 Teacher Validation
+When a schedule entry is created or edited, the application checks the relationship between the selected teacher and subject.
 
-When creating or editing a schedule, the system checks the relationship between the selected teacher and subject.
+If the teacher is not assigned to the selected subject, the application may report a warning or require confirmation, depending on the operation and validation rules.
 
-If the teacher is not assigned to the selected subject, the system can display a confirmation warning.
-
-This prevents accidental assignment while still allowing an administrator to explicitly confirm the operation when required.
+Check the teacher's subject assignments before changing the schedule.
 
 ---
 
@@ -183,15 +249,20 @@ This prevents accidental assignment while still allowing an administrator to exp
 
 Open **Группы** to manage student groups.
 
-A group contains information such as:
+A group record can include information such as:
 
-* group name;
-* course;
-* number of students.
+- Group name
+- Course
+- Number of students
+- Other descriptive information supported by the form
 
-The course is limited to the supported college course range.
+Use the official group name and enter the correct student count.
 
-The number of students is used by the classroom recommendation system when selecting suitable classrooms.
+The course must fall within the range supported by the application.
+
+Student counts are important because classroom recommendations use group size to help identify suitable rooms.
+
+Before generating a timetable, verify that the group records are complete and accurate.
 
 ---
 
@@ -199,17 +270,19 @@ The number of students is used by the classroom recommendation system when selec
 
 Open **Предметы** to manage subjects.
 
-A subject can contain:
+Depending on the available fields, a subject may include:
 
-* subject name;
-* course;
-* subject type;
-* classroom category requirements;
-* assigned teachers.
+- Subject name
+- Course
+- Subject type
+- Required classroom categories
+- Teacher assignments or related teacher records
 
-Subjects can require specific types of classrooms.
+Some subjects require specialized classrooms.
 
-For example, a subject requiring computers can be associated with the **Компьютерный класс** classroom category.
+For example, a subject that requires computers can be associated with the **Компьютерный класс** category.
+
+Review the subject requirements before generating a timetable. Incorrect requirements can prevent suitable classrooms from being selected.
 
 ---
 
@@ -217,131 +290,136 @@ For example, a subject requiring computers can be associated with the **Комп
 
 Open **Аудитории** to manage classrooms.
 
-A classroom contains:
+A classroom record can contain:
 
-* classroom name;
-* classroom category;
-* capacity.
+- Classroom name or number
+- Classroom category
+- Capacity
 
-The classroom category describes the type of room.
+The classroom category describes the room's intended use. Examples include standard classrooms, computer classrooms, and specialized rooms, depending on the categories configured in the application.
 
-Examples may include:
+Enter the actual classroom identifier and its correct capacity.
 
-* standard classroom;
-* computer classroom;
-* specialized classroom.
-
-The classroom capacity is used when selecting suitable rooms for student groups.
+Classroom information affects both manual scheduling and automatic classroom recommendations.
 
 ---
 
 ## 12. Classroom Recommendations
 
-ScheduleSystem can recommend suitable classrooms for a lesson.
+ScheduleSystem includes a classroom recommendation service.
 
-The recommendation system considers:
+Recommendations consider relevant information such as:
 
 1. Classroom category requirements of the subject.
 2. Number of students in the group.
 3. Classroom capacity.
-4. Classroom availability.
+4. Classroom availability and scheduling conflicts.
 
-For example, if a group contains 25 students, a classroom with a capacity of 20 students will not be recommended.
+### Example: Classroom Capacity
 
-If a subject requires a computer classroom, only classrooms belonging to the appropriate category are considered suitable.
+If a group has 25 students, a classroom with a capacity of 20 students is unsuitable for that group.
+
+### Example: Classroom Category
+
+If a subject requires a computer classroom, a room from an incompatible category should not be treated as suitable.
+
+Recommendations are intended to assist scheduling decisions. Review the selected classroom and any validation messages before saving a timetable entry.
 
 ---
 
 ## 13. Notifications
 
-The system provides notifications for important schedule-related events.
+ScheduleSystem includes a notification interface for schedule-related information.
 
-Notifications can contain information about:
+Depending on the application's current implementation, notifications may contain details about a subject, group, scheduled time, or relevant changes.
 
-* the subject;
-* the group;
-* the scheduled time;
-* schedule changes.
+Example notification:
 
-The notification interface is available through the notification section of the application.
-
-Example:
-
-> Компьютерная графика — 25БД-1
+> Компьютерная графика — 25БД-1  
 > Время: 08:30–09:30
 
-Notifications help users quickly identify changes or important schedule information.
+Open the notification interface to review available messages.
+
+Notification availability and visibility may depend on the current implementation and the user's permissions. If a notification appears unrelated to your account, report the issue to the system administrator.
 
 ---
 
 ## 14. Schedule Export
 
-ScheduleSystem supports exporting schedules into several formats:
+ScheduleSystem provides schedule export functionality in **PDF and Excel formats**.
 
-* PDF;
-* Excel;
-* CSV.
+The available export actions depend on the current schedule page and the export options implemented by the application.
 
-The system supports exporting the general schedule as well as schedules for individual entities where applicable.
-
-Typical file names include:
+Typical file names may resemble:
 
 ```text
 Общее_расписание.pdf
 Общее_расписание.xlsx
-Общее_расписание.csv
 ```
 
-Individual schedule exports may use a format similar to:
+An individual export may use a name similar to:
 
 ```text
 Расписание_Название.xlsx
 ```
 
-Exported files can be opened using compatible desktop applications.
+The actual file name depends on the export operation.
+
+### 14.1 Choosing a Format
+
+- **PDF** — suitable for viewing, sharing, and printing.
+- **Excel** — suitable for spreadsheet-based review and further analysis.
+
+CSV export should only be used if a CSV option is present in the current application version.
+
+### 14.2 Recommended Export Procedure
+
+1. Open **Расписание**.
+2. Apply the required filters, if applicable.
+3. Review the displayed schedule.
+4. Select the appropriate export action.
+5. Save the generated file.
+6. Open the file and verify that the expected records are included.
+
+Export the timetable after reviewing the final changes.
 
 ---
 
-## 15. Account
+## 15. Account and Authentication
 
-The application uses authentication based on ASP.NET Core Identity.
+ScheduleSystem uses ASP.NET Core Identity for authentication and account management.
 
-Users can access their personal account through the account interface.
+Depending on the application's configuration, users can access account-related pages to sign in, register, or manage supported account information.
 
-The profile page contains information about the current account.
+Some pages and operations require authentication.
 
-Depending on the user's permissions, additional administrative functionality may be available.
+If sign-in fails, check the entered credentials and contact the administrator if the problem persists.
+
+Never share account passwords or store them in public repositories.
 
 ---
 
 ## 16. Profile
 
-The profile section provides access to personal information and account-related functions.
+The profile interface provides access to information associated with the current account.
 
-The page can contain:
+Depending on the implemented profile page, it may display details such as the user's display name and email address.
 
-* display name;
-* email address;
-* account status;
-* quick actions;
-* notification settings.
+The available profile actions depend on the current application version and account permissions.
 
-The profile interface is designed to provide access to frequently used account functions without navigating through multiple pages.
+If you need to change information that is not editable through the interface, contact the system administrator.
 
 ---
 
 ## 17. Settings
 
-The application provides settings for account and system-related functionality.
+Available settings depend on the user's role and the application's implementation.
 
-Available sections depend on the user's role.
+Administrative settings may include program-related configuration or other system management functions.
 
-The settings interface may contain:
+Before changing system-wide settings, verify what the setting controls and whether the change affects other users.
 
-* profile settings;
-* notification settings;
-* program settings for administrators;
-* application information.
+If a setting is unavailable, your account may not have the required permissions, or the functionality may not be implemented in the current version.
 
 ---
 
@@ -351,42 +429,50 @@ ScheduleSystem supports role-based access control.
 
 The main roles are:
 
-* **User** — regular application user;
-* **Admin** — administrator with access to administrative functions.
+- **User** — regular application user.
+- **Admin** — administrator with access to protected management and configuration functions.
 
-Administrative functions may include management of system data and configuration.
+Administrative access is required for certain operations, including access to the schedule generation interface.
 
-Users should only perform actions allowed by their assigned role.
+The exact permissions depend on the authorization rules implemented for each page and action.
+
+Use administrator privileges only when necessary. Do not attempt to bypass access restrictions.
 
 ---
 
 ## 19. Working with Data
 
-When entering data into the system, use consistent naming.
+Consistent data entry improves searching, filtering, validation, and exporting.
 
-### Recommended group naming
+### Group Names
 
 Use the official group name used by the educational institution.
 
-### Recommended teacher naming
+### Teacher Names
 
-Enter the teacher's full name in a consistent format.
+Enter teacher names in a consistent format.
 
-### Recommended subject naming
+### Subject Names
 
-Use the official subject name from the curriculum.
+Use the official subject names from the curriculum.
 
-### Recommended classroom naming
+### Classroom Names
 
 Use the actual classroom number or identifier.
 
-Consistent naming makes searching, filtering and exporting information easier.
+### Capacity and Categories
+
+Enter accurate classroom capacities and select the appropriate classroom categories.
+
+Review related records when editing or removing data. Existing schedule entries may depend on teachers, groups, subjects, or classrooms.
 
 ---
 
-## 20. Recommended Workflow
+## 20. Recommended Setup Workflow
 
-For a new installation, it is recommended to enter information in the following order:
+For a new installation, prepare reference data before generating a timetable.
+
+A recommended order is:
 
 ```text
 Classroom Categories
@@ -399,155 +485,187 @@ Subjects
         ↓
 Groups
         ↓
-Teacher–Subject Relations
+Group-Subject and Teacher-Subject Relationships
+        ↓
+Generation Settings
         ↓
 Schedule Generation
         ↓
-Schedule Validation
+Validation and Review
         ↓
 Schedule Export
 ```
 
-This order ensures that the generator has the necessary data available.
+The exact order may vary depending on the required relationships and the available management forms.
+
+The important requirement is that the generator has complete and consistent data before it starts.
 
 ---
 
 ## 21. Creating a Complete Timetable
 
-A typical workflow for creating a timetable is:
+Use the following workflow to create and review a timetable.
 
-### Step 1 — Add classrooms
+### Step 1 — Configure Classroom Categories
 
-Create the available classrooms and specify their categories and capacities.
+Check that the categories required by the institution are available.
 
-### Step 2 — Add teachers
+### Step 2 — Add Classrooms
 
-Create teacher accounts and assign the subjects they teach.
+Create the classrooms and specify their categories and capacities.
 
-### Step 3 — Add subjects
+### Step 3 — Add Teachers
 
-Create the subjects and specify their course and classroom requirements.
+Create teacher records and configure their subject assignments.
 
-### Step 4 — Add groups
+### Step 4 — Add Subjects
 
-Create student groups and specify the number of students.
+Create the subjects and specify their relevant course and classroom requirements.
 
-### Step 5 — Generate the schedule
+### Step 5 — Add Groups
 
-Use the schedule generation functionality to create an initial timetable.
+Create student groups and enter accurate student counts.
 
-### Step 6 — Review the timetable
+### Step 6 — Check Relationships
 
-Check the generated schedule using the available filters.
+Verify that the required teacher-subject and group-subject relationships are configured.
 
-### Step 7 — Correct individual entries
+### Step 7 — Generate the Schedule
 
-If necessary, edit individual schedule entries.
+Open the schedule generation interface, configure the available settings, and start generation.
 
-### Step 8 — Export
+### Step 8 — Review the Preview
 
-Export the final timetable to the required format.
+Check the proposed timetable and address any reported issues.
+
+### Step 9 — Confirm and Save
+
+Confirm the result when the preview meets the requirements.
+
+### Step 10 — Review and Export
+
+Open the schedule page, verify the saved entries, and export the timetable in the required format.
 
 ---
 
 ## 22. Avoiding Common Problems
 
-### Teacher is not available
+### A Teacher Is Not Available
 
 Check whether the teacher already has a lesson during the selected period.
 
-### Classroom is not suitable
+Also verify that the teacher is assigned to the selected subject when required.
+
+### A Classroom Is Not Suitable
 
 Check:
 
-* classroom category;
-* classroom capacity;
-* existing lessons in the same period.
+- Classroom category
+- Classroom capacity
+- Subject requirements
+- Existing lessons in the same period
 
-### Group conflict
+### A Group Has a Scheduling Conflict
 
 Check whether the group already has another lesson at the selected time.
 
-### Subject cannot be assigned to a teacher
+### A Teacher Is Not Assigned to the Subject
 
-Check the teacher's assigned subjects.
+Review the teacher-subject relationship.
 
-If the assignment is intentional, review the confirmation warning shown by the system.
+If the application presents a confirmation warning, follow the displayed instructions and confirm only when the assignment is intentional and authorized.
 
-### Schedule overlaps
+### Schedule Entries Overlap
 
-Check the selected:
+Review the selected group, teacher, classroom, day, start time, and end time.
 
-* group;
-* teacher;
-* classroom;
-* day;
-* start time;
-* end time.
+### Automatic Generation Does Not Produce a Complete Timetable
+
+Check:
+
+- Required subject and group relationships
+- Teacher-subject assignments
+- Classroom categories and capacities
+- Available teaching days and time slots
+- Daily and consecutive-lesson restrictions
+- Existing schedule conflicts
+
+The generator may be unable to find a complete solution when the constraints are incompatible.
 
 ---
 
-## 23. Data Accuracy Recommendations
+## 23. Data Accuracy Checklist
 
 Before generating or exporting a timetable, verify that:
 
-* all teachers have been added;
-* subjects are correctly configured;
-* teacher-subject relationships are correct;
-* all groups have correct student counts;
-* classrooms have correct capacities;
-* classroom categories are correct;
-* schedule restrictions are configured correctly.
+- [ ] Required teachers have been added.
+- [ ] Subjects are configured correctly.
+- [ ] Teacher-subject assignments are accurate.
+- [ ] Required group-subject relationships are configured.
+- [ ] Group names and student counts are correct.
+- [ ] Classroom names and capacities are correct.
+- [ ] Classroom categories match their actual use.
+- [ ] Subject classroom requirements are correct.
+- [ ] Generation settings reflect the institution's requirements.
+- [ ] The final timetable has been reviewed for conflicts.
 
-Incorrect source data can lead to an incomplete or unsuitable generated timetable.
+Incorrect source data can lead to incomplete or unsuitable schedules.
 
 ---
 
 ## 24. Export Recommendations
 
-It is recommended to export the final schedule after all changes have been reviewed.
+Export the timetable after reviewing the saved entries.
 
 Use:
 
-* **PDF** for printing and viewing;
-* **Excel** for further editing and analysis;
-* **CSV** for data processing or import into other systems.
+- **PDF** for printing and viewing.
+- **Excel** for spreadsheet-based review and analysis.
 
-Keep an exported copy of the final timetable as a backup.
+After exporting:
+
+1. Open the file.
+2. Check that the expected records are present.
+3. Verify group, teacher, subject, classroom, day, and time information.
+4. Keep a copy of the final export in an approved storage location.
+
+An exported file is a snapshot of the schedule at the time of export. Exporting does not replace the application database or automatically update a previously downloaded file.
 
 ---
 
 ## 25. Troubleshooting
 
-### The application does not open
+### The Application Does Not Open
 
 Check that:
 
-* PostgreSQL is running;
-* the database connection string is correct;
-* the required .NET runtime/SDK is installed;
-* the application starts without build errors.
+- The application is running.
+- PostgreSQL is available.
+- The database connection string is correct.
+- The required .NET runtime or SDK is installed for the selected launch method.
+- The application starts without build or configuration errors.
 
-### Database errors appear
+### Database Errors Appear
 
-Check the database connection and ensure that all EF Core migrations have been applied.
+Check the database connection and verify that the required Entity Framework Core migrations have been applied.
 
-### Data is missing
+### Expected Data Is Missing
 
-Verify that the correct database is configured in the application.
+Verify that the application is connected to the correct database and that the records exist in that database.
 
-### Schedule generation produces unexpected results
+### Schedule Generation Produces Unexpected Results
 
-Check the source data and generation settings.
+Review the source data, teacher-subject assignments, group-subject relationships, classroom requirements, available time slots, and generation settings.
 
-In particular, verify:
+### An Access-Denied or Not-Found Page Appears
 
-* teacher-subject relationships;
-* group student counts;
-* classroom capacities;
-* classroom categories;
-* subject requirements;
-* existing schedule conflicts.
+Verify that the signed-in account has the required role and that the requested page is available in the deployed application version.
+
+If the problem persists, provide the administrator with the page URL, the action performed, and the error message. Do not include passwords or other secrets.
+
+### Export Fails
+
+Check that the schedule can be opened in the application and try the export again. If the error persists, record the selected export format and any displayed error message.
 
 ---
 
@@ -555,37 +673,45 @@ In particular, verify:
 
 For reliable operation:
 
-1. Keep all reference data up to date.
-2. Use consistent naming.
-3. Check teacher-subject relationships.
-4. Verify classroom capacities.
-5. Review generated schedules before publishing them.
-6. Export final schedules as backups.
-7. Use administrator permissions only when necessary.
-8. Avoid deleting reference data that is still used by schedules.
+1. Keep reference data accurate and up to date.
+2. Use consistent naming conventions.
+3. Verify teacher-subject and group-subject relationships.
+4. Check classroom capacities and categories.
+5. Review generation settings before starting.
+6. Inspect the generated timetable before confirming it.
+7. Correct reported conflicts before publishing the timetable.
+8. Export the final schedule after reviewing changes.
+9. Protect administrator credentials.
+10. Avoid deleting reference records that are still used by schedules.
 
 ---
 
 ## 27. Summary
 
-ScheduleSystem provides a centralized environment for managing college schedules.
+ScheduleSystem provides a centralized environment for managing college schedules, validating schedule entries, recommending suitable classrooms, and generating timetables.
 
 The recommended workflow is:
 
 ```text
-Prepare data
-    ↓
-Configure teachers and subjects
-    ↓
-Configure groups and classrooms
-    ↓
-Generate schedule
-    ↓
-Validate schedule
-    ↓
-Review and edit
-    ↓
-Export final schedule
+Prepare reference data
+        ↓
+Configure teachers, subjects, and groups
+        ↓
+Configure classrooms and requirements
+        ↓
+Review generation settings
+        ↓
+Generate a timetable
+        ↓
+Validate and review the preview
+        ↓
+Confirm and save
+        ↓
+Review the saved schedule
+        ↓
+Export the final timetable
 ```
 
-Following this workflow helps maintain consistent schedule data and reduces the number of manual scheduling errors.
+Following this workflow helps maintain consistent scheduling data and reduces manual scheduling errors.
+
+For problems that cannot be resolved through the application interface, contact the system administrator and provide the relevant error message and steps to reproduce the issue.
