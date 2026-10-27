@@ -2,176 +2,194 @@
 
 ## 1. Overview
 
-ScheduleSystem is an ASP.NET Core MVC web application built with .NET 8.
+ScheduleSystem is a web application built with ASP.NET Core MVC and .NET 8 for managing educational schedules.
 
-The application follows a layered architecture based on the Model-View-Controller (MVC) pattern.
+The application provides functionality for managing teachers, subjects, student groups, classrooms and lessons. It also includes automatic schedule generation, schedule validation, classroom recommendations, authentication and schedule export.
+
+The application uses a layered structure based on the Model-View-Controller (MVC) pattern.
 
 The main architectural components are:
 
-* Models;
-* Controllers;
-* Services;
-* ViewModels;
-* Razor Views;
-* Entity Framework Core;
-* PostgreSQL;
-* ASP.NET Core Identity.
+- ASP.NET Core MVC;
+- Controllers and Razor Views;
+- Models and ViewModels;
+- Application services;
+- Entity Framework Core;
+- PostgreSQL;
+- ASP.NET Core Identity;
+- Dependency injection.
 
-The architecture separates presentation, application logic and data access.
+The architecture separates HTTP request handling, application logic, presentation and persistent data access.
 
 ---
 
 ## 2. High-Level Architecture
 
-The general application architecture can be represented as:
+The application follows a server-side MVC architecture.
 
 ```text
-                         User
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │ Razor Views │
-                    │    (.cshtml)│
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │ Controllers │
-                    └──────┬──────┘
-                           │
-              ┌────────────┴────────────┐
-              │                         │
-              ▼                         ▼
-       ┌──────────────┐        ┌────────────────┐
-       │   Services   │        │   ViewModels   │
-       └──────┬───────┘        └────────────────┘
-              │
-              ▼
-       ┌──────────────────┐
-       │ Entity Framework │
-       │       Core       │
-       └────────┬─────────┘
-                │
-                ▼
-       ┌──────────────────┐
-       │    PostgreSQL    │
-       └──────────────────┘
+                       Browser
+                          |
+                          | HTTP Request
+                          v
+                ASP.NET Core Middleware
+                          |
+                          v
+                       Routing
+                          |
+                          v
+                     Controllers
+                          |
+               +----------+----------+
+               |                     |
+               v                     v
+            Services          ApplicationDbContext
+               |                     |
+               |                     v
+               |              Entity Framework Core
+               |                     |
+               +---------------------+
+                                     |
+                                     v
+                                 PostgreSQL
+
+                     Controller Result
+                            |
+                            v
+                       Razor Views
+                            |
+                            v
+                         Browser
 ```
 
-ASP.NET Core Identity is integrated into the application and uses the same Entity Framework Core database context.
+Controllers coordinate requests and responses. Services implement reusable application operations, while Entity Framework Core provides access to the PostgreSQL database.
+
+ASP.NET Core Identity is integrated with the application's Entity Framework Core context.
 
 ---
 
 ## 3. MVC Pattern
 
-The application uses the Model-View-Controller pattern.
+ScheduleSystem uses the Model-View-Controller pattern.
 
-### Model
+### 3.1. Models
 
-Models represent application data and domain entities.
+Models represent application entities and their relationships.
 
 Examples include:
 
-* `Teacher`;
-* `Subject`;
-* `Group`;
-* `Classroom`;
-* `Schedule`;
-* `TeacherSubject`;
-* `Notification`;
-* `AuditLog`.
+- `Teacher`;
+- `Subject`;
+- `Group`;
+- `Classroom`;
+- `ClassroomCategory`;
+- `Schedule`;
+- `TeacherSubject`;
+- `GroupSubject`;
+- `Notification`;
+- `AuditLog`.
 
 Models are mapped to database tables through Entity Framework Core.
 
----
+Some supporting models represent schedule-generation settings, time slots and other application-specific data.
 
-### View
+### 3.2. Views
 
-Views are Razor `.cshtml` files.
+Views are Razor `.cshtml` files responsible for rendering pages and collecting user input.
 
-They are responsible for displaying information and collecting user input.
-
-Examples include:
+Feature-related views are organized into directories such as:
 
 ```text
-Views/Teachers/
-Views/Subjects/
-Views/Groups/
-Views/Classrooms/
-Views/Schedules/
-Views/Account/
-Views/Home/
+Views/
+├── Account/
+├── Analytics/
+├── AuditLogs/
+├── Classrooms/
+├── Groups/
+├── Home/
+├── Notifications/
+├── ScheduleGenerator/
+├── Schedules/
+├── Subjects/
+└── Teachers/
 ```
 
-The views do not contain the main business logic of the application.
+The actual directories depend on the current project files.
 
----
+Views are responsible for presentation. Server-side controllers and services remain responsible for processing requests and enforcing application rules.
 
-### Controller
+### 3.3. Controllers
 
-Controllers process HTTP requests and coordinate application operations.
+Controllers receive HTTP requests, coordinate application operations and return views, redirects or other responses.
 
 Examples include:
 
 ```text
-TeachersController
-SubjectsController
-GroupsController
-ClassroomsController
-SchedulesController
-ScheduleGeneratorController
-NotificationsController
 AccountController
 AnalyticsController
 AuditLogsController
+ClassroomsController
+GroupsController
+GroupSubjectsController
 HomeController
+NotificationsController
+ScheduleGeneratorController
+SchedulesController
+SubjectsController
+TeachersController
 ```
 
-Controllers receive user requests, validate input, call services or the database layer and return the appropriate view or response.
+Controllers can interact with `ApplicationDbContext` directly or use registered application services, depending on the operation.
+
+The schedule-generation workflow is handled separately by `ScheduleGeneratorController`.
 
 ---
 
 ## 4. Layered Architecture
 
-ScheduleSystem can be logically divided into several layers.
+The application can be logically divided into the following layers.
 
 ```text
-┌──────────────────────────────────────┐
-│          Presentation Layer          │
-│                                      │
-│        Razor Views / ViewModels      │
-└──────────────────┬───────────────────┘
-                   │
-┌──────────────────▼───────────────────┐
-│          Application Layer            │
-│                                      │
-│ Controllers / Services / Validation  │
-└──────────────────┬───────────────────┘
-                   │
-┌──────────────────▼───────────────────┐
-│             Data Layer                │
-│                                      │
-│ ApplicationDbContext / EF Core       │
-└──────────────────┬───────────────────┘
-                   │
-┌──────────────────▼───────────────────┐
-│             Database                  │
-│                                      │
-│              PostgreSQL               │
-└──────────────────────────────────────┘
++--------------------------------------+
+|          Presentation Layer          |
+|          Razor Views / UI            |
++-------------------+------------------+
+                    |
+                    v
++--------------------------------------+
+|          Request Handling            |
+|             Controllers              |
++-------------------+------------------+
+                    |
+                    v
++--------------------------------------+
+|          Application Logic           |
+|               Services               |
++-------------------+------------------+
+                    |
+                    v
++--------------------------------------+
+|             Data Access               |
+|       ApplicationDbContext / EF Core |
++-------------------+------------------+
+                    |
+                    v
++--------------------------------------+
+|               Database                |
+|              PostgreSQL               |
++--------------------------------------+
 ```
 
-This separation makes the application easier to maintain and extend.
+This is a logical representation rather than a strict physical separation into independent projects. Controllers may use the database context directly where the current implementation requires it.
 
 ---
 
 ## 5. Project Structure
 
-The main project structure is organized approximately as follows:
+The following tree illustrates the main areas of the project. It is representative rather than an exhaustive inventory of every source file.
 
 ```text
 ScheduleSystem/
-│
 ├── Controllers/
 │   ├── AccountController.cs
 │   ├── AnalyticsController.cs
@@ -204,35 +222,26 @@ ScheduleSystem/
 │   ├── Subject.cs
 │   ├── Teacher.cs
 │   ├── TeacherSubject.cs
-│   └── ...
+│   └── Generator/
+│       └── Schedule-generation-related models
 │
 ├── Services/
 │   ├── ClassroomRecommendationService.cs
 │   ├── ScheduleExportService.cs
 │   ├── ScheduleGeneratorService.cs
-│   └── ScheduleValidationService.cs
+│   ├── ScheduleValidationService.cs
+│   └── TeacherRecommendationService.cs
 │
 ├── ViewComponents/
 │   └── NotificationBell/
 │
 ├── ViewModels/
-│   └── ...
+│   └── Presentation-specific models
 │
 ├── Views/
-│   ├── Account/
-│   ├── Analytics/
-│   ├── AuditLogs/
-│   ├── Classrooms/
-│   ├── Groups/
-│   ├── Home/
-│   ├── Notifications/
-│   ├── ScheduleGenerator/
-│   ├── Schedules/
-│   ├── Subjects/
-│   └── Teachers/
+│   └── Feature-specific Razor Views
 │
 ├── Migrations/
-│
 ├── wwwroot/
 │   ├── css/
 │   ├── js/
@@ -243,280 +252,282 @@ ScheduleSystem/
 └── ScheduleSystem.csproj
 ```
 
+Some model types are located in subdirectories and namespaces. The actual source tree is authoritative when checking individual file locations.
+
 ---
 
-## 6. Controllers
+## 6. Controller Responsibilities
 
-Controllers are responsible for handling incoming requests.
+Controllers handle incoming requests and coordinate the work required to produce a response.
 
-A typical request flow is:
+A typical MVC request follows this sequence:
 
 ```text
 HTTP Request
-     ↓
-Controller
-     ↓
-Validation
-     ↓
-Service / DbContext
-     ↓
-ViewModel
-     ↓
-Razor View
+     |
+     v
+Controller Action
+     |
+     v
+Input and Model Validation
+     |
+     v
+Service and/or DbContext
+     |
+     v
+Result Processing
+     |
+     v
+Razor View, Redirect or File Response
 ```
 
-Controllers should coordinate operations rather than contain large amounts of complex business logic.
+Controllers may perform query construction and straightforward data operations. More complex reusable operations are delegated to services.
+
+The implementation does not require every controller to follow an identical internal sequence.
 
 ---
 
-## 7. Services
+## 7. Application Services
 
-The application uses dedicated services for complex operations.
+Application services encapsulate reusable operations and domain-related processing.
 
-Important services include:
+The application registers the following services through dependency injection:
 
-### ScheduleValidationService
+- `ScheduleExportService`;
+- `ScheduleValidationService`;
+- `ScheduleGeneratorService`;
+- `ClassroomRecommendationService`;
+- `TeacherRecommendationService`.
 
-Responsible for checking schedule consistency and detecting conflicts.
+### 7.1. ScheduleValidationService
 
-It can validate:
+`ScheduleValidationService` checks schedule data and reports validation errors or warnings.
 
-* teacher conflicts;
-* group conflicts;
-* classroom conflicts;
-* time ranges;
-* classroom capacity;
-* classroom category requirements.
+The implementation includes checks related to:
 
----
+- valid days and time ranges;
+- the existence of referenced teachers, groups, subjects and classrooms;
+- compatibility between a group's course and a subject's course;
+- teacher-subject assignments;
+- classroom capacity;
+- scheduling conflicts and classroom requirements.
 
-### ScheduleGeneratorService
+The exact validation result depends on the submitted schedule and the relevant validation conditions.
 
-Responsible for automatic schedule generation.
+### 7.2. ScheduleGeneratorService
 
-It uses:
+`ScheduleGeneratorService` performs automatic schedule generation.
 
-* groups;
-* subjects;
-* teachers;
-* classrooms;
-* schedule restrictions;
-* generation settings.
+It receives a `ScheduleGenerationRequest`, validates the request and processes the selected groups, days, time slots and generation settings.
 
----
+The service evaluates possible assignments against scheduling constraints and returns a generation result.
 
-### ClassroomRecommendationService
+The generation process is separate from the HTTP request-handling logic in `ScheduleGeneratorController`.
 
-Responsible for finding suitable classrooms.
+### 7.3. ClassroomRecommendationService
 
-The service considers:
+`ClassroomRecommendationService` supports classroom selection by evaluating classroom suitability.
 
-* classroom category;
-* group size;
-* classroom capacity;
-* classroom availability;
-* subject requirements.
+Relevant factors include classroom capacity, category requirements, availability and scheduling conflicts.
 
----
+Recommendations assist the user in selecting a suitable classroom. They should not be interpreted as a guarantee that every possible scheduling constraint has been satisfied.
 
-### ScheduleExportService
+### 7.4. TeacherRecommendationService
 
-Responsible for converting schedule data into export formats.
+`TeacherRecommendationService` provides teacher-related recommendation functionality used by the schedule-management workflow.
 
-Supported formats include:
+Its exact selection rules are defined by the service implementation.
 
-* PDF;
-* Excel;
-* CSV.
+### 7.5. ScheduleExportService
+
+`ScheduleExportService` generates downloadable schedule documents.
+
+The implementation uses:
+
+- ClosedXML for Excel workbook generation;
+- QuestPDF for PDF document generation.
+
+Supported export options should be determined from the actual controller actions and public methods. An export format should not be considered available merely because it is mentioned in documentation.
 
 ---
 
 ## 8. Why Services Are Used
 
-Complex operations are separated into services instead of being implemented directly inside controllers.
+Services help separate complex or reusable operations from HTTP request handling.
 
-For example, automatic schedule generation is a complex process.
+For example, schedule generation involves input processing, loading related data, evaluating possible assignments and applying scheduling constraints.
 
-Without a dedicated service, the controller would contain:
+Without a dedicated service, the controller would need to coordinate all these details directly.
 
-```text
-Request handling
-+
-Validation
-+
-Generation algorithm
-+
-Database operations
-+
-Error handling
-```
-
-Using a service separates these responsibilities:
+The current separation can be represented as:
 
 ```text
-Controller
-    ↓
+ScheduleGeneratorController
+             |
+             v
 ScheduleGeneratorService
-    ↓
-ApplicationDbContext
+             |
+             v
+    ApplicationDbContext
+             |
+             v
+         PostgreSQL
 ```
 
-This makes the code easier to test and maintain.
+This structure improves readability and creates a clearer place for future changes to generation rules.
+
+It does not, by itself, guarantee automated test coverage or complete separation of all business logic.
 
 ---
 
-## 9. Models
+## 9. Domain Models
 
-Models represent persistent domain entities.
+Domain models represent the entities and relationships used by the application.
 
-Examples:
+Important entities include:
 
-```text
-Teacher
-Subject
-Group
-Classroom
-ClassroomCategory
-Schedule
-ScheduleTimeSlot
-ScheduleGenerationSettings
-Notification
-AuditLog
-```
+| Model | Purpose |
+|---|---|
+| `Teacher` | Stores teacher information |
+| `Subject` | Represents an academic subject |
+| `Group` | Represents a student group |
+| `Classroom` | Represents a classroom |
+| `ClassroomCategory` | Classifies classrooms |
+| `Schedule` | Represents a scheduled lesson |
+| `TeacherSubject` | Links teachers and subjects |
+| `GroupSubject` | Represents a group-subject relationship |
+| `Notification` | Represents a user notification |
+| `AuditLog` | Represents an audit-log entry |
+| `ScheduleTimeSlot` | Represents a reusable schedule time slot |
+| `ScheduleGenerationSettings` | Stores schedule-generation settings |
 
-Models can contain:
+Models may contain properties, navigation properties, validation attributes and relationship configuration.
 
-* properties;
-* navigation properties;
-* relationships;
-* validation-related attributes where appropriate.
+The database schema is defined through Entity Framework Core mappings and migrations.
 
 ---
 
-## 10. Teacher–Subject Architecture
+## 10. Teacher–Subject Relationship
 
-Teachers and subjects use a many-to-many relationship.
+Teachers and subjects are connected through the `TeacherSubject` entity.
 
-```text
-┌──────────────┐
-│    Teacher   │
-└──────┬───────┘
-       │
-       │ 1:N
-       ▼
-┌────────────────┐
-│ TeacherSubject │
-└───────┬────────┘
-        │
-        │ N:1
-        ▼
-┌──────────────┐
-│   Subject    │
-└──────────────┘
-```
-
-This allows:
+The relationship is many-to-many:
 
 ```text
-One Teacher → Multiple Subjects
-One Subject → Multiple Teachers
++-------------+       +----------------+       +-------------+
+|   Teacher   | 1   N | TeacherSubject | N   1 |   Subject   |
++-------------+-------+----------------+-------+-------------+
 ```
 
-The relationship is represented by `TeacherSubject`.
+This relationship allows:
 
-The composite key is:
+- one teacher to be associated with multiple subjects;
+- one subject to be associated with multiple teachers.
+
+`ApplicationDbContext` configures a composite key consisting of:
 
 ```text
 TeacherId + SubjectId
 ```
 
+The relationship uses foreign keys to connect the join entity to teachers and subjects.
+
 ---
 
 ## 11. ViewModels
 
-ViewModels are used when the data required by a page does not directly correspond to one database entity.
+ViewModels represent data prepared specifically for a page or form.
 
-They allow the application to prepare exactly the data required by a view.
+They are useful when the information required by a view does not correspond to a single database entity.
 
-For example, teacher creation can require:
+For example, a form may require:
 
 ```text
-Teacher information
-+
-Available subjects
-+
-Selected subjects
+Entity Information
+        +
+Available Options
+        +
+Selected Values
 ```
 
-Instead of exposing database entities directly, a dedicated ViewModel can represent the form.
+A ViewModel can combine these values into a presentation-specific structure.
 
-This improves separation between the database model and the presentation layer.
+ViewModels help keep page-specific data separate from persistent domain entities. Their use depends on the requirements of each feature.
 
 ---
 
 ## 12. Data Access
 
-Entity Framework Core is responsible for data access.
+The application uses Entity Framework Core for database access.
 
-The application uses:
+The main context is:
 
-```text
+```csharp
 ApplicationDbContext
 ```
 
-which inherits from:
+It inherits from:
 
-```text
+```csharp
 IdentityDbContext<ApplicationUser>
 ```
 
-The context provides access to application entities and Identity entities.
+This enables the same context to manage application entities and ASP.NET Core Identity data.
+
+The context exposes `DbSet` properties for entities including teachers, groups, subjects, classrooms, schedules, notifications and audit logs.
+
+It also configures relationships, keys and delete behaviors through `OnModelCreating`.
 
 ---
 
-## 13. PostgreSQL
+## 13. PostgreSQL Integration
 
-PostgreSQL is the persistent database system.
+PostgreSQL is the application's persistent relational database.
 
-The application communicates with PostgreSQL through:
+The application uses the Npgsql Entity Framework Core provider.
+
+The data-access flow is:
 
 ```text
+C# Models
+    |
+    v
 Entity Framework Core
-        +
-Npgsql
-```
-
-The general flow is:
-
-```text
-C# Entity
-   ↓
-EF Core
-   ↓
-Npgsql
-   ↓
+    |
+    v
+Npgsql Provider
+    |
+    v
 PostgreSQL
 ```
+
+Application configuration supplies the database connection string through the ASP.NET Core configuration system.
+
+The actual connection string and credentials depend on the deployment environment.
 
 ---
 
 ## 14. Dependency Injection
 
-ASP.NET Core dependency injection is used to provide application services and framework components.
+The application uses the built-in ASP.NET Core dependency injection container.
 
-Services can be registered in the application's startup configuration and injected where required.
+Services and framework components are registered during application startup in `Program.cs`.
 
 For example:
 
-```text
-Controller
-    ↓
-Injected Service
-    ↓
-Service Logic
+```csharp
+builder.Services.AddScoped<ScheduleExportService>();
+builder.Services.AddScoped<ScheduleValidationService>();
+builder.Services.AddScoped<ClassroomRecommendationService>();
+builder.Services.AddScoped<ScheduleGeneratorService>();
+builder.Services.AddScoped<TeacherRecommendationService>();
 ```
 
-This reduces direct coupling between components.
+The scoped lifetime means a new service instance is created for a given dependency-injection scope.
+
+Controllers receive required dependencies through their constructors.
+
+This reduces the need to instantiate application services manually and makes dependencies explicit.
 
 ---
 
@@ -524,594 +535,724 @@ This reduces direct coupling between components.
 
 Authentication is implemented using ASP.NET Core Identity.
 
-The authentication architecture is:
+The application configures Identity with `ApplicationUser` and `IdentityRole` and uses Entity Framework Core for identity storage.
+
+The authentication flow is:
 
 ```text
 User
- ↓
-Login
- ↓
+  |
+  v
+Login Form
+  |
+  v
 ASP.NET Core Identity
- ↓
-Authentication
- ↓
-Authorization
- ↓
-Controller / Resource
+  |
+  v
+Authentication Cookie
+  |
+  v
+Authenticated Request
 ```
 
-Identity manages:
+The application configures login and access-denied paths.
 
-* users;
-* passwords;
-* roles;
-* authentication state;
-* claims;
-* account-related information.
+Password policy and account lockout settings are defined in `Program.cs`. The current configuration requires a minimum password length of eight characters, a digit, lowercase and uppercase letters, and a non-alphanumeric character. It also configures a lockout after repeated failed login attempts.
 
 ---
 
 ## 16. Authorization
 
-Authorization determines which operations a user is allowed to perform.
+Authorization controls access to protected actions and resources.
 
-The application supports role-based access control.
-
-Main roles:
+The application supports role-based access control with the roles:
 
 ```text
 User
 Admin
 ```
 
-Administrative controllers and actions can be protected using authorization rules.
+For example, `ScheduleGeneratorController` is protected with:
+
+```csharp
+[Authorize(Roles = "Admin")]
+```
+
+This restricts the controller to authenticated users assigned the `Admin` role.
+
+Other controllers and actions may use different authorization rules. Access requirements should be checked against the relevant controller and action attributes.
 
 ---
 
-## 17. Schedule Architecture
+## 17. Schedule Management Architecture
 
-The scheduling subsystem is composed of several components:
+Manual schedule management is handled by `SchedulesController`.
+
+The controller uses:
+
+- `ApplicationDbContext`;
+- `ScheduleExportService`;
+- `ScheduleValidationService`;
+- `ClassroomRecommendationService`;
+- `TeacherRecommendationService`.
+
+The general flow is:
 
 ```text
+Browser
+   |
+   v
 SchedulesController
-       │
-       ├───────────────┐
-       │               │
-       ▼               ▼
-ScheduleValidation   ScheduleGenerator
-Service              Service
-       │               │
-       └───────┬───────┘
-               │
-               ▼
-       ApplicationDbContext
-               │
-               ▼
-           PostgreSQL
+   |
+   +----------------------------+
+   |             |              |
+   v             v              v
+Validation   Classroom       Teacher
+Service      Recommendations Recommendations
+   |             |              |
+   +-------------+--------------+
+                 |
+                 v
+         ApplicationDbContext
+                 |
+                 v
+             PostgreSQL
 ```
 
-This structure keeps scheduling logic separate from HTTP request handling.
+The controller also supports schedule queries and filtering.
+
+The exact services used depend on the action being executed.
 
 ---
 
-## 18. Schedule Generation Flow
+## 18. Automatic Schedule Generation
 
-The automatic generation process can be represented as:
+Automatic schedule generation uses a dedicated controller and service.
+
+The workflow includes a preview before the generated schedule is saved.
 
 ```text
-Start Generation
-       ↓
-Load Groups
-       ↓
-Load Subjects
-       ↓
-Load Teachers
-       ↓
-Load Classrooms
-       ↓
-Load Generation Settings
-       ↓
-Build Possible Assignments
-       ↓
-Check Constraints
-       ↓
-Assign Time Slots
-       ↓
-Validate Generated Schedule
-       ↓
-Save Results
+ScheduleGeneratorController
+            |
+            v
+Validate Generation Request
+            |
+            v
+ScheduleGeneratorService
+            |
+            v
+Load Required Data
+            |
+            v
+Evaluate Candidate Assignments
+            |
+            v
+Apply Scheduling Constraints
+            |
+            v
+Return Generation Result
+            |
+            v
+Display Preview
+            |
+            v
+User Confirms Save
+            |
+            v
+Persist Schedule Changes
 ```
 
-The generator attempts to satisfy the configured constraints.
+The generator works with selected groups, days, time slots and generation settings.
+
+The request model defines its own default values. The controller may provide different initial values when constructing the form model. Consequently, model defaults and the defaults displayed by the user interface are not necessarily identical.
+
+Generation success depends on the supplied data and the constraints that can be satisfied. The system should not be described as guaranteeing a valid complete timetable for every input.
 
 ---
 
 ## 19. Schedule Validation Flow
 
-Validation follows a similar architecture:
+Schedule validation is handled by `ScheduleValidationService`.
+
+A simplified flow is:
 
 ```text
 Schedule Input
-      ↓
-ScheduleValidationService
-      ↓
-Check Time
-      ↓
-Check Teacher
-      ↓
-Check Group
-      ↓
-Check Classroom
-      ↓
-Check Capacity
-      ↓
-Check Classroom Category
-      ↓
-Validation Result
+      |
+      v
+Check Basic Values
+      |
+      v
+Load Related Entities
+      |
+      v
+Check Course Compatibility
+      |
+      v
+Check Teacher–Subject Assignment
+      |
+      v
+Check Capacity and Requirements
+      |
+      v
+Check Scheduling Conflicts
+      |
+      v
+Return Validation Result
 ```
 
-This allows schedule-related rules to be centralized.
+The service returns a validation result that may contain errors and additional warning information.
+
+Some checks may require user confirmation, depending on the rule and the controller workflow. The exact behavior is defined by the validation result and the action that consumes it.
 
 ---
 
-## 20. Classroom Recommendation Flow
+## 20. Classroom Recommendations
 
-The classroom recommendation process is:
+Classroom recommendations help identify rooms that may be suitable for a lesson.
+
+The general process is:
 
 ```text
-Subject
-   +
-Group
-   ↓
-Read Subject Requirements
-   ↓
-Read Group Size
-   ↓
-Find Classrooms
-   ↓
-Filter by Category
-   ↓
-Filter by Capacity
-   ↓
-Check Availability
-   ↓
-Return Recommendations
+Schedule Requirements
+          |
+          v
+Read Group and Subject Data
+          |
+          v
+Find Candidate Classrooms
+          |
+          v
+Evaluate Category Requirements
+          |
+          v
+Evaluate Capacity
+          |
+          v
+Check Availability and Conflicts
+          |
+          v
+Return Suitable Candidates
 ```
 
-The recommendation service is used to reduce manual classroom selection.
+The relevant requirements depend on the subject, group and classroom configuration.
+
+Recommendations support the scheduling process but do not replace the final validation of a schedule.
 
 ---
 
 ## 21. Notification Architecture
 
-Notifications are stored in the database and displayed through the application's notification interface.
+The application includes notification-related models, a notification controller and a notification bell ViewComponent.
 
-The architecture is approximately:
+The general presentation flow is:
 
 ```text
-Schedule/Event
-      ↓
-Notification Creation
-      ↓
-PostgreSQL
-      ↓
-NotificationBell / Notifications Page
-      ↓
-User
+Notification Data
+       |
+       v
+Application Database
+       |
+       v
+Notification Controller / ViewComponent
+       |
+       v
+Notification Interface
 ```
 
-The notification bell is implemented using a ViewComponent.
+The `Notification` entity is exposed through `ApplicationDbContext`.
+
+The ViewComponent is responsible for rendering the notification-bell component. Notification creation, delivery and read-state behavior depend on the corresponding controller and service implementation.
+
+The presence of a notification model does not imply the use of a separate message broker or real-time push infrastructure.
 
 ---
 
-## 22. Audit Architecture
+## 22. Audit Logging
 
-Important actions can be recorded in the audit log.
+The application includes an `AuditLog` model and an `AuditLogsController`.
 
-The general flow is:
+The general data flow is:
 
 ```text
-Administrative Action
-        ↓
-Audit Logging
-        ↓
-AuditLog Entity
-        ↓
+Application Action
+        |
+        v
+Audit Log Entry
+        |
+        v
+ApplicationDbContext
+        |
+        v
 PostgreSQL
-        ↓
-Audit Logs Interface
+        |
+        v
+Audit Log Interface
 ```
 
-Audit information can be used to investigate changes and administrative activity.
+Audit records can provide a history of selected application events when the relevant logging code records them.
+
+The actual set of tracked events depends on the implementation. The existence of an audit-log entity alone does not mean that every application action is automatically recorded.
 
 ---
 
 ## 23. Export Architecture
 
-Schedule export is separated from the main schedule controller logic.
+Schedule export is separated into `ScheduleExportService`.
 
-The general flow is:
+The general workflow is:
 
 ```text
-Schedule Request
-      ↓
-SchedulesController
-      ↓
+Export Request
+      |
+      v
+Controller Action
+      |
+      v
 ScheduleExportService
-      ↓
-Format Generation
-      ↓
-PDF / Excel / CSV
-      ↓
-File Download
+      |
+      v
+Generate Document
+      |
+      v
+Return Download Response
 ```
 
-This allows export functionality to be maintained independently from the schedule management interface.
+The project references ClosedXML and QuestPDF.
+
+- ClosedXML is used for Excel workbook generation.
+- QuestPDF is used for PDF document generation.
+
+The exact export actions and document types should be verified in the controller and service implementations.
+
+Additional formats should only be documented after their implementation has been confirmed.
 
 ---
 
-## 24. Razor Views
+## 24. Razor Views and Presentation
 
-The presentation layer uses Razor Views.
+The presentation layer is implemented with Razor Views.
 
-Views are organized by feature:
+Views are organized by feature, including account management, analytics, audit logs, classrooms, groups, notifications, schedule management, subjects and teachers.
 
-```text
-Views/
-├── Account/
-├── Analytics/
-├── AuditLogs/
-├── Classrooms/
-├── Groups/
-├── Home/
-├── Notifications/
-├── ScheduleGenerator/
-├── Schedules/
-├── Subjects/
-└── Teachers/
-```
+Razor Views render server-provided data and generate HTML responses.
 
-Each feature has its own UI components and forms.
+The presentation layer may use ViewModels, view data and model-binding mechanisms to transfer data between controller actions and views.
 
 ---
 
 ## 25. Frontend Architecture
 
-The frontend is based on:
+The frontend uses:
 
-* Razor;
-* HTML5;
-* CSS3;
-* JavaScript.
+- Razor;
+- HTML5;
+- CSS3;
+- JavaScript.
 
-The interface uses solid white surfaces, blue accents, shared controls and responsive page layouts. The existing site.css, liquid-glass.css and page styles retain their paths; presentation responsibilities and validation limits are documented in TechnicalDocumentation.md, section 29.
+CSS and JavaScript assets are served from the web root, including `wwwroot/css` and `wwwroot/js`.
 
-Styles are separated into dedicated CSS files where appropriate.
+The application interface combines shared styling with feature-specific presentation and client-side interactions.
 
-Examples include:
+Client-side validation and interaction improve usability, but server-side validation remains necessary because client-side checks can be bypassed.
 
-```text
-Profile.css
-Settings.css
-ProgramSettings.css
-StudyLoad.css
-liquid-glass.css
-```
-
-The frontend is responsible for presentation and client-side interactions while server-side validation remains authoritative.
+The exact stylesheet names and their responsibilities should be maintained in accordance with the current contents of `wwwroot`.
 
 ---
 
 ## 26. Request Lifecycle
 
-A typical request follows this process:
+A typical page request follows the ASP.NET Core request pipeline.
 
 ```text
 Browser
-  │
-  ▼
-ASP.NET Core Middleware
-  │
-  ▼
-Routing
-  │
-  ▼
-Controller
-  │
-  ├── ViewModel
-  │
-  ├── Service
-  │
-  └── ApplicationDbContext
-           │
-           ▼
-       PostgreSQL
-           │
-           ▼
-       Controller
-           │
-           ▼
-       Razor View
-           │
-           ▼
-        Browser
+   |
+   v
+HTTPS Redirection
+   |
+   v
+Static Files / Routing
+   |
+   v
+Authentication Middleware
+   |
+   v
+Session Middleware
+   |
+   v
+Authorization Middleware
+   |
+   v
+Controller Action
+   |
+   +------------------+
+   |                  |
+   v                  v
+Application       ApplicationDbContext
+Services               |
+   |                   v
+   |              Entity Framework Core
+   |                   |
+   +-------------------+
+                       |
+                       v
+                   PostgreSQL
+                       |
+                       v
+                Controller Result
+                       |
+                       v
+                   Razor View
+                       |
+                       v
+                    Browser
 ```
 
-This is the standard server-side MVC request lifecycle used by the application.
+The exact middleware path depends on the requested resource and the configured pipeline. Static-file requests, for example, may be handled without executing a controller action.
 
 ---
 
 ## 27. Separation of Responsibilities
 
-The project follows a separation of responsibilities.
+The main responsibilities are divided as follows.
 
 ### Controllers
 
-Handle requests and coordinate operations.
+Receive requests, coordinate operations and return responses.
 
 ### Services
 
-Contain reusable application and business logic.
+Implement reusable application operations and complex processing.
 
 ### Models
 
-Represent domain and database entities.
+Represent application entities and domain-related data.
 
 ### ViewModels
 
-Represent data required by presentation forms and pages.
+Represent data structures tailored to presentation requirements.
 
-### Views
+### Razor Views
 
-Render the user interface.
+Render HTML pages and forms.
 
-### DbContext
+### ApplicationDbContext
 
-Provides access to persistent data.
+Provides Entity Framework Core access to application and Identity entities.
+
+### Entity Framework Core
+
+Maps objects to relational data and executes database operations.
 
 ### PostgreSQL
 
-Stores persistent information.
+Stores persistent application data.
+
+These responsibilities describe the logical architecture. Some straightforward data-access operations remain in controllers.
 
 ---
 
 ## 28. Configuration
 
-Application configuration is handled through the ASP.NET Core configuration system.
+Application configuration is managed through the ASP.NET Core configuration system.
 
-Configuration can include:
+Configuration includes values such as:
 
-* database connection;
-* administrator password;
-* environment-specific settings;
-* application behavior.
+- database connection strings;
+- administrator account settings;
+- environment-specific behavior;
+- application options.
 
-Sensitive configuration values should not be committed to source control.
+The application uses the `DefaultConnection` connection-string setting for PostgreSQL.
+
+The administrator seed process reads the administrator password from configuration. Environment variables can provide nested configuration values using double underscores, for example:
+
+```text
+Admin__Password
+```
+
+Sensitive credentials should be supplied through environment-specific configuration or an appropriate secrets-management mechanism rather than committed to source control.
+
+The exact configuration requirements depend on the deployment environment.
 
 ---
 
 ## 29. Security Architecture
 
-The security model contains several layers:
+The security architecture combines authentication, authorization, validation and controlled data access.
 
 ```text
+Incoming Request
+       |
+       v
 Authentication
-      ↓
+       |
+       v
 Authorization
-      ↓
-Server-side Validation
-      ↓
-Entity Framework / Database Constraints
-      ↓
+       |
+       v
+Controller and Server-Side Validation
+       |
+       v
+Application Logic
+       |
+       v
+Entity Framework Core
+       |
+       v
 PostgreSQL
 ```
 
-The application also avoids storing the administrator password directly in source code.
+Relevant security mechanisms include:
 
-The administrator password is supplied through configuration/environment variables.
+- ASP.NET Core Identity;
+- role-based authorization;
+- password policy;
+- account lockout configuration;
+- antiforgery validation on applicable form actions;
+- server-side input validation;
+- environment-based secret configuration.
+
+The administrator password is read through configuration rather than hard-coded into the seeding logic.
+
+Security depends on the full implementation and deployment configuration. This architecture description is not a substitute for a security audit.
 
 ---
 
-## 30. Error Handling
+## 30. Error Handling and Validation
 
-The application validates input and schedule-related operations before saving data.
+The application uses input validation and operation-specific checks to identify invalid data and scheduling problems.
 
-Examples of validation include:
+Examples include:
 
-* invalid time ranges;
-* schedule conflicts;
-* incompatible classrooms;
-* insufficient classroom capacity;
-* invalid teacher-subject assignments.
+- invalid time ranges;
+- missing related entities;
+- incompatible group and subject courses;
+- classroom capacity limitations;
+- teacher-subject assignment warnings;
+- scheduling conflicts.
 
-Validation results are returned to the user through the application interface.
+Validation results are handled by the relevant controller and presented through the application interface.
+
+The application also configures an exception handler for non-development environments.
+
+The behavior of a specific error depends on the relevant controller, service and middleware configuration.
 
 ---
 
 ## 31. Database Migrations
 
-Entity Framework Core migrations provide controlled database schema evolution.
+Entity Framework Core migrations are used to manage changes to the database schema.
 
-The migration flow is:
+The general workflow is:
 
 ```text
-Model Change
-    ↓
-Migration Creation
-    ↓
-Migration File
-    ↓
-Database Update
-    ↓
-PostgreSQL Schema
+Model or Mapping Change
+          |
+          v
+Create Migration
+          |
+          v
+Review Migration Files
+          |
+          v
+Apply Migration
+          |
+          v
+Updated Database Schema
 ```
 
-Typical commands:
+Typical commands include:
 
 ```powershell
 dotnet ef migrations add MigrationName
 dotnet ef database update
 ```
 
+Run these commands from the project directory with the required .NET tooling and database configuration available.
+
+Migrations should be reviewed before being applied to a production database.
+
 ---
 
 ## 32. Build and Verification
 
-Before a release, the application should be verified using:
+The project can be built with the .NET CLI.
 
 ```powershell
+dotnet restore
 dotnet build
 ```
 
-The Entity Framework model can be checked using:
+The build checks compilation and reports compiler errors and warnings.
+
+When supported by the installed Entity Framework Core tooling, pending model changes can be checked with:
 
 ```powershell
 dotnet ef migrations has-pending-model-changes
 ```
 
-The project should build successfully without unexpected model changes.
+A successful build does not prove that all application workflows are correct. Database connectivity, authentication, generation, validation, export and other important features should also be tested.
 
 ---
 
 ## 33. Git Workflow
 
-The project uses Git for version control.
+Git is used for source control, and GitHub hosts the remote repository.
 
-The general workflow is:
+A typical development workflow is:
 
 ```text
-Modify Code
-    ↓
-Test
-    ↓
-dotnet build
-    ↓
+Modify Source Files
+        |
+        v
+Review Changes
+        |
+        v
+Run Build and Tests
+        |
+        v
+Inspect Git Status
+        |
+        v
+Commit Changes
+        |
+        v
+Push to GitHub
+```
+
+Typical commands include:
+
+```powershell
 git status
-    ↓
-git add
-    ↓
-git commit
-    ↓
+git add .
+git commit -m "Describe the changes"
 git push
 ```
 
-The remote repository is hosted on GitHub.
+Changes should be reviewed before committing to avoid including credentials, generated artifacts or unrelated files.
 
 ---
 
 ## 34. Maintainability
 
-The architecture is designed to make future changes easier.
-
-For example:
-
-### New export format
-
-Can be implemented within the export layer without redesigning the entire scheduling system.
+The architecture provides several clear locations for future changes.
 
 ### New validation rule
 
-Can be added to the schedule validation service.
+A scheduling rule can be added to the relevant validation logic and integrated into the applicable workflow.
 
 ### New recommendation rule
 
-Can be added to the classroom recommendation service.
+Classroom or teacher recommendation behavior can be updated in the corresponding service.
+
+### New export format
+
+A new document format can be implemented in the export service and exposed through an appropriate controller action.
 
 ### New UI page
 
-Can be implemented through a controller, ViewModel and Razor View.
+A new feature can use a controller action, Razor View and ViewModel where appropriate.
 
 ### New database entity
 
-Can be added through a model, `DbSet`, Entity Framework configuration and migration.
+A new persistent entity may require a model, context configuration, relationships and a database migration.
+
+The exact changes depend on the feature and its dependencies.
 
 ---
 
 ## 35. Scalability Considerations
 
-The current architecture is suitable for a college-level scheduling application.
+The current architecture is appropriate for a college-level timetable management application.
 
-If the system is expanded to support significantly larger organizations, possible improvements include:
+If the workload or number of users grows significantly, possible improvements include:
 
-* database indexing optimization;
-* caching;
-* asynchronous background schedule generation;
-* distributed processing;
-* stronger logging infrastructure;
-* API separation;
-* automated testing;
-* pagination for large datasets.
+- reviewing database indexes and query performance;
+- introducing pagination for large datasets;
+- adding caching where data can safely be reused;
+- moving long-running generation operations to background processing;
+- improving structured logging and monitoring;
+- adding automated unit and integration tests;
+- introducing API endpoints where required;
+- optimizing database transactions and concurrency handling.
 
-These improvements are not required for the current project scope.
+These are potential future improvements, not claims that the current application already implements them.
 
 ---
 
 ## 36. Current Architecture Summary
 
-The current architecture can be summarized as:
+The application can be summarized as follows:
 
 ```text
-                    ┌─────────────────────┐
-                    │       Browser       │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │    ASP.NET Core     │
-                    │        MVC          │
-                    └──────────┬──────────┘
-                               │
-              ┌────────────────┼────────────────┐
-              │                │                │
-              ▼                ▼                ▼
-        Controllers        ViewModels         Views
-              │
-              ▼
-          Services
-              │
-              ▼
-     ApplicationDbContext
-              │
-              ▼
-         Entity Framework
-              │
-              ▼
-          PostgreSQL
+                         Browser
+                            |
+                            v
+                   ASP.NET Core MVC
+                            |
+                            v
+                       Controllers
+                            |
+               +------------+------------+
+               |                         |
+               v                         v
+           App Services            Razor Views
+               |
+               v
+       ApplicationDbContext
+               |
+               v
+       Entity Framework Core
+               |
+               v
+           PostgreSQL
 ```
+
+ASP.NET Core Identity integrates with the same Entity Framework Core context.
+
+The application also includes dedicated components for schedule validation, automatic generation, recommendations, export, notifications and audit-related functionality.
 
 ---
 
 ## 37. Architectural Principles
 
-ScheduleSystem follows several important principles:
+The application is organized around the following principles:
 
-1. Separation of concerns.
-2. MVC-based presentation architecture.
-3. Dedicated services for complex business operations.
-4. Entity Framework Core for data access.
+1. MVC-based request handling and presentation.
+2. Separation of presentation, application logic and data access.
+3. Dedicated services for reusable and complex operations.
+4. Entity Framework Core for relational data access.
 5. PostgreSQL for persistent storage.
-6. Dependency injection.
-7. Role-based authorization.
-8. Migration-based database management.
-9. ViewModels for presentation-specific data.
-10. Centralized schedule validation.
-11. Centralized schedule generation.
-12. Separation of export functionality.
+6. Dependency injection for application components.
+7. ASP.NET Core Identity for authentication.
+8. Role-based authorization for protected operations.
+9. Entity Framework Core migrations for schema evolution.
+10. ViewModels for presentation-specific data where appropriate.
+11. Dedicated schedule-generation and validation components.
+12. A separate service for schedule export.
+
+These principles describe the current structure and intended organization of the application. They do not imply that every feature has independent projects or that all business logic resides exclusively in services.
 
 ---
 
 ## 38. Conclusion
 
-ScheduleSystem uses a structured ASP.NET Core MVC architecture that separates the user interface, request handling, business logic and persistent storage.
+ScheduleSystem is an ASP.NET Core MVC application built with .NET 8, Entity Framework Core and PostgreSQL.
 
-The architecture provides dedicated components for the most complex parts of the system:
+Its architecture combines controllers, Razor Views, application services and a shared database context to support timetable management.
 
-* schedule validation;
-* automatic schedule generation;
-* classroom recommendations;
-* schedule export;
-* authentication;
-* notifications;
-* audit logging.
+The main functional areas include:
 
-This structure makes the project easier to understand, maintain and extend while keeping the current implementation appropriate for a college timetable management system.
+- management of teachers, subjects, groups and classrooms;
+- schedule creation and filtering;
+- schedule validation;
+- automatic schedule generation with preview and confirmation;
+- classroom and teacher recommendation functionality;
+- Excel and PDF export capabilities;
+- Identity-based authentication and role-based authorization;
+- notification and audit-related functionality.
+
+The architecture is suitable for the current project scope and provides identifiable components for future maintenance and extension.
+
+Further architectural improvements can be introduced as testing, performance, deployment and functional requirements evolve.
